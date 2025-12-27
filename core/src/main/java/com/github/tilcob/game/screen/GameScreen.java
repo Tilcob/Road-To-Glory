@@ -1,0 +1,131 @@
+package com.github.tilcob.game.screen;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.ScreenAdapter;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tilcob.game.GdxGame;
+import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.assets.SkinAsset;
+import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.input.GameControllerState;
+import com.github.tilcob.game.input.KeyboardController;
+import com.github.tilcob.game.system.*;
+import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
+import com.github.tilcob.game.tiled.TiledManager;
+import com.github.tilcob.game.ui.model.GameViewModel;
+import com.github.tilcob.game.ui.view.GameView;
+
+import java.util.function.BiConsumer;
+import java.util.function.Consumer;
+
+public class GameScreen extends ScreenAdapter {
+    private final Engine engine;  // Could also be done with PoolingEngine for better performance in Java
+    private final TiledManager tiledManager;
+    private final TiledAshleyConfigurator tiledAshleyConfigurator;
+    private final KeyboardController keyboardController;
+    private final GdxGame game;
+    private final World physicWorld;
+    private final AudioManager audioManager;
+    private final Stage stage;
+    private final Viewport uiViewport;
+    private final GameViewModel viewModel;
+    private final Skin skin;
+
+    public GameScreen(GdxGame game) {
+        this.game = game;
+        this.engine = new Engine();
+        this.physicWorld = new World(Constants.GRAVITY, true);
+        this.physicWorld.setAutoClearForces(false);
+        this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld);
+        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld);
+        this.keyboardController = new KeyboardController(GameControllerState.class, engine, null);
+        this.audioManager = game.getAudioManager();
+        this.uiViewport = new FitViewport(320f, 180f);
+        this.stage = new Stage(uiViewport, game.getBatch());
+        this.viewModel = new GameViewModel(game);
+        this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
+
+        this.engine.addSystem(new ControllerSystem(game));
+        this.engine.addSystem(new PhysicMoveSystem());
+        this.engine.addSystem(new AttackSystem(physicWorld, audioManager));
+        this.engine.addSystem(new FsmSystem());
+        this.engine.addSystem(new FacingSystem());
+        this.engine.addSystem(new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL));
+        this.engine.addSystem(new DamageSystem(viewModel));
+        this.engine.addSystem(new LifeSystem(viewModel));
+        this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
+        this.engine.addSystem(new TriggerSystem(audioManager));
+        this.engine.addSystem(new CameraSystem(game.getCamera()));
+        this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
+        this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
+
+        // DamagedSystem must run after FsmSystem to correctly
+        // detect when a damaged animation should be played.
+        // This is done by checking if an entity has a Damaged component,
+        // and this component is removed in the DamagedSystem.
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        super.resize(width, height);
+        uiViewport.update(width, height, true);
+    }
+
+    @Override
+    public void show() {
+        game.setInputProcessors(stage, keyboardController);
+        keyboardController.setActiveState(GameControllerState.class);
+
+        stage.addActor(new GameView(skin, stage, viewModel));
+
+        Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
+        Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
+        Consumer<TiledMap> audioConsumer = audioManager::setMap;
+
+        tiledManager.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer).andThen(audioConsumer));
+        tiledManager.setLoadObjectConsumer(tiledAshleyConfigurator::onLoadObject);
+        tiledManager.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
+        tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
+
+        TiledMap map = tiledManager.loadMap(MapAsset.MAIN);
+        tiledManager.setMap(map);
+    }
+
+    @Override
+    public void hide() {
+        engine.removeAllEntities();
+        stage.clear();
+    }
+
+    @Override
+    public void render(float delta) {
+        delta = Math.min(delta, 1 / 30f);
+        engine.update(delta);
+
+        uiViewport.apply();
+        stage.getBatch().setColor(Color.WHITE);
+        stage.act(delta);
+        stage.draw();
+    }
+
+    @Override
+    public void dispose() {
+        for (EntitySystem system : engine.getSystems()) {
+            if (system instanceof Disposable disposable) {
+                disposable.dispose();
+            }
+        }
+        physicWorld.dispose();
+        stage.dispose();
+    }
+}
