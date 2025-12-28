@@ -8,11 +8,11 @@
     ],
     "fileStates": {
         "main.tmx": {
-            "scale": 1.2033333333333331,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 240.16620498614967,
-                "y": 239.7506925207757
+                "x": 193,
+                "y": 268.5
             }
         },
         "objects.tsx": {
@@ -34,7 +34,7 @@
     ],
     "project": "Road-To-Glory.tiled-project",
     "recentFiles": [
-        "objects.tsx",
-        "main.tmx"
+        "main.tmx",
+        "objects.tsx"
     ]
 }

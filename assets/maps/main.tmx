@@ -1,16 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="30" tilewidth="16" tileheight="16" infinite="0" nextlayerid="5" nextobjectid="1">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
+ <properties>
+  <property name="music" value="TOWN"/>
+ </properties>
  <tileset firstgid="1" source="terrain.tsx"/>
- <layer id="1" name="Ground" width="30" height="30">
+ <tileset firstgid="193" source="objects.tsx"/>
+ <layer id="1" name="ground" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJzt0LENACAIBdGP9vTK/nvKCBQYLa549SXnkhwAADxjaRTM5u5KuyA+eAQAuOMAWFYxOQ==
+   eJzjY2Bg4BvkeBsSHm72YrNjoOwdLmGKCzMCMfMAuIUXiPnR7ER2A63t3cZA33BHt5de8YscztgwrcJg1N6BiV9QfmZigORpeuQjZP42BtQ8TQt7JYFYGo0vhSZGbzxQZfdQxQCRHD2x
   </data>
  </layer>
- <layer id="2" name="Water" width="30" height="30">
+ <layer id="2" name="background" width="30" height="20">
   <data encoding="base64" compression="zlib">
-   eJztwQEBAAAAgiD/r25IQAEAAPBoDhAAAQ==
+   eJxjYBgFAwFYgJgViNlopB4XEABiTiAWopF6XEAGiGWBWI5G6kfBKEAH1MozpAJq5RlSwWieGZpgNJ0OXwAA36YCRQ==
   </data>
  </layer>
- <objectgroup id="3" name="Objects"/>
- <objectgroup id="4" name="Trigger"/>
+ <objectgroup id="3" name="objects">
+  <object id="1" name="Player" gid="196" x="81" y="305.667" width="32" height="32">
+   <properties>
+    <property name="cameraFollow" type="bool" value="true"/>
+    <property name="controller" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="2" gid="195" x="68.6667" y="301.333" width="41" height="63"/>
+  <object id="3" gid="195" x="251.333" y="205.333" width="41" height="63"/>
+  <object id="4" gid="195" x="365.333" y="89.3333" width="41" height="63"/>
+  <object id="5" gid="194" x="346" y="232.667" width="80" height="112"/>
+  <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
+  <object id="12" gid="197" x="329.333" y="288.667" width="32" height="32"/>
+  <object id="13" gid="193" x="136" y="272.667" width="16" height="16"/>
+ </objectgroup>
+ <objectgroup id="5" name="trigger">
+  <object id="9" name="trap_trigger" type="Trigger" x="255.333" y="271.697" width="16.3636" height="16.7273">
+   <properties>
+    <property name="id" type="int" value="11"/>
+    <property name="sensor" type="bool" value="true"/>
+    <property name="triggerType" value="TRAP"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <layer id="4" name="foreground" width="30" height="20">
+  <data encoding="base64" compression="zlib">
+   eJztwTEBAAAAwqD1T20JT6AAAHgaCWAAAQ==
+  </data>
+ </layer>
 </map>

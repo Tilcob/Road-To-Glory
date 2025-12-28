@@ -1,12 +1,124 @@
 package com.github.tilcob.game;
 
-import com.badlogic.gdx.Game;
-import com.github.tilcob.game.screen.FirstScreen;
+import com.badlogic.gdx.*;
+import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.graphics.FPSLogger;
+import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
+import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tilcob.game.assets.AssetManager;
+import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.screen.LoadingScreen;
+
+import java.util.HashMap;
+import java.util.Map;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GdxGame extends Game {
+    private Batch batch;
+    private OrthographicCamera camera;
+    private Viewport viewport;
+    private AssetManager assetManager;
+    private AudioManager audioManager;
+    private GLProfiler glProfiler;
+    private FPSLogger fpsLogger;
+    private InputMultiplexer inputMultiplexer;
+    private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
+
     @Override
     public void create() {
-        setScreen(new FirstScreen());
+        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        inputMultiplexer = new InputMultiplexer();
+        Gdx.input.setInputProcessor(inputMultiplexer);
+
+        batch = new SpriteBatch();
+        camera = new OrthographicCamera();
+        viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
+        assetManager = new AssetManager(new InternalFileHandleResolver());
+        audioManager = new AudioManager(assetManager);
+        glProfiler = new GLProfiler(Gdx.graphics);
+        fpsLogger = new FPSLogger();
+
+        glProfiler.enable();
+        addScreen(new LoadingScreen(this, assetManager));
+        setScreen(LoadingScreen.class);
+    }
+
+    @Override
+    public void resize(int width, int height) {
+        viewport.update(width, height, true);
+        super.resize(width, height);
+    }
+
+    @Override
+    public void render() {
+        glProfiler.reset();
+        Gdx.gl.glClearColor(0, 0, 0, 1);
+        Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+
+        super.render();
+
+        Gdx.graphics.setTitle("GdxGame - Draw Cals: " + glProfiler.getDrawCalls()); // Draw calls should be minimized!!
+        fpsLogger.log();
+    }
+
+    public void addScreen(Screen screen) {
+        screenCache.put(screen.getClass(), screen);
+    }
+
+    public void removeScreen(Screen screen) {
+        screenCache.remove(screen.getClass());
+    }
+
+    public void setScreen(Class<? extends Screen> screenClass) {
+        Screen screen = screenCache.get(screenClass);
+        if (screen == null) {
+            throw new GdxRuntimeException("No screen with class: " + screenClass + " found in the screen cache.");
+        }
+        super.setScreen(screen);
+    }
+
+    @Override
+    public void dispose() {
+        screenCache.values().forEach(Screen::dispose);
+        screenCache.clear();
+        batch.dispose();
+        assetManager.debugDiagnostics();
+        assetManager.dispose();
+    }
+
+    public Batch getBatch() {
+        return batch;
+    }
+
+    public OrthographicCamera getCamera() {
+        return camera;
+    }
+
+    public Viewport getViewport() {
+        return viewport;
+    }
+
+    public AssetManager getAssetManager() {
+        return assetManager;
+    }
+
+    public AudioManager getAudioManager() {
+        return audioManager;
+    }
+
+    public void setInputProcessors(InputProcessor... processors) {
+        inputMultiplexer.clear();
+        if (processors == null) return;
+
+        for (InputProcessor processor : processors) {
+            inputMultiplexer.addProcessor(processor);
+        }
     }
 }

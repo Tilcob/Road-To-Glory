@@ -1,0 +1,243 @@
+package com.github.tilcob.game.tiled;
+
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.graphics.glutils.FileTextureData;
+import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
+import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.*;
+import com.github.tilcob.game.assets.AssetManager;
+import com.github.tilcob.game.assets.AtlasAsset;
+import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.config.Constants;
+
+public class TiledAshleyConfigurator {
+    private final Engine engine;
+    private final AssetManager assetManager;
+    private final World world;
+    private final Vector2 tmpVec2;
+    private final MapObjects tmpMapObjects;
+
+    public TiledAshleyConfigurator(Engine engine, AssetManager assetManager, World world) {
+        this.engine = engine;
+        this.assetManager = assetManager;
+        this.world = world;
+        this.tmpVec2 = new Vector2();
+        this.tmpMapObjects = new MapObjects();
+    }
+
+    public void onLoadObject(TiledMapTileMapObject object) {
+        Entity entity = engine.createEntity();
+        TiledMapTile tile = object.getTile();
+        TextureRegion region = getTextureRegion(tile);
+        int z = tile.getProperties().get(Constants.Z, 1, Integer.class);
+
+        entity.add(new Graphic(Color.WHITE.cpy(), region));
+        addEntityTransform(
+            object.getX(), object.getY(), z,
+            region.getRegionWidth(), region.getRegionHeight(),
+            object.getScaleX(), object.getScaleY(), entity
+        );
+        addEntityController(object, entity);
+        addEntityMove(tile, entity);
+        addEntityAnimation(tile, entity);
+        BodyDef.BodyType bodyType = getObjectBodyType(tile);
+        addEntityPhysic(tile.getObjects(), bodyType, Vector2.Zero, entity);
+        addEntityCameraFollow(object, entity);
+        addEntityLife(tile, entity);
+        addEntityPlayer(object, entity);
+        addEntityAttack(tile, entity);
+        entity.add(new Facing(Facing.FacingDirection.DOWN));
+        entity.add(new Fsm(entity));
+        entity.add(new Tiled(object));
+
+        engine.addEntity(entity);
+    }
+
+    private void addEntityPlayer(TiledMapTileMapObject object, Entity entity) {
+        if (Constants.PLAYER_NAME.equals(object.getName())) {
+            entity.add(new Player());
+        }
+    }
+
+    private void addEntityLife(TiledMapTile tile, Entity entity) {
+        int life = tile.getProperties().get(Constants.LIFE, 0, Integer.class);
+        if (life == 0) return;
+
+        float lifeRegeneration = tile.getProperties().get(Constants.LIFE_REGENERATION, 0f, Float.class);
+        entity.add(new Life(life, lifeRegeneration));
+    }
+
+    private void addEntityAttack(TiledMapTile tile, Entity entity) {
+        float damage = tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
+        if (damage == 0) return;
+
+        float damageDelay = tile.getProperties().get(Constants.DAMAGE_DELAY, 0f, Float.class);
+        String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
+        SoundAsset soundAsset = null;
+        if (!soundAssetStr.isBlank()) {
+            soundAsset = SoundAsset.valueOf(soundAssetStr);
+        }
+
+        entity.add(new Attack(damage, damageDelay, soundAsset));
+    }
+
+    private void addEntityCameraFollow(TiledMapTileMapObject object, Entity entity) {
+        boolean cameraFollow = object.getProperties().get(Constants.CAMERA_FOLLOW, false, Boolean.class);
+
+        if (!cameraFollow) return;
+
+        entity.add(new CameraFollow());
+    }
+
+    private BodyDef.BodyType getObjectBodyType(TiledMapTile tile) {
+        String classType = tile.getProperties().get(Constants.TYPE, "", String.class);
+
+        if (Constants.PROP.equals(classType)) {
+            return BodyDef.BodyType.StaticBody;
+        }
+
+        String bodyTypeStr = tile.getProperties().get(Constants.BODY_TYPE, "DynamicBody", String.class);
+        return BodyDef.BodyType.valueOf(bodyTypeStr);
+    }
+
+    private void addEntityPhysic(MapObjects mapObjects, BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity) {
+        if (mapObjects.getCount() == 0) return;
+
+        Transform transform = Transform.MAPPER.get(entity);
+        Vector2 position = transform.getPosition();
+        Vector2 scaling = transform.getScaling();
+
+        Body body = createBody(mapObjects, position, scaling, bodyType, relativeTo, entity);
+        entity.add(new Physic(body, transform.getPosition().cpy()));
+    }
+
+    private void addEntityPhysic(MapObject mapObject, BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity) {
+        if (tmpMapObjects.getCount() > 0) tmpMapObjects.remove(0);
+        tmpMapObjects.add(mapObject);
+        addEntityPhysic(tmpMapObjects, bodyType, relativeTo, entity);
+    }
+
+    private void addEntityAnimation(TiledMapTile tile, Entity entity) {
+        String animationStr = tile.getProperties().get(Constants.ANIMATION, "", String.class);
+        if (animationStr.isBlank()) return;
+
+        Animation2D.AnimationType animationType = Animation2D.AnimationType.valueOf(animationStr);
+        String atlasAssetStr = tile.getProperties().get(Constants.ATLAS_ASSET, AtlasAsset.OBJECTS.name(), String.class);
+        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        TextureAtlas textureAtlas = assetManager.get(atlasAsset);
+        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+        float animationSpeed = tile.getProperties().get(Constants.ANIMATION_SPEED, 0f, Float.class);
+
+        entity.add(new Animation2D(atlasAsset, atlasKey, animationType, Animation.PlayMode.LOOP, animationSpeed));
+    }
+
+    private void addEntityMove(TiledMapTile tile, Entity entity) {
+        float speed = tile.getProperties().get(Constants.SPEED, 0f, Float.class);
+        if (speed == 0) return;
+
+        entity.add(new Move(speed));
+    }
+
+    private void addEntityController(TiledMapTileMapObject object, Entity entity) {
+        boolean controller = object.getProperties().get(Constants.CONTROLLER, false, Boolean.class);
+        if(!controller) return;
+
+        entity.add(new Controller());
+    }
+
+    private void addEntityTransform(float x, float y, int z, float w, float h,
+                                    float scaleX, float scaleY, Entity entity) {
+        Vector2 position = new Vector2(x, y);
+        Vector2 size = new Vector2(w, h);
+        Vector2 scaling = new Vector2(scaleX, scaleY);
+
+        position.scl(Constants.UNIT_SCALE);
+        size.scl(Constants.UNIT_SCALE);
+
+        entity.add(new Transform(position, z, size, scaling, 0));
+    }
+
+    private TextureRegion getTextureRegion(TiledMapTile tile) {
+        String atlasAssetStr = tile.getProperties().get(Constants.ATLAS_ASSET, AtlasAsset.OBJECTS.name(), String.class);
+        AtlasAsset atlasAsset = AtlasAsset.valueOf(atlasAssetStr);
+        TextureAtlas textureAtlas = assetManager.get(atlasAsset);
+        FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
+        String atlasKey = textureData.getFileHandle().nameWithoutExtension();
+        TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
+
+        if  (region != null) return region;
+
+        return tile.getTextureRegion();
+    }
+
+    public void onLoadTile(TiledMapTile tile, float x, float y) {
+        createBody(
+            tile.getObjects(),
+            new Vector2(x, y),
+            Constants.DEFAULT_PHYSIC_SCALING,
+            BodyDef.BodyType.StaticBody,
+            Vector2.Zero,
+            Constants.ENVIRONMENT
+        );
+    }
+
+    private Body createBody(MapObjects mapObjects,
+                            Vector2 position,
+                            Vector2 scaling,
+                            BodyDef.BodyType bodyType,
+                            Vector2 relativeTo,
+                            Object userData) {
+        BodyDef bodyDef = new BodyDef();
+        bodyDef.type = bodyType;
+        bodyDef.position.set(position);
+        bodyDef.fixedRotation = true;
+
+        Body body = world.createBody(bodyDef);
+        body.setUserData(userData);
+        for (MapObject object : mapObjects) {
+            FixtureDef fixtureDef = TiledPhysics.fixtureDefOf(object, scaling, relativeTo);
+            if (fixtureDef == null) continue;
+            Fixture fixture = body.createFixture(fixtureDef);
+            fixture.setUserData(object.getName());
+            fixtureDef.shape.dispose();
+
+        }
+        return body;
+    }
+
+    public void onLoadTrigger(String triggerName, MapObject triggerMapObject) {
+        if (triggerMapObject instanceof RectangleMapObject rectMapObject) {
+            Entity entity = engine.createEntity();
+            Rectangle rectangle = rectMapObject.getRectangle();
+
+            addEntityTransform(
+                rectangle.getX(), rectangle.getY(), 0,
+                rectangle.getWidth(), rectangle.getHeight(),
+                1, 1, entity
+            );
+            addEntityPhysic(
+                triggerMapObject, BodyDef.BodyType.StaticBody,
+                tmpVec2.set(rectangle.getX(), rectangle.getY()).scl(Constants.UNIT_SCALE), entity
+            );
+            entity.add(new Trigger(triggerName));
+            entity.add(new Tiled(rectMapObject));
+
+            engine.addEntity(entity);
+        } else {
+            throw new IllegalArgumentException("Unsupported trigger map object: " + triggerMapObject);
+        }
+    }
+}

@@ -1,4 +1,4 @@
-package com.github.tilcob.game.asset;
+package com.github.tilcob.game.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
@@ -18,21 +18,21 @@ public class AssetManager implements Disposable {
     }
 
     public <T> T load(Asset<T> asset) {
-        assetManager.load(asset.getDescriptor());
+        assetManager.load(asset.getAssetDescriptor());
         assetManager.finishLoading();
-        return assetManager.get(asset.getDescriptor());
+        return assetManager.get(asset.getAssetDescriptor());
     }
 
     public <T> void queue(Asset<T> asset) {
-        assetManager.load(asset.getDescriptor());
+        assetManager.load(asset.getAssetDescriptor());
     }
 
     public <T> T get(Asset<T> asset) {
-        return assetManager.get(asset.getDescriptor());
+        return assetManager.get(asset.getAssetDescriptor());
     }
 
     public <T> void unload(Asset<T> asset) {
-        assetManager.unload(asset.getDescriptor().fileName);
+        assetManager.unload(asset.getAssetDescriptor().fileName);
     }
 
     public boolean update() {

@@ -1,4 +1,4 @@
-package com.github.tilcob.game.asset;
+package com.github.tilcob.game.assets;
 
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.maps.tiled.BaseTiledMapLoader;
@@ -7,17 +7,16 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 public enum MapAsset implements Asset<TiledMap> {
     MAIN("main.tmx");
 
-    private final AssetDescriptor<TiledMap> descriptor;
+    private final AssetDescriptor<TiledMap> mapAssetDescriptor;
 
-    MapAsset(String path) {
+    MapAsset(String mapName) {
         BaseTiledMapLoader.Parameters parameters = new BaseTiledMapLoader.Parameters();
         parameters.projectFilePath = "maps/Road-To-Glory.tiled-project";
-        this.descriptor = new AssetDescriptor<>("maps/" + path, TiledMap.class);
+        this.mapAssetDescriptor = new AssetDescriptor<>("maps/" + mapName, TiledMap.class, parameters);
     }
 
-
     @Override
-    public AssetDescriptor<TiledMap> getDescriptor() {
-        return descriptor;
+    public AssetDescriptor<TiledMap> getAssetDescriptor() {
+        return this.mapAssetDescriptor;
     }
 }
