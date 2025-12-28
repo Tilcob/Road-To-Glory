@@ -11,7 +11,7 @@ public enum MapAsset implements Asset<TiledMap> {
 
     MapAsset(String mapName) {
         BaseTiledMapLoader.Parameters parameters = new BaseTiledMapLoader.Parameters();
-        parameters.projectFilePath = "maps/gameworld.tiled-project";
+        parameters.projectFilePath = "maps/Road-To-Glory.tiled-project";
         this.mapAssetDescriptor = new AssetDescriptor<>("maps/" + mapName, TiledMap.class, parameters);
     }
 
