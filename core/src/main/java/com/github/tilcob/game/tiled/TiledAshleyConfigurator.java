@@ -9,12 +9,15 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.assets.SoundAsset;
@@ -56,8 +59,9 @@ public class TiledAshleyConfigurator {
         addEntityPhysic(tile.getObjects(), bodyType, Vector2.Zero, entity);
         addEntityCameraFollow(object, entity);
         addEntityLife(tile, entity);
-        addEntityPlayer(object, entity);
         addEntityAttack(tile, entity);
+        addEntityChest(tile, entity);
+        entity.add(new MapEntity());
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
         entity.add(new Tiled(object));
@@ -65,9 +69,11 @@ public class TiledAshleyConfigurator {
         engine.addEntity(entity);
     }
 
-    private void addEntityPlayer(TiledMapTileMapObject object, Entity entity) {
-        if (Constants.PLAYER_NAME.equals(object.getName())) {
-            entity.add(new Player());
+    private void addEntityChest(TiledMapTile tile, Entity entity) {
+        boolean hasInventory = tile.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
+
+        if (hasInventory) {
+            entity.add(new Chest());
         }
     }
 
@@ -218,26 +224,108 @@ public class TiledAshleyConfigurator {
         return body;
     }
 
-    public void onLoadTrigger(String triggerName, MapObject triggerMapObject) {
+    public void onLoadTrigger(Trigger.Type type, MapObject triggerMapObject) {
+
         if (triggerMapObject instanceof RectangleMapObject rectMapObject) {
-            Entity entity = engine.createEntity();
-            Rectangle rectangle = rectMapObject.getRectangle();
-
-            addEntityTransform(
-                rectangle.getX(), rectangle.getY(), 0,
-                rectangle.getWidth(), rectangle.getHeight(),
-                1, 1, entity
-            );
-            addEntityPhysic(
-                triggerMapObject, BodyDef.BodyType.StaticBody,
-                tmpVec2.set(rectangle.getX(), rectangle.getY()).scl(Constants.UNIT_SCALE), entity
-            );
-            entity.add(new Trigger(triggerName));
-            entity.add(new Tiled(rectMapObject));
-
-            engine.addEntity(entity);
+            makeRectTriggerEntity(triggerMapObject, rectMapObject, type);
+        } else if (triggerMapObject instanceof EllipseMapObject ellipseMapObj) {
+            makeEllipseTriggerEntity(triggerMapObject, ellipseMapObj, type);
+        } else if (triggerMapObject instanceof PolygonMapObject polygonMapObject) {
+            makePolygonTriggerEntity(triggerMapObject, polygonMapObject, type);
+        } else if (triggerMapObject instanceof PolylineMapObject polylineMapObject) {
+            makePolylineTriggerEntity(triggerMapObject, polylineMapObject, type);
         } else {
-            throw new IllegalArgumentException("Unsupported trigger map object: " + triggerMapObject);
+            throw new GdxRuntimeException("Unsupported trigger map object: " + triggerMapObject);
         }
+    }
+
+    private void makeRectTriggerEntity(MapObject triggerMapObject,
+                                       RectangleMapObject rectMapObject, Trigger.Type type) {
+        Entity entity = engine.createEntity();
+        Rectangle rectangle = rectMapObject.getRectangle();
+
+        addEntityTransform(
+            rectangle.getX(), rectangle.getY(), 0,
+            rectangle.getWidth(), rectangle.getHeight(),
+            1, 1, entity
+        );
+        addEntityPhysic(
+            triggerMapObject, BodyDef.BodyType.StaticBody,
+            tmpVec2.set(rectangle.getX(), rectangle.getY()).scl(Constants.UNIT_SCALE), entity
+        );
+        entity.add(new Trigger(type));
+        entity.add(new Tiled(rectMapObject));
+        entity.add(new MapEntity());
+
+        engine.addEntity(entity);
+    }
+
+    private void makeEllipseTriggerEntity(MapObject triggerMapObject,
+                                          EllipseMapObject ellipseMapObject, Trigger.Type type) {
+        Entity entity = engine.createEntity();
+        Ellipse ellipse = ellipseMapObject.getEllipse();
+
+        addEntityTransform(
+            ellipse.x + ellipse.width * .5f,
+            ellipse.y + ellipse.height * .5f, 0,
+            ellipse.width, ellipse.height,
+            1, 1, entity
+        );
+        addEntityPhysic(
+            triggerMapObject, BodyDef.BodyType.StaticBody,
+            tmpVec2.set(ellipse.x + ellipse.width * .5f, ellipse.y + ellipse.height * .5f).scl(Constants.UNIT_SCALE),
+            entity
+        );
+        entity.add(new Trigger(type));
+        entity.add(new Tiled(ellipseMapObject));
+        entity.add(new MapEntity());
+
+        engine.addEntity(entity);
+    }
+
+    private void makePolygonTriggerEntity(MapObject triggerMapObject,
+                                          PolygonMapObject polygonMapObject, Trigger.Type type) {
+        Entity entity = engine.createEntity();
+        Polygon polygon = polygonMapObject.getPolygon();
+
+        float[] vertices = polygon.getVertices();
+        float x = vertices[0];
+        float y = vertices[1];
+
+        addEntityTransform(
+            x, y, 0, 1, 1, 1, 1, entity
+        );
+        addEntityPhysic(
+            triggerMapObject, BodyDef.BodyType.StaticBody,
+            tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
+        );
+        entity.add(new Trigger(type));
+        entity.add(new Tiled(polygonMapObject));
+        entity.add(new MapEntity());
+
+        engine.addEntity(entity);
+    }
+
+    private void makePolylineTriggerEntity(MapObject triggerMapObject,
+                                           PolylineMapObject polylineMapObject, Trigger.Type type) {
+        Entity entity = engine.createEntity();
+        Polyline polyline = polylineMapObject.getPolyline();
+
+        float[] vertices = polyline.getVertices();
+        float x = vertices[0];
+        float y = vertices[1];
+
+        addEntityTransform(
+            x, y, 0, 1, 1, 1, 1, entity
+        );
+        addEntityPhysic(
+            triggerMapObject, BodyDef.BodyType.StaticBody,
+            tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
+        );
+        entity.add(new Trigger(type));
+        entity.add(new Tiled(polylineMapObject));
+        entity.add(new MapEntity());
+
+        engine.addEntity(entity);
     }
 }

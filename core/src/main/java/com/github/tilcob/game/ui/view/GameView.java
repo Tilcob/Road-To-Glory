@@ -39,8 +39,8 @@ public class GameView extends View<GameViewModel> {
 
     @Override
     protected void setupPropertyChanges() {
-        viewModel.onPropertyChange(Constants.LIFE_POINTS, Integer.class, this::updateLife);
-        viewModel.onPropertyChange(Constants.PLAYER_DAMAGE, Map.Entry.class, this::showDamage);
+        viewModel.onPropertyChange(Constants.LIFE_POINTS_PC, Integer.class, this::updateLife);
+        viewModel.onPropertyChange(Constants.PLAYER_DAMAGE_PC, Map.Entry.class, this::showDamage);
     }
 
     private void updateLife(int lifePoints) {

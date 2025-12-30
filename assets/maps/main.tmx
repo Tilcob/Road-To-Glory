@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="17">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
  <properties>
   <property name="music" value="TOWN"/>
  </properties>
@@ -16,12 +16,6 @@
   </data>
  </layer>
  <objectgroup id="3" name="objects">
-  <object id="1" name="Player" gid="196" x="81" y="305.667" width="32" height="32">
-   <properties>
-    <property name="cameraFollow" type="bool" value="true"/>
-    <property name="controller" type="bool" value="true"/>
-   </properties>
-  </object>
   <object id="2" gid="195" x="68.6667" y="301.333" width="41" height="63"/>
   <object id="3" gid="195" x="251.333" y="205.333" width="41" height="63"/>
   <object id="4" gid="195" x="365.333" y="89.3333" width="41" height="63"/>
@@ -29,14 +23,28 @@
   <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
   <object id="12" gid="197" x="329.333" y="288.667" width="32" height="32"/>
   <object id="13" gid="193" x="136" y="272.667" width="16" height="16"/>
+  <object id="22" type="PlayerSpawn" x="148.5" y="304.5" width="10" height="10"/>
  </objectgroup>
  <objectgroup id="5" name="trigger">
-  <object id="9" name="trap_trigger" type="Trigger" x="255.333" y="271.697" width="16.3636" height="16.7273">
+  <object id="9" type="Trigger" x="255.333" y="271.697" width="16.3636" height="16.7273">
    <properties>
     <property name="id" type="int" value="11"/>
-    <property name="sensor" type="bool" value="true"/>
     <property name="triggerType" value="TRAP"/>
    </properties>
+  </object>
+  <object id="17" type="Trigger" x="136.5" y="269.5" width="16.5" height="11.5">
+   <properties>
+    <property name="id" type="int" value="13"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="18" type="Trigger" x="366" y="222" width="13.25" height="9.5">
+   <properties>
+    <property name="id" type="int" value="0"/>
+    <property name="toMap" value="HOUSE"/>
+    <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
  <layer id="4" name="foreground" width="30" height="20">

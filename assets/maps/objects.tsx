@@ -5,7 +5,6 @@
   <properties>
    <property name="atlasAsset" value="OBJECTS"/>
    <property name="hasInventory" type="bool" value="true"/>
-   <property name="loot" propertytype="Loot" value="BASIC"/>
   </properties>
   <image source="objects/chest.png" width="16" height="16"/>
   <objectgroup draworder="index" id="2">
@@ -38,13 +37,14 @@
    <property name="animationSpeed" type="float" value="1"/>
    <property name="atlasAsset" value="OBJECTS"/>
    <property name="attackSound" value="SWING"/>
-   <property name="bodyType" propertytype="BodyType" value="DynamicBody"/>
+   <property name="bodyType" value="DynamicBody"/>
+   <property name="cameraFollow" type="bool" value="true"/>
+   <property name="controller" type="bool" value="true"/>
    <property name="damage" type="float" value="7"/>
    <property name="damageDelay" type="float" value="0.2"/>
    <property name="hasInventory" type="bool" value="true"/>
    <property name="life" type="int" value="12"/>
    <property name="lifeRegeneration" type="float" value="0.25"/>
-   <property name="mapObjectType" type="int" value="0"/>
    <property name="speed" type="float" value="4"/>
   </properties>
   <image source="objects/player.png" width="32" height="32"/>
@@ -79,7 +79,7 @@
    <property name="animation" value="IDLE"/>
    <property name="animationSpeed" type="float" value="1"/>
    <property name="atlasAsset" value="OBJECTS"/>
-   <property name="bodyType" propertytype="BodyType" value="StaticBody"/>
+   <property name="bodyType" value="StaticBody"/>
    <property name="life" type="int" value="9999"/>
    <property name="lifeRegeneration" type="float" value="99"/>
   </properties>
@@ -92,7 +92,6 @@
   <properties>
    <property name="animation" value="IDLE"/>
    <property name="atlasAsset" value="OBJECTS"/>
-   <property name="mapObjectType" type="int" value="2"/>
    <property name="z" type="int" value="0"/>
   </properties>
   <image source="objects/trap.png" width="16" height="16"/>

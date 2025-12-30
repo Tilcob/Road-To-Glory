@@ -1,20 +1,32 @@
 package com.github.tilcob.game.tiled;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
+import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.objects.PolygonMapObject;
+import com.badlogic.gdx.maps.objects.PolylineMapObject;
 import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileLayer;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.component.MapEntity;
+import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -24,10 +36,12 @@ public class TiledManager {
     private Consumer<TiledMap> mapChangeConsumer;
     private Consumer<TiledMapTileMapObject> loadObjectConsumer;
     private LoadTileConsumer loadTileConsumer;
-    private BiConsumer<String, MapObject> loadTriggerConsumer;
+    private BiConsumer<Trigger.Type, MapObject> loadTriggerConsumer;
     private TiledMap currentMap;
+    private final Engine engine;
+    private final Map<MapAsset, Vector2> spawnPoints;
 
-    public TiledManager(AssetManager assetManager, World world) {
+    public TiledManager(AssetManager assetManager, World world, Engine engine) {
         this.assetManager = assetManager;
         this.world = world;
         this.mapChangeConsumer = null;
@@ -35,6 +49,8 @@ public class TiledManager {
         this.loadTileConsumer = null;
         this.currentMap = null;
         this.loadTileConsumer = null;
+        this.engine = engine;
+        this.spawnPoints = new HashMap<>();
     }
 
 
@@ -44,7 +60,12 @@ public class TiledManager {
         return tiledMap;
     }
 
+    public MapAsset getMapAsset(TiledMap map) {
+        return map.getProperties().get(Constants.MAP_ASSET, MapAsset.class);
+    }
+
     public void setMap(TiledMap map) {
+        clearMapEntities(engine);
         if (currentMap != null) {
             assetManager.unload(currentMap.getProperties().get(Constants.MAP_ASSET, MapAsset.class));
 
@@ -60,6 +81,15 @@ public class TiledManager {
         loadMapObjects(map);
         if (mapChangeConsumer != null) {
             mapChangeConsumer.accept(map);
+        }
+    }
+
+    public void clearMapEntities(Engine engine) {
+        ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(MapEntity.class).get());
+
+
+        for (Entity entity : entities) {
+            engine.removeEntity(entity);
         }
     }
 
@@ -81,11 +111,14 @@ public class TiledManager {
         if (loadTriggerConsumer == null) return;
 
         for (MapObject object : layer.getObjects()) {
-            if (object.getName() == null || object.getName().isBlank()) {
-                throw new GdxRuntimeException("Trigger must have a name: " + object);
-            }
-            if (object instanceof RectangleMapObject rectMapObject) {
-                loadTriggerConsumer.accept(object.getName(), rectMapObject);
+            String classType = object.getProperties().get(Constants.TYPE, "", String.class);
+            if (!classType.equals(Constants.TRIGGER_CLASS)) throw new GdxRuntimeException("Trigger must have the Trigger class: " + object);
+            if (object instanceof RectangleMapObject
+                || object instanceof EllipseMapObject
+                || object instanceof PolygonMapObject
+                || object instanceof PolylineMapObject) {
+                String typeStr = object.getProperties().get(Constants.TRIGGER_TYPE, "", String.class);
+                loadTriggerConsumer.accept(Trigger.Type.valueOf(typeStr), object);
             } else {
                 throw new GdxRuntimeException("Unsupported trigger object: " + object);
             }
@@ -151,6 +184,14 @@ public class TiledManager {
         for (MapObject object : objectLayer.getObjects()) {
             if (object instanceof TiledMapTileMapObject tileMapObject) {
                 loadObjectConsumer.accept(tileMapObject);
+            } else if (object instanceof RectangleMapObject rectObject) {
+                String type = rectObject.getProperties().get(Constants.TYPE, "", String.class);
+                if (type.equals(Constants.SPAWN_CLASS)) {
+                    Rectangle rect = rectObject.getRectangle();
+                    Vector2 spawnPoint = new Vector2(rect.x * Constants.UNIT_SCALE, rect.y * Constants.UNIT_SCALE);
+                    spawnPoints.put(getMapAsset(currentMap), spawnPoint);
+                    return;
+                }
             } else {
                 throw new GdxRuntimeException("Unsupported object type: " + object.getClass().getSimpleName());
             }
@@ -169,14 +210,21 @@ public class TiledManager {
         this.loadTileConsumer = loadTileConsumer;
     }
 
-    public void setLoadTriggerConsumer(BiConsumer<String, MapObject> loadTriggerConsumer) {
+    public void setLoadTriggerConsumer(BiConsumer<Trigger.Type, MapObject> loadTriggerConsumer) {
         this.loadTriggerConsumer = loadTriggerConsumer;
+    }
+
+    public Map<MapAsset, Vector2> getSpawnPoints() {
+        return spawnPoints;
+    }
+
+    public Vector2 getSpawnPoint() {
+        return spawnPoints.get(getMapAsset(currentMap));
     }
 
     @FunctionalInterface
     public interface LoadTileConsumer {
         void accept(TiledMapTile tile, float x, float y);
-
 
     }
 }
