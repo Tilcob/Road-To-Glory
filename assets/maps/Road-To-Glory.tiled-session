@@ -5,14 +5,31 @@
     },
     "activeFile": "main.tmx",
     "expandedProjectPaths": [
+        "."
     ],
     "fileStates": {
-        "main.tmx": {
-            "scale": 1,
-            "selectedLayer": 0,
+        "house.tmx": {
+            "expandedObjectLayers": [
+                4,
+                3
+            ],
+            "scale": 2,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 193,
-                "y": 268.5
+                "x": 80.5,
+                "y": 61.75
+            }
+        },
+        "main.tmx": {
+            "expandedObjectLayers": [
+                5,
+                3
+            ],
+            "scale": 2,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 97,
+                "y": 321.75
             }
         },
         "objects.tsx": {
@@ -20,21 +37,37 @@
             "scaleInDock": 1,
             "scaleInEditor": 1
         },
+        "player.tmx": {
+            "scale": 1.5,
+            "selectedLayer": 1,
+            "viewCenter": {
+                "x": 18,
+                "y": -122.33333333333331
+            }
+        },
         "terrain.tsx": {
-            "dynamicWrapping": false
+            "dynamicWrapping": false,
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         }
     },
-    "map.height": 30,
+    "last.objectTypesPath": "C:/Users/jakob/Downloads/propertytypes.json",
+    "map.height": 1,
     "map.lastUsedFormat": "tmx",
     "map.layerDataFormat": "3",
     "map.tileHeight": 16,
     "map.tileWidth": 16,
+    "map.width": 1,
     "openFiles": [
-        "main.tmx"
+        "main.tmx",
+        "objects.tsx",
+        "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
+    "property.type": "string",
     "recentFiles": [
-        "main.tmx",
-        "objects.tsx"
+        "terrain.tsx",
+        "objects.tsx",
+        "main.tmx"
     ]
 }

@@ -27,7 +27,7 @@ public class GameViewModel extends ViewModel {
     public void playerDamage(int amount, float x, float y) {
         Vector2 position = new Vector2(x, y);
         this.playerDamage = Map.entry(position, amount);
-        this.propertyChangeSupport.firePropertyChange(Constants.PLAYER_DAMAGE, null, this.playerDamage);
+        this.propertyChangeSupport.firePropertyChange(Constants.PLAYER_DAMAGE_PC, null, this.playerDamage);
     }
 
     public Vector2 toScreenCoords(Vector2 position) {
@@ -49,7 +49,7 @@ public class GameViewModel extends ViewModel {
 
     public void setLifePoints(int lifePoints) {
         if (this.lifePoints != lifePoints) {
-            this.propertyChangeSupport.firePropertyChange(Constants.LIFE_POINTS, this.lifePoints, lifePoints);
+            this.propertyChangeSupport.firePropertyChange(Constants.LIFE_POINTS_PC, this.lifePoints, lifePoints);
             if (this.lifePoints != 0 && this.lifePoints < lifePoints) {
                 audioManager.playSound(SoundAsset.LIFE_REG);
             }
@@ -63,7 +63,7 @@ public class GameViewModel extends ViewModel {
 
     public void setMaxLife(int maxLife) {
         if (this.maxLife != maxLife) {
-            this.propertyChangeSupport.firePropertyChange(Constants.MAX_LIFE, this.maxLife, maxLife);
+            this.propertyChangeSupport.firePropertyChange(Constants.MAX_LIFE_PC, this.maxLife, maxLife);
         }
         this.maxLife = maxLife;
     }

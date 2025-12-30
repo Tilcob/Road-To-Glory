@@ -3,9 +3,12 @@ package com.github.tilcob.game.assets;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.maps.tiled.TiledMapTile;
+import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
+import com.github.tilcob.game.config.Constants;
 import com.github.tommyettinger.freetypist.FreeTypistSkinLoader;
 
 public class AssetManager implements Disposable {
@@ -38,6 +41,12 @@ public class AssetManager implements Disposable {
     public boolean update() {
         // assetManager.getProgress(); value between 0 and 1
         return assetManager.update();
+    }
+
+    public TiledMapTile getPlayerTile() {
+        TiledMap player = new TmxMapLoader().load("maps/player.tmx");
+        TiledMapTileSet objects = player.getTileSets().getTileSet("objects");
+        return objects.getTile(Constants.PLAYER_ID);
     }
 
     public void debugDiagnostics() {

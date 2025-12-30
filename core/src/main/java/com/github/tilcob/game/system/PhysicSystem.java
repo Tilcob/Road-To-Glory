@@ -1,9 +1,6 @@
 package com.github.tilcob.game.system;
 
-import com.badlogic.ashley.core.Engine;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.EntityListener;
-import com.badlogic.ashley.core.Family;
+import com.badlogic.ashley.core.*;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
@@ -99,26 +96,41 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
         if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
 
-        playerTriggerContact(entityA, fixtureA, entityB, fixtureB);
+        onEnter(entityA, fixtureA, entityB, fixtureB);
     }
 
-    private void playerTriggerContact(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
+    private void onEnter(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
         Trigger trigger = Trigger.MAPPER.get(entityA);
         boolean isPlayer = Player.MAPPER.get(entityB) != null && !fixtureB.isSensor();
         if (trigger != null && isPlayer) {
-            trigger.setTriggeringEntity(entityB);
+            trigger.add(entityB);
             return;
         }
 
         trigger = Trigger.MAPPER.get(entityB);
         isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
         if (trigger != null && isPlayer) {
-            trigger.setTriggeringEntity(entityA);
+            trigger.add(entityA);
         }
     }
 
     @Override
     public void endContact(Contact contact) {
+    }
+
+    private void onExit(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
+        Trigger trigger = Trigger.MAPPER.get(entityA);
+        boolean isPlayer = Player.MAPPER.get(entityB) != null && !fixtureB.isSensor();
+        if (trigger != null && isPlayer) {
+            trigger.remove(entityB);
+            return;
+        }
+
+        trigger = Trigger.MAPPER.get(entityB);
+        isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
+        if (trigger != null && isPlayer) {
+            trigger.remove(entityA);
+        }
     }
 
     @Override

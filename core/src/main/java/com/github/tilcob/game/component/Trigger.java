@@ -3,27 +3,35 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.ObjectSet;
 
 public class Trigger implements Component {
     public static final ComponentMapper<Trigger> MAPPER = ComponentMapper.getFor(Trigger.class);
 
-    private final String name;
-    private Entity triggeringEntity;
+    private final ObjectSet<Entity> entities = new ObjectSet<>();
+    private final Type type;
 
-    public Trigger(String name) {
-        this.name = name;
-        this.triggeringEntity = null;
+    public Trigger(Type type) {
+        this.type = type;
     }
 
-    public String getName() {
-        return name;
+    public Type getType() {
+        return type;
     }
 
-    public void setTriggeringEntity(Entity triggeringEntity) {
-        this.triggeringEntity = triggeringEntity;
+    public ObjectSet<Entity> getEntities() {
+        return entities;
     }
 
-    public Entity getTriggeringEntity() {
-        return triggeringEntity;
+    public void add(Entity entity) {
+        entities.add(entity);
+    }
+
+    public void remove(Entity entity) {
+        entities.remove(entity);
+    }
+
+    public enum Type {
+        TRAP, CHEST, CHANGE_MAP
     }
 }

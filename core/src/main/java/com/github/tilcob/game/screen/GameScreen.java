@@ -1,6 +1,7 @@
 package com.github.tilcob.game.screen;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
@@ -16,9 +17,11 @@ import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.KeyboardController;
+import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -40,13 +43,14 @@ public class GameScreen extends ScreenAdapter {
     private final Viewport uiViewport;
     private final GameViewModel viewModel;
     private final Skin skin;
+    private Entity player;
 
     public GameScreen(GdxGame game) {
         this.game = game;
         this.engine = new Engine();
         this.physicWorld = new World(Constants.GRAVITY, true);
         this.physicWorld.setAutoClearForces(false);
-        this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld);
+        this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld, engine);
         this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld);
         this.keyboardController = new KeyboardController(GameControllerState.class, engine, null);
         this.audioManager = game.getAudioManager();
@@ -65,6 +69,7 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new LifeSystem(viewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
+        this.engine.addSystem(new MapChangeSystem(tiledManager));
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
         this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
@@ -87,6 +92,7 @@ public class GameScreen extends ScreenAdapter {
         keyboardController.setActiveState(GameControllerState.class);
 
         stage.addActor(new GameView(skin, stage, viewModel));
+        player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
@@ -99,6 +105,7 @@ public class GameScreen extends ScreenAdapter {
 
         TiledMap map = tiledManager.loadMap(MapAsset.MAIN);
         tiledManager.setMap(map);
+        Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
     }
 
     @Override

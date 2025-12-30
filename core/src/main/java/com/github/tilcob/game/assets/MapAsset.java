@@ -5,7 +5,8 @@ import com.badlogic.gdx.maps.tiled.BaseTiledMapLoader;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 
 public enum MapAsset implements Asset<TiledMap> {
-    MAIN("main.tmx");
+    MAIN("main.tmx"),
+    HOUSE("house.tmx");
 
     private final AssetDescriptor<TiledMap> mapAssetDescriptor;
 
