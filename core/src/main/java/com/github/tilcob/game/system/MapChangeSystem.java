@@ -5,7 +5,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.component.MapChange;
-import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.component.Physic;
+import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.tiled.TiledManager;
 
 public class MapChangeSystem extends IteratingSystem {

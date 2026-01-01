@@ -1,11 +1,15 @@
 package com.github.tilcob.game.ui.view;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.github.tilcob.game.input.UiEvent;
+import com.badlogic.gdx.utils.Array;
+import com.github.tilcob.game.component.Inventory;
+import com.github.tilcob.game.event.EntityAddItemEvent;
+import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.ui.model.ViewModel;
 
 public abstract class View<T extends ViewModel> extends Table implements EventListener {
@@ -57,6 +61,14 @@ public abstract class View<T extends ViewModel> extends Table implements EventLi
 
     }
 
+    public void onInventory() {
+
+    }
+
+    public void onAddItem(Array<Entity> items) {
+
+    }
+
     public static void onClick(Actor actor, OnEventConsumer consumer) {
         actor.addListener(new ClickListener() {
             @Override
@@ -94,10 +106,16 @@ public abstract class View<T extends ViewModel> extends Table implements EventLi
                 case UP -> onUp();
                 case DOWN -> onDown();
                 case SELECT -> onSelect();
+                case INVENTORY -> onInventory();
             }
             return true;
+        } else if (event instanceof EntityAddItemEvent addItemEvent) {
+            Entity player = addItemEvent.getEntity();
+            if (Inventory.MAPPER.get(player) != null) {
+                Array<Entity> items = Inventory.MAPPER.get(player).getItems();
+                onAddItem(items);
+            }
         }
-
         return false;
     }
 

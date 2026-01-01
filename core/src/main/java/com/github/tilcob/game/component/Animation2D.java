@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.github.tilcob.game.assets.AtlasAsset;
-import com.github.tilcob.game.config.Constants;
 
 public class Animation2D implements Component {
     public static final ComponentMapper<Animation2D> MAPPER = ComponentMapper.getFor(Animation2D.class);

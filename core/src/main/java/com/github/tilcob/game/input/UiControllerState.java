@@ -1,6 +1,7 @@
 package com.github.tilcob.game.input;
 
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.github.tilcob.game.event.UiEvent;
 
 public class UiControllerState implements ControllerState {
     private final Stage stage;

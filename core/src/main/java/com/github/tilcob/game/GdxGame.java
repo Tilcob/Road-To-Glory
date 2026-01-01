@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.screen.LoadingScreen;
 
 import java.util.HashMap;
@@ -29,6 +30,7 @@ public class GdxGame extends Game {
     private GLProfiler glProfiler;
     private FPSLogger fpsLogger;
     private InputMultiplexer inputMultiplexer;
+    private final GameEventBus eventBus = new GameEventBus();
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
 
     @Override
@@ -111,6 +113,10 @@ public class GdxGame extends Game {
 
     public AudioManager getAudioManager() {
         return audioManager;
+    }
+
+    public GameEventBus getEventBus() {
+        return eventBus;
     }
 
     public void setInputProcessors(InputProcessor... processors) {

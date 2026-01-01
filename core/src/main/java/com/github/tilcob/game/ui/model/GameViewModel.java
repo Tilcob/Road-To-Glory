@@ -1,6 +1,7 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
@@ -13,6 +14,7 @@ public class GameViewModel extends ViewModel {
     private int lifePoints;
     private int maxLife;
     private Map.Entry<Vector2, Integer> playerDamage;
+    private final Array<ItemModel> playerItems = new Array<>();
     private final Vector2 tmpVec2;
 
     public GameViewModel(GdxGame game) {
@@ -66,5 +68,9 @@ public class GameViewModel extends ViewModel {
             this.propertyChangeSupport.firePropertyChange(Constants.MAX_LIFE_PC, this.maxLife, maxLife);
         }
         this.maxLife = maxLife;
+    }
+
+    public Array<ItemModel> getPlayerItems() {
+        return playerItems;
     }
 }

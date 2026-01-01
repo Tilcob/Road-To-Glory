@@ -3,19 +3,21 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.GdxGame;
-import com.github.tilcob.game.component.Attack;
-import com.github.tilcob.game.component.Controller;
-import com.github.tilcob.game.component.Move;
+import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.screen.MenuScreen;
 
 public class ControllerSystem extends IteratingSystem {
     private final GdxGame game;
+    private final Stage stage;
 
-    public ControllerSystem(GdxGame game) {
+    public ControllerSystem(GdxGame game, Stage stage) {
         super(Family.all(Controller.class).get());
         this.game = game;
+        this.stage = stage;
     }
 
     @Override
@@ -33,6 +35,8 @@ public class ControllerSystem extends IteratingSystem {
                 case RIGHT -> moveEntity(entity, 1f, 0f);
                 case SELECT -> startEntityAttack(entity);
                 case CANCEL -> game.setScreen(MenuScreen.class);
+                case INTERACT -> interact(entity);
+                case INVENTORY -> showEntityInventory(entity);
             }
         }
         controller.getPressedCommands().clear();
@@ -46,6 +50,22 @@ public class ControllerSystem extends IteratingSystem {
             }
         }
         controller.getReleasedCommands().clear();
+    }
+
+    private void showEntityInventory(Entity player) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        if (inventory == null) return;
+
+        stage.getRoot().fire(new UiEvent(Command.INVENTORY));
+    }
+
+    private void interact(Entity player) {
+        OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);
+        if (openChestRequest == null) return;
+
+        Entity chestEntity = openChestRequest.getChest();
+        Chest.MAPPER.get(chestEntity).open();
+
     }
 
     private void startEntityAttack(Entity entity) {

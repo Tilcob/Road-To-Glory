@@ -49,6 +49,7 @@ public class PlayerFactory {
         addEntityAttack(player, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
+        entity.add(new Inventory());
 
         engine.addEntity(entity);
         return entity;
