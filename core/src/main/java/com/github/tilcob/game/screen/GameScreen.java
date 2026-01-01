@@ -3,6 +3,7 @@ package com.github.tilcob.game.screen;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -16,10 +17,12 @@ import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.GameControllerState;
+import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.system.*;
@@ -50,14 +53,15 @@ public class GameScreen extends ScreenAdapter {
         this.physicWorld.setAutoClearForces(false);
         this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld, engine);
         this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld);
-        this.keyboardController = new KeyboardController(GameControllerState.class, engine, null);
+        this.keyboardController = new KeyboardController(GameControllerState.class, game.getEventBus(),
+            GameState.GAME, engine.getEntitiesFor(Family.all(Controller.class).get()));
         this.audioManager = game.getAudioManager();
         this.uiViewport = new FitViewport(320f, 180f);
         this.stage = new Stage(uiViewport, game.getBatch());
         this.viewModel = new GameViewModel(game);
         this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
 
-        this.engine.addSystem(new ControllerSystem(game, stage));
+        this.engine.addSystem(new ControllerSystem(game));
         this.engine.addSystem(new PhysicMoveSystem());
         this.engine.addSystem(new AttackSystem(physicWorld, audioManager));
         this.engine.addSystem(new FsmSystem());
@@ -68,7 +72,7 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
         this.engine.addSystem(new MapChangeSystem(tiledManager));
-        this.engine.addSystem(new InventorySystem(stage));
+        this.engine.addSystem(new InventorySystem(game.getEventBus()));
         this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
@@ -127,6 +131,7 @@ public class GameScreen extends ScreenAdapter {
                 disposable.dispose();
             }
         }
+        viewModel.dispose();
         physicWorld.dispose();
         stage.dispose();
     }

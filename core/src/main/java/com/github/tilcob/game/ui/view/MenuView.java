@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {
@@ -111,11 +112,19 @@ public class MenuView extends View<MenuViewModel> {
         return slider;
     }
 
+    @Override
+    protected void setupPropertyChanges() {
+        viewModel.onPropertyChange(Constants.ON_DOWN, null, this::onDown);
+        viewModel.onPropertyChange(Constants.ON_UP, null, this::onUp);
+        viewModel.onPropertyChange(Constants.ON_RIGHT, null, this::onRight);
+        viewModel.onPropertyChange(Constants.ON_LEFT, null, this::onLeft);
+        viewModel.onPropertyChange(Constants.ON_SELECT, null, this::onSelect);
+    }
+
     /**
      * Moves selection to the next menu item.
      */
-    @Override
-    public void onDown() {
+    public void onDown(Object o) {
         Group menuContentTable = this.selectedItem.getParent();
         int currentIdx = menuContentTable.getChildren().indexOf(this.selectedItem, true);
         if (currentIdx == -1) {
@@ -132,8 +141,7 @@ public class MenuView extends View<MenuViewModel> {
     /**
      * Moves selection to the previous menu item.
      */
-    @Override
-    public void onUp() {
+    public void onUp(Object o) {
         Group menuContentTable = this.selectedItem.getParent();
         int currentIdx = menuContentTable.getChildren().indexOf(this.selectedItem, true);
         if (currentIdx == -1) {
@@ -145,8 +153,7 @@ public class MenuView extends View<MenuViewModel> {
         selectMenuItem((Group) menuContentTable.getChild(currentIdx));
     }
 
-    @Override
-    public void onRight() {
+    public void onRight(Object o) {
         MenuOption menuOption = MenuOption.valueOf(this.selectedItem.getName());
         switch (menuOption) {
             case MUSIC_VOLUME, SOUND_VOLUME -> {
@@ -156,8 +163,7 @@ public class MenuView extends View<MenuViewModel> {
         }
     }
 
-    @Override
-    public void onLeft() {
+    public void onLeft(Object o) {
         MenuOption menuOption = MenuOption.valueOf(this.selectedItem.getName());
         switch (menuOption) {
             case MUSIC_VOLUME, SOUND_VOLUME -> {
@@ -167,8 +173,7 @@ public class MenuView extends View<MenuViewModel> {
         }
     }
 
-    @Override
-    public void onSelect() {
+    public void onSelect(Object o) {
         MenuOption menuOption = MenuOption.valueOf(this.selectedItem.getName());
         switch (menuOption) {
             case START_GAME -> viewModel.startGame();

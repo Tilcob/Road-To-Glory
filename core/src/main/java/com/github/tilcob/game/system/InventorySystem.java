@@ -7,14 +7,15 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.EntityAddItemEvent;
+import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem {
-    private final Stage stage;
+    private final GameEventBus eventBus;
 
-    public InventorySystem(Stage stage) {
+    public InventorySystem(GameEventBus eventBus) {
         super(Family.all(Inventory.class).get());
-        this.stage = stage;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -29,7 +30,7 @@ public class InventorySystem extends IteratingSystem {
             inventory.add(spawnItem(itemType, slotIndex));
 
         }
-        stage.getRoot().fire(new EntityAddItemEvent(player));
+        eventBus.fire(new EntityAddItemEvent(player));
 
         inventory.getItemsToAdd().clear();
     }

@@ -78,6 +78,13 @@ public class Constants {
     public static final String LIFE_POINTS_PC = "lifePoints";
     public static final String MAX_LIFE_PC = "maxLife";
     public static final String PLAYER_DAMAGE_PC = "playerDamage";
+    public static final String OPEN_INVENTORY = "openInventory";
+    public static final String ADD_ITEMS = "addItems";
+    public static final String ON_LEFT = "onLeft";
+    public static final String ON_RIGHT = "onRight";
+    public static final String ON_UP = "onUp";
+    public static final String ON_DOWN = "onDown";
+    public static final String ON_SELECT = "onSelect";
 
     // Player properties
     public static final int PLAYER_ID = 4;

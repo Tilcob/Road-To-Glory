@@ -6,18 +6,19 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.screen.MenuScreen;
 
 public class ControllerSystem extends IteratingSystem {
     private final GdxGame game;
-    private final Stage stage;
+    private final GameEventBus eventBus;
 
-    public ControllerSystem(GdxGame game, Stage stage) {
+    public ControllerSystem(GdxGame game) {
         super(Family.all(Controller.class).get());
         this.game = game;
-        this.stage = stage;
+        this.eventBus = game.getEventBus();
     }
 
     @Override
@@ -56,7 +57,7 @@ public class ControllerSystem extends IteratingSystem {
         Inventory inventory = Inventory.MAPPER.get(player);
         if (inventory == null) return;
 
-        stage.getRoot().fire(new UiEvent(Command.INVENTORY));
+        eventBus.fire(new UiEvent(Command.INVENTORY));
     }
 
     private void interact(Entity player) {
