@@ -40,20 +40,15 @@ public class GameView extends View<GameViewModel> {
         inventoryRoot.setVisible(false);
 
         Table table1 = new Table();
-        table1.setName("inventoryPanel");
+        table1.setBackground(skin.getDrawable("Other_panel_brown"));
 
         Label label = new Label("Inventory", skin);
-        label.setColor(skin.getColor("black"));
-        table1.add(label);
-
-        table1.row();
+        label.setColor(skin.getColor("BLACK"));
+        table1.add(label).row();
 
         Table table2 = new Table();
-        table2.setName("items");
 
-        table2.add();
-
-        table2.add();
+        table1.row();
         ScrollPane scrollPane = new ScrollPane(table2, skin);
         table1.add(scrollPane);
         inventoryRoot.add(table1);
@@ -101,7 +96,7 @@ public class GameView extends View<GameViewModel> {
         final Vector2 position = damageAndPosition.getKey();
         int damage = damageAndPosition.getValue();
 
-        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RAINBOW}" + damage, skin, "small");
+        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RAINBOW}" + damage, skin);
         stage.addActor(textraLabel);
 
         textraLabel.addAction(

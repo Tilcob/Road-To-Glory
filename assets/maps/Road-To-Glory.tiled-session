@@ -10,26 +10,26 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                4,
-                3
+                3,
+                4
             ],
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 83,
-                "y": 154.25
+                "x": 80,
+                "y": 79.75
             }
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                5,
-                3
+                3,
+                5
             ],
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 97,
-                "y": 321.75
+                "x": 193,
+                "y": 295.25
             }
         },
         "objects.tsx": {
@@ -38,11 +38,14 @@
             "scaleInEditor": 1
         },
         "player.tmx": {
+            "expandedObjectLayers": [
+                2
+            ],
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 18,
-                "y": -122.33333333333331
+                "x": 8,
+                "y": 7.666666666666686
             }
         },
         "terrain.tsx": {
@@ -60,14 +63,18 @@
     "map.width": 1,
     "openFiles": [
         "main.tmx",
+        "house.tmx",
         "objects.tsx",
-        "terrain.tsx"
+        "terrain.tsx",
+        "player.tmx"
     ],
     "project": "Road-To-Glory.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "player.tmx",
         "terrain.tsx",
         "objects.tsx",
+        "house.tmx",
         "main.tmx"
     ]
 }
