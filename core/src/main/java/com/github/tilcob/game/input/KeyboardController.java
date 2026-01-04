@@ -1,10 +1,11 @@
 package com.github.tilcob.game.input;
 
-import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.github.tilcob.game.event.GameEventBus;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,21 +17,23 @@ public class KeyboardController extends InputAdapter {
         Map.entry(Input.Keys.A, Command.LEFT),
         Map.entry(Input.Keys.D, Command.RIGHT),
         Map.entry(Input.Keys.SPACE, Command.SELECT),
-        Map.entry(Input.Keys.ESCAPE, Command.CANCEL)
+        Map.entry(Input.Keys.ESCAPE, Command.CANCEL),
+        Map.entry(Input.Keys.E, Command.INTERACT),
+        Map.entry(Input.Keys.I, Command.INVENTORY)
     );
 
     private final boolean[] commandState;
     private final Map<Class<? extends ControllerState>, ControllerState> stateCache;
     private ControllerState activeState;
 
-    public KeyboardController(Class<? extends ControllerState> initialState, Engine engine, Stage stage) {
+    public KeyboardController(Class<? extends ControllerState> initialState, GameEventBus eventBus, GameState state, ImmutableArray<Entity> entities) {
         this.stateCache = new HashMap<>();
         this.activeState = null;
         this.commandState = new boolean[Command.values().length];
 
         this.stateCache.put(IdleControllerState.class, new IdleControllerState());
-        if (engine != null) this.stateCache.put(GameControllerState.class, new GameControllerState(engine));
-        if (stage != null) this.stateCache.put(UiControllerState.class, new UiControllerState(stage));
+        if (state == GameState.GAME) this.stateCache.put(GameControllerState.class, new GameControllerState(entities));
+        if (state == GameState.MENU) this.stateCache.put(UiControllerState.class, new UiControllerState(eventBus));
 
         setActiveState(initialState);
     }

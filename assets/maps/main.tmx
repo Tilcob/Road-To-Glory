@@ -22,7 +22,12 @@
   <object id="5" gid="194" x="346" y="232.667" width="80" height="112"/>
   <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
   <object id="12" gid="197" x="329.333" y="288.667" width="32" height="32"/>
-  <object id="13" gid="193" x="136" y="272.667" width="16" height="16"/>
+  <object id="13" gid="193" x="136" y="272.667" width="16" height="16">
+   <properties>
+    <property name="hasInventory" type="bool" value="true"/>
+    <property name="loot" value="HELMET,BOOTS"/>
+   </properties>
+  </object>
   <object id="22" type="PlayerSpawn" x="148.5" y="304.5" width="10" height="10"/>
  </objectgroup>
  <objectgroup id="5" name="trigger">

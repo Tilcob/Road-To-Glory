@@ -3,9 +3,9 @@ package com.github.tilcob.game.screen;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -17,9 +17,12 @@ import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.GameControllerState;
+import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.system.*;
@@ -28,7 +31,6 @@ import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.view.GameView;
 
-import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class GameScreen extends ScreenAdapter {
@@ -43,7 +45,6 @@ public class GameScreen extends ScreenAdapter {
     private final Viewport uiViewport;
     private final GameViewModel viewModel;
     private final Skin skin;
-    private Entity player;
 
     public GameScreen(GdxGame game) {
         this.game = game;
@@ -52,7 +53,8 @@ public class GameScreen extends ScreenAdapter {
         this.physicWorld.setAutoClearForces(false);
         this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld, engine);
         this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld);
-        this.keyboardController = new KeyboardController(GameControllerState.class, engine, null);
+        this.keyboardController = new KeyboardController(GameControllerState.class, game.getEventBus(),
+            GameState.GAME, engine.getEntitiesFor(Family.all(Controller.class).get()));
         this.audioManager = game.getAudioManager();
         this.uiViewport = new FitViewport(320f, 180f);
         this.stage = new Stage(uiViewport, game.getBatch());
@@ -70,14 +72,11 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
         this.engine.addSystem(new MapChangeSystem(tiledManager));
+        this.engine.addSystem(new InventorySystem(game.getEventBus(), game.getItemRegistry()));
+        this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
         this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
-
-        // DamagedSystem must run after FsmSystem to correctly
-        // detect when a damaged animation should be played.
-        // This is done by checking if an entity has a Damaged component,
-        // and this component is removed in the DamagedSystem.
     }
 
     @Override
@@ -92,7 +91,7 @@ public class GameScreen extends ScreenAdapter {
         keyboardController.setActiveState(GameControllerState.class);
 
         stage.addActor(new GameView(skin, stage, viewModel));
-        player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
+        Entity player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
@@ -132,6 +131,7 @@ public class GameScreen extends ScreenAdapter {
                 disposable.dispose();
             }
         }
+        viewModel.dispose();
         physicWorld.dispose();
         stage.dispose();
     }

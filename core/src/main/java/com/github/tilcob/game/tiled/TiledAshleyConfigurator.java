@@ -17,6 +17,7 @@ import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.objects.TiledMapTileMapObject;
 import com.badlogic.gdx.math.*;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.AtlasAsset;
@@ -24,6 +25,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.item.ItemType;
 
 public class TiledAshleyConfigurator {
     private final Engine engine;
@@ -60,7 +62,7 @@ public class TiledAshleyConfigurator {
         addEntityCameraFollow(object, entity);
         addEntityLife(tile, entity);
         addEntityAttack(tile, entity);
-        addEntityChest(tile, entity);
+        addEntityChest(object, entity);
         entity.add(new MapEntity());
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
@@ -69,12 +71,23 @@ public class TiledAshleyConfigurator {
         engine.addEntity(entity);
     }
 
-    private void addEntityChest(TiledMapTile tile, Entity entity) {
-        boolean hasInventory = tile.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
+    private void addEntityChest(MapObject object, Entity entity) {
+        boolean hasInventory = object.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
+        String lootStr = object.getProperties().get(Constants.LOOT, "", String.class);
+        Array<ItemType> loot = new Array<>();
+        if (!lootStr.isBlank()) loot = getItemType(lootStr);
 
-        if (hasInventory) {
-            entity.add(new Chest());
+        if (hasInventory) entity.add(new Chest(loot));
+    }
+
+    private Array<ItemType> getItemType(String lootStr) {
+        Array<ItemType> loot = new Array<>();
+        String[] itemTypes = lootStr.split(",");
+
+        for (String itemType : itemTypes) {
+            loot.add(ItemType.valueOf(itemType));
         }
+        return loot;
     }
 
     private void addEntityLife(TiledMapTile tile, Entity entity) {

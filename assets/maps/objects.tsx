@@ -4,7 +4,8 @@
  <tile id="0" type="GameObject">
   <properties>
    <property name="atlasAsset" value="OBJECTS"/>
-   <property name="hasInventory" type="bool" value="true"/>
+   <property name="hasInventory" type="bool" value="false"/>
+   <property name="loot" value=""/>
   </properties>
   <image source="objects/chest.png" width="16" height="16"/>
   <objectgroup draworder="index" id="2">

@@ -1,6 +1,5 @@
 package com.github.tilcob.game.screen;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -10,6 +9,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
+import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.input.UiControllerState;
 import com.github.tilcob.game.ui.model.MenuViewModel;
@@ -27,7 +27,7 @@ public class MenuScreen extends ScreenAdapter {
         this.uiViewport = new FitViewport(800f, 450f);
         this.stage = new Stage(uiViewport, game.getBatch());
         this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
-        this.keyboardController = new KeyboardController(UiControllerState.class, null, stage);
+        this.keyboardController = new KeyboardController(UiControllerState.class, game.getEventBus(), GameState.MENU, null);
     }
 
     @Override

@@ -1,16 +1,14 @@
 package com.github.tilcob.game.input;
 
-import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.Controller;
 
 public class GameControllerState implements ControllerState{
     private final ImmutableArray<Entity> controllerEntities;
 
-    public GameControllerState(Engine engine) {
-        this.controllerEntities = engine.getEntitiesFor(Family.all(Controller.class).get());
+    public GameControllerState(ImmutableArray<Entity> controllerEntities) {
+        this.controllerEntities = controllerEntities;
     }
 
     @Override

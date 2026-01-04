@@ -3,8 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.github.tilcob.game.component.Animation2D;
 import com.github.tilcob.game.component.Damaged;
 import com.github.tilcob.game.component.Life;
 import com.github.tilcob.game.component.Transform;

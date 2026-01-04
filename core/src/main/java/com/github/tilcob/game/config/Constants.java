@@ -41,7 +41,7 @@ public class Constants {
     public static final String PROP = "Prop";
     public static final String CAMERA_FOLLOW = "cameraFollow";
     public static final String LIFE = "life";
-        public static final String LIFE_REGENERATION = "lifeRegeneration";
+    public static final String LIFE_REGENERATION = "lifeRegeneration";
     public static final String ATTACK_SOUND = "attackSound";
     public static final String DAMAGE = "damage";
     public static final String DAMAGE_DELAY = "damageDelay";
@@ -53,6 +53,7 @@ public class Constants {
     public static final String TRIGGER_TYPE = "triggerType";
     public static final String TO_MAP = "toMap";
     public static final String SPAWN_CLASS = "PlayerSpawn";
+    public static final String LOOT = "loot";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";
@@ -77,7 +78,17 @@ public class Constants {
     public static final String LIFE_POINTS_PC = "lifePoints";
     public static final String MAX_LIFE_PC = "maxLife";
     public static final String PLAYER_DAMAGE_PC = "playerDamage";
+    public static final String OPEN_INVENTORY = "openInventory";
+    public static final String ADD_ITEMS_TO_INVENTORY = "addItems";
+    public static final String ON_LEFT = "onLeft";
+    public static final String ON_RIGHT = "onRight";
+    public static final String ON_UP = "onUp";
+    public static final String ON_DOWN = "onDown";
+    public static final String ON_SELECT = "onSelect";
 
     // Player properties
     public static final int PLAYER_ID = 4;
+    public static final int INVENTORY_CAPACITY = 18;
+    public static final int INVENTORY_ROWS = 3;
+    public static final int INVENTORY_COLUMNS = 6;
 }

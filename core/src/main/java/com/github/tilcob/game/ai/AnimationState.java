@@ -1,10 +1,9 @@
 package com.github.tilcob.game.ai;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.component.*;
-
-import com.badlogic.ashley.core.Entity;
 
 public enum AnimationState implements State<Entity> {
     IDLE {

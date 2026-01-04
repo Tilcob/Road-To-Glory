@@ -1,6 +1,5 @@
 package org.example;
 
-
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 
 public class TexturePackerTool {
