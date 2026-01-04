@@ -1,19 +1,19 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.EntityAddItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
+import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.Command;
 
 import java.util.Map;
@@ -37,31 +37,44 @@ public class GameViewModel extends ViewModel {
 
         game.getEventBus().subscribe(UiEvent.class, this::onUiEvent);
         game.getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
+        game.getEventBus().subscribe(UpdateInventoryEvent.class, this::updateInventory);
+    }
+
+    private void updateInventory(UpdateInventoryEvent updateInventoryEvent) {
+        Inventory inventory = Inventory.MAPPER.get(updateInventoryEvent.player());
+        if (inventory == null) return;
+        playerItems.clear();
+        onAddItem(inventory.getItems());
+        this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, playerItems);
     }
 
     private void onEntityAddItemEvent(EntityAddItemEvent event) {
-        Inventory inventory = Inventory.MAPPER.get(event.getEntity());
+        Inventory inventory = Inventory.MAPPER.get(event.entity());
         if (inventory == null) return;
         onAddItem(inventory.getItems());
-        this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS, null, playerItems);
+        this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, playerItems);
     }
 
     public void onAddItem(Array<Entity> items) {
         for (Entity itemEntity : items) {
             Item item = Item.MAPPER.get(itemEntity);
+            Id idComp = Id.MAPPER.get(itemEntity);
+            if (idComp == null) return;
+
             ItemModel model = new ItemModel(
-                1,
+                idComp.getId(),
                 item.getItemType().getCategory(),
-                item.getItemType().getAtlasKey(),
+                item.getItemType().getDrawableName(),
                 item.getSlotIndex(),
-                item.isEquipped()
+                item.isEquipped(),
+                item.getCount()
             );
             playerItems.add(model);
         }
     }
 
     private void onUiEvent(UiEvent event) {
-        if (!(event.getCommand() == Command.INVENTORY)) return;
+        if (!(event.command() == Command.INVENTORY)) return;
 
         boolean old = open;
         open = !open;
@@ -110,12 +123,8 @@ public class GameViewModel extends ViewModel {
         this.maxLife = maxLife;
     }
 
-    public Array<ItemModel> getPlayerItems() {
-        return playerItems;
-    }
-
-    public boolean isOpen() {
-        return open;
+    public GameEventBus getEventBus() {
+        return game.getEventBus();
     }
 
     @Override

@@ -3,7 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Chest;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.OpenChestRequest;

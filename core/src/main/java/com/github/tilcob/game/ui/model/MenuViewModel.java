@@ -18,7 +18,7 @@ public class MenuViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent uiEvent) {
-        switch (uiEvent.getCommand()) {
+        switch (uiEvent.command()) {
             case LEFT ->  onLeft();
             case RIGHT ->  onRight();
             case UP -> onUp();

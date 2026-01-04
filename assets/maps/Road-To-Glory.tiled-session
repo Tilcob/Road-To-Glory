@@ -10,8 +10,8 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                3,
-                4
+                4,
+                3
             ],
             "scale": 2,
             "selectedLayer": 3,
@@ -22,14 +22,14 @@
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                3,
-                5
+                5,
+                3
             ],
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 193,
-                "y": 295.25
+                "x": 264,
+                "y": 159.75
             }
         },
         "objects.tsx": {

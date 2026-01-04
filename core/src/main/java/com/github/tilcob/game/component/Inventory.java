@@ -23,4 +23,8 @@ public class Inventory implements Component {
     public void add(Entity entity) {
         entities.add(entity);
     }
+
+    public void remove(Entity fromEntity) {
+        entities.removeValue(fromEntity, true);
+    }
 }

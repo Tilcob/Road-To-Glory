@@ -10,11 +10,13 @@ public class Item implements Component {
     private final ItemType itemType;
     private int slotIndex;
     private boolean equipped;
+    private int count;
 
-    public Item(ItemType itemType, int slotIndex) {
+    public Item(ItemType itemType, int slotIndex, int count) {
         this.itemType = itemType;
         this.slotIndex = slotIndex;
         this.equipped = false;
+        this.count = count;
     }
 
     public ItemType getItemType() {
@@ -33,7 +35,19 @@ public class Item implements Component {
         return equipped;
     }
 
+    public int getCount() {
+        return count;
+    }
+
     public void setEquipped(boolean equipped) {
         this.equipped = equipped;
+    }
+
+    public void add(int amount) {
+        count += amount;
+    }
+
+    public void remove(int amount) {
+        count -= amount;
     }
 }

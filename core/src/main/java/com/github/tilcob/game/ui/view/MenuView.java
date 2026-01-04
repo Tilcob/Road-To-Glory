@@ -100,7 +100,7 @@ public class MenuView extends View<MenuViewModel> {
         Table table = new Table();
         table.setName(menuOption.name());
 
-        Label label = new Label(title, skin);
+        Label label = new Label(title, skin, "text_12");
         label.setColor(skin.getColor("sand"));
         table.add(label).row();
 

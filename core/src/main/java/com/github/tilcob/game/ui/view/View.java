@@ -5,12 +5,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.model.ViewModel;
 
 public abstract class View<T extends ViewModel> extends Table {
     protected final Stage stage;
     protected final Skin skin;
     protected final T viewModel;
+    protected InventoryDragAndDrop dragAndDrop;
 
     public View(Skin skin, Stage stage, T viewModel) {
         super(skin);

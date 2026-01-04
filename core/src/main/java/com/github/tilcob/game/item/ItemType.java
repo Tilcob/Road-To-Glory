@@ -1,27 +1,37 @@
 package com.github.tilcob.game.item;
 
 public enum ItemType {
-    UNDEFINED(ItemCategory.UNDEFINED, ""),
-    HELMET(ItemCategory.HELMET, "helmet"),
-    SWORD(ItemCategory.WEAPON, "sword"),
-    BIG_SWORD(ItemCategory.WEAPON, "sword2"),
-    BOOTS(ItemCategory.BOOTS, "boots"),
-    ARMOR(ItemCategory.ARMOR, "armor"),
+    UNDEFINED(ItemCategory.UNDEFINED, "", 1),
+    HELMET(ItemCategory.HELMET, "helmet", 1),
+    SWORD(ItemCategory.WEAPON, "sword", 1),
+    BIG_SWORD(ItemCategory.WEAPON, "sword2", 1),
+    BOOTS(ItemCategory.BOOTS, "boots", 2),
+    ARMOR(ItemCategory.ARMOR, "armor", 1),
     ;
 
     private final ItemCategory category;
-    private final String atlasKey;
+    private final String drawableName;
+    private final int maxStack;
 
-    ItemType(ItemCategory itemCategory, String atlasKey) {
+    ItemType(ItemCategory itemCategory, String drawableName, int maxStack) {
         this.category = itemCategory;
-        this.atlasKey = atlasKey;
+        this.drawableName = drawableName;
+        this.maxStack = maxStack;
     }
 
     public ItemCategory getCategory() {
         return category;
     }
 
-    public String getAtlasKey() {
-        return atlasKey;
+    public String getDrawableName() {
+        return drawableName;
+    }
+
+    public int getMaxStack() {
+        return maxStack;
+    }
+
+    public boolean isStackable() {
+        return maxStack > 1;
     }
 }

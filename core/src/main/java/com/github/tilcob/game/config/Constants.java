@@ -79,7 +79,7 @@ public class Constants {
     public static final String MAX_LIFE_PC = "maxLife";
     public static final String PLAYER_DAMAGE_PC = "playerDamage";
     public static final String OPEN_INVENTORY = "openInventory";
-    public static final String ADD_ITEMS = "addItems";
+    public static final String ADD_ITEMS_TO_INVENTORY = "addItems";
     public static final String ON_LEFT = "onLeft";
     public static final String ON_RIGHT = "onRight";
     public static final String ON_UP = "onUp";
@@ -89,4 +89,6 @@ public class Constants {
     // Player properties
     public static final int PLAYER_ID = 4;
     public static final int INVENTORY_CAPACITY = 18;
+    public static final int INVENTORY_ROWS = 3;
+    public static final int INVENTORY_COLUMNS = 6;
 }

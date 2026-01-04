@@ -72,7 +72,7 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
         this.engine.addSystem(new MapChangeSystem(tiledManager));
-        this.engine.addSystem(new InventorySystem(game.getEventBus()));
+        this.engine.addSystem(new InventorySystem(game.getEventBus(), game.getItemRegistry()));
         this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
