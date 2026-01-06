@@ -11,10 +11,10 @@ public class MenuViewModel extends ViewModel {
     private final AudioManager audioManager;
 
     public MenuViewModel(GdxGame game) {
-        super(game, game.getEventBus());
+        super(game);
         this.audioManager = game.getAudioManager();
 
-        game.getEventBus().subscribe(UiEvent.class, this::onUiEvent);
+        getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
 
     private void onUiEvent(UiEvent uiEvent) {
