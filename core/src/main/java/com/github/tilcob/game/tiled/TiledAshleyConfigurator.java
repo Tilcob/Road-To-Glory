@@ -21,11 +21,14 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.AtlasAsset;
+import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.loot.LootTableType;
+import com.github.tilcob.game.registry.ChestRegistry;
 
 public class TiledAshleyConfigurator {
     private final Engine engine;
@@ -33,13 +36,17 @@ public class TiledAshleyConfigurator {
     private final World world;
     private final Vector2 tmpVec2;
     private final MapObjects tmpMapObjects;
+    private final ChestRegistry chestRegistry;
+    private final TiledManager tiledManager;
 
-    public TiledAshleyConfigurator(Engine engine, AssetManager assetManager, World world) {
+    public TiledAshleyConfigurator(Engine engine, AssetManager assetManager, World world, ChestRegistry chestRegistry, TiledManager tiledManager) {
         this.engine = engine;
         this.assetManager = assetManager;
         this.world = world;
         this.tmpVec2 = new Vector2();
         this.tmpMapObjects = new MapObjects();
+        this.chestRegistry = chestRegistry;
+        this.tiledManager = tiledManager;
     }
 
     public void onLoadObject(TiledMapTileMapObject object) {
@@ -63,21 +70,35 @@ public class TiledAshleyConfigurator {
         addEntityLife(tile, entity);
         addEntityAttack(tile, entity);
         addEntityChest(object, entity);
-        entity.add(new MapEntity());
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
         entity.add(new Tiled(object));
+        entity.add(new MapEntity());
 
         engine.addEntity(entity);
     }
 
     private void addEntityChest(MapObject object, Entity entity) {
+        int id = object.getProperties().get(Constants.ID, 0, Integer.class);
+        MapAsset map = tiledManager.getCurrentMapAsset();
+        if (chestRegistry.contains(map, id)) {
+            entity.add(new Chest(chestRegistry.getOrCreate(map, id, null)));
+            return;
+        }
+
         boolean hasInventory = object.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
+        if (!hasInventory) return;
         String lootStr = object.getProperties().get(Constants.LOOT, "", String.class);
         Array<ItemType> loot = new Array<>();
-        if (!lootStr.isBlank()) loot = getItemType(lootStr);
+        ChestRegistry.ChestState state;
+        if (!lootStr.isBlank()) {
+            loot = getItemType(lootStr);
+            state = chestRegistry.getOrCreate(map, id, loot);
+        } else {
+            state = new ChestRegistry.ChestState(LootTableType.BASIC_CHEST);
+        }
 
-        if (hasInventory) entity.add(new Chest(loot));
+        entity.add(new Chest(state));
     }
 
     private Array<ItemType> getItemType(String lootStr) {

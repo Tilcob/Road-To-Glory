@@ -52,7 +52,7 @@ public class GameScreen extends ScreenAdapter {
         this.physicWorld = new World(Constants.GRAVITY, true);
         this.physicWorld.setAutoClearForces(false);
         this.tiledManager = new TiledManager(game.getAssetManager(), physicWorld, engine);
-        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld);
+        this.tiledAshleyConfigurator = new TiledAshleyConfigurator(engine, game.getAssetManager(), this.physicWorld, game.getChestRegistry(), tiledManager);
         this.keyboardController = new KeyboardController(GameControllerState.class, game.getEventBus(),
             GameState.GAME, engine.getEntitiesFor(Family.all(Controller.class).get()));
         this.audioManager = game.getAudioManager();

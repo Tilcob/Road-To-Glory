@@ -9,4 +9,5 @@ public enum Command {
     CANCEL,
     INTERACT,
     INVENTORY,
+    SPLIT_STACK
 }

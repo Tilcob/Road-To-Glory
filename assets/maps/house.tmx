@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="5">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="6">
  <tileset firstgid="1" source="terrain.tsx"/>
  <tileset firstgid="193" source="objects.tsx"/>
  <layer id="1" name="ground" width="10" height="10">
@@ -14,7 +14,12 @@
  </layer>
  <objectgroup id="3" name="objects">
   <object id="1" gid="197" x="98.4044" y="49.795" width="32" height="32"/>
-  <object id="2" gid="193" x="109.729" y="109.939" width="16" height="16"/>
+  <object id="2" gid="193" x="109.729" y="109.939" width="16" height="16">
+   <properties>
+    <property name="hasInventory" type="bool" value="true"/>
+    <property name="loot" value=""/>
+   </properties>
+  </object>
   <object id="4" type="PlayerSpawn" x="18.75" y="22" width="7.5" height="10"/>
  </objectgroup>
  <objectgroup id="4" name="trigger">
@@ -23,6 +28,12 @@
     <property name="toMap" value="MAIN"/>
     <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
    </properties>
+  </object>
+  <object id="5" type="Trigger" x="109.5" y="107" width="17" height="9">
+   <properties>
+    <property name="id" type="int" value="2"/>
+   </properties>
+   <ellipse/>
   </object>
  </objectgroup>
  <layer id="5" name="foreground" width="10" height="10">

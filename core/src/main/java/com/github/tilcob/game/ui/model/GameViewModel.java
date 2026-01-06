@@ -74,11 +74,11 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent event) {
-        if (!(event.command() == Command.INVENTORY)) return;
-
-        boolean old = open;
-        open = !open;
-        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
+        if (event.command() == Command.INVENTORY) {
+            boolean old = open;
+            open = !open;
+            this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
+        }
     }
 
     public void playerDamage(int amount, float x, float y) {

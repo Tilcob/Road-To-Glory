@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
@@ -48,7 +49,6 @@ public class GameView extends View<GameViewModel> {
 
         Table table1 = new Table();
         table1.setBackground(skin.getDrawable("Other_panel_brown"));
-
         Label label = new Label("Inventory", skin, "text_12");
         label.setColor(skin.getColor("BLACK"));
         table1.add(label).row();
@@ -56,10 +56,8 @@ public class GameView extends View<GameViewModel> {
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
-                InventorySlot slot = new InventorySlot(i, j, skin);
-                Image image = new Image(skin.getDrawable("Other_panel_border_brown"));
-                slot.addActor(image);
-
+                int index = i * Constants.INVENTORY_COLUMNS + j;
+                InventorySlot slot = new InventorySlot(index, skin, viewModel.getEventBus());
                 this.slots[i][j] = slot;
                 contentTable.add(slot);
             }
@@ -79,7 +77,7 @@ public class GameView extends View<GameViewModel> {
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 InventorySlot slot = slots[i][j];
-                dragAndDrop.addTarget(new InventorySlotTarget(slot, Constants.INVENTORY_COLUMNS, viewModel.getEventBus()));
+                dragAndDrop.addTarget(new InventorySlotTarget(slot, viewModel.getEventBus()));
             }
         }
     }
@@ -100,7 +98,8 @@ public class GameView extends View<GameViewModel> {
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 InventorySlot slot = slots[i][j];
-                if (slot.getChildren().size > 1) slot.getChildren().removeIndex(1);
+                Actor actor = slot.findActor("item");
+                if (actor != null) actor.remove();
                 slot.setCount(0);
             }
         }
@@ -112,11 +111,13 @@ public class GameView extends View<GameViewModel> {
 
             InventorySlot slot = slots[row][col];
             Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
+            itemImage.setName("item");
             itemImage.setScaling(Scaling.fit);
+            itemImage.setFillParent(true);
 
-            if (slot.getChildren().size > 1) slot.getChildren().removeIndex(1);
-            slot.addActor(itemImage);
+            slot.add(itemImage);
             slot.setCount(item.getCount());
+            slot.getCountTable().toFront();
 
             dragAndDrop.addSource(new InventoryItemSource(itemImage, item.getSlotIdx()));
         }

@@ -25,7 +25,7 @@
   <object id="13" gid="193" x="136" y="272.667" width="16" height="16">
    <properties>
     <property name="hasInventory" type="bool" value="true"/>
-    <property name="loot" value="HELMET,BOOTS"/>
+    <property name="loot" value="HELMET,BOOTS,BOOTS"/>
    </properties>
   </object>
   <object id="22" type="PlayerSpawn" x="148.5" y="304.5" width="10" height="10"/>
