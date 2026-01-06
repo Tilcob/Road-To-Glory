@@ -20,7 +20,6 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
@@ -29,7 +28,9 @@ import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
+import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.view.GameView;
+import com.github.tilcob.game.ui.view.InventoryView;
 
 import java.util.function.Consumer;
 
@@ -43,7 +44,8 @@ public class GameScreen extends ScreenAdapter {
     private final AudioManager audioManager;
     private final Stage stage;
     private final Viewport uiViewport;
-    private final GameViewModel viewModel;
+    private final GameViewModel gameViewModel;
+    private final InventoryViewModel inventoryViewModel;
     private final Skin skin;
 
     public GameScreen(GdxGame game) {
@@ -58,7 +60,8 @@ public class GameScreen extends ScreenAdapter {
         this.audioManager = game.getAudioManager();
         this.uiViewport = new FitViewport(320f, 180f);
         this.stage = new Stage(uiViewport, game.getBatch());
-        this.viewModel = new GameViewModel(game);
+        this.gameViewModel = new GameViewModel(game);
+        this.inventoryViewModel = new InventoryViewModel(game);
         this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
 
         this.engine.addSystem(new ControllerSystem(game));
@@ -67,8 +70,8 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new FsmSystem());
         this.engine.addSystem(new FacingSystem());
         this.engine.addSystem(new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL));
-        this.engine.addSystem(new DamageSystem(viewModel));
-        this.engine.addSystem(new LifeSystem(viewModel));
+        this.engine.addSystem(new DamageSystem(gameViewModel));
+        this.engine.addSystem(new LifeSystem(gameViewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
         this.engine.addSystem(new MapChangeSystem(tiledManager));
@@ -90,7 +93,8 @@ public class GameScreen extends ScreenAdapter {
         game.setInputProcessors(stage, keyboardController);
         keyboardController.setActiveState(GameControllerState.class);
 
-        stage.addActor(new GameView(skin, stage, viewModel));
+        stage.addActor(new GameView(skin, stage, gameViewModel));
+        stage.addActor(new InventoryView(skin, stage, inventoryViewModel));
         Entity player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
@@ -131,7 +135,7 @@ public class GameScreen extends ScreenAdapter {
                 disposable.dispose();
             }
         }
-        viewModel.dispose();
+        gameViewModel.dispose();
         physicWorld.dispose();
         stage.dispose();
     }

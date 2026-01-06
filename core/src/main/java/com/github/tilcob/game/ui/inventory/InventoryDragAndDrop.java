@@ -7,7 +7,7 @@ public class InventoryDragAndDrop {
 
     public InventoryDragAndDrop() {
         this.dragAndDrop = new DragAndDrop();
-        dragAndDrop.setDragActorPosition(0, 0);
+        dragAndDrop.setDragActorPosition(8, -8);
     }
 
     public void addSource(DragAndDrop.Source source) {

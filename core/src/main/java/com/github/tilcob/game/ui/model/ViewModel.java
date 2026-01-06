@@ -12,10 +12,10 @@ public abstract class ViewModel {
     protected final PropertyChangeSupport propertyChangeSupport;
     protected final GameEventBus gameEventBus;
 
-    public ViewModel(GdxGame game, GameEventBus eventBus) {
+    public ViewModel(GdxGame game) {
         this.game = game;
         this.propertyChangeSupport = new PropertyChangeSupport(this);
-        this.gameEventBus = eventBus;
+        this.gameEventBus = game.getEventBus();
     }
 
     public <T> void onPropertyChange(String propertyName, Class<T> propertyType, OnPropertyChange<T> consumer) {
@@ -30,7 +30,11 @@ public abstract class ViewModel {
         }
     }
 
-    public abstract void dispose();
+    public GameEventBus getEventBus() {
+        return gameEventBus;
+    }
+
+    public void dispose() {}
 
     @FunctionalInterface
     public interface OnPropertyChange<T> {
