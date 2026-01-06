@@ -29,7 +29,9 @@ import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -63,8 +65,8 @@ public class TiledManager {
         return tiledMap;
     }
 
-    public MapAsset getMapAsset(TiledMap map) {
-        return map.getProperties().get(Constants.MAP_ASSET, MapAsset.class);
+    public MapAsset getCurrentMapAsset() {
+        return currentMap.getProperties().get(Constants.MAP_ASSET, MapAsset.class);
     }
 
     public void setMap(TiledMap map) {
@@ -184,6 +186,7 @@ public class TiledManager {
     private void loadObjectLayer(MapLayer objectLayer) {
         if (loadObjectConsumer == null) return;
 
+        Set<Integer> chests = new HashSet<>();
         for (MapObject object : objectLayer.getObjects()) {
             if (object instanceof TiledMapTileMapObject tileMapObject) {
                 loadObjectConsumer.accept(tileMapObject);
@@ -192,7 +195,7 @@ public class TiledManager {
                 if (type.equals(Constants.SPAWN_CLASS)) {
                     Rectangle rect = rectObject.getRectangle();
                     Vector2 spawnPoint = new Vector2(rect.x * Constants.UNIT_SCALE, rect.y * Constants.UNIT_SCALE);
-                    spawnPoints.put(getMapAsset(currentMap), spawnPoint);
+                    spawnPoints.put(getCurrentMapAsset(), spawnPoint);
                     return;
                 }
             } else {
@@ -217,12 +220,16 @@ public class TiledManager {
         this.loadTriggerConsumer = loadTriggerConsumer;
     }
 
+    public TiledMap getCurrentMap() {
+        return currentMap;
+    }
+
     public Map<MapAsset, Vector2> getSpawnPoints() {
         return spawnPoints;
     }
 
     public Vector2 getSpawnPoint() {
-        return spawnPoints.get(getMapAsset(currentMap));
+        return spawnPoints.get(getCurrentMapAsset());
     }
 
     @FunctionalInterface

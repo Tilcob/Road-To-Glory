@@ -6,30 +6,30 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.registry.ChestRegistry;
 
 public class Chest implements Component {
     public static final ComponentMapper<Chest> MAPPER = ComponentMapper.getFor(Chest.class);
 
-    private final Array<ItemType> contents;
-    private boolean isOpen = false;
+    private final ChestRegistry.ChestState state;
 
-    public Chest(Array<ItemType> contents) {
-        this.contents = contents;
+    public Chest(ChestRegistry.ChestState state) {
+        this.state = state;
     }
 
     public void open() {
-        isOpen = true;
+        state.open();
     }
 
     public void close() {
-        isOpen = false;
+        state.close();
     }
 
     public boolean isOpen() {
-        return isOpen;
+        return state.isOpened();
     }
 
     public Array<ItemType> getContents() {
-        return contents;
+        return state.getContents();
     }
 }

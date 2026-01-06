@@ -1,21 +1,64 @@
 package com.github.tilcob.game.ui.inventory;
 
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.SplitStackEvent;
+import com.github.tilcob.game.event.UiEvent;
+import com.github.tilcob.game.input.Command;
 
 public class InventorySlot extends Stack {
-    private final int row;
-    private final int col;
+    private final int slotIndex;
+    private final Skin skin;
     private final Label countLabel;
+    private final GameEventBus eventBus;
+    private Table countTable;
 
-    public InventorySlot(int row, int col, Skin skin) {
-        this.row = row;
-        this.col = col;
-        this.countLabel = new Label("", skin, "text_10");
-        countLabel.setColor(skin.getColor("BLACK"));
+    public InventorySlot(int slotIndex, Skin skin, GameEventBus eventBus) {
+        this.slotIndex = slotIndex;
+        this.skin = skin;
+        this.eventBus = eventBus;
+
+        setupUi();
+        setupInput();
+        this.countLabel = findActor("countLabel");
+    }
+
+    private void setupInput() {
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == Input.Buttons.RIGHT) {
+                    eventBus.fire(new SplitStackEvent(slotIndex));
+                    return true;
+                }
+                return false;
+            }
+        });
+
+    }
+
+    private void setupUi() {
         setTouchable(Touchable.enabled);
+
+        Image image = new Image(skin.getDrawable("Other_panel_border_brown_detail"));
+        image.setName("background");
+        add(image);
+
+        Label label = new Label("", skin, "text_10");
+        label.setName("countLabel");
+        label.setColor(skin.getColor("BLACK"));
+        label.setVisible(false);
+
+        countTable = new Table();
+        countTable.setFillParent(true);
+        countTable.add(label).expand().bottom().right().padRight(2).padBottom(2);
+
+        add(countTable);
     }
 
     public void setCount(int count) {
@@ -27,15 +70,11 @@ public class InventorySlot extends Stack {
         }
     }
 
-    public int getIndex(int columns) {
-        return row * columns + col;
+    public int getSlotIndex() {
+        return slotIndex;
     }
 
-    public int getRow() {
-        return row;
-    }
-
-    public int getCol() {
-        return col;
+    public Table getCountTable() {
+        return countTable;
     }
 }

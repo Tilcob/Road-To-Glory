@@ -7,7 +7,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.registry.ItemRegistry;
 import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
@@ -22,6 +22,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         this.registry = registry;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
     }
 
     @Override
@@ -32,14 +33,24 @@ public class InventorySystem extends IteratingSystem implements Disposable {
 
         for (ItemType itemType : inventory.getItemsToAdd()) {
             int slotIndex = emptySlotIndex(inventory);
-            if (slotIndex == -1) return; // Inventory is full
-
-            inventory.add(spawnItem(itemType, slotIndex, ++id));
-
+            if (slotIndex == -1) {
+                eventBus.fire(new InventoryFullEvent());
+                return;
+            }
+            addItem(inventory, itemType, slotIndex);
         }
-        eventBus.fire(new EntityAddItemEvent(player));
-
         inventory.getItemsToAdd().clear();
+        eventBus.fire(new EntityAddItemEvent(player));
+    }
+
+    private void addItem(Inventory inventory, ItemType itemType, int slotIndex) {
+        Entity stackEntity = findStackableItem(inventory, itemType);
+        if (stackEntity != null) {
+            Item stack = Item.MAPPER.get(stackEntity);
+            stack.add(1);
+            return;
+        }
+        inventory.add(spawnItem(itemType, slotIndex, ++id));
     }
 
     private Entity spawnItem(ItemType itemType, int slotIndex, int id) {
@@ -52,8 +63,11 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         return entity;
     }
 
-    // remove items: gameEventBus.fire(new ItemRemovedEvent(id));
-    //engine.removeEntity(entity);
+    private void removeItem(Entity entity) {
+        int id = Id.MAPPER.get(entity).getId();
+        eventBus.fire(new ItemRemovedEvent(id));
+        getEngine().removeEntity(entity);
+    }
 
     private int emptySlotIndex(Inventory inventory) {
         outer:
@@ -127,9 +141,43 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         return null;
     }
 
+    private Entity findStackableItem(Inventory inventory, ItemType type) {
+        for (Entity e : inventory.getItems()) {
+            Item item = Item.MAPPER.get(e);
+            if (item.getItemType() == type && type.isStackable() && item.getCount() < type.getMaxStack()) {
+                return e;
+            }
+        }
+        return null;
+    }
+
+    private void onSplitStack(SplitStackEvent event) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        Entity itemEntity = findItemAtSlot(inventory, event.slotIndex());
+        if (itemEntity == null) return;
+
+        Item item = Item.MAPPER.get(itemEntity);
+        if (item.getCount() < 2) return;
+
+        int half = item.getCount() / 2;
+        item.remove(half);
+
+        int emptySlot = emptySlotIndex(inventory);
+        if (emptySlot == -1) return;
+
+        Entity newItemEntity = spawnItem(item.getItemType(), emptySlot, ++id);
+        Item newItem = Item.MAPPER.get(newItemEntity);
+        newItem.add(half - 1);
+        newItem.setSlotIndex(emptySlot);
+
+        inventory.add(newItemEntity);
+
+        eventBus.fire(new UpdateInventoryEvent(player));
+    }
 
     @Override
     public void dispose() {
         eventBus.unsubscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.unsubscribe(SplitStackEvent.class, this::onSplitStack);
     }
 }

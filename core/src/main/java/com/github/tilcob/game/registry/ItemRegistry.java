@@ -1,4 +1,4 @@
-package com.github.tilcob.game.item;
+package com.github.tilcob.game.registry;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.IntMap;

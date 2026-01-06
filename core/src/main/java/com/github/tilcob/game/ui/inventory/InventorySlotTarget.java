@@ -7,13 +7,11 @@ import com.github.tilcob.game.ui.model.ItemModel;
 
 public class InventorySlotTarget extends DragAndDrop.Target {
     private final InventorySlot inventorySlot;
-    private final int columns;
     private final GameEventBus eventBus;
 
-    public InventorySlotTarget(InventorySlot slot, int columns, GameEventBus eventBus) {
+    public InventorySlotTarget(InventorySlot slot, GameEventBus eventBus) {
         super(slot);
         this.inventorySlot = slot;
-        this.columns = columns;
         this.eventBus = eventBus;
     }
 
@@ -26,7 +24,7 @@ public class InventorySlotTarget extends DragAndDrop.Target {
     public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
         InventoryItemSource itemSource = (InventoryItemSource) payload.getObject();
         int fromIdx = itemSource.getFromIdx();
-        int toIdx = inventorySlot.getIndex(columns);
+        int toIdx = inventorySlot.getSlotIndex();
         eventBus.fire(new DragAndDropEvent(fromIdx, toIdx));
     }
 }

@@ -14,10 +14,10 @@
                 3
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 80,
-                "y": 79.75
+                "x": 117,
+                "y": 111.25
             }
         },
         "main.tmx": {
@@ -26,10 +26,10 @@
                 3
             ],
             "scale": 2,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 264,
-                "y": 159.75
+                "x": 138.5,
+                "y": 268.75
             }
         },
         "objects.tsx": {
