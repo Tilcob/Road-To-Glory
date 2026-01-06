@@ -24,6 +24,7 @@ import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.player.PlayerFactory;
+import com.github.tilcob.game.player.PlayerStateApplier;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -58,7 +59,7 @@ public class GameScreen extends ScreenAdapter {
         this.keyboardController = new KeyboardController(GameControllerState.class, game.getEventBus(),
             GameState.GAME, engine.getEntitiesFor(Family.all(Controller.class).get()));
         this.audioManager = game.getAudioManager();
-        this.uiViewport = new FitViewport(320f, 180f);
+        this.uiViewport = new FitViewport(640f, 360f);
         this.stage = new Stage(uiViewport, game.getBatch());
         this.gameViewModel = new GameViewModel(game);
         this.inventoryViewModel = new InventoryViewModel(game);
@@ -74,8 +75,8 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new LifeSystem(gameViewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
-        this.engine.addSystem(new MapChangeSystem(tiledManager));
-        this.engine.addSystem(new InventorySystem(game.getEventBus(), game.getItemRegistry()));
+        this.engine.addSystem(new MapChangeSystem(tiledManager, game.getStateManager()));
+        this.engine.addSystem(new InventorySystem(game.getEventBus()));
         this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
@@ -95,7 +96,6 @@ public class GameScreen extends ScreenAdapter {
 
         stage.addActor(new GameView(skin, stage, gameViewModel));
         stage.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        Entity player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
@@ -106,9 +106,24 @@ public class GameScreen extends ScreenAdapter {
         tiledManager.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
         tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
 
-        TiledMap map = tiledManager.loadMap(MapAsset.MAIN);
-        tiledManager.setMap(map);
-        Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
+        createPlayerFromState();
+    }
+
+    private void createPlayerFromState() {
+        Entity player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
+        loadMap();
+
+        if (game.getStateManager().getGameState().getPlayerState() != null) {
+            PlayerStateApplier.apply(game.getStateManager().getGameState().getPlayerState(), player);
+        } else {
+            Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
+        }
+    }
+
+    private void loadMap() {
+        MapAsset mapToLoad = game.getStateManager().getGameState().getCurrentMap();
+        if (mapToLoad == null) mapToLoad = MapAsset.MAIN;
+        tiledManager.setMap(tiledManager.loadMap(mapToLoad));
     }
 
     @Override

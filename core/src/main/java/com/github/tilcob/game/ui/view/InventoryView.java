@@ -46,7 +46,7 @@ public class InventoryView extends View<InventoryViewModel> {
                 int index = i * Constants.INVENTORY_COLUMNS + j;
                 InventorySlot slot = new InventorySlot(index, skin, viewModel.getEventBus());
                 this.slots[i][j] = slot;
-                contentTable.add(slot);
+                contentTable.add(slot).size(35,35);
             }
             contentTable.row();
         }
@@ -87,7 +87,6 @@ public class InventoryView extends View<InventoryViewModel> {
             Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
             itemImage.setName("item");
             itemImage.setScaling(Scaling.fit);
-            itemImage.setFillParent(true);
 
             slot.add(itemImage);
             slot.setCount(item.getCount());

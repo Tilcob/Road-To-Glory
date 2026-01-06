@@ -60,7 +60,7 @@ public class MenuView extends View<MenuViewModel> {
 
         setupMenuContent();
 
-        Label label = new Label("by Tilcob 2025", skin);
+        Label label = new Label("by Tilcob 2025", skin, "text_10");
         label.setColor(skin.getColor("WHITE"));
         add(label).padRight(2.0f).expandX().align(Align.bottomRight);
     }

@@ -11483,6 +11483,46 @@ atlasData: {
 			hidden: false
 		}
 		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/slot_grey.9.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: slot_grey
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: NINE_PATCH
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/armor.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: armor
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
 			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/boots.png
 			bgColor: {
 				r: 1
@@ -11503,6 +11543,26 @@ atlasData: {
 			hidden: false
 		}
 		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/bracelet.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: bracelet
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
 			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/helmet.png
 			bgColor: {
 				r: 1
@@ -11513,6 +11573,86 @@ atlasData: {
 			tint: null
 			tintName: null
 			name: helmet
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/necklace.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: necklace
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/ring.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: ring
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/shield.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: shield
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: TEXTURE
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/sword.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: sword
 			tiled: false
 			minWidth: -1
 			minHeight: -1
@@ -11560,6 +11700,64 @@ jsonData: {
 	]
 	fonts: []
 	freeTypeFonts: [
+		{
+			class: com.ray3k.skincomposer.data.FreeTypeFontData
+			name: Kenny_Future_06
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets/ui/Kenney Future.ttf
+			previewTTF: IBMPlexSerif-Medium
+			useCustomSerializer: true
+			size: 6
+			mono: false
+			hinting: AutoMedium
+			color: WHITE
+			gamma: 1.8
+			renderCount: 2
+			borderWidth: 0
+			borderColor: null
+			borderStraight: false
+			borderGamma: 1.8
+			shadowOffsetX: 0
+			shadowOffsetY: 0
+			shadowColor: null
+			spaceX: 0
+			spaceY: 0
+			characters: ""
+			kerning: true
+			flip: false
+			genMipMaps: false
+			minFilter: Nearest
+			magFilter: Nearest
+			incremental: false
+		}
+		{
+			class: com.ray3k.skincomposer.data.FreeTypeFontData
+			name: Kenny_Future_08
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets/ui/Kenney Future.ttf
+			previewTTF: IBMPlexSerif-Medium
+			useCustomSerializer: true
+			size: 8
+			mono: false
+			hinting: AutoMedium
+			color: WHITE
+			gamma: 1.8
+			renderCount: 2
+			borderWidth: 0
+			borderColor: null
+			borderStraight: false
+			borderGamma: 1.8
+			shadowOffsetX: 0
+			shadowOffsetY: 0
+			shadowColor: null
+			spaceX: 0
+			spaceY: 0
+			characters: ""
+			kerning: true
+			flip: false
+			genMipMaps: false
+			minFilter: Nearest
+			magFilter: Nearest
+			incremental: false
+		}
 		{
 			class: com.ray3k.skincomposer.data.FreeTypeFontData
 			name: Kenny_Future_10
@@ -12813,6 +13011,60 @@ jsonData: {
 				deletable: true
 				parent: null
 			}
+			{
+				class: com.ray3k.skincomposer.data.StyleData
+				name: text_08
+				clazz: com.badlogic.gdx.scenes.scene2d.ui.Label
+				properties: {
+					font: {
+						type: com.badlogic.gdx.graphics.g2d.BitmapFont
+						name: font
+						optional: false
+						value: Kenny_Future_08
+					}
+					fontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: fontColor
+						optional: true
+						value: null
+					}
+					background: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: background
+						optional: true
+						value: null
+					}
+				}
+				deletable: true
+				parent: null
+			}
+			{
+				class: com.ray3k.skincomposer.data.StyleData
+				name: text_06
+				clazz: com.badlogic.gdx.scenes.scene2d.ui.Label
+				properties: {
+					font: {
+						type: com.badlogic.gdx.graphics.g2d.BitmapFont
+						name: font
+						optional: false
+						value: Kenny_Future_06
+					}
+					fontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: fontColor
+						optional: true
+						value: null
+					}
+					background: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: background
+						optional: true
+						value: null
+					}
+				}
+				deletable: true
+				parent: null
+			}
 		]
 		com.badlogic.gdx.scenes.scene2d.ui.CheckBox: [
 			{
@@ -13433,7 +13685,7 @@ sceneComposer: {
 														class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimImage
 														name: null
 														drawable: {
-															file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_panel_border_brown.9.png
+															file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/slot_grey.9.png
 															bgColor: {
 																r: 1
 																g: 1
@@ -13442,7 +13694,7 @@ sceneComposer: {
 															}
 															tint: null
 															tintName: null
-															name: Other_panel_border_brown
+															name: slot_grey
 															tiled: false
 															minWidth: -1
 															minHeight: -1
@@ -13452,7 +13704,7 @@ sceneComposer: {
 															type: NINE_PATCH
 															hidden: false
 														}
-														scaling: stretch
+														scaling: fill
 														touchable: enabled
 														visible: true
 													}
@@ -13479,10 +13731,10 @@ sceneComposer: {
 											alignment: 1
 											minWidth: -1
 											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
+											maxWidth: 35
+											maxHeight: 35
+											preferredWidth: 20
+											preferredHeight: 20
 											uniformX: false
 											uniformY: false
 											colSpan: 1

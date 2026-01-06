@@ -7,19 +7,17 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.registry.ItemRegistry;
+import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
-    private final ItemRegistry registry;
     private Entity player;
     private int id = 0;
 
-    public InventorySystem(GameEventBus eventBus, ItemRegistry registry) {
+    public InventorySystem(GameEventBus eventBus) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
-        this.registry = registry;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);

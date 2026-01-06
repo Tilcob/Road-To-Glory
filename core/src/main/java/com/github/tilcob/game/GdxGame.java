@@ -15,14 +15,15 @@ import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.registry.ChestRegistry;
-import com.github.tilcob.game.registry.ItemRegistry;
+import com.github.tilcob.game.save.StateManager;
+import com.github.tilcob.game.save.registry.ChestRegistry;
+import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.screen.LoadingScreen;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GdxGame extends Game {
     private Batch batch;
     private OrthographicCamera camera;
@@ -35,6 +36,7 @@ public class GdxGame extends Game {
     private final GameEventBus eventBus = new GameEventBus();
     private final ItemRegistry itemRegistry = new ItemRegistry(eventBus);
     private final ChestRegistry chestRegistry = new ChestRegistry();
+    private final StateManager stateManager = new StateManager(new GameState());
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
 
     @Override
@@ -50,6 +52,7 @@ public class GdxGame extends Game {
         audioManager = new AudioManager(assetManager);
         glProfiler = new GLProfiler(Gdx.graphics);
         fpsLogger = new FPSLogger();
+        stateManager.saveChestRegistry(chestRegistry);
 
         glProfiler.enable();
         addScreen(new LoadingScreen(this, assetManager));
@@ -129,6 +132,10 @@ public class GdxGame extends Game {
 
     public ChestRegistry getChestRegistry() {
         return chestRegistry;
+    }
+
+    public StateManager getStateManager() {
+        return stateManager;
     }
 
     public void setInputProcessors(InputProcessor... processors) {

@@ -28,7 +28,8 @@ import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.loot.LootTableType;
-import com.github.tilcob.game.registry.ChestRegistry;
+import com.github.tilcob.game.save.registry.ChestRegistry;
+import com.github.tilcob.game.save.states.ChestState;
 
 public class TiledAshleyConfigurator {
     private final Engine engine;
@@ -89,13 +90,14 @@ public class TiledAshleyConfigurator {
         boolean hasInventory = object.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
         if (!hasInventory) return;
         String lootStr = object.getProperties().get(Constants.LOOT, "", String.class);
-        Array<ItemType> loot = new Array<>();
-        ChestRegistry.ChestState state;
+        Array<ItemType> loot;
+        ChestState state;
         if (!lootStr.isBlank()) {
             loot = getItemType(lootStr);
             state = chestRegistry.getOrCreate(map, id, loot);
         } else {
-            state = new ChestRegistry.ChestState(LootTableType.BASIC_CHEST);
+            loot = LootTableType.BASIC_CHEST.getLootTable().roll();
+            state = chestRegistry.getOrCreate(map, id, loot);
         }
 
         entity.add(new Chest(state));
