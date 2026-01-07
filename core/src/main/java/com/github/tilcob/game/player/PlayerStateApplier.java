@@ -4,7 +4,11 @@ import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Life;
 import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.PlayerState;
+
+import java.util.Map;
 
 public class PlayerStateApplier {
     public static void apply(PlayerState state, Entity player) {
@@ -14,9 +18,14 @@ public class PlayerStateApplier {
 
         if (transform == null || life == null || inventory == null) return;
 
-        transform.getPosition().set(state.getPosition());
+        transform.getPosition().set(state.getPositionAsVector().scl(1 / Constants.UNIT_SCALE));
         life.setLife(state.getLife());
         inventory.getItems().clear();
-        inventory.getItemsToAdd().addAll(state.getItems());
+        Map<ItemType, Integer> items = state.getItems();
+        for (var entry : items.entrySet()) {
+            for (int i = 0; i < entry.getValue(); i++) {
+                inventory.getItemsToAdd().add(entry.getKey());
+            }
+        }
     }
 }

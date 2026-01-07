@@ -1,33 +1,45 @@
 package com.github.tilcob.game.save.states;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.tilcob.game.assets.MapAsset;
-import com.github.tilcob.game.save.registry.ChestRegistry;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
     private MapAsset currentMap;
     private PlayerState playerState;
-    private ChestRegistry chestRegistry;
+    private ChestRegistryState chestRegistryState;
+    private int saveVersion = 1;
 
-    public MapAsset getCurrentMap() {
-        return currentMap;
-    }
-
-    public void setCurrentMap(MapAsset currentMap) {
-        this.currentMap = currentMap;
-    }
+    public GameState() {}
 
     public PlayerState getPlayerState() {
         return playerState;
     }
+
     public void setPlayerState(PlayerState playerState) {
         this.playerState = playerState;
     }
 
-    public ChestRegistry getChestRegistry() {
-        return chestRegistry;
+    public ChestRegistryState getChestRegistryState() {
+        return chestRegistryState;
     }
 
-    public void setChestRegistry(ChestRegistry chestRegistry) {
-        this.chestRegistry = chestRegistry;
+    public void setChestRegistryState(ChestRegistryState chestRegistryState) {
+        this.chestRegistryState = chestRegistryState;
+    }
+
+    public MapAsset getCurrentMap() {
+        return currentMap;
+    }
+    public void setCurrentMap(MapAsset currentMap) {
+        this.currentMap = currentMap;
+    }
+
+    public int getSaveVersion() {
+        return saveVersion;
+    }
+
+    public void setSaveVersion(int saveVersion) {
+        this.saveVersion = saveVersion;
     }
 }

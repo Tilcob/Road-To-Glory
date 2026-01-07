@@ -20,6 +20,8 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.AutosaveEvent;
+import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
@@ -48,6 +50,7 @@ public class GameScreen extends ScreenAdapter {
     private final GameViewModel gameViewModel;
     private final InventoryViewModel inventoryViewModel;
     private final Skin skin;
+    private Entity player;
 
     public GameScreen(GdxGame game) {
         this.game = game;
@@ -64,6 +67,7 @@ public class GameScreen extends ScreenAdapter {
         this.gameViewModel = new GameViewModel(game);
         this.inventoryViewModel = new InventoryViewModel(game);
         this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
+        game.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
 
         this.engine.addSystem(new ControllerSystem(game));
         this.engine.addSystem(new PhysicMoveSystem());
@@ -75,7 +79,7 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new LifeSystem(gameViewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
         this.engine.addSystem(new TriggerSystem(audioManager));
-        this.engine.addSystem(new MapChangeSystem(tiledManager, game.getStateManager()));
+        this.engine.addSystem(new MapChangeSystem(tiledManager, game.getEventBus(), game.getStateManager()));
         this.engine.addSystem(new InventorySystem(game.getEventBus()));
         this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new CameraSystem(game.getCamera()));
@@ -106,11 +110,11 @@ public class GameScreen extends ScreenAdapter {
         tiledManager.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
         tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
 
-        createPlayerFromState();
+        createPlayer();
     }
 
-    private void createPlayerFromState() {
-        Entity player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
+    private void createPlayer() {
+        player = PlayerFactory.create(engine, game.getAssetManager(), physicWorld);
         loadMap();
 
         if (game.getStateManager().getGameState().getPlayerState() != null) {
@@ -118,6 +122,7 @@ public class GameScreen extends ScreenAdapter {
         } else {
             Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
         }
+        game.getEventBus().fire(new UpdateInventoryEvent(player));
     }
 
     private void loadMap() {
@@ -143,6 +148,12 @@ public class GameScreen extends ScreenAdapter {
         stage.draw();
     }
 
+    private void autosave(AutosaveEvent event) {
+        if (player == null) return;
+        game.getStateManager().setPlayerState(player);
+        game.saveGame();
+    }
+
     @Override
     public void dispose() {
         for (EntitySystem system : engine.getSystems()) {
@@ -150,6 +161,7 @@ public class GameScreen extends ScreenAdapter {
                 disposable.dispose();
             }
         }
+        game.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         gameViewModel.dispose();
         physicWorld.dispose();
         stage.dispose();

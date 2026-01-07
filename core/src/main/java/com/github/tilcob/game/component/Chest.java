@@ -28,6 +28,10 @@ public class Chest implements Component {
     }
 
     public Array<ItemType> getContents() {
-        return state.getContents();
+        return state.getContentsForGame();
+    }
+
+    public void clear() {
+        state.getContents().clear();
     }
 }

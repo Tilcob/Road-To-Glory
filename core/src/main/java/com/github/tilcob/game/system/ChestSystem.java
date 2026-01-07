@@ -27,8 +27,7 @@ public class ChestSystem extends IteratingSystem {
             }
 
             inventory.getItemsToAdd().addAll(chest.getContents());
-            chest.getContents().clear();
-
+            chest.clear();
             close(player, chest);
         }
     }
