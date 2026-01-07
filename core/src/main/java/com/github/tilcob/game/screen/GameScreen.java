@@ -119,8 +119,10 @@ public class GameScreen extends ScreenAdapter {
 
         if (game.getStateManager().getGameState().getPlayerState() != null) {
             PlayerStateApplier.apply(game.getStateManager().getGameState().getPlayerState(), player);
+            game.getStateManager().setPlayerState(player);
         } else {
             Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
+            game.getStateManager().setPlayerState(player);
         }
         game.getEventBus().fire(new UpdateInventoryEvent(player));
     }

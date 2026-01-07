@@ -1,11 +1,14 @@
 package com.github.tilcob.game.player;
 
 import com.badlogic.ashley.core.Entity;
-import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.component.Inventory;
+import com.github.tilcob.game.component.Item;
+import com.github.tilcob.game.component.Life;
+import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.PlayerState;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.List;
 
 public class PlayerStateExtractor {
     public static PlayerState fromEntity(Entity entity) {
@@ -19,13 +22,13 @@ public class PlayerStateExtractor {
         state.setPosX(transform.getPosition().x);
         state.setPosY(transform.getPosition().y);
         state.setLife(life.getLife());
-        Map<ItemType, Integer> items = state.getItems();
         for (Entity itemEntity : inventory.getItems()) {
             Item item = Item.MAPPER.get(itemEntity);
             if (item == null) continue;
-            items.merge(item.getItemType(), item.getCount(), Integer::sum);
+            for (int i = 0; i < item.getCount(); i++) {
+                state.getItemsByName().add(item.getItemType().name());
+            }
         }
-        state.setItems(items);
         return state;
     }
 }

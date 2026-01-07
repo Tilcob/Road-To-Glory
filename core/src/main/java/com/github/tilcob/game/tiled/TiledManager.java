@@ -186,7 +186,6 @@ public class TiledManager {
     private void loadObjectLayer(MapLayer objectLayer) {
         if (loadObjectConsumer == null) return;
 
-        Set<Integer> chests = new HashSet<>();
         for (MapObject object : objectLayer.getObjects()) {
             if (object instanceof TiledMapTileMapObject tileMapObject) {
                 loadObjectConsumer.accept(tileMapObject);

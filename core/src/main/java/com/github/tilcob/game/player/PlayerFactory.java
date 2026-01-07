@@ -18,7 +18,6 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.tiled.TiledPhysics;
 
 public class PlayerFactory {

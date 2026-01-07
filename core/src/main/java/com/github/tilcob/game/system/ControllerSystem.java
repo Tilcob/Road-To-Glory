@@ -3,9 +3,9 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
@@ -35,7 +35,10 @@ public class ControllerSystem extends IteratingSystem {
                 case LEFT -> moveEntity(entity, -1f, 0f);
                 case RIGHT -> moveEntity(entity, 1f, 0f);
                 case SELECT -> startEntityAttack(entity);
-                case CANCEL -> game.setScreen(MenuScreen.class);
+                case CANCEL -> {
+                    game.setScreen(MenuScreen.class);
+                    eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
+                }
                 case INTERACT -> interact(entity);
                 case INVENTORY -> showEntityInventory(entity);
             }

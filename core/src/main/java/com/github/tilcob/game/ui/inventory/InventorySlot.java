@@ -5,12 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.utils.Scaling;
-import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.SplitStackEvent;
-import com.github.tilcob.game.event.UiEvent;
-import com.github.tilcob.game.input.Command;
 
 public class InventorySlot extends Stack {
     private final int slotIndex;
