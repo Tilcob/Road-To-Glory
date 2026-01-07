@@ -1,10 +1,8 @@
-package com.github.tilcob.game.save;
+package com.github.tilcob.game.save.states;
 
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.player.PlayerStateExtractor;
-import com.github.tilcob.game.save.states.ChestRegistryState;
-import com.github.tilcob.game.save.states.GameState;
 
 public class StateManager {
     private GameState gameState;

@@ -4,15 +4,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.MapChange;
 import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.save.SaveManager;
-import com.github.tilcob.game.save.StateManager;
-import com.github.tilcob.game.save.states.GameState;
+import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.tiled.TiledManager;
 
 public class MapChangeSystem extends IteratingSystem {
@@ -31,9 +28,9 @@ public class MapChangeSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         MapChange mapChange = MapChange.MAPPER.get(entity);
         stateManager.saveMap(mapChange.getMapAsset());
-        eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
         tiledManager.setMap(tiledManager.loadMap(mapChange.getMapAsset()));
         Vector2 spawn = tiledManager.getSpawnPoint();
+        eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
 
         Transform.MAPPER.get(entity).getPosition().set(spawn.x, spawn.y);
         Physic.MAPPER.get(entity).getBody().setTransform(spawn.x, spawn.y, 0);

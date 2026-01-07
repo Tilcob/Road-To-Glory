@@ -1,6 +1,5 @@
 package com.github.tilcob.game.ui.model;
 
-import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.event.GameEventBus;
 

@@ -14,13 +14,12 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.save.SaveManager;
-import com.github.tilcob.game.save.StateManager;
-import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.save.SaveManager;
+import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
+import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.screen.LoadingScreen;
 
 import java.io.IOException;
@@ -102,7 +101,8 @@ public class GdxGame extends Game {
     public void loadGame() {
         if (saveManager.exists()) {
             try {
-                stateManager.setGameState(saveManager.load());
+                GameState loaded = saveManager.load();
+                stateManager.setGameState(loaded);
                 chestRegistry.loadFromState(stateManager.loadChestRegistryState());
             } catch (IOException e) {
                 Gdx.app.error("GdxGame", "Error loading state: " + e.getMessage());

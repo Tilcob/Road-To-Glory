@@ -3,7 +3,6 @@ package com.github.tilcob.game.ui.inventory;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.github.tilcob.game.event.DragAndDropEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.ui.model.ItemModel;
 
 public class InventorySlotTarget extends DragAndDrop.Target {
     private final InventorySlot inventorySlot;

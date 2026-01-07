@@ -1,13 +1,17 @@
 package com.github.tilcob.game.save.states;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.tilcob.game.item.ItemType;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChestState {
-    private List<ItemType> contents = new ArrayList<>();
+    @JsonIgnore
+    private final List<ItemType> contents = new ArrayList<>();
+    private List<String> contentsByName = new ArrayList<>();
     private boolean opened;
 
     public ChestState() {}
@@ -20,10 +24,27 @@ public class ChestState {
 
     public void setOpened(boolean opened) { this.opened = opened; }
 
+    public List<String> getContentsByName() {
+        return contentsByName;
+    }
+
+    public void setContentsByName(List<String> contentsByName) {
+        this.contentsByName = contentsByName;
+    }
+
+    @JsonIgnore
     public List<ItemType> getContents() { return contents; }
 
-    public void setContents(List<ItemType> contents) {
-        this.contents = contents;
+    @JsonIgnore
+    public void rebuildContentsFromName() {
+        contents.clear();
+        for (String name : contentsByName) {
+            try {
+                contents.add(ItemType.valueOf(name));
+            } catch (IllegalArgumentException e) {
+                Gdx.app.error("ChestState", e.getMessage());
+            }
+        }
     }
 
     @JsonIgnore

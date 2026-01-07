@@ -1,20 +1,10 @@
 package com.github.tilcob.game.ui.model;
 
-import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.Id;
-import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.EntityAddItemEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.UiEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
-import com.github.tilcob.game.input.Command;
 
 import java.util.Map;
 

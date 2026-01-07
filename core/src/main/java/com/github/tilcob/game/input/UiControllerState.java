@@ -1,6 +1,5 @@
 package com.github.tilcob.game.input;
 
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 
