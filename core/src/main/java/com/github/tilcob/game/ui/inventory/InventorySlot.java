@@ -5,6 +5,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.SplitStackEvent;
@@ -46,10 +47,9 @@ public class InventorySlot extends Stack {
         setTouchable(Touchable.enabled);
 
         Image image = new Image(skin.getDrawable("Other_panel_border_brown_detail"));
-        image.setName("background");
         add(image);
 
-        Label label = new Label("", skin, "text_10");
+        Label label = new Label("", skin, "text_08");
         label.setName("countLabel");
         label.setColor(skin.getColor("BLACK"));
         label.setVisible(false);

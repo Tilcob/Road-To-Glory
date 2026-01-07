@@ -68,6 +68,6 @@ public class InventoryViewModel extends ViewModel {
     @Override
     public void dispose() {
         game.getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
-        game.getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
+        game.getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
     }
 }

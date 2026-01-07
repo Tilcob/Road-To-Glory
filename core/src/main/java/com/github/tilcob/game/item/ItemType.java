@@ -4,9 +4,12 @@ public enum ItemType {
     UNDEFINED(ItemCategory.UNDEFINED, "", 1),
     HELMET(ItemCategory.HELMET, "helmet", 1),
     SWORD(ItemCategory.WEAPON, "sword", 1),
-    BIG_SWORD(ItemCategory.WEAPON, "sword2", 1),
     BOOTS(ItemCategory.BOOTS, "boots", 2),
     ARMOR(ItemCategory.ARMOR, "armor", 1),
+    SHIELD(ItemCategory.SHIELD, "shield", 1),
+    RING(ItemCategory.RING, "ring", 1),
+    BRACELET(ItemCategory.BRACELET, "bracelet", 1),
+    NECKLACE(ItemCategory.NECKLACE, "necklace", 1),
     ;
 
     private final ItemCategory category;

@@ -7,19 +7,16 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.registry.ItemRegistry;
+import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
-    private final ItemRegistry registry;
     private Entity player;
-    private int id = 0;
 
-    public InventorySystem(GameEventBus eventBus, ItemRegistry registry) {
+    public InventorySystem(GameEventBus eventBus) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
-        this.registry = registry;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
@@ -50,7 +47,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
             stack.add(1);
             return;
         }
-        inventory.add(spawnItem(itemType, slotIndex, ++id));
+        inventory.add(spawnItem(itemType, slotIndex, inventory.nextId()));
     }
 
     private Entity spawnItem(ItemType itemType, int slotIndex, int id) {
@@ -165,7 +162,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         int emptySlot = emptySlotIndex(inventory);
         if (emptySlot == -1) return;
 
-        Entity newItemEntity = spawnItem(item.getItemType(), emptySlot, ++id);
+        Entity newItemEntity = spawnItem(item.getItemType(), emptySlot, inventory.nextId());
         Item newItem = Item.MAPPER.get(newItemEntity);
         newItem.add(half - 1);
         newItem.setSlotIndex(emptySlot);

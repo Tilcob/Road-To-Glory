@@ -14,15 +14,19 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.registry.ChestRegistry;
-import com.github.tilcob.game.registry.ItemRegistry;
+import com.github.tilcob.game.save.SaveManager;
+import com.github.tilcob.game.save.StateManager;
+import com.github.tilcob.game.save.registry.ChestRegistry;
+import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.screen.LoadingScreen;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-/** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class GdxGame extends Game {
     private Batch batch;
     private OrthographicCamera camera;
@@ -35,6 +39,8 @@ public class GdxGame extends Game {
     private final GameEventBus eventBus = new GameEventBus();
     private final ItemRegistry itemRegistry = new ItemRegistry(eventBus);
     private final ChestRegistry chestRegistry = new ChestRegistry();
+    private final StateManager stateManager = new StateManager(new GameState());
+    private SaveManager saveManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
 
     @Override
@@ -42,7 +48,10 @@ public class GdxGame extends Game {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
-
+        saveManager = new SaveManager(
+            Gdx.files.local("savegame.json").path()
+        );
+        loadGame();
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
@@ -90,6 +99,28 @@ public class GdxGame extends Game {
         super.setScreen(screen);
     }
 
+    public void loadGame() {
+        if (saveManager.exists()) {
+            try {
+                stateManager.setGameState(saveManager.load());
+                chestRegistry.loadFromState(stateManager.loadChestRegistryState());
+            } catch (IOException e) {
+                Gdx.app.error("GdxGame", "Error loading state: " + e.getMessage());
+            }
+        }  else {
+            stateManager.setGameState(new GameState());
+        }
+    }
+
+    public void saveGame() {
+        try {
+            stateManager.saveChestRegistryState(chestRegistry.toState());
+            saveManager.save(stateManager.getGameState());
+        } catch (IOException e) {
+            Gdx.app.error("GdxGame", "Error saving state: " + e.getMessage());
+        }
+    }
+
     @Override
     public void dispose() {
         screenCache.values().forEach(Screen::dispose);
@@ -129,6 +160,14 @@ public class GdxGame extends Game {
 
     public ChestRegistry getChestRegistry() {
         return chestRegistry;
+    }
+
+    public StateManager getStateManager() {
+        return stateManager;
+    }
+
+    public SaveManager getSaveManager() {
+        return saveManager;
     }
 
     public void setInputProcessors(InputProcessor... processors) {

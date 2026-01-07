@@ -2,18 +2,16 @@ package com.github.tilcob.game.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.item.ItemType;
-import com.github.tilcob.game.registry.ChestRegistry;
+import com.github.tilcob.game.save.states.ChestState;
 
 public class Chest implements Component {
     public static final ComponentMapper<Chest> MAPPER = ComponentMapper.getFor(Chest.class);
 
-    private final ChestRegistry.ChestState state;
+    private final ChestState state;
 
-    public Chest(ChestRegistry.ChestState state) {
+    public Chest(ChestState state) {
         this.state = state;
     }
 
@@ -30,6 +28,10 @@ public class Chest implements Component {
     }
 
     public Array<ItemType> getContents() {
-        return state.getContents();
+        return state.getContentsForGame();
+    }
+
+    public void clear() {
+        state.getContents().clear();
     }
 }

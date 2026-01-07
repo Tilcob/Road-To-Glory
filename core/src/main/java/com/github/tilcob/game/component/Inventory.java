@@ -11,6 +11,7 @@ public class Inventory implements Component {
 
     private final Array<Entity> entities = new Array<>();
     private final Array<ItemType> itemsToAdd = new Array<>();
+    private int nextItemId = 0;
 
     public Array<Entity> getItems() {
         return entities;
@@ -26,5 +27,13 @@ public class Inventory implements Component {
 
     public void remove(Entity fromEntity) {
         entities.removeValue(fromEntity, true);
+    }
+
+    public int nextId() {
+        return ++nextItemId;
+    }
+
+    public void syncId(int id) {
+        nextItemId = Math.max(nextItemId, id);
     }
 }
