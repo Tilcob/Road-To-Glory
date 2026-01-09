@@ -2,13 +2,12 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
+import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.InventoryItemSource;
 import com.github.tilcob.game.ui.inventory.InventorySlot;
@@ -19,10 +18,10 @@ import com.github.tilcob.game.ui.model.ItemModel;
 public class InventoryView extends View<InventoryViewModel> {
     private Table inventoryRoot;
     private InventorySlot[][] slots;
+    private Table questLog;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
         super(skin, stage, viewModel);
-
     }
 
     @Override
@@ -54,6 +53,18 @@ public class InventoryView extends View<InventoryViewModel> {
         inventoryRoot.add(table1);
         stage.addActor(inventoryRoot);
 
+        Table scrollTable = new Table();
+        scrollTable.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label questLabel = new Label("Quest Log", skin, "text_12");
+        questLabel.setColor(skin.getColor("BLACK"));
+        scrollTable.add(questLabel).row();
+        questLog = new Table();
+        ScrollPane scrollPane = new ScrollPane(questLog, skin);
+        scrollPane.setHeight(inventoryRoot.getHeight());
+        scrollPane.setScrollingDisabled(true, false);
+        scrollTable.add(scrollPane);
+        inventoryRoot.add(scrollTable).pad(5.0f);
+
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 InventorySlot slot = slots[i][j];
@@ -66,6 +77,17 @@ public class InventoryView extends View<InventoryViewModel> {
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, Array.class, this::updatePlayerItems);
         viewModel.onPropertyChange(Constants.OPEN_INVENTORY, Boolean.class, this::setInventoryVisibility);
+        viewModel.onPropertyChange(Constants.ADD_QUESTS, Array.class, this::updateQuests);
+    }
+
+    private void updateQuests(Array<Quest> quests) {
+        questLog.clear();
+        for (Quest quest : quests) {
+            String questId = quest.getQuestId().replace("_", " ");
+            Label label = new Label(questId, skin, "text_8");
+            label.setColor(skin.getColor("BLACK"));
+            questLog.add(label).row();
+        }
     }
 
     private void updatePlayerItems(Array<ItemModel> array) {

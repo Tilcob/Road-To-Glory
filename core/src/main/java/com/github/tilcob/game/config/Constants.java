@@ -54,6 +54,7 @@ public class Constants {
     public static final String TO_MAP = "toMap";
     public static final String SPAWN_CLASS = "PlayerSpawn";
     public static final String LOOT = "loot";
+    public static final String QUEST_ID = "questId";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";
@@ -85,6 +86,7 @@ public class Constants {
     public static final String ON_UP = "onUp";
     public static final String ON_DOWN = "onDown";
     public static final String ON_SELECT = "onSelect";
+    public static final String ADD_QUESTS = "addQuests";
 
     // Player properties
     public static final int PLAYER_ID = 4;

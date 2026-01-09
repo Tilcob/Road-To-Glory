@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.item.ItemType;
-import com.github.tilcob.game.save.states.ChestState;
+import com.github.tilcob.game.save.states.chest.ChestState;
 
 public class Chest implements Component {
     public static final ComponentMapper<Chest> MAPPER = ComponentMapper.getFor(Chest.class);

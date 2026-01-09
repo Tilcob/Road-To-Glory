@@ -16,6 +16,9 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestLoader;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
@@ -41,6 +44,7 @@ public class GdxGame extends Game {
     private final StateManager stateManager = new StateManager(new GameState());
     private SaveManager saveManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
+    private final Map<String, Quest> allQuests = new HashMap<>();
 
     @Override
     public void create() {
@@ -168,6 +172,10 @@ public class GdxGame extends Game {
 
     public SaveManager getSaveManager() {
         return saveManager;
+    }
+
+    public Map<String, Quest> getAllQuests() {
+        return allQuests;
     }
 
     public void setInputProcessors(InputProcessor... processors) {

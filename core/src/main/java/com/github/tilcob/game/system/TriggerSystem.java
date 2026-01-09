@@ -7,23 +7,22 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Tiled;
 import com.github.tilcob.game.component.Trigger;
-import com.github.tilcob.game.trigger.ChangeMapTriggerHandler;
-import com.github.tilcob.game.trigger.ChestTriggerHandler;
-import com.github.tilcob.game.trigger.TrapTriggerHandler;
-import com.github.tilcob.game.trigger.TriggerHandler;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.trigger.*;
 
 import java.util.EnumMap;
 
 public class TriggerSystem extends IteratingSystem {
     private final EnumMap<Trigger.Type, TriggerHandler> handlers;
 
-    public TriggerSystem(AudioManager audioManager) {
+    public TriggerSystem(AudioManager audioManager, GameEventBus eventBus) {
         super(Family.all(Trigger.class).get());
         this.handlers = new EnumMap<>(Trigger.Type.class);
 
         handlers.put(Trigger.Type.TRAP, new TrapTriggerHandler(audioManager));
         handlers.put(Trigger.Type.CHEST, new ChestTriggerHandler());
         handlers.put(Trigger.Type.CHANGE_MAP, new ChangeMapTriggerHandler());
+        handlers.put(Trigger.Type.QUEST, new QuestTrigger(eventBus));
     }
 
     @Override

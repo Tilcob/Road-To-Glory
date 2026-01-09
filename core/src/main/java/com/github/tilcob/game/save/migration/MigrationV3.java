@@ -1,8 +1,8 @@
 package com.github.tilcob.game.save.migration;
 
 import com.github.tilcob.game.assets.MapAsset;
-import com.github.tilcob.game.save.states.ChestRegistryState;
-import com.github.tilcob.game.save.states.ChestState;
+import com.github.tilcob.game.save.states.chest.ChestRegistryState;
+import com.github.tilcob.game.save.states.chest.ChestState;
 import com.github.tilcob.game.save.states.GameState;
 
 import java.util.HashMap;

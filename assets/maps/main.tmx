@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="24">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="25">
  <properties>
   <property name="music" value="TOWN"/>
  </properties>
@@ -50,6 +50,12 @@
     <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
    </properties>
    <ellipse/>
+  </object>
+  <object id="24" type="Trigger" x="295" y="221" width="10" height="15">
+   <properties>
+    <property name="questId" value="Talk_To_Jakob"/>
+    <property name="triggerType" propertytype="TriggerType" value="QUEST"/>
+   </properties>
   </object>
  </objectgroup>
  <layer id="4" name="foreground" width="30" height="20">

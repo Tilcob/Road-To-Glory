@@ -10,26 +10,26 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                4,
-                3
+                3,
+                4
             ],
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 84.5,
-                "y": 70.75
+                "x": 80,
+                "y": 79.75
             }
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                5,
-                3
+                3,
+                5
             ],
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 138.5,
-                "y": 268.75
+                "x": 264,
+                "y": 159.75
             }
         },
         "objects.tsx": {
