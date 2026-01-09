@@ -29,7 +29,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.loot.LootTableType;
 import com.github.tilcob.game.save.registry.ChestRegistry;
-import com.github.tilcob.game.save.states.ChestState;
+import com.github.tilcob.game.save.states.chest.ChestState;
 
 public class TiledAshleyConfigurator {
     private final Engine engine;
@@ -261,7 +261,6 @@ public class TiledAshleyConfigurator {
     }
 
     public void onLoadTrigger(Trigger.Type type, MapObject triggerMapObject) {
-
         if (triggerMapObject instanceof RectangleMapObject rectMapObject) {
             makeRectTriggerEntity(triggerMapObject, rectMapObject, type);
         } else if (triggerMapObject instanceof EllipseMapObject ellipseMapObj) {
@@ -290,6 +289,8 @@ public class TiledAshleyConfigurator {
             tmpVec2.set(rectangle.getX(), rectangle.getY()).scl(Constants.UNIT_SCALE), entity
         );
         entity.add(new Trigger(type));
+        String questId = rectMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
+        if (!questId.isBlank()) entity.add(new Quest(questId));
         entity.add(new Tiled(rectMapObject));
         entity.add(new MapEntity());
 
@@ -313,6 +314,8 @@ public class TiledAshleyConfigurator {
             entity
         );
         entity.add(new Trigger(type));
+        String questId = ellipseMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
+        if (!questId.isBlank()) entity.add(new Quest(questId));
         entity.add(new Tiled(ellipseMapObject));
         entity.add(new MapEntity());
 
@@ -336,6 +339,8 @@ public class TiledAshleyConfigurator {
             tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
         );
         entity.add(new Trigger(type));
+        String questId = polygonMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
+        if (!questId.isBlank()) entity.add(new Quest(questId));
         entity.add(new Tiled(polygonMapObject));
         entity.add(new MapEntity());
 
@@ -359,6 +364,8 @@ public class TiledAshleyConfigurator {
             tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
         );
         entity.add(new Trigger(type));
+        String questId = polylineMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
+        if (!questId.isBlank()) entity.add(new Quest(questId));
         entity.add(new Tiled(polylineMapObject));
         entity.add(new MapEntity());
 

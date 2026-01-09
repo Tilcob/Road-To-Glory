@@ -4,6 +4,12 @@ import com.badlogic.gdx.Gdx;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.save.states.chest.ChestRegistryState;
+import com.github.tilcob.game.save.states.chest.ChestState;
+import com.github.tilcob.game.save.states.quest.QuestState;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
@@ -12,6 +18,7 @@ public class GameState {
     private String currentMapByName;
     private PlayerState playerState;
     private ChestRegistryState chestRegistryState;
+    private List<QuestState> quests = new ArrayList<>();
     private int saveVersion = 1;
 
     public GameState() {}
@@ -31,6 +38,15 @@ public class GameState {
     public void setChestRegistryState(ChestRegistryState chestRegistryState) {
         this.chestRegistryState = chestRegistryState;
     }
+
+    public List<QuestState> getQuests() {
+        return quests;
+    }
+
+    public void setQuests(List<QuestState> quests) {
+        this.quests = quests;
+    }
+
     @JsonIgnore
     public MapAsset getCurrentMap() {
         if (currentMap != null) return currentMap;

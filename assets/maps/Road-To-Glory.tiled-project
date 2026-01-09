@@ -116,6 +116,11 @@
                     "value": 0
                 },
                 {
+                    "name": "questId",
+                    "type": "string",
+                    "value": ""
+                },
+                {
                     "name": "sensor",
                     "type": "bool",
                     "value": true
@@ -154,7 +159,8 @@
             "values": [
                 "CHEST",
                 "TRAP",
-                "CHANGE_MAP"
+                "CHANGE_MAP",
+                "QUEST"
             ],
             "valuesAsFlags": false
         }

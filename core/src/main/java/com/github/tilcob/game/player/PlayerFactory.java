@@ -50,6 +50,7 @@ public class PlayerFactory {
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
         entity.add(new Inventory());
+        entity.add(new QuestLog());
 
         engine.addEntity(entity);
         return entity;

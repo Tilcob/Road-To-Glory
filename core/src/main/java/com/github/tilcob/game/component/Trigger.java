@@ -3,13 +3,16 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.utils.ObjectSet;
+import com.github.tilcob.game.config.Constants;
 
 public class Trigger implements Component {
     public static final ComponentMapper<Trigger> MAPPER = ComponentMapper.getFor(Trigger.class);
 
     private final ObjectSet<Entity> entities = new ObjectSet<>();
     private final Type type;
+
 
     public Trigger(Type type) {
         this.type = type;
@@ -32,6 +35,9 @@ public class Trigger implements Component {
     }
 
     public enum Type {
-        TRAP, CHEST, CHANGE_MAP
+        TRAP,
+        CHEST,
+        CHANGE_MAP,
+        QUEST,
     }
 }

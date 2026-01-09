@@ -12462,7 +12462,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: true
-						value: Other_panel_border_brown_detail
+						value: Other_panel_brown
 					}
 					corner: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable

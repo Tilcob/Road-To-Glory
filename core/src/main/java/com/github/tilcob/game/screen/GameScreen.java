@@ -18,6 +18,7 @@ import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Controller;
+import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.AutosaveEvent;
@@ -27,6 +28,8 @@ import com.github.tilcob.game.input.GameState;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
+import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestLoader;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -78,10 +81,11 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new DamageSystem(gameViewModel));
         this.engine.addSystem(new LifeSystem(gameViewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
-        this.engine.addSystem(new TriggerSystem(audioManager));
+        this.engine.addSystem(new TriggerSystem(audioManager, game.getEventBus()));
         this.engine.addSystem(new MapChangeSystem(tiledManager, game.getEventBus(), game.getStateManager()));
         this.engine.addSystem(new InventorySystem(game.getEventBus()));
         this.engine.addSystem(new ChestSystem());
+        this.engine.addSystem(new QuestSystem(game.getEventBus()));
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
         this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
@@ -111,6 +115,13 @@ public class GameScreen extends ScreenAdapter {
         tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
 
         createPlayer();
+        loadQuest();
+    }
+
+    private void loadQuest() {
+        QuestLoader loader = new QuestLoader(new QuestFactory(game.getEventBus()));
+        QuestLog questLog = QuestLog.MAPPER.get(player);
+        game.getStateManager().loadQuests(questLog, loader);
     }
 
     private void createPlayer() {
@@ -119,11 +130,10 @@ public class GameScreen extends ScreenAdapter {
 
         if (game.getStateManager().getGameState().getPlayerState() != null) {
             PlayerStateApplier.apply(game.getStateManager().getGameState().getPlayerState(), player);
-            game.getStateManager().setPlayerState(player);
         } else {
             Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
-            game.getStateManager().setPlayerState(player);
         }
+        game.getStateManager().setPlayerState(player);
         game.getEventBus().fire(new UpdateInventoryEvent(player));
     }
 
@@ -152,6 +162,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void autosave(AutosaveEvent event) {
         if (player == null) return;
+        game.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
         game.getStateManager().setPlayerState(player);
         game.saveGame();
     }

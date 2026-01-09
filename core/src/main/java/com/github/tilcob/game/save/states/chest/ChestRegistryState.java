@@ -1,4 +1,4 @@
-package com.github.tilcob.game.save.states;
+package com.github.tilcob.game.save.states.chest;
 
 
 import com.badlogic.gdx.Gdx;

@@ -1,0 +1,13 @@
+{
+  "quests": [
+    {
+      "questId": "Talk_To_Jakob",
+      "steps" : [
+        {
+          "type": "talk",
+          "npc": "Jakob"
+        }
+      ]
+    }
+  ]
+}

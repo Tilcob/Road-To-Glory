@@ -152,13 +152,10 @@ public class TiledManager {
 
         // left edge
         createBoundary(boxThickness, halfMapHeight, -boxThickness, halfMapHeight, body);
-
         // right edge
         createBoundary(boxThickness, halfMapHeight, mapWidth + boxThickness, halfMapHeight, body);
-
         // bottom edge
         createBoundary(halfMapWidth, boxThickness, halfMapWidth, -boxThickness, body);
-
         // top edge
         createBoundary(halfMapWidth, boxThickness, halfMapWidth, mapHeight + boxThickness, body);
     }
