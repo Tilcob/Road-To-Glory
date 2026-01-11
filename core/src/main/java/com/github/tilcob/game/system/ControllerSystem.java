@@ -10,15 +10,16 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.screen.MenuScreen;
+import com.github.tilcob.game.screen.ScreenNavigator;
 
 public class ControllerSystem extends IteratingSystem {
-    private final GdxGame game;
+    private final ScreenNavigator screenNavigator;
     private final GameEventBus eventBus;
 
-    public ControllerSystem(GdxGame game) {
+    public ControllerSystem(ScreenNavigator screenNavigator, GameEventBus eventBus) {
         super(Family.all(Controller.class).get());
-        this.game = game;
-        this.eventBus = game.getEventBus();
+        this.screenNavigator = screenNavigator;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -36,7 +37,7 @@ public class ControllerSystem extends IteratingSystem {
                 case RIGHT -> moveEntity(entity, 1f, 0f);
                 case SELECT -> startEntityAttack(entity);
                 case CANCEL -> {
-                    game.setScreen(MenuScreen.class);
+                    screenNavigator.setScreen(MenuScreen.class);
                     eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
                 }
                 case INTERACT -> interact(entity);

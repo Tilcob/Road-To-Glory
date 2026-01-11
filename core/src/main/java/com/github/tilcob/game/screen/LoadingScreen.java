@@ -2,54 +2,49 @@ package com.github.tilcob.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.*;
 import com.github.tilcob.game.dialog.DialogLoader;
 import com.github.tilcob.game.quest.QuestFactory;
 
+import java.util.function.Consumer;
+
 public class LoadingScreen extends ScreenAdapter {
-    private final GdxGame game;
-    private final AssetManager assetManager;
+    private final GameServices services;
     private final QuestFactory questFactory;
     private final DialogLoader dialogLoader;
+    private final Consumer<LoadingScreen> onFinished;
 
-    public LoadingScreen(GdxGame game, AssetManager assetManager) {
-        this.game = game;
-        this.assetManager = assetManager;
-        this.questFactory = new QuestFactory(game.getEventBus());
+    public LoadingScreen(GameServices services, Consumer<LoadingScreen> onFinished) {
+        this.services = services;
+        this.questFactory = new QuestFactory(services.getEventBus());
         this.dialogLoader = new DialogLoader();
+        this.onFinished = onFinished;
     }
 
     @Override
     public void show() {
         for (AtlasAsset asset: AtlasAsset.values()) {
-            assetManager.queue(asset);
+            services.getAssetManager().queue(asset);
         }
         for (SoundAsset soundAsset : SoundAsset.values()) {
-            assetManager.queue(soundAsset);
+            services.getAssetManager().queue(soundAsset);
         }
         for (QuestAsset questAsset : QuestAsset.values()) {
-            game.getAllQuests().putAll(questFactory.loadAll(questAsset));
+            services.getAllQuests().putAll(questFactory.loadAll(questAsset));
         }
         for (DialogAsset dialogAsset : DialogAsset.values()) {
-            game.getAllDialogs().put(dialogAsset.name().toLowerCase(), dialogLoader.load(dialogAsset));
+            services.getAllDialogs().put(dialogAsset.name().toLowerCase(), dialogLoader.load(dialogAsset));
         }
-        assetManager.queue(SkinAsset.DEFAULT);
+        services.getAssetManager().queue(SkinAsset.DEFAULT);
     }
 
     @Override
     public void render(float delta) {
-        if (assetManager.update()) {
+        if (services.getAssetManager().update()) {
             Gdx.app.debug("LoadingScreen", "Finished asset loading.");
-            creatScreens();
-            game.removeScreen(this);
-            dispose();
-            game.setScreen(MenuScreen.class);
+            onFinished.accept(this);
         }
-    }
-
-    private void creatScreens() {
-        game.addScreen(new MenuScreen(game));
-        game.addScreen(new GameScreen(game));
     }
 }

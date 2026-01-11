@@ -1,6 +1,9 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.assets.SoundAsset;
@@ -13,14 +16,16 @@ import java.util.Map;
 
 public class GameViewModel extends ViewModel {
     private final AudioManager audioManager;
+    private final Viewport viewport;
     private int lifePoints;
     private int maxLife;
     private Map.Entry<Vector2, Integer> playerDamage;
     private final Vector2 tmpVec2;
 
-    public GameViewModel(GdxGame game) {
-        super(game);
-        this.audioManager = game.getAudioManager();
+    public GameViewModel(GameServices services, Viewport viewport) {
+        super(services);
+        this.audioManager = services.getAudioManager();
+        this.viewport = viewport;
         this.lifePoints = 0;
         this.maxLife = 0;
         this.playerDamage = null;
@@ -42,7 +47,7 @@ public class GameViewModel extends ViewModel {
 
     public Vector2 toScreenCoords(Vector2 position) {
         tmpVec2.set(position);
-        game.getViewport().project(tmpVec2);
+        viewport.project(tmpVec2);
         return tmpVec2;
     }
 
@@ -74,5 +79,10 @@ public class GameViewModel extends ViewModel {
             this.propertyChangeSupport.firePropertyChange(Constants.MAX_LIFE_PC, this.maxLife, maxLife);
         }
         this.maxLife = maxLife;
+    }
+
+    @Override
+    public void dispose() {
+        getEventBus().unsubscribe(DialogEvent.class, this::onDialog);
     }
 }
