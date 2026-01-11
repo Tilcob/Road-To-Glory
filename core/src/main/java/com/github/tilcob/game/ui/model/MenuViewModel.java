@@ -1,18 +1,22 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.Gdx;
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.screen.GameScreen;
+import com.github.tilcob.game.screen.ScreenNavigator;
 
 public class MenuViewModel extends ViewModel {
     private final AudioManager audioManager;
+    private final ScreenNavigator screenNavigator;
 
-    public MenuViewModel(GdxGame game) {
-        super(game);
-        this.audioManager = game.getAudioManager();
+    public MenuViewModel(GameServices services, ScreenNavigator screenNavigator) {
+        super(services);
+        this.audioManager = services.getAudioManager();
+        this.screenNavigator = screenNavigator;
 
         getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
@@ -65,7 +69,7 @@ public class MenuViewModel extends ViewModel {
     }
 
     public void startGame() {
-        game.setScreen(GameScreen.class);
+        screenNavigator.setScreen(GameScreen.class);
     }
 
     public void quitGame() {
@@ -74,6 +78,6 @@ public class MenuViewModel extends ViewModel {
 
     @Override
     public void dispose() {
-
+        getEventBus().unsubscribe(UiEvent.class, this::onUiEvent);
     }
 }

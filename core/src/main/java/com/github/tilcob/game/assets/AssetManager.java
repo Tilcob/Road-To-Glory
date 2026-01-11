@@ -13,6 +13,7 @@ import com.github.tommyettinger.freetypist.FreeTypistSkinLoader;
 
 public class AssetManager implements Disposable {
     private final com.badlogic.gdx.assets.AssetManager assetManager;
+    private TiledMap playerMap;
 
     public AssetManager(FileHandleResolver resolver) {
         this.assetManager = new com.badlogic.gdx.assets.AssetManager(resolver);
@@ -20,17 +21,17 @@ public class AssetManager implements Disposable {
         this.assetManager.setLoader(Skin.class, new FreeTypistSkinLoader(resolver));
     }
 
-    public <T> T load(Asset<T> asset) {
-        assetManager.load(asset.getAssetDescriptor());
-        assetManager.finishLoading();
-        return assetManager.get(asset.getAssetDescriptor());
-    }
-
     public <T> void queue(Asset<T> asset) {
         assetManager.load(asset.getAssetDescriptor());
     }
 
     public <T> T get(Asset<T> asset) {
+        return assetManager.get(asset.getAssetDescriptor());
+    }
+
+    public <T> T loadSync(Asset<T> asset) {
+        assetManager.load(asset.getAssetDescriptor());
+        assetManager.finishLoading();
         return assetManager.get(asset.getAssetDescriptor());
     }
 
@@ -43,9 +44,15 @@ public class AssetManager implements Disposable {
         return assetManager.update();
     }
 
+    public void finishLoading() {
+        assetManager.finishLoading();
+    }
+
     public TiledMapTile getPlayerTile() {
-        TiledMap player = new TmxMapLoader().load("maps/player.tmx");
-        TiledMapTileSet objects = player.getTileSets().getTileSet("objects");
+        if (playerMap == null) {
+            playerMap = get(PlayerMapAsset.PLAYER);
+        }
+        TiledMapTileSet objects = playerMap.getTileSets().getTileSet("objects");
         return objects.getTile(Constants.PLAYER_ID);
     }
 
@@ -55,6 +62,10 @@ public class AssetManager implements Disposable {
 
     @Override
     public void dispose() {
+        if (playerMap != null) {
+            playerMap.dispose();
+            playerMap = null;
+        }
         assetManager.dispose();
     }
 }

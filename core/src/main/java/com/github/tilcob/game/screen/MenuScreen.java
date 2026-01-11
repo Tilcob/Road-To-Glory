@@ -1,11 +1,13 @@
 package com.github.tilcob.game.screen;
 
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
@@ -16,18 +18,30 @@ import com.github.tilcob.game.ui.model.MenuViewModel;
 import com.github.tilcob.game.ui.view.MenuView;
 
 public class MenuScreen extends ScreenAdapter {
-    private final GdxGame game;
+    private final GameServices services;
     private final Stage stage;
     private final Skin skin;
     private final Viewport uiViewport;
-    private final KeyboardController  keyboardController;
+    private final KeyboardController keyboardController;
+    private final InputMultiplexer inputMultiplexer;
+    private final ScreenNavigator screenNavigator;
 
-    public MenuScreen(GdxGame game) {
-        this.game = game;
-        this.uiViewport = new FitViewport(800f, 450f);
-        this.stage = new Stage(uiViewport, game.getBatch());
-        this.skin = game.getAssetManager().get(SkinAsset.DEFAULT);
-        this.keyboardController = new KeyboardController(UiControllerState.class, game.getEventBus(), GameState.MENU, null);
+    public MenuScreen(
+        GameServices services,
+        com.badlogic.gdx.graphics.g2d.Batch batch,
+        InputMultiplexer inputMultiplexer,
+        Viewport uiViewport,
+        ScreenNavigator screenNavigator
+    ) {
+        this.services = services;
+        this.uiViewport = uiViewport;
+        this.stage = new Stage(uiViewport, batch);
+        this.skin = services.getAssetManager().get(SkinAsset.DEFAULT);
+        this.keyboardController = new KeyboardController(
+            UiControllerState.class, services.getEventBus(), GameState.MENU, null
+        );
+        this.inputMultiplexer = inputMultiplexer;
+        this.screenNavigator = screenNavigator;
     }
 
     @Override
@@ -37,10 +51,9 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        game.setInputProcessors(stage, keyboardController);
-
-        stage.addActor(new MenuView(skin, stage, new MenuViewModel(game)));
-        game.getAudioManager().playMusic(MusicAsset.MENU);
+        setInputProcessors(stage, keyboardController);
+        stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator)));
+        services.getAudioManager().playMusic(MusicAsset.MENU);
     }
 
     @Override
@@ -54,6 +67,15 @@ public class MenuScreen extends ScreenAdapter {
         stage.getBatch().setColor(Color.WHITE);
         stage.act(delta);
         stage.draw();
+    }
+
+    private void setInputProcessors(com.badlogic.gdx.InputProcessor... processors) {
+        inputMultiplexer.clear();
+        if (processors == null) return;
+
+        for (com.badlogic.gdx.InputProcessor processor : processors) {
+            inputMultiplexer.addProcessor(processor);
+        }
     }
 
     @Override

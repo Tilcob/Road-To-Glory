@@ -25,48 +25,43 @@ import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.screen.LoadingScreen;
+import com.github.tilcob.game.screen.MenuScreen;
+import com.github.tilcob.game.screen.ScreenFactory;
+import com.github.tilcob.game.screen.ScreenNavigator;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-public class GdxGame extends Game {
+public class GdxGame extends Game implements ScreenNavigator {
     private Batch batch;
     private OrthographicCamera camera;
     private Viewport viewport;
-    private AssetManager assetManager;
-    private AudioManager audioManager;
     private GLProfiler glProfiler;
     private FPSLogger fpsLogger;
     private InputMultiplexer inputMultiplexer;
-    private final GameEventBus eventBus = new GameEventBus();
-    private final ItemRegistry itemRegistry = new ItemRegistry(eventBus);
-    private final ChestRegistry chestRegistry = new ChestRegistry();
-    private final StateManager stateManager = new StateManager(new GameState());
-    private SaveManager saveManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
-    private final Map<String, Quest> allQuests = new HashMap<>();
-    private final Map<String, MapDialogData> allDialogs = new HashMap<>();
+    private GameServices services;
+    private ScreenFactory screenFactory;
 
     @Override
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         inputMultiplexer = new InputMultiplexer();
         Gdx.input.setInputProcessor(inputMultiplexer);
-        saveManager = new SaveManager(
-            Gdx.files.local("savegame.json").path()
-        );
-        loadGame();
+
+        services = new GameServices(new InternalFileHandleResolver(),
+            Gdx.files.local("savegame.json").path());
+        services.loadGame();
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
-        assetManager = new AssetManager(new InternalFileHandleResolver());
-        audioManager = new AudioManager(assetManager);
         glProfiler = new GLProfiler(Gdx.graphics);
         fpsLogger = new FPSLogger();
+        screenFactory = new ScreenFactory(services, batch, camera, viewport, inputMultiplexer, this);
 
         glProfiler.enable();
-        addScreen(new LoadingScreen(this, assetManager));
+        addScreen(screenFactory.createLoadingScreen(this::onLoadingFinished));
         setScreen(LoadingScreen.class);
     }
 
@@ -96,6 +91,7 @@ public class GdxGame extends Game {
         screenCache.remove(screen.getClass());
     }
 
+    @Override
     public void setScreen(Class<? extends Screen> screenClass) {
         Screen screen = screenCache.get(screenClass);
         if (screen == null) {
@@ -104,36 +100,12 @@ public class GdxGame extends Game {
         super.setScreen(screen);
     }
 
-    public void loadGame() {
-        if (saveManager.exists()) {
-            try {
-                GameState loaded = saveManager.load();
-                stateManager.setGameState(loaded);
-                chestRegistry.loadFromState(stateManager.loadChestRegistryState());
-            } catch (IOException e) {
-                Gdx.app.error("GdxGame", "Error loading state: " + e.getMessage());
-            }
-        }  else {
-            stateManager.setGameState(new GameState());
-        }
-    }
-
-    public void saveGame() {
-        try {
-            stateManager.saveChestRegistryState(chestRegistry.toState());
-            saveManager.save(stateManager.getGameState());
-        } catch (IOException e) {
-            Gdx.app.error("GdxGame", "Error saving state: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void dispose() {
-        screenCache.values().forEach(Screen::dispose);
-        screenCache.clear();
-        batch.dispose();
-        assetManager.debugDiagnostics();
-        assetManager.dispose();
+    private void onLoadingFinished(LoadingScreen loadingScreen) {
+        addScreen(screenFactory.createMenuScreen());
+        addScreen(screenFactory.createGameScreen());
+        removeScreen(loadingScreen);
+        loadingScreen.dispose();
+        setScreen(MenuScreen.class);
     }
 
     public Batch getBatch() {
@@ -148,40 +120,8 @@ public class GdxGame extends Game {
         return viewport;
     }
 
-    public AssetManager getAssetManager() {
-        return assetManager;
-    }
-
-    public AudioManager getAudioManager() {
-        return audioManager;
-    }
-
-    public GameEventBus getEventBus() {
-        return eventBus;
-    }
-
-    public ItemRegistry getItemRegistry() {
-        return itemRegistry;
-    }
-
-    public ChestRegistry getChestRegistry() {
-        return chestRegistry;
-    }
-
-    public StateManager getStateManager() {
-        return stateManager;
-    }
-
-    public SaveManager getSaveManager() {
-        return saveManager;
-    }
-
-    public Map<String, Quest> getAllQuests() {
-        return allQuests;
-    }
-
-    public Map<String, MapDialogData> getAllDialogs() {
-        return allDialogs;
+    public GameServices getServices() {
+        return services;
     }
 
     public void setInputProcessors(InputProcessor... processors) {
@@ -191,5 +131,15 @@ public class GdxGame extends Game {
         for (InputProcessor processor : processors) {
             inputMultiplexer.addProcessor(processor);
         }
+    }
+
+    @Override
+    public void dispose() {
+        screenCache.values().forEach(Screen::dispose);
+        screenCache.clear();
+        batch.dispose();
+        services.getAssetManager().debugDiagnostics();
+        services.getAssetManager().dispose();
+
     }
 }

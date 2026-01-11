@@ -1,5 +1,6 @@
 package com.github.tilcob.game.ui.model;
 
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.event.GameEventBus;
 
@@ -7,14 +8,14 @@ import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
 
 public abstract class ViewModel {
-    protected final GdxGame game;
+    protected final GameServices services;
     protected final PropertyChangeSupport propertyChangeSupport;
     protected final GameEventBus gameEventBus;
 
-    public ViewModel(GdxGame game) {
-        this.game = game;
+    public ViewModel(GameServices services) {
+        this.services = services;
         this.propertyChangeSupport = new PropertyChangeSupport(this);
-        this.gameEventBus = game.getEventBus();
+        this.gameEventBus = services.getEventBus();
     }
 
     public <T> void onPropertyChange(String propertyName, Class<T> propertyType, OnPropertyChange<T> consumer) {

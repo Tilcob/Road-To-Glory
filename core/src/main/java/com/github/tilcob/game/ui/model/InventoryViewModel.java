@@ -3,6 +3,7 @@ package com.github.tilcob.game.ui.model;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
+import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Inventory;
@@ -16,8 +17,8 @@ public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();
     private boolean open = false;
 
-    public InventoryViewModel(GdxGame game) {
-        super(game);
+    public InventoryViewModel(GameServices services) {
+        super(services);
 
         getEventBus().subscribe(UpdateInventoryEvent.class, this::updateInventory);
         getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
@@ -78,10 +79,10 @@ public class InventoryViewModel extends ViewModel {
 
     @Override
     public void dispose() {
-        game.getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
-        game.getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
-        game.getEventBus().unsubscribe(UiEvent.class, this::onUiEvent);
-        game.getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);
-        game.getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
+        getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
+        getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
+        getEventBus().unsubscribe(UiEvent.class, this::onUiEvent);
+        getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);
+        getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
     }
 }
