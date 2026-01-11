@@ -2,9 +2,12 @@ package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.GdxGame;
+import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.DialogEvent;
+import com.github.tilcob.game.event.FinishedDialogEvent;
 
 import java.util.Map;
 
@@ -22,6 +25,13 @@ public class GameViewModel extends ViewModel {
         this.maxLife = 0;
         this.playerDamage = null;
         this.tmpVec2 = new Vector2();
+
+        getEventBus().subscribe(DialogEvent.class, this::onDialog);
+    }
+
+    private void onDialog(DialogEvent event) {
+        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, event.lines());
+        getEventBus().fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, event.entity()));
     }
 
     public void playerDamage(int amount, float x, float y) {

@@ -29,8 +29,8 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(entity);
 
         for (Quest quest : questLog.getQuests()) {
+            if (quest.isCompleted()) continue;
             QuestStep step = quest.getSteps().get(quest.getCurrentStep());
-
             if (step.isCompleted()) {
                 quest.incCurrentStep();
                 if (quest.getCurrentStep() < quest.getSteps().size()) {

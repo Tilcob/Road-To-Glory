@@ -28,6 +28,7 @@ import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.loot.LootTableType;
+import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.chest.ChestState;
 
@@ -71,12 +72,24 @@ public class TiledAshleyConfigurator {
         addEntityLife(tile, entity);
         addEntityAttack(tile, entity);
         addEntityChest(object, entity);
+        addEntityNpc(object, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new Fsm(entity));
         entity.add(new Tiled(object));
         entity.add(new MapEntity());
 
         engine.addEntity(entity);
+    }
+
+    private void addEntityNpc(MapObject object, Entity entity) {
+        String npcTypeStr = object.getProperties().get(Constants.NPC_TYPE, "", String.class);
+        String name = object.getName();
+        if (npcTypeStr.isBlank() || npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
+
+        entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
+        //entity.add(new Controller());
+        entity.add(new PlayerReference(null));
+        entity.add(new Dialog());
     }
 
     private void addEntityChest(MapObject object, Entity entity) {

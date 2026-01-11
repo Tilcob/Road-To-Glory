@@ -17,4 +17,9 @@ public class ChangeMapTriggerHandler implements TriggerHandler {
 
         triggeringEntity.add(new MapChange(mapAsset));
     }
+
+    @Override
+    public void exit(Entity trigger, Entity triggeringEntity) {
+
+    }
 }

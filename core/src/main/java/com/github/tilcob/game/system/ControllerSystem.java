@@ -64,12 +64,17 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
-        OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);
-        if (openChestRequest == null) return;
-
-        Entity chestEntity = openChestRequest.getChest();
-        Chest.MAPPER.get(chestEntity).open();
-
+        if (OpenChestRequest.MAPPER.get(player) != null) {
+            OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);
+            Entity chestEntity = openChestRequest.getChest();
+            Chest.MAPPER.get(chestEntity).open();
+        }
+        if (StartDialogRequest.MAPPER.get(player) != null) {
+            StartDialogRequest startDialogRequest = StartDialogRequest.MAPPER.get(player);
+            Entity npc = startDialogRequest.getNpc();
+            PlayerReference.MAPPER.get(npc).setPlayer(player);
+            Dialog.MAPPER.get(npc).setState(Dialog.State.REQUEST);
+        }
     }
 
     private void startEntityAttack(Entity entity) {

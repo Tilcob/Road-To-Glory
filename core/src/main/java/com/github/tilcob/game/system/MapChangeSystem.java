@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.tiled.TiledManager;
 
@@ -31,6 +32,7 @@ public class MapChangeSystem extends IteratingSystem {
         tiledManager.setMap(tiledManager.loadMap(mapChange.getMapAsset()));
         Vector2 spawn = tiledManager.getSpawnPoint();
         eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
+        eventBus.fire(new MapChangeEvent(mapChange.getMapAsset().name().toLowerCase()));
 
         Transform.MAPPER.get(entity).getPosition().set(spawn.x, spawn.y);
         Physic.MAPPER.get(entity).getBody().setTransform(spawn.x, spawn.y, 0);

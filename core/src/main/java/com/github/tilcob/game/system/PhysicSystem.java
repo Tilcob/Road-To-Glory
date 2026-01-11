@@ -7,20 +7,23 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
-import com.github.tilcob.game.component.Physic;
-import com.github.tilcob.game.component.Player;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
-import com.github.tilcob.game.component.Trigger;
+import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.ExitTriggerEvent;
+import com.github.tilcob.game.event.GameEventBus;
 
 public class PhysicSystem extends IteratingSystem implements EntityListener, ContactListener {
     private final World world;
     private final float interval;
+    private final GameEventBus eventBus;
     private float accumulator;
 
-    public PhysicSystem(World world, float interval) {
+    public PhysicSystem(World world, float interval, GameEventBus eventBus) {
         super(Family.all(Physic.class, Transform.class).get());
         this.world = world;
         this.interval = interval;
+        this.eventBus = eventBus;
         this.accumulator = 0;
         world.setContactListener(this);
     }
@@ -87,6 +90,10 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     }
 
+    private boolean isDialogSensor(Fixture fixture) {
+        Object data = fixture.getUserData();
+        return data instanceof String && ((String) data).equals(Constants.DIALOG_REQUEST);
+    }
 
     // Don't add or remove bodies here!!!!
 
@@ -114,11 +121,40 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
         if (trigger != null && isPlayer) {
             trigger.add(entityA);
+            return;
         }
+
+        if (isDialogSensor(fixtureA) && Player.MAPPER.get(entityB) != null) {
+            trigger = Trigger.MAPPER.get(entityA);
+            if (trigger != null) {
+                trigger.add(entityB);
+            } else {
+                entityB.add(new StartDialogRequest(entityA));
+            }
+            return;
+        }
+
+        if (isDialogSensor(fixtureB) && Player.MAPPER.get(entityA) != null) {
+            trigger = Trigger.MAPPER.get(entityB);
+            if (trigger != null) {
+                trigger.add(entityA);
+            } else {
+                entityA.add(new StartDialogRequest(entityB));
+            }
+        }
+
     }
 
     @Override
     public void endContact(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Object userDataA = fixtureA.getBody().getUserData();
+        Fixture fixtureB = contact.getFixtureB();
+        Object userDataB = fixtureB.getBody().getUserData();
+
+        if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
+
+        onExit(entityA, fixtureA, entityB, fixtureB);
     }
 
     private void onExit(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
@@ -126,6 +162,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         boolean isPlayer = Player.MAPPER.get(entityB) != null && !fixtureB.isSensor();
         if (trigger != null && isPlayer) {
             trigger.remove(entityB);
+            eventBus.fire(new ExitTriggerEvent(entityB, entityA));
             return;
         }
 
@@ -133,6 +170,28 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
         if (trigger != null && isPlayer) {
             trigger.remove(entityA);
+            eventBus.fire(new ExitTriggerEvent(entityA, entityB));
+        }
+
+        if (isDialogSensor(fixtureA) && Player.MAPPER.get(entityB) != null) {
+            trigger = Trigger.MAPPER.get(entityA);
+            if (trigger != null) {
+                trigger.remove(entityB);
+            } else {
+                entityA.add(new Trigger(Trigger.Type.DIALOG));
+            }
+            eventBus.fire(new ExitTriggerEvent(entityB, entityA));
+            return;
+        }
+
+        if (isDialogSensor(fixtureB) && Player.MAPPER.get(entityA) != null) {
+            trigger = Trigger.MAPPER.get(entityB);
+            if (trigger != null) {
+                trigger.remove(entityA);
+            } else {
+                entityB.add(new Trigger(Trigger.Type.DIALOG));
+            }
+            eventBus.fire(new ExitTriggerEvent(entityA, entityB));
         }
     }
 

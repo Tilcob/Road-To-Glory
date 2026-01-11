@@ -1,0 +1,28 @@
+{
+    "npcs": {
+        "Npc-1": {
+            "idle": [
+                "Good day sir.",
+                "Take care."
+            ],
+            "questDialog": {
+                "questId": "Welcome_To_Town",
+                "notStarted": [
+                    "Welcome in our town!"
+                ],
+                "inProgress": [
+                    "Are you new here?"
+                ],
+                "completed": [
+                    "By my friend!"
+                ]
+            }
+        },
+        "Merchant-1": {
+            "idle": [
+                "Welcome in my shop!",
+                "Would you like to see my wares?"
+            ]
+        }
+    }
+}

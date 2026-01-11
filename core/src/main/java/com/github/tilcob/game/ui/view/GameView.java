@@ -1,5 +1,6 @@
 package com.github.tilcob.game.ui.view;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -8,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tommyettinger.textra.TextraLabel;
@@ -41,6 +43,11 @@ public class GameView extends View<GameViewModel> {
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.LIFE_POINTS_PC, Integer.class, this::updateLife);
         viewModel.onPropertyChange(Constants.PLAYER_DAMAGE_PC, Map.Entry.class, this::showDamage);
+        viewModel.onPropertyChange(Constants.SHOW_DIALOG, Array.class, this::showDialog);
+    }
+
+    private void showDialog(Array<String> array) {
+        Gdx.app.log("showDialog", array.toString());
     }
 
     private void updateLife(int lifePoints) {
@@ -61,7 +68,7 @@ public class GameView extends View<GameViewModel> {
         final Vector2 position = damageAndPosition.getKey();
         int damage = damageAndPosition.getValue();
 
-        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RAINBOW}" + damage, skin);
+        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RED}" + damage, skin);
         stage.addActor(textraLabel);
 
         textraLabel.addAction(
