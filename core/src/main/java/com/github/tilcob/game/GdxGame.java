@@ -52,7 +52,7 @@ public class GdxGame extends Game implements ScreenNavigator {
 
         services = new GameServices(new InternalFileHandleResolver(),
             Gdx.files.local("savegame.json").path());
-
+        services.loadGame();
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);

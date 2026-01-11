@@ -29,10 +29,9 @@ public class AudioManager {
 
         if (this.currentMusic != null) {
             this.currentMusic.stop();
-            assetManager.unload(this.currentMusicAsset);
         }
 
-        this.currentMusic = assetManager.load(musicAsset);
+        this.currentMusic = assetManager.loadSync(musicAsset);
         this.currentMusic.setLooping(true);
         this.currentMusic.setVolume(musicVolume);
         this.currentMusic.play();

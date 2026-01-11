@@ -60,7 +60,7 @@ public class TiledManager {
 
 
     public TiledMap loadMap(MapAsset mapAsset){
-        TiledMap tiledMap = assetManager.load(mapAsset);
+        TiledMap tiledMap = assetManager.loadSync(mapAsset);
         tiledMap.getProperties().put(Constants.MAP_ASSET, mapAsset);
         return tiledMap;
     }

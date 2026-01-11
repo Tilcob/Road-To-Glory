@@ -27,7 +27,8 @@ public class GameEventBus {
         Array<Consumer<?>> list = listeners.get(type);
         if (list == null) return;
 
-        for (Consumer<?> listener : list) {
+        Array<Consumer<?>> snapshot = new Array<>(list);
+        for (Consumer<?> listener : snapshot) {
             ((Consumer<T>) listener).accept(event);
         }
     }
