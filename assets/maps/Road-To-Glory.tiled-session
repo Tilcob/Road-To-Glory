@@ -10,8 +10,8 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                3,
-                4
+                4,
+                3
             ],
             "scale": 2,
             "selectedLayer": 2,
@@ -22,11 +22,11 @@
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                3,
-                5
+                5,
+                3
             ],
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 264,
                 "y": 159.75
@@ -35,17 +35,17 @@
         "objects.tsx": {
             "dynamicWrapping": true,
             "scaleInDock": 1,
-            "scaleInEditor": 1
+            "scaleInEditor": 0.75
         },
         "player.tmx": {
             "expandedObjectLayers": [
                 2
             ],
-            "scale": 1.5,
+            "scale": 4,
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 8,
-                "y": 7.666666666666686
+                "y": 7.875
             }
         },
         "terrain.tsx": {
@@ -69,7 +69,7 @@
         "player.tmx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "string",
+    "property.type": "NpcType",
     "recentFiles": [
         "player.tmx",
         "terrain.tsx",

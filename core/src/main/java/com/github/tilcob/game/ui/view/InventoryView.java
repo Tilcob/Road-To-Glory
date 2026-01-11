@@ -5,7 +5,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
-import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
@@ -84,9 +83,12 @@ public class InventoryView extends View<InventoryViewModel> {
         questLog.clear();
         for (Quest quest : quests) {
             String questId = quest.getQuestId().replace("_", " ");
-            Label label = new Label(questId, skin, "text_8");
+            Label label = new Label(questId, skin, "text_08");
             label.setColor(skin.getColor("BLACK"));
-            questLog.add(label).row();
+            Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
+            image.setVisible(quest.isCompleted());
+            questLog.add(label);
+            questLog.add(image).row();
         }
     }
 

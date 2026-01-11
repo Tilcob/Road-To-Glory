@@ -8,6 +8,12 @@
           "npc": "Jakob"
         }
       ]
+    },
+    {
+      "questId": "Talk",
+      "steps": [
+
+      ]
     }
   ]
 }

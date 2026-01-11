@@ -33,4 +33,9 @@ public class TrapTriggerHandler implements TriggerHandler {
 
         triggeringEntity.add(new Damaged(2f));
     }
+
+    @Override
+    public void exit(Entity trigger, Entity triggeringEntity) {
+
+    }
 }

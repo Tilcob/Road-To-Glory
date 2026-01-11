@@ -5543,46 +5543,6 @@ atlasData: {
 			hidden: false
 		}
 		{
-			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_checkbox_grey_cross.png
-			bgColor: {
-				r: 1
-				g: 1
-				b: 1
-				a: 1
-			}
-			tint: null
-			tintName: null
-			name: Other_checkbox_grey_cross
-			tiled: false
-			minWidth: -1
-			minHeight: -1
-			customized: false
-			tenPatchData: null
-			tvgData: null
-			type: TEXTURE
-			hidden: false
-		}
-		{
-			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_checkbox_grey_empty.png
-			bgColor: {
-				r: 1
-				g: 1
-				b: 1
-				a: 1
-			}
-			tint: null
-			tintName: null
-			name: Other_checkbox_grey_empty
-			tiled: false
-			minWidth: -1
-			minHeight: -1
-			customized: false
-			tenPatchData: null
-			tvgData: null
-			type: TEXTURE
-			hidden: false
-		}
-		{
 			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_hexagon_brown.png
 			bgColor: {
 				r: 1
@@ -11662,6 +11622,46 @@ atlasData: {
 			type: TEXTURE
 			hidden: false
 		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_checkbox_grey_empty.9.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: Other_checkbox_grey_empty
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: NINE_PATCH
+			hidden: false
+		}
+		{
+			file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_checkbox_grey_cross.9.png
+			bgColor: {
+				r: 1
+				g: 1
+				b: 1
+				a: 1
+			}
+			tint: null
+			tintName: null
+			name: Other_checkbox_grey_cross
+			tiled: false
+			minWidth: -1
+			minHeight: -1
+			customized: false
+			tenPatchData: null
+			tvgData: null
+			type: NINE_PATCH
+			hidden: false
+		}
 	]
 	fontDrawables: []
 }
@@ -12462,7 +12462,7 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: true
-						value: Other_panel_brown
+						value: Other_panel_border_brown_detail
 					}
 					corner: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
@@ -13076,13 +13076,13 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: checkboxOn
 						optional: false
-						value: null
+						value: Other_checkbox_grey_cross
 					}
 					checkboxOff: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: checkboxOff
 						optional: false
-						value: null
+						value: Other_checkbox_grey_empty
 					}
 					checkboxOnOver: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
@@ -13112,13 +13112,13 @@ jsonData: {
 						type: com.badlogic.gdx.graphics.g2d.BitmapFont
 						name: font
 						optional: false
-						value: null
+						value: Kenny_Future_16
 					}
 					fontColor: {
 						type: com.badlogic.gdx.graphics.Color
 						name: fontColor
 						optional: true
-						value: null
+						value: BLACK
 					}
 					downFontColor: {
 						type: com.badlogic.gdx.graphics.Color
@@ -13260,6 +13260,201 @@ jsonData: {
 					}
 				}
 				deletable: false
+				parent: null
+			}
+			{
+				class: com.ray3k.skincomposer.data.StyleData
+				name: font_10
+				clazz: com.badlogic.gdx.scenes.scene2d.ui.CheckBox
+				properties: {
+					checkboxOn: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOn
+						optional: false
+						value: Other_checkbox_grey_cross
+					}
+					checkboxOff: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOff
+						optional: false
+						value: Other_checkbox_grey_empty
+					}
+					checkboxOnOver: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOnOver
+						optional: true
+						value: null
+					}
+					checkboxOver: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOver
+						optional: true
+						value: null
+					}
+					checkboxOnDisabled: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOnDisabled
+						optional: true
+						value: null
+					}
+					checkboxOffDisabled: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkboxOffDisabled
+						optional: true
+						value: null
+					}
+					font: {
+						type: com.badlogic.gdx.graphics.g2d.BitmapFont
+						name: font
+						optional: false
+						value: Kenny_Future_10
+					}
+					fontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: fontColor
+						optional: true
+						value: BLACK
+					}
+					downFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: downFontColor
+						optional: true
+						value: null
+					}
+					overFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: overFontColor
+						optional: true
+						value: null
+					}
+					focusedFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: focusedFontColor
+						optional: true
+						value: null
+					}
+					disabledFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: disabledFontColor
+						optional: true
+						value: null
+					}
+					checkedFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: checkedFontColor
+						optional: true
+						value: null
+					}
+					checkedDownFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: checkedDownFontColor
+						optional: true
+						value: null
+					}
+					checkedOverFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: checkedOverFontColor
+						optional: true
+						value: null
+					}
+					checkedFocusedFontColor: {
+						type: com.badlogic.gdx.graphics.Color
+						name: checkedFocusedFontColor
+						optional: true
+						value: null
+					}
+					up: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: up
+						optional: true
+						value: null
+					}
+					down: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: down
+						optional: true
+						value: null
+					}
+					over: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: over
+						optional: true
+						value: null
+					}
+					focused: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: focused
+						optional: true
+						value: null
+					}
+					disabled: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: disabled
+						optional: true
+						value: null
+					}
+					checked: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checked
+						optional: true
+						value: null
+					}
+					checkedOver: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkedOver
+						optional: true
+						value: null
+					}
+					checkedDown: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkedDown
+						optional: true
+						value: null
+					}
+					checkedFocused: {
+						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+						name: checkedFocused
+						optional: true
+						value: null
+					}
+					pressedOffsetX: {
+						type: float
+						name: pressedOffsetX
+						optional: true
+						value: 0
+					}
+					pressedOffsetY: {
+						type: float
+						name: pressedOffsetY
+						optional: true
+						value: 0
+					}
+					unpressedOffsetX: {
+						type: float
+						name: unpressedOffsetX
+						optional: true
+						value: 0
+					}
+					unpressedOffsetY: {
+						type: float
+						name: unpressedOffsetY
+						optional: true
+						value: 0
+					}
+					checkedOffsetX: {
+						type: float
+						name: checkedOffsetX
+						optional: true
+						value: 0
+					}
+					checkedOffsetY: {
+						type: float
+						name: checkedOffsetY
+						optional: true
+						value: 0
+					}
+				}
+				deletable: true
 				parent: null
 			}
 		]
@@ -13628,7 +13823,7 @@ sceneComposer: {
 										deletable: false
 										parent: null
 									}
-									text: Inventory
+									text: Quest Log
 									textAlignment: 8
 									ellipsis: false
 									ellipsisString: ...
@@ -13674,610 +13869,219 @@ sceneComposer: {
 							}
 							{
 								child: {
-									class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimTable
-									cells: [
-										{
-											child: {
-												class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimStack
-												name: null
-												children: [
-													{
-														class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimImage
-														name: null
-														drawable: {
-															file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/slot_grey.9.png
-															bgColor: {
-																r: 1
-																g: 1
-																b: 1
-																a: 1
-															}
-															tint: null
-															tintName: null
-															name: slot_grey
-															tiled: false
-															minWidth: -1
-															minHeight: -1
-															customized: false
-															tenPatchData: null
-															tvgData: null
-															type: NINE_PATCH
-															hidden: false
-														}
-														scaling: fill
-														touchable: enabled
-														visible: true
-													}
-												]
-												touchable: enabled
-												visible: true
-											}
-											row: 0
-											column: 0
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: 35
-											maxHeight: 35
-											preferredWidth: 20
-											preferredHeight: 20
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: {
-												class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimStack
-												name: null
-												children: [
-													{
-														class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimImage
-														name: null
-														drawable: {
-															file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Other/Other_panel_border_brown.9.png
-															bgColor: {
-																r: 1
-																g: 1
-																b: 1
-																a: 1
-															}
-															tint: null
-															tintName: null
-															name: Other_panel_border_brown
-															tiled: false
-															minWidth: -1
-															minHeight: -1
-															customized: false
-															tenPatchData: null
-															tvgData: null
-															type: NINE_PATCH
-															hidden: false
-														}
-														scaling: stretch
-														touchable: enabled
-														visible: true
-													}
-												]
-												touchable: enabled
-												visible: true
-											}
-											row: 0
-											column: 1
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 0
-											column: 2
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 0
-											column: 3
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 0
-											column: 4
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 0
-											column: 5
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 0
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 1
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 2
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 3
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 4
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 1
-											column: 5
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 0
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 1
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 2
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 3
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 4
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-										{
-											child: null
-											row: 2
-											column: 5
-											padLeft: 0
-											padRight: 0
-											padTop: 0
-											padBottom: 0
-											spaceLeft: 0
-											spaceRight: 0
-											spaceTop: 0
-											spaceBottom: 0
-											expandX: false
-											expandY: false
-											fillX: false
-											fillY: false
-											growX: false
-											growY: false
-											alignment: 1
-											minWidth: -1
-											minHeight: -1
-											maxWidth: -1
-											maxHeight: -1
-											preferredWidth: -1
-											preferredHeight: -1
-											uniformX: false
-											uniformY: false
-											colSpan: 1
-										}
-									]
+									class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimScrollPane
 									name: null
-									background: null
-									color: null
-									padLeft: 5
-									padRight: 5
-									padTop: 5
-									padBottom: 5
-									paddingEnabled: false
-									alignment: 1
-									fillParent: false
-									touchable: childrenOnly
+									style: {
+										name: default
+										clazz: com.badlogic.gdx.scenes.scene2d.ui.ScrollPane
+										properties: {
+											background: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: background
+												optional: true
+												value: Other_panel_border_brown_detail
+											}
+											corner: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: corner
+												optional: true
+												value: null
+											}
+											hScroll: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: hScroll
+												optional: true
+												value: null
+											}
+											hScrollKnob: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: hScrollKnob
+												optional: true
+												value: null
+											}
+											vScroll: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: vScroll
+												optional: true
+												value: null
+											}
+											vScrollKnob: {
+												type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+												name: vScrollKnob
+												optional: true
+												value: null
+											}
+										}
+										deletable: false
+										parent: null
+									}
+									fadeScrollBars: true
+									child: {
+										class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimTable
+										cells: [
+											{
+												child: {
+													class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimLabel
+													name: null
+													style: {
+														name: default
+														clazz: com.badlogic.gdx.scenes.scene2d.ui.Label
+														properties: {
+															font: {
+																type: com.badlogic.gdx.graphics.g2d.BitmapFont
+																name: font
+																optional: false
+																value: Kenny_Future_16
+															}
+															fontColor: {
+																type: com.badlogic.gdx.graphics.Color
+																name: fontColor
+																optional: true
+																value: null
+															}
+															background: {
+																type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
+																name: background
+																optional: true
+																value: null
+															}
+														}
+														deletable: false
+														parent: null
+													}
+													text: Lorem ipsum
+													textAlignment: 8
+													ellipsis: false
+													ellipsisString: ...
+													wrap: false
+													color: {
+														color: {
+															r: 0
+															g: 0
+															b: 0
+															a: 1
+														}
+														name: BLACK
+													}
+													touchable: enabled
+													visible: true
+												}
+												row: 0
+												column: 0
+												padLeft: 0
+												padRight: 0
+												padTop: 0
+												padBottom: 0
+												spaceLeft: 0
+												spaceRight: 0
+												spaceTop: 0
+												spaceBottom: 0
+												expandX: false
+												expandY: false
+												fillX: false
+												fillY: false
+												growX: false
+												growY: false
+												alignment: 1
+												minWidth: -1
+												minHeight: -1
+												maxWidth: -1
+												maxHeight: -1
+												preferredWidth: -1
+												preferredHeight: -1
+												uniformX: false
+												uniformY: false
+												colSpan: 1
+											}
+											{
+												child: {
+													class: com.ray3k.skincomposer.dialog.scenecomposer.DialogSceneComposerModel$SimImage
+													name: null
+													drawable: {
+														file: C:/01_Programmieren/Java/Road-To-Glory/assets_raw/ui/Green/Green_icon_outline_checkmark.png
+														bgColor: {
+															r: 1
+															g: 1
+															b: 1
+															a: 1
+														}
+														tint: null
+														tintName: null
+														name: Green_icon_outline_checkmark
+														tiled: false
+														minWidth: -1
+														minHeight: -1
+														customized: false
+														tenPatchData: null
+														tvgData: null
+														type: TEXTURE
+														hidden: false
+													}
+													scaling: stretch
+													touchable: enabled
+													visible: true
+												}
+												row: 0
+												column: 1
+												padLeft: 5
+												padRight: 5
+												padTop: 5
+												padBottom: 5
+												spaceLeft: 0
+												spaceRight: 0
+												spaceTop: 0
+												spaceBottom: 0
+												expandX: false
+												expandY: false
+												fillX: false
+												fillY: false
+												growX: false
+												growY: false
+												alignment: 1
+												minWidth: -1
+												minHeight: -1
+												maxWidth: -1
+												maxHeight: -1
+												preferredWidth: -1
+												preferredHeight: -1
+												uniformX: false
+												uniformY: false
+												colSpan: 1
+											}
+										]
+										name: null
+										background: null
+										color: null
+										padLeft: 0
+										padRight: 0
+										padTop: 0
+										padBottom: 0
+										paddingEnabled: false
+										alignment: 1
+										fillParent: false
+										touchable: childrenOnly
+										visible: true
+									}
+									clamp: false
+									flickScroll: true
+									flingTime: 1
+									forceScrollX: false
+									forceScrollY: false
+									overScrollX: true
+									overScrollY: true
+									overScrollDistance: 50
+									overScrollSpeedMin: 30
+									overScrollSpeedMax: 200
+									scrollBarBottom: true
+									scrollBarRight: true
+									scrollBarsOnTop: false
+									scrollBarsVisible: true
+									scrollBarTouch: true
+									scrollingDisabledX: false
+									scrollingDisabledY: false
+									smoothScrolling: true
+									variableSizeKnobs: true
+									touchable: enabled
 									visible: true
 								}
 								row: 1

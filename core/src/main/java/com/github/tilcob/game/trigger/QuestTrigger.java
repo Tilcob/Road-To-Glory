@@ -18,4 +18,9 @@ public class QuestTrigger implements TriggerHandler{
         if (quest == null || quest.getQuestId().isBlank()) return;
         eventBus.fire(new AddQuestEvent(triggeringEntity, quest.getQuestId()));
     }
+
+    @Override
+    public void exit(Entity trigger, Entity triggeringEntity) {
+
+    }
 }

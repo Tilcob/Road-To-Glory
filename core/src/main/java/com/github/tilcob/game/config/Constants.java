@@ -55,6 +55,8 @@ public class Constants {
     public static final String SPAWN_CLASS = "PlayerSpawn";
     public static final String LOOT = "loot";
     public static final String QUEST_ID = "questId";
+    public static final String NPC_TYPE = "npcType";
+    public static final String DIALOG_REQUEST = "dialog_request";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";
@@ -70,7 +72,7 @@ public class Constants {
     public static final Vector2 GRAVITY = Vector2.Zero;
     public static final Vector2 DEFAULT_PHYSIC_SCALING = new Vector2(1f,1f);
     public static final int MAX_NUM_OF_VERTICES = 8; // must be in between 3 and 8
-    public static final float STANDARD_INTERACTION_RADIUS = 1.2f;
+    public static final float AGGRO_RANGE = 5f; // 5 tiles range
 
     // Camera
     public static final float CAMERA_OFFSET_Y = 1f;
@@ -87,6 +89,7 @@ public class Constants {
     public static final String ON_DOWN = "onDown";
     public static final String ON_SELECT = "onSelect";
     public static final String ADD_QUESTS = "addQuests";
+    public static final String SHOW_DIALOG = "showDialog";
 
     // Player properties
     public static final int PLAYER_ID = 4;

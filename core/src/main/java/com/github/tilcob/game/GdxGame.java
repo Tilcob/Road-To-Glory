@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.quest.Quest;
@@ -45,6 +46,7 @@ public class GdxGame extends Game {
     private SaveManager saveManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
     private final Map<String, Quest> allQuests = new HashMap<>();
+    private final Map<String, MapDialogData> allDialogs = new HashMap<>();
 
     @Override
     public void create() {
@@ -176,6 +178,10 @@ public class GdxGame extends Game {
 
     public Map<String, Quest> getAllQuests() {
         return allQuests;
+    }
+
+    public Map<String, MapDialogData> getAllDialogs() {
+        return allDialogs;
     }
 
     public void setInputProcessors(InputProcessor... processors) {

@@ -17,11 +17,12 @@ import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.Controller;
-import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.AutosaveEvent;
+import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
@@ -76,8 +77,9 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new PhysicMoveSystem());
         this.engine.addSystem(new AttackSystem(physicWorld, audioManager));
         this.engine.addSystem(new FsmSystem());
+        this.engine.addSystem(new AiSystem());
         this.engine.addSystem(new FacingSystem());
-        this.engine.addSystem(new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL));
+        this.engine.addSystem(new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL, game.getEventBus()));
         this.engine.addSystem(new DamageSystem(gameViewModel));
         this.engine.addSystem(new LifeSystem(gameViewModel));
         this.engine.addSystem(new AnimationSystem(game.getAssetManager()));
@@ -86,6 +88,8 @@ public class GameScreen extends ScreenAdapter {
         this.engine.addSystem(new InventorySystem(game.getEventBus()));
         this.engine.addSystem(new ChestSystem());
         this.engine.addSystem(new QuestSystem(game.getEventBus()));
+        //this.engine.addSystem(new DialogRequestSystem());
+        this.engine.addSystem(new DialogSystem(game.getEventBus(), game.getAllDialogs()));
         this.engine.addSystem(new CameraSystem(game.getCamera()));
         this.engine.addSystem(new RenderSystem(game.getBatch(), game.getViewport(), game.getCamera()));
         this.engine.addSystem(new PhysicDebugRenderSystem(physicWorld, game.getCamera()));
@@ -141,6 +145,7 @@ public class GameScreen extends ScreenAdapter {
         MapAsset mapToLoad = game.getStateManager().getGameState().getCurrentMap();
         if (mapToLoad == null) mapToLoad = MapAsset.MAIN;
         tiledManager.setMap(tiledManager.loadMap(mapToLoad));
+        game.getEventBus().fire(new MapChangeEvent(tiledManager.getCurrentMapAsset().name().toLowerCase()));
     }
 
     @Override

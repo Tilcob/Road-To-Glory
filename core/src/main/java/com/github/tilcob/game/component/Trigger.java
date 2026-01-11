@@ -39,5 +39,6 @@ public class Trigger implements Component {
         CHEST,
         CHANGE_MAP,
         QUEST,
+        DIALOG,
     }
 }

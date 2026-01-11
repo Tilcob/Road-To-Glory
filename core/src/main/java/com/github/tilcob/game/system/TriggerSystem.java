@@ -4,25 +4,31 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Tiled;
 import com.github.tilcob.game.component.Trigger;
+import com.github.tilcob.game.event.ExitTriggerEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.trigger.*;
 
 import java.util.EnumMap;
 
-public class TriggerSystem extends IteratingSystem {
+public class TriggerSystem extends IteratingSystem implements Disposable {
     private final EnumMap<Trigger.Type, TriggerHandler> handlers;
+    private final GameEventBus eventBus;
 
     public TriggerSystem(AudioManager audioManager, GameEventBus eventBus) {
         super(Family.all(Trigger.class).get());
         this.handlers = new EnumMap<>(Trigger.Type.class);
+        this.eventBus = eventBus;
+        eventBus.subscribe(ExitTriggerEvent.class, this::onExit);
 
         handlers.put(Trigger.Type.TRAP, new TrapTriggerHandler(audioManager));
         handlers.put(Trigger.Type.CHEST, new ChestTriggerHandler());
         handlers.put(Trigger.Type.CHANGE_MAP, new ChangeMapTriggerHandler());
         handlers.put(Trigger.Type.QUEST, new QuestTrigger(eventBus));
+        handlers.put(Trigger.Type.DIALOG, new DialogTrigger());
     }
 
     @Override
@@ -42,6 +48,15 @@ public class TriggerSystem extends IteratingSystem {
         trigger.getEntities().clear();
     }
 
+    private void onExit(ExitTriggerEvent event) {
+        Trigger trigger = Trigger.MAPPER.get(event.trigger());
+        TriggerHandler handler = handlers.get(trigger.getType());
+        if (handler == null) return;
+        Tiled tiled = Tiled.MAPPER.get(event.trigger());
+        Entity entity = entityByTiledId(tiled.getId()) != null ? entityByTiledId(tiled.getId()): event.trigger();
+        handler.exit(entity, event.player());
+    }
+
     private Entity entityByTiledId(int id) {
         if (id == 0)  return null;
         ImmutableArray<Entity> entities = getEngine().getEntitiesFor(Family.all(Tiled.class).get());
@@ -51,5 +66,10 @@ public class TriggerSystem extends IteratingSystem {
             }
         }
         return null;
+    }
+
+    @Override
+    public void dispose() {
+        eventBus.unsubscribe(ExitTriggerEvent.class, this::onExit);
     }
 }

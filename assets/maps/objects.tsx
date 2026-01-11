@@ -46,6 +46,7 @@
    <property name="hasInventory" type="bool" value="true"/>
    <property name="life" type="int" value="12"/>
    <property name="lifeRegeneration" type="float" value="0.25"/>
+   <property name="npcType" propertytype="NpcType" value="UNDEFINED"/>
    <property name="speed" type="float" value="4"/>
   </properties>
   <image source="objects/player.png" width="32" height="32"/>
@@ -83,10 +84,16 @@
    <property name="bodyType" value="StaticBody"/>
    <property name="life" type="int" value="9999"/>
    <property name="lifeRegeneration" type="float" value="99"/>
+   <property name="npcType" propertytype="NpcType" value="UNDEFINED"/>
   </properties>
   <image source="objects/training_dummy.png" width="32" height="32"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="3" y="5" width="26" height="23"/>
+   <object id="3" name="dialog_request" type="Trigger" x="-3" y="-3" width="38" height="38">
+    <properties>
+     <property name="triggerType" propertytype="TriggerType" value="DIALOG"/>
+    </properties>
+   </object>
   </objectgroup>
  </tile>
  <tile id="5" type="GameObject">

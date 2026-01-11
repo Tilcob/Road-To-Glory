@@ -9,4 +9,9 @@ public class ChestTriggerHandler implements TriggerHandler {
     public void execute(Entity chest, Entity triggeringEntity) {
         triggeringEntity.add(new OpenChestRequest(chest));
     }
+
+    @Override
+    public void exit(Entity trigger, Entity triggeringEntity) {
+        triggeringEntity.remove(OpenChestRequest.class);
+    }
 }

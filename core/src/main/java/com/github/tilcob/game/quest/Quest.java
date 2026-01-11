@@ -33,4 +33,8 @@ public class Quest {
     public void incCurrentStep() {
         currentStep++;
     }
+
+    public boolean isCompleted() {
+        return currentStep == steps.size();
+    }
 }
