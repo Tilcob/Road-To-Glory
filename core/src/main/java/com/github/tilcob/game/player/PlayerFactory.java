@@ -115,7 +115,7 @@ public class PlayerFactory {
 
         String typeStr = tile.getProperties().get(Constants.ANIMATION, "", String.class);
         Animation2D.AnimationType type = Animation2D.AnimationType.valueOf(typeStr);
-        float speed = tile.getProperties().get(Constants.ANIMATION_SPEED, 0f, Float.class);
+        float speed = tile.getProperties().get(Constants.ANIMATION_SPEED, Constants.DEFAULT_ANIMATION_SPEED, Float.class);
 
         entity.add(new Animation2D(atlasAsset, atlasKey, type, Animation.PlayMode.LOOP, speed));
     }
