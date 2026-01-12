@@ -5,24 +5,25 @@ import com.badlogic.ashley.core.ComponentMapper;
 import com.github.tilcob.game.input.Command;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 
 public class Controller implements Component {
     public static final ComponentMapper<Controller> MAPPER = ComponentMapper.getFor(Controller.class);
 
-    private final List<Command> pressedCommand;
-    private final List<Command> releasedCommand;
+    private final EnumSet<Command> pressedCommand;
+    private final EnumSet<Command> releasedCommand;
 
     public Controller() {
-        this.pressedCommand = new ArrayList<>();
-        this.releasedCommand = new ArrayList<>();
+        this.pressedCommand = EnumSet.noneOf(Command.class);
+        this.releasedCommand = EnumSet.noneOf(Command.class);
     }
 
-    public List<Command> getPressedCommands() {
+    public EnumSet<Command> getPressedCommands() {
         return pressedCommand;
     }
 
-    public List<Command> getReleasedCommands() {
+    public EnumSet<Command> getReleasedCommands() {
         return releasedCommand;
     }
 }
