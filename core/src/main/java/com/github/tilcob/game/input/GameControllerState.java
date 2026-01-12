@@ -1,7 +1,7 @@
 package com.github.tilcob.game.input;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tilcob.game.component.Controller;
 
 public class GameControllerState implements ControllerState {
@@ -18,6 +18,7 @@ public class GameControllerState implements ControllerState {
         Controller controller = Controller.MAPPER.get(entity);
         if (controller == null) return;
         controller.getPressedCommands().add(command);
+        controller.getCommandBuffer().put(command, TimeUtils.millis() / 1000f);
         controller.getHeldCommands().add(command);
     }
 

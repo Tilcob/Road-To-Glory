@@ -2,7 +2,6 @@ package com.github.tilcob.game.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
-import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.config.Constants;
 
