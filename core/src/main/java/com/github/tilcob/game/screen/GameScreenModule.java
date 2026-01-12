@@ -14,9 +14,8 @@ import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.GameControllerState;
-import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
-import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -65,10 +64,8 @@ public class GameScreenModule {
             services.getChestRegistry(),
             tiledManager
         );
-        KeyboardController keyboardController = new KeyboardController(
-            GameControllerState.class,
-            services.getEventBus(),
-            GameState.GAME,
+        IdleControllerState idleControllerState = new IdleControllerState();
+        GameControllerState gameControllerState = new GameControllerState(
             engine.getEntitiesFor(Family.all(Controller.class).get())
         );
         Stage stage = new Stage(uiViewport, batch);
@@ -134,7 +131,8 @@ public class GameScreenModule {
             engine,
             tiledManager,
             tiledAshleyConfigurator,
-            keyboardController,
+            idleControllerState,
+            gameControllerState,
             physicWorld,
             stage,
             gameViewModel,
@@ -154,7 +152,8 @@ public class GameScreenModule {
         Engine engine,
         TiledManager tiledManager,
         TiledAshleyConfigurator tiledAshleyConfigurator,
-        KeyboardController keyboardController,
+        IdleControllerState idleControllerState,
+        GameControllerState gameControllerState,
         World physicWorld,
         Stage stage,
         GameViewModel gameViewModel,

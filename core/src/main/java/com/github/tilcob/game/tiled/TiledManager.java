@@ -190,7 +190,6 @@ public class TiledManager {
                     Rectangle rect = rectObject.getRectangle();
                     Vector2 spawnPoint = new Vector2(rect.x * Constants.UNIT_SCALE, rect.y * Constants.UNIT_SCALE);
                     spawnPoints.put(getCurrentMapAsset(), spawnPoint);
-                    return;
                 }
             } else {
                 throw new GdxRuntimeException("Unsupported object type: " + object.getClass().getSimpleName());
