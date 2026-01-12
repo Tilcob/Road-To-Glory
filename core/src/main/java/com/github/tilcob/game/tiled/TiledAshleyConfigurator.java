@@ -195,7 +195,7 @@ public class TiledAshleyConfigurator {
         TextureAtlas textureAtlas = assetManager.get(atlasAsset);
         FileTextureData textureData = (FileTextureData) tile.getTextureRegion().getTexture().getTextureData();
         String atlasKey = textureData.getFileHandle().nameWithoutExtension();
-        float animationSpeed = tile.getProperties().get(Constants.ANIMATION_SPEED, 0f, Float.class);
+        float animationSpeed = tile.getProperties().get(Constants.ANIMATION_SPEED, Constants.DEFAULT_ANIMATION_SPEED, Float.class);
 
         entity.add(new Animation2D(atlasAsset, atlasKey, animationType, Animation.PlayMode.LOOP, animationSpeed));
     }

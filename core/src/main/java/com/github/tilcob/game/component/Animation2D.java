@@ -30,7 +30,7 @@ public class Animation2D implements Component {
         this.facingDirection = null;
         this.playMode = playMode;
         this.speed = speed;
-        this.stateTime = stateTime;
+        this.stateTime = 0f;
         this.animation = null;
     }
 
@@ -104,6 +104,9 @@ public class Animation2D implements Component {
     }
 
     public boolean isFinished() {
+        if (animation == null) {
+            return false;
+        }
         return animation.isAnimationFinished(stateTime);
     }
 
