@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.github.tilcob.game.component.Damaged;
 import com.github.tilcob.game.component.Life;
+import com.github.tilcob.game.component.Player;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.ui.model.GameViewModel;
 
@@ -26,9 +27,6 @@ public class DamageSystem extends IteratingSystem {
 
         Transform transform = Transform.MAPPER.get(entity);
         if (transform != null) {
-            // we should check that the damage source is the player, but
-            // in this tutorial game it is in the only possibility so we can skip it
-
             float x = transform.getPosition().x + transform.getSize().x * .5f;
             float y = transform.getPosition().y;
             viewModel.playerDamage((int) damaged.getDamage(), x, y);

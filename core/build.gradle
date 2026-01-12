@@ -19,6 +19,9 @@ dependencies {
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.2"
   testRuntimeOnly "org.junit.jupiter:junit-jupiter-engine:5.10.2"
   testRuntimeOnly "org.junit.platform:junit-platform-launcher:1.10.2"
+  testRuntimeOnly "com.badlogicgames.gdx:gdx-platform:$gdxVersion:natives-desktop"
+  testRuntimeOnly "com.badlogicgames.gdx:gdx-box2d-platform:$gdxVersion:natives-desktop"
+  testRuntimeOnly "com.badlogicgames.gdx:gdx-freetype-platform:$gdxVersion:natives-desktop"
 
   if(enableGraalNative == 'true') {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"

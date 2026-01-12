@@ -4,40 +4,103 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.config.Constants;
 
 public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
-    private float damage;
-    private float damageDelay;
+    private final float damage;
+    private float windup;
+    private final float cooldown;
     private float attackTimer;
+    private float damageTimer;
     private SoundAsset sfx;
+    private boolean startedThisFrame;
+    private boolean triggeredThisFrame;
+    private boolean finishedThisFrame;
+    private State state;
 
-    public Attack (float damage, float damageDelay, SoundAsset soundAsset) {
+    public Attack (float damage, float windup, float cooldown, SoundAsset soundAsset) {
         this.damage = damage;
-        this.damageDelay = damageDelay;
+        this.windup = windup;
+        this.cooldown = cooldown;
         this.sfx = soundAsset;
         this.attackTimer = 0f;
+        this.damageTimer = .1f;
+        this.startedThisFrame = false;
+        this.triggeredThisFrame = false;
+        this.finishedThisFrame = false;
+        this.state = State.IDLE;
     }
 
     public boolean canAttack() {
-        return attackTimer == 0;
+        return state == State.IDLE;
     }
 
-    public boolean isAttacking() {
-        return attackTimer > 0;
+    public boolean isInWindup() {
+        return state == State.WINDUP;
     }
 
-    public boolean hasAttackStarted() {
-        return MathUtils.isEqual(attackTimer, damageDelay, .0001f);
+    public boolean isInRecovery() {
+        return state == State.RECOVERY;
+    }
+
+    public void setWindup(float windup) {
+        this.windup = windup;
+        if (state == State.WINDUP) {
+            attackTimer = Math.max(0f, windup);
+        }
+    }
+
+    public boolean consumeStarted() {
+        if (!startedThisFrame) return false;
+        startedThisFrame = false;
+        return true;
     }
 
     public void startAttack() {
-        attackTimer = damageDelay;
+        if (!canAttack()) return;
+        state = State.WINDUP;
+        attackTimer = Math.max(0f, windup);
+        startedThisFrame = true;
     }
 
-    public void decreaseAttackTimer(float delta) {
-        attackTimer = Math.max(0f, attackTimer - delta);
+    public void advance(float delta) {
+        finishedThisFrame = false;
+        triggeredThisFrame = false;
+
+        if (state != State.IDLE) {
+            damageTimer = Math.max(0f, damageTimer - delta);
+            if (damageTimer == 0f) {
+                triggeredThisFrame = true;
+            }
+        }
+
+        if (state == State.WINDUP) {
+            attackTimer = Math.max(0f, attackTimer - delta);
+            if (attackTimer == 0f) {
+                state = State.RECOVERY;
+                attackTimer = Math.max(cooldown, Constants.FIXED_INTERVAL);
+            }
+        } else if (state == State.RECOVERY) {
+            attackTimer = Math.max(0f, attackTimer - delta);
+            if (attackTimer == 0f) {
+                state = State.IDLE;
+                finishedThisFrame = true;
+            }
+        }
+    }
+
+    public boolean consumeTriggered() {
+        if (!triggeredThisFrame) return false;
+        triggeredThisFrame = false;
+        return true;
+    }
+
+    public boolean consumeFinished() {
+        if (!finishedThisFrame) return false;
+        finishedThisFrame = false;
+        return true;
     }
 
     public float getDamage() {
@@ -46,5 +109,11 @@ public class Attack implements Component {
 
     public SoundAsset getSfx() {
         return sfx;
+    }
+
+    public enum State {
+        IDLE,
+        WINDUP,
+        RECOVERY
     }
 }

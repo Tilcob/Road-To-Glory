@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.GdxRuntimeException;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
@@ -17,7 +18,9 @@ public class AttackSystem extends IteratingSystem {
     private final AudioManager audioManager;
     private final World world;
     private final Vector2 tmpVertex;
+    private final ObjectSet<Entity> hitEntities;
     private Body attackerBody;
+    private Entity attackerEntity;
     private float attackDamage;
 
     public AttackSystem(World world, AudioManager audioManager) {
@@ -25,7 +28,9 @@ public class AttackSystem extends IteratingSystem {
         this.world = world;
         this.audioManager = audioManager;
         this.tmpVertex = new Vector2();
+        this.hitEntities = new ObjectSet<>();
         this.attackerBody = null;
+        this.attackerEntity = null;
         this.attackDamage = 0;
     }
 
@@ -33,42 +38,55 @@ public class AttackSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Attack attack = Attack.MAPPER.get(entity);
 
-        if (attack.canAttack()) return;
-
-        if (attack.hasAttackStarted()) {
+        if (attack.consumeStarted()) {
             if (attack.getSfx() != null) audioManager.playSound(attack.getSfx());
-            Move move = Move.MAPPER.get(entity);
-            if (move != null) {
-                move.setRooted(true);
-            }
+            setRooted(entity, true);
+            hitEntities.clear();
         }
 
-        attack.decreaseAttackTimer(deltaTime);
-        if (attack.canAttack()) {
+        if (attack.canAttack()) return;
+
+        attack.advance(deltaTime);
+        if (attack.consumeTriggered()) {
+            setRooted(entity, false);
             Facing.FacingDirection facingDirection = Facing.MAPPER.get(entity).getDirection();
+            attackerEntity = entity;
             attackerBody = Physic.MAPPER.get(entity).getBody();
             PolygonShape attackShape = getAttackFixture(attackerBody, facingDirection);
             updateAttackAABB(attackerBody.getPosition(), attackShape);
 
             attackDamage = attack.getDamage();
-            world.QueryAABB(this::attackCallback, attackAABB.x, attackAABB.y, attackAABB.width, attackAABB.height);
+            world.QueryAABB(this::attackCallback, attackAABB.x, attackAABB.y, attackAABB.x + attackAABB.width, attackAABB.y + attackAABB.height);
+        }
 
-            Move move = Move.MAPPER.get(entity);
-            if (move != null) {
-                move.setRooted(false);
-            }
+        if (attack.consumeFinished()) {
+            setRooted(entity, false);
+        }
+    }
 
+    private static void setRooted(Entity entity, boolean rooted) {
+        Move move = Move.MAPPER.get(entity);
+        if (move != null) {
+            move.setRooted(rooted);
         }
     }
 
     private void updateAttackAABB(Vector2 position, PolygonShape attackShape) {
-        attackShape.getVertex(0, tmpVertex);
-        tmpVertex.add(position);
-        attackAABB.setPosition(tmpVertex.x, tmpVertex.y);
+        int vertexCount = attackShape.getVertexCount();
+        float minX = Float.MAX_VALUE;
+        float minY = Float.MAX_VALUE;
+        float maxX = -Float.MAX_VALUE;
+        float maxY = -Float.MAX_VALUE;
 
-        attackShape.getVertex(2, tmpVertex);
-        tmpVertex.add(position);
-        attackAABB.setSize(tmpVertex.x, tmpVertex.y);
+        for (int i = 0; i < vertexCount; i++) {
+            attackShape.getVertex(i, tmpVertex);
+            tmpVertex.add(position);
+            minX = Math.min(minX, tmpVertex.x);
+            minY = Math.min(minY, tmpVertex.y);
+            maxX = Math.max(maxX, tmpVertex.x);
+            maxY = Math.max(maxY, tmpVertex.y);
+        }
+        attackAABB.set(minX, minY, maxX - minX, maxY - minY);
     }
 
     private boolean attackCallback(Fixture fixture) {
@@ -82,13 +100,15 @@ public class AttackSystem extends IteratingSystem {
             return true;
         }
 
+        if (hitEntities.contains(entity)) return true;
+        hitEntities.add(entity);
+
         Damaged damaged = Damaged.MAPPER.get(entity);
         if (damaged == null) {
-            entity.add(new Damaged(attackDamage));
+            entity.add(new Damaged(attackDamage, attackerEntity));
         } else {
-            damaged.addDamage(attackDamage);
+            damaged.addDamage(attackDamage, attackerEntity);
         }
-
         return true;
     }
 

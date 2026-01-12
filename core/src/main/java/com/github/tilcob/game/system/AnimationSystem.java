@@ -12,6 +12,7 @@ import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.component.Animation2D;
 import com.github.tilcob.game.component.Animation2D.AnimationType;
+import com.github.tilcob.game.component.Attack;
 import com.github.tilcob.game.component.Facing;
 import com.github.tilcob.game.component.Facing.FacingDirection;
 import com.github.tilcob.game.component.Graphic;
@@ -38,7 +39,7 @@ public class AnimationSystem extends IteratingSystem {
         FacingDirection facingDirection = Facing.MAPPER.get(entity).getDirection();
         final float stateTime;
         if (animation2D.isDirty() || facingDirection != animation2D.getDirection()) {
-            updateAnimation(animation2D, facingDirection);
+            updateAnimation(entity, animation2D, facingDirection);
             stateTime = 0;
         } else {
             stateTime = animation2D.incAndGetStateTime(deltaTime);
@@ -50,7 +51,7 @@ public class AnimationSystem extends IteratingSystem {
         Graphic.MAPPER.get(entity).setRegion(keyFrame);
     }
 
-    private void updateAnimation(Animation2D animation2D, FacingDirection facingDirection) {
+    private void updateAnimation(Entity entity, Animation2D animation2D, FacingDirection facingDirection) {
         AtlasAsset atlasAsset = animation2D.getAtlasAsset();
         String atlasKey = animation2D.getAtlasKey();
         AnimationType type = animation2D.getType();
@@ -67,6 +68,13 @@ public class AnimationSystem extends IteratingSystem {
         });
 
         animation2D.setAnimation(animation, facingDirection);
+        if (type == AnimationType.ATTACK) {
+            Attack attack = Attack.MAPPER.get(entity);
+            if (attack != null && attack.isInWindup()) {
+                float speed = Math.max(animation2D.getSpeed(), 0.0001f);
+                attack.setWindup(animation.getAnimationDuration() / speed);
+            }
+        }
     }
 
     public record CacheKey(

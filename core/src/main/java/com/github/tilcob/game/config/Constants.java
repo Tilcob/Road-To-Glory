@@ -16,6 +16,7 @@ public class Constants {
     public static final float FIXED_INTERVAL = 1 / 60f;
     public static final float DEFAULT_ANIMATION_SPEED = 1f;
     public static final float DEFAULT_ARRIVAL_DISTANCE = 0.1f;
+    public static final float DEFAULT_DAMAGE_DELAY = .2f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -45,9 +46,9 @@ public class Constants {
     public static final String LIFE_REGENERATION = "lifeRegeneration";
     public static final String ATTACK_SOUND = "attackSound";
     public static final String DAMAGE = "damage";
-    public static final String DAMAGE_DELAY = "damageDelay";
+    public static final String ATTACK_WINDUP = "attackWindup";
+    public static final String ATTACK_COOLDOWN = "attackCooldown";
     public static final String ATTACK_SENSOR = "attack_sensor_";
-    public static final String PLAYER_NAME = "Player";
     public static final String ID = "id";
     public static final String BODY_TYPE = "bodyType";
     public static final String HAS_INVENTORY = "hasInventory";

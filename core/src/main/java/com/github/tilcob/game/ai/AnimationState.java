@@ -11,7 +11,7 @@ public enum AnimationState implements State<Entity> {
     IDLE {
         @Override
         public void enter(Entity entity) {
-            setupAnimation(entity, Animation2D.AnimationType.IDLE);
+            setupAnimation(entity, Animation2D.AnimationType.IDLE, Animation.PlayMode.LOOP);
         }
 
         @Override
@@ -23,7 +23,7 @@ public enum AnimationState implements State<Entity> {
             }
 
             Attack attack = Attack.MAPPER.get(entity);
-            if (attack != null && attack.isAttacking()) {
+            if (attack != null && attack.isInWindup()) {
                 AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(ATTACK);
                 return;
             }
@@ -47,7 +47,7 @@ public enum AnimationState implements State<Entity> {
     WALK {
         @Override
         public void enter(Entity entity) {
-            setupAnimation(entity, Animation2D.AnimationType.WALK);
+            setupAnimation(entity, Animation2D.AnimationType.WALK, Animation.PlayMode.LOOP);
         }
 
         @Override
@@ -71,13 +71,14 @@ public enum AnimationState implements State<Entity> {
     ATTACK {
         @Override
         public void enter(Entity entity) {
-            setupAnimation(entity, Animation2D.AnimationType.ATTACK);
+            setupAnimation(entity, Animation2D.AnimationType.ATTACK, Animation.PlayMode.NORMAL);
         }
 
         @Override
         public void update(Entity entity) {
             Attack attack = Attack.MAPPER.get(entity);
-            if (attack.canAttack()) {
+            Animation2D animation2D = Animation2D.MAPPER.get(entity);
+            if (attack.canAttack() || (animation2D.isFinished() && !attack.isInWindup()) || attack.isInRecovery() ) {
                 AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }
@@ -95,7 +96,7 @@ public enum AnimationState implements State<Entity> {
     DAMAGED {
         @Override
         public void enter(Entity entity) {
-            setupAnimation(entity, Animation2D.AnimationType.DAMAGED);
+            setupAnimation(entity, Animation2D.AnimationType.DAMAGED, Animation.PlayMode.NORMAL);
         }
 
         @Override
@@ -116,10 +117,10 @@ public enum AnimationState implements State<Entity> {
         }
     };
 
-    private static void setupAnimation(Entity entity, Animation2D.AnimationType idle) {
+    private static void setupAnimation(Entity entity, Animation2D.AnimationType idle, Animation.PlayMode playMode) {
         Animation2D animation2D = Animation2D.MAPPER.get(entity);
         animation2D.setType(idle);
-        animation2D.setPlayMode(Animation.PlayMode.LOOP);
+        animation2D.setPlayMode(playMode);
         if (animation2D.getSpeed() <= 0f) {
             animation2D.setSpeed(Constants.DEFAULT_ANIMATION_SPEED);
         }
