@@ -16,6 +16,7 @@ import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
@@ -28,7 +29,7 @@ public class GameScreenModule {
     private final Batch batch;
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final InputMultiplexer inputMultiplexer;
+    private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
 
     public GameScreenModule(
@@ -36,14 +37,14 @@ public class GameScreenModule {
         Batch batch,
         OrthographicCamera camera,
         Viewport viewport,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         ScreenNavigator screenNavigator
     ) {
         this.services = services;
         this.batch = batch;
         this.camera = camera;
         this.viewport = viewport;
-        this.inputMultiplexer = inputMultiplexer;
+        this.inputManager = inputManager;
         this.screenNavigator = screenNavigator;
     }
 
@@ -139,7 +140,7 @@ public class GameScreenModule {
             gameViewModel,
             inventoryViewModel,
             skin,
-            inputMultiplexer,
+            inputManager,
             services.getAudioManager()
         );
     }
@@ -159,7 +160,7 @@ public class GameScreenModule {
         GameViewModel gameViewModel,
         InventoryViewModel inventoryViewModel,
         Skin skin,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         com.github.tilcob.game.audio.AudioManager audioManager
     ) {}
 }

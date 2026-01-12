@@ -26,6 +26,7 @@ import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -54,7 +55,7 @@ public class GameScreen extends ScreenAdapter {
     private GameViewModel gameViewModel;
     private InventoryViewModel inventoryViewModel;
     private Skin skin;
-    private InputMultiplexer inputMultiplexer;
+    private InputManager inputManager;
     private Entity player;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
@@ -73,7 +74,7 @@ public class GameScreen extends ScreenAdapter {
         this.gameViewModel = dependencies.gameViewModel();
         this.inventoryViewModel = dependencies.inventoryViewModel();
         this.skin = dependencies.skin();
-        this.inputMultiplexer = dependencies.inputMultiplexer();
+        this.inputManager = dependencies.inputManager();
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
     }
 
@@ -85,7 +86,7 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        setInputProcessors(stage, keyboardController);
+        inputManager.setInputProcessors(stage, keyboardController);
         keyboardController.setActiveState(com.github.tilcob.game.input.GameControllerState.class);
 
         stage.addActor(new GameView(skin, stage, gameViewModel));
@@ -152,15 +153,6 @@ public class GameScreen extends ScreenAdapter {
         services.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
         services.saveGame();
-    }
-
-    private void setInputProcessors(com.badlogic.gdx.InputProcessor... processors) {
-        inputMultiplexer.clear();
-        if (processors == null) return;
-
-        for (com.badlogic.gdx.InputProcessor processor : processors) {
-            inputMultiplexer.addProcessor(processor);
-        }
     }
 
     @Override

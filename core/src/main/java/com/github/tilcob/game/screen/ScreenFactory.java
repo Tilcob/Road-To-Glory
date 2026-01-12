@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
+import com.github.tilcob.game.input.InputManager;
 
 import java.util.function.Consumer;
 
@@ -14,7 +15,7 @@ public class ScreenFactory {
     private final Batch batch;
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final InputMultiplexer inputMultiplexer;
+    private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
 
     public ScreenFactory(
@@ -22,14 +23,14 @@ public class ScreenFactory {
         Batch batch,
         OrthographicCamera camera,
         Viewport viewport,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         ScreenNavigator screenNavigator
     ) {
         this.services = services;
         this.batch = batch;
         this.camera = camera;
         this.viewport = viewport;
-        this.inputMultiplexer = inputMultiplexer;
+        this.inputManager = inputManager;
         this.screenNavigator = screenNavigator;
     }
 
@@ -39,12 +40,12 @@ public class ScreenFactory {
 
     public MenuScreen createMenuScreen() {
         Viewport uiViewport = new FitViewport(800f, 450f);
-        return new MenuScreen(services, batch, inputMultiplexer, uiViewport, screenNavigator);
+        return new MenuScreen(services, batch, inputManager, uiViewport, screenNavigator);
     }
 
     public GameScreen createGameScreen() {
         Viewport uiViewport = new FitViewport(640f, 360f);
-        GameScreenModule module = new GameScreenModule(services, batch, camera, viewport, inputMultiplexer, screenNavigator);
+        GameScreenModule module = new GameScreenModule(services, batch, camera, viewport, inputManager, screenNavigator);
         return module.create(uiViewport);
     }
 }
