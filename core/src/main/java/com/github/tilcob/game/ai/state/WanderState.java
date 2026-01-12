@@ -6,7 +6,8 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.Controller;
-import com.github.tilcob.game.component.Fsm;
+import com.github.tilcob.game.component.AnimationFsm;
+import com.github.tilcob.game.component.NpcFsm;
 import com.github.tilcob.game.input.Command;
 
 public class WanderState implements State<Entity> {
@@ -25,7 +26,7 @@ public class WanderState implements State<Entity> {
     @Override
     public void update(Entity entity) {
         if (Math.random() < 0.01) {
-            Fsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
+            NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
         }
     }
 

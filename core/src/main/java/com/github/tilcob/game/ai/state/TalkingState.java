@@ -5,7 +5,8 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.ai.NpcState;
-import com.github.tilcob.game.component.Fsm;
+import com.github.tilcob.game.component.AnimationFsm;
+import com.github.tilcob.game.component.NpcFsm;
 
 public class TalkingState implements State<Entity> {
     @Override
@@ -25,7 +26,7 @@ public class TalkingState implements State<Entity> {
     @Override
     public boolean onMessage(Entity entity, Telegram telegram) {
         if (telegram.message == Messages.DIALOG_FINISHED) {
-            Fsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
+            NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
             return true;
         }
         return false;

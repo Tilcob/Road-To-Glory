@@ -5,7 +5,8 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
-import com.github.tilcob.game.component.Fsm;
+import com.github.tilcob.game.component.AnimationFsm;
+import com.github.tilcob.game.component.NpcFsm;
 
 public class ChaseState implements State<Entity> {
 
@@ -14,7 +15,7 @@ public class ChaseState implements State<Entity> {
         Entity player = NpcStateSupport.findPlayer(entity);
         NpcBehaviorProfile behaviorProfile = NpcStateSupport.behaviorProfile(entity);
         if (player == null || !NpcStateSupport.inAggroRange(entity, player, behaviorProfile.getAggroRange())) {
-            Fsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
+            NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
             return;
         }
         NpcStateSupport.chasePlayer(entity, player);

@@ -16,19 +16,19 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Move move = Move.MAPPER.get(entity);
             if (move != null && !move.isRooted() && !move.getDirection().isZero()) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(WALK);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(WALK);
                 return;
             }
 
             Attack attack = Attack.MAPPER.get(entity);
             if (attack != null && attack.isAttacking()) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(ATTACK);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(ATTACK);
                 return;
             }
 
             Damaged damaged = Damaged.MAPPER.get(entity);
             if (damaged != null) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(DAMAGED);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(DAMAGED);
             }
         }
 
@@ -52,7 +52,7 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Move move = Move.MAPPER.get(entity);
             if (move.getDirection().isZero() || move.isRooted()) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }
 
@@ -76,7 +76,7 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Attack attack = Attack.MAPPER.get(entity);
             if (attack.canAttack()) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }
 
@@ -100,7 +100,7 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Animation2D animation2D = Animation2D.MAPPER.get(entity);
             if (animation2D.isFinished()) {
-                Fsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
+                AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }
 

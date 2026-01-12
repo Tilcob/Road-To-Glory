@@ -71,12 +71,12 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
         Telegram telegram = new Telegram();
         telegram.message = Messages.DIALOG_FINISHED;
-        Fsm.MAPPER.get(npcEntity).getNpcFsm().handleMessage(telegram);
+        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().handleMessage(telegram);
     }
 
     private void startDialog(Entity npcEntity, Dialog dialog) {
         dialog.setState(Dialog.State.ACTIVE);
-        Fsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
+        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
 
         Npc npc = Npc.MAPPER.get(npcEntity);
         Entity player = PlayerReference.MAPPER.get(npcEntity).getPlayer();

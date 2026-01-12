@@ -48,7 +48,7 @@ public class PlayerFactory {
         addEntityLife(player, entity);
         addEntityAttack(player, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
-        entity.add(new Fsm(entity));
+        entity.add(new AnimationFsm(entity));
         entity.add(new Inventory());
         entity.add(new QuestLog());
 

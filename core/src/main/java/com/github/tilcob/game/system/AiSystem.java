@@ -9,7 +9,7 @@ import com.github.tilcob.game.component.*;
 public class AiSystem extends IteratingSystem {
 
     public AiSystem() {
-        super(Family.all(Npc.class, Controller.class).exclude(Player.class).get());
+        super(Family.all(Npc.class).exclude(Player.class).get());
     }
 
     @Override
@@ -19,6 +19,6 @@ public class AiSystem extends IteratingSystem {
             ImmutableArray<Entity> players = getEngine().getEntitiesFor(Family.all(Player.class).get());
             if (players.size() > 0) reference.setPlayer(players.first());
         }
-        Fsm.MAPPER.get(entity).getNpcFsm().update();
+        NpcFsm.MAPPER.get(entity).getNpcFsm().update();
     }
 }
