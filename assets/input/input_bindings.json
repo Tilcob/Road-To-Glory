@@ -4,8 +4,8 @@
         "DOWN": "S",
         "LEFT": "A",
         "RIGHT": "D",
-        "SELECT": "SPACE",
-        "CANCEL": "ESCAPE",
+        "SELECT": "SPACEBAR",
+        "CANCEL": "ESC",
         "INTERACT": "E",
         "INVENTORY": "I"
     }

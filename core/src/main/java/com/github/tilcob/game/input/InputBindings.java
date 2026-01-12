@@ -29,8 +29,9 @@ public class InputBindings {
         }
         for (Map.Entry<String, String> entry : bindingFile.bindings.entrySet()) {
             Command command = parseCommand(entry.getKey());
+            if (command == null) continue;
             int keycode = parseKeycode(entry.getValue());
-            if (command != null && keycode != Input.Keys.UNKNOWN) {
+            if (keycode != Input.Keys.UNKNOWN) {
                 bindings.put(command, keycode);
             }
         }
@@ -96,7 +97,18 @@ public class InputBindings {
         if (keyName == null || keyName.isBlank()) {
             return Input.Keys.UNKNOWN;
         }
-        return Input.Keys.valueOf(keyName.trim().toUpperCase());
+        String normalized = keyName.trim().toUpperCase();
+        if ("SPACE".equals(normalized) || "SPACEBAR".equals(normalized)) {
+            return Input.Keys.SPACE;
+        }
+        if ("ESC".equals(normalized) || "ESCAPE".equals(normalized)) {
+            return Input.Keys.ESCAPE;
+        }
+        try {
+            return Input.Keys.valueOf(normalized);
+        } catch (IllegalArgumentException ex) {
+            return Input.Keys.UNKNOWN;
+        }
     }
 
     public static class BindingFile {

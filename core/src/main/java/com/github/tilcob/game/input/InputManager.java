@@ -93,10 +93,10 @@ public class InputManager implements InputDeviceListener {
 
     private void rebuildProcessors() {
         inputMultiplexer.clear();
-        for (InputProcessor processor : externalProcessors) {
+        for (InputProcessor processor : deviceProcessors) {
             inputMultiplexer.addProcessor(processor);
         }
-        for (InputProcessor processor : deviceProcessors) {
+        for (InputProcessor processor : externalProcessors) {
             inputMultiplexer.addProcessor(processor);
         }
     }
