@@ -45,6 +45,7 @@ public class ChestState {
                 Gdx.app.error("ChestState", e.getMessage());
             }
         }
+        opened = false;
     }
 
     @JsonIgnore
@@ -60,6 +61,7 @@ public class ChestState {
     private void addItems(Array<ItemType> contents) {
         for (ItemType item : contents) {
             this.contents.add(item);
+            contentsByName.add(item.name());
         }
     }
 
@@ -68,4 +70,20 @@ public class ChestState {
 
     @JsonIgnore
     public void close() { opened = false; }
+
+    @JsonIgnore
+    public void clearContents() {
+        contents.clear();
+        contentsByName.clear();
+    }
+
+    @JsonIgnore
+    public void setContents(List<ItemType> newContents) {
+        contents.clear();
+        contentsByName.clear();
+        for (ItemType item : newContents) {
+            contents.add(item);
+            contentsByName.add(item.name());
+        }
+    }
 }

@@ -6,6 +6,8 @@ import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.chest.ChestState;
 
+import java.util.List;
+
 public class Chest implements Component {
     public static final ComponentMapper<Chest> MAPPER = ComponentMapper.getFor(Chest.class);
 
@@ -33,5 +35,10 @@ public class Chest implements Component {
 
     public void clear() {
         state.getContents().clear();
+        state.clearContents();
+    }
+
+    public void setContents(List<ItemType> items) {
+        state.setContents(items);
     }
 }
