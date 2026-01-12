@@ -85,6 +85,7 @@ public class GameScreenModule {
         // AI
         engine.addSystem(withPriority(new FsmSystem(), SystemOrder.AI));
         engine.addSystem(withPriority(new AiSystem(), SystemOrder.AI));
+        engine.addSystem(withPriority(new NpcPathfindingSystem(), SystemOrder.AI));
 
         // Physics
         engine.addSystem(withPriority(new PhysicMoveSystem(), SystemOrder.PHYSICS));

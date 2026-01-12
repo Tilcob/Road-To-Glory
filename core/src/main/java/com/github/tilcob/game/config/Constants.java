@@ -15,6 +15,7 @@ public class Constants {
     public static final float FRAME_DURATION = 1 / 8f;
     public static final float FIXED_INTERVAL = 1 / 60f;
     public static final float DEFAULT_ANIMATION_SPEED = 1f;
+    public static final float DEFAULT_ARRIVAL_DISTANCE = 0.1f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
