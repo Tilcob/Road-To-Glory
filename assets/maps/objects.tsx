@@ -39,12 +39,11 @@
    <property name="atlasAsset" value="OBJECTS"/>
    <property name="attackCooldown" type="float" value="0.5"/>
    <property name="attackSound" value="SWING"/>
-   <property name="attackWindup" type="float" value="0.2"/>
+   <property name="attackWindup" type="float" value="1"/>
    <property name="bodyType" value="DynamicBody"/>
    <property name="cameraFollow" type="bool" value="true"/>
    <property name="controller" type="bool" value="true"/>
    <property name="damage" type="float" value="7"/>
-   <property name="damageDelay" type="float" value="0.2"/>
    <property name="hasInventory" type="bool" value="true"/>
    <property name="life" type="int" value="12"/>
    <property name="lifeRegeneration" type="float" value="0.25"/>

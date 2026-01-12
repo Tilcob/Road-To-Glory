@@ -10,11 +10,13 @@ public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
     private final float damage;
-    private final float windup;
+    private float windup;
     private final float cooldown;
     private float attackTimer;
+    private float damageTimer;
     private SoundAsset sfx;
     private boolean startedThisFrame;
+    private boolean triggeredThisFrame;
     private boolean finishedThisFrame;
     private State state;
 
@@ -24,7 +26,9 @@ public class Attack implements Component {
         this.cooldown = cooldown;
         this.sfx = soundAsset;
         this.attackTimer = 0f;
+        this.damageTimer = .1f;
         this.startedThisFrame = false;
+        this.triggeredThisFrame = false;
         this.finishedThisFrame = false;
         this.state = State.IDLE;
     }
@@ -33,16 +37,19 @@ public class Attack implements Component {
         return state == State.IDLE;
     }
 
-    public boolean isAttacking() {
-        return state != State.IDLE;
-    }
-
     public boolean isInWindup() {
         return state == State.WINDUP;
     }
 
     public boolean isInRecovery() {
         return state == State.RECOVERY;
+    }
+
+    public void setWindup(float windup) {
+        this.windup = windup;
+        if (state == State.WINDUP) {
+            attackTimer = Math.max(0f, windup);
+        }
     }
 
     public boolean consumeStarted() {
@@ -58,14 +65,20 @@ public class Attack implements Component {
         startedThisFrame = true;
     }
 
-    public boolean advance(float delta) {
-        boolean triggered = false;
+    public void advance(float delta) {
         finishedThisFrame = false;
+        triggeredThisFrame = false;
+
+        if (state != State.IDLE) {
+            damageTimer = Math.max(0f, damageTimer - delta);
+            if (damageTimer == 0f) {
+                triggeredThisFrame = true;
+            }
+        }
 
         if (state == State.WINDUP) {
             attackTimer = Math.max(0f, attackTimer - delta);
             if (attackTimer == 0f) {
-                triggered = true;
                 state = State.RECOVERY;
                 attackTimer = Math.max(cooldown, Constants.FIXED_INTERVAL);
             }
@@ -76,8 +89,12 @@ public class Attack implements Component {
                 finishedThisFrame = true;
             }
         }
+    }
 
-        return triggered;
+    public boolean consumeTriggered() {
+        if (!triggeredThisFrame) return false;
+        triggeredThisFrame = false;
+        return true;
     }
 
     public boolean consumeFinished() {

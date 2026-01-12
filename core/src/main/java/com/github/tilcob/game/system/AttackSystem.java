@@ -40,17 +40,15 @@ public class AttackSystem extends IteratingSystem {
 
         if (attack.consumeStarted()) {
             if (attack.getSfx() != null) audioManager.playSound(attack.getSfx());
-            Move move = Move.MAPPER.get(entity);
-            if (move != null) {
-                move.setRooted(true);
-            }
+            setRooted(entity, true);
             hitEntities.clear();
         }
 
         if (attack.canAttack()) return;
 
-        boolean attackTriggered = attack.advance(deltaTime);
-        if (attackTriggered) {
+        attack.advance(deltaTime);
+        if (attack.consumeTriggered()) {
+            setRooted(entity, false);
             Facing.FacingDirection facingDirection = Facing.MAPPER.get(entity).getDirection();
             attackerEntity = entity;
             attackerBody = Physic.MAPPER.get(entity).getBody();
@@ -62,10 +60,14 @@ public class AttackSystem extends IteratingSystem {
         }
 
         if (attack.consumeFinished()) {
-            Move move = Move.MAPPER.get(entity);
-            if (move != null) {
-                move.setRooted(false);
-            }
+            setRooted(entity, false);
+        }
+    }
+
+    private static void setRooted(Entity entity, boolean rooted) {
+        Move move = Move.MAPPER.get(entity);
+        if (move != null) {
+            move.setRooted(rooted);
         }
     }
 

@@ -138,9 +138,7 @@ public class TiledAshleyConfigurator {
     private void addEntityAttack(TiledMapTile tile, Entity entity) {
         float damage = tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
         if (damage == 0) return;
-
-        float damageDelay = tile.getProperties().get(Constants.DAMAGE_DELAY, 0f, Float.class);
-        float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, damageDelay, Float.class);
+        float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, Constants.DEFAULT_DAMAGE_DELAY, Float.class);
         float cooldown = tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
         String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
         SoundAsset soundAsset = null;

@@ -23,7 +23,7 @@ public enum AnimationState implements State<Entity> {
             }
 
             Attack attack = Attack.MAPPER.get(entity);
-            if (attack != null && attack.isAttacking()) {
+            if (attack != null && attack.isInWindup()) {
                 AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(ATTACK);
                 return;
             }
@@ -78,7 +78,7 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Attack attack = Attack.MAPPER.get(entity);
             Animation2D animation2D = Animation2D.MAPPER.get(entity);
-            if (attack.canAttack() || animation2D.isFinished()) {
+            if (attack.canAttack() || (animation2D.isFinished() && !attack.isInWindup()) || attack.isInRecovery() ) {
                 AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }

@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
+import com.github.tilcob.game.component.Attack;
 import com.github.tilcob.game.component.Facing;
 import com.github.tilcob.game.component.Move;
 
@@ -18,6 +19,10 @@ public class FacingSystem extends IteratingSystem {
         Move move = Move.MAPPER.get(entity);
         Vector2 direction = move.getDirection();
         if (direction.isZero()) return;
+        Attack attack = Attack.MAPPER.get(entity);
+        if (attack != null && attack.isInWindup()) {
+            return;
+        }
 
         Facing facing = Facing.MAPPER.get(entity);
         if (direction.y > 0) {
