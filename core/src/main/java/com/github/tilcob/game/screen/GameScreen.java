@@ -18,6 +18,8 @@ import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.input.GameControllerState;
+import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -40,7 +42,8 @@ public class GameScreen extends ScreenAdapter {
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
-    private com.github.tilcob.game.input.KeyboardController keyboardController;
+    private IdleControllerState idleControllerState;
+    private GameControllerState gameControllerState;
     private World physicWorld;
     private com.github.tilcob.game.audio.AudioManager audioManager;
     private Stage stage;
@@ -59,7 +62,8 @@ public class GameScreen extends ScreenAdapter {
         this.engine = dependencies.engine();
         this.tiledManager = dependencies.tiledManager();
         this.tiledAshleyConfigurator = dependencies.tiledAshleyConfigurator();
-        this.keyboardController = dependencies.keyboardController();
+        this.idleControllerState = dependencies.idleControllerState();
+        this.gameControllerState = dependencies.gameControllerState();
         this.physicWorld = dependencies.physicWorld();
         this.audioManager = dependencies.audioManager();
         this.stage = dependencies.stage();
@@ -78,8 +82,8 @@ public class GameScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        inputManager.setInputProcessors(stage, keyboardController);
-        keyboardController.setActiveState(com.github.tilcob.game.input.GameControllerState.class);
+        inputManager.setInputProcessors(stage);
+        inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState);
 
         stage.addActor(new GameView(skin, stage, gameViewModel));
         stage.addActor(new InventoryView(skin, stage, inventoryViewModel));

@@ -84,6 +84,7 @@ public class TiledAshleyConfigurator {
     private void addEntityNpc(MapObject object, Entity entity) {
         String npcTypeStr = object.getProperties().get(Constants.NPC_TYPE, "", String.class);
         String name = object.getName();
+        if (name == null) return;
         if (npcTypeStr.isBlank() || npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
         entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));

@@ -8,9 +8,8 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
-import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
-import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.input.UiControllerState;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 import com.github.tilcob.game.ui.view.MenuView;
@@ -20,9 +19,10 @@ public class MenuScreen extends ScreenAdapter {
     private final Stage stage;
     private final Skin skin;
     private final Viewport uiViewport;
-    private final KeyboardController keyboardController;
     private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
+    private final IdleControllerState idleControllerState;
+    private final UiControllerState uiControllerState;
 
     public MenuScreen(
         GameServices services,
@@ -35,11 +35,10 @@ public class MenuScreen extends ScreenAdapter {
         this.uiViewport = uiViewport;
         this.stage = new Stage(uiViewport, batch);
         this.skin = services.getAssetManager().get(SkinAsset.DEFAULT);
-        this.keyboardController = new KeyboardController(
-            UiControllerState.class, services.getEventBus(), GameState.MENU, null
-        );
         this.inputManager = inputManager;
         this.screenNavigator = screenNavigator;
+        this.idleControllerState = new IdleControllerState();
+        this.uiControllerState = new UiControllerState(services.getEventBus());
     }
 
     @Override
@@ -49,7 +48,8 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        inputManager.setInputProcessors(stage, keyboardController);
+        inputManager.setInputProcessors(stage);
+        inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
         stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator)));
         services.getAudioManager().playMusic(MusicAsset.MENU);
     }

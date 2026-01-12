@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="30">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="31">
  <properties>
   <property name="music" value="TOWN"/>
  </properties>
@@ -35,6 +35,14 @@
   <object id="22" type="PlayerSpawn" x="148.5" y="304.5" width="10" height="10"/>
   <object id="29" name="Npc-2" gid="197" x="379.333" y="288.667" width="32" height="32">
    <properties>
+    <property name="npcType" propertytype="NpcType" value="FRIEND"/>
+   </properties>
+  </object>
+  <object id="30" name="Npc-3" gid="196" x="230" y="246.667" width="32" height="32">
+   <properties>
+    <property name="bodyType" value="StaticBody"/>
+    <property name="controller" type="bool" value="false"/>
+    <property name="hasInventory" type="bool" value="false"/>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
    </properties>
   </object>

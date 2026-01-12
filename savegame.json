@@ -1,0 +1,27 @@
+{
+  "currentMapByName" : "MAIN",
+  "playerState" : {
+    "posX" : 4.141721,
+    "posY" : 0.1263381,
+    "life" : 12.0,
+    "itemsByName" : [ ]
+  },
+  "chestRegistryState" : {
+    "chestsByName" : {
+      "MAIN" : {
+        "13" : {
+          "contentsByName" : [ "HELMET", "BOOTS", "BOOTS" ],
+          "opened" : false
+        }
+      },
+      "HOUSE" : {
+        "2" : {
+          "contentsByName" : [ "BOOTS", "HELMET" ],
+          "opened" : false
+        }
+      }
+    }
+  },
+  "quests" : [ ],
+  "saveVersion" : 4
+}
