@@ -4,28 +4,30 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.Controller;
 
-public class GameControllerState implements ControllerState{
-    private final ImmutableArray<Entity> controllerEntities;
+public class GameControllerState implements ControllerState {
+    private final ActiveEntityReference activeEntityReference;
 
-    public GameControllerState(ImmutableArray<Entity> controllerEntities) {
-        this.controllerEntities = controllerEntities;
+    public GameControllerState(ActiveEntityReference activeEntityReference) {
+        this.activeEntityReference = activeEntityReference;
     }
 
     @Override
     public void keyDown(Command command) {
-        for (Entity entity : controllerEntities) {
-            Controller controller = Controller.MAPPER.get(entity);
-            controller.getPressedCommands().add(command);
-            controller.getHeldCommands().add(command);
-        }
+        Entity entity = activeEntityReference.get();
+        if (entity == null) return;
+        Controller controller = Controller.MAPPER.get(entity);
+        if (controller == null) return;
+        controller.getPressedCommands().add(command);
+        controller.getHeldCommands().add(command);
     }
 
     @Override
     public void keyUp(Command command) {
-        for (Entity entity : controllerEntities) {
-            Controller controller = Controller.MAPPER.get(entity);
-            controller.getReleasedCommands().add(command);
-            controller.getHeldCommands().remove(command);
-        }
+        Entity entity = activeEntityReference.get();
+        if (entity == null) return;
+        Controller controller = Controller.MAPPER.get(entity);
+        if (controller == null) return;
+        controller.getReleasedCommands().add(command);
+        controller.getHeldCommands().remove(command);
     }
 }
