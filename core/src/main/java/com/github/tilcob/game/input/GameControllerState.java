@@ -14,14 +14,18 @@ public class GameControllerState implements ControllerState{
     @Override
     public void keyDown(Command command) {
         for (Entity entity : controllerEntities) {
-            Controller.MAPPER.get(entity).getPressedCommands().add(command);
+            Controller controller = Controller.MAPPER.get(entity);
+            controller.getPressedCommands().add(command);
+            controller.getHeldCommands().add(command);
         }
     }
 
     @Override
     public void keyUp(Command command) {
         for (Entity entity : controllerEntities) {
-            Controller.MAPPER.get(entity).getReleasedCommands().add(command);
+            Controller controller = Controller.MAPPER.get(entity);
+            controller.getReleasedCommands().add(command);
+            controller.getHeldCommands().remove(command);
         }
     }
 }

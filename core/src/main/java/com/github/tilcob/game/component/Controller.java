@@ -13,10 +13,12 @@ public class Controller implements Component {
 
     private final EnumSet<Command> pressedCommand;
     private final EnumSet<Command> releasedCommand;
+    private final EnumSet<Command> heldCommand;
 
     public Controller() {
         this.pressedCommand = EnumSet.noneOf(Command.class);
         this.releasedCommand = EnumSet.noneOf(Command.class);
+        this.heldCommand = EnumSet.noneOf(Command.class);
     }
 
     public EnumSet<Command> getPressedCommands() {
@@ -25,5 +27,9 @@ public class Controller implements Component {
 
     public EnumSet<Command> getReleasedCommands() {
         return releasedCommand;
+    }
+
+    public EnumSet<Command> getHeldCommands() {
+        return heldCommand;
     }
 }

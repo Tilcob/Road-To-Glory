@@ -24,16 +24,9 @@ public class ControllerSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
-        if (controller.getPressedCommands().isEmpty() && controller.getReleasedCommands().isEmpty()) {
-            return;
-        }
-
+        updateMovement(entity, controller);
         for (Command command : controller.getPressedCommands()) {
             switch (command) {
-                case UP -> moveEntity(entity, 0f, 1f);
-                case DOWN -> moveEntity(entity, 0f, -1f);
-                case LEFT -> moveEntity(entity, -1f, 0f);
-                case RIGHT -> moveEntity(entity, 1f, 0f);
                 case SELECT -> startEntityAttack(entity);
                 case CANCEL -> {
                     screenNavigator.setScreen(MenuScreen.class);
@@ -44,16 +37,20 @@ public class ControllerSystem extends IteratingSystem {
             }
         }
         controller.getPressedCommands().clear();
-
-        for (Command command : controller.getReleasedCommands()) {
-            switch (command) {
-                case UP -> moveEntity(entity, 0f, -1f);
-                case DOWN -> moveEntity(entity, 0f, 1f);
-                case LEFT -> moveEntity(entity, 1f, 0f);
-                case RIGHT -> moveEntity(entity, -1f, 0f);
-            }
-        }
         controller.getReleasedCommands().clear();
+    }
+
+    private void updateMovement(Entity entity, Controller controller) {
+        Move move = Move.MAPPER.get(entity);
+        if (move == null) return;
+
+        float x = 0f;
+        float y = 0f;
+        if (controller.getHeldCommands().contains(Command.UP)) y += 1f;
+        if (controller.getHeldCommands().contains(Command.DOWN)) y -= 1f;
+        if (controller.getHeldCommands().contains(Command.LEFT)) x -= 1f;
+        if (controller.getHeldCommands().contains(Command.RIGHT)) x += 1f;
+        move.getDirection().set(x, y);
     }
 
     private void showEntityInventory(Entity player) {
@@ -81,14 +78,6 @@ public class ControllerSystem extends IteratingSystem {
         Attack attack = Attack.MAPPER.get(entity);
         if (attack != null && attack.canAttack()) {
             attack.startAttack();
-        }
-    }
-
-    private void moveEntity(Entity entity, float dx, float dy) {
-        Move move = Move.MAPPER.get(entity);
-        if (move != null) {
-            move.getDirection().x += dx;
-            move.getDirection().y += dy;
         }
     }
 }
