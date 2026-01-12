@@ -29,16 +29,29 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         this.player = player;
         if (inventory.getItemsToAdd().isEmpty()) return;
 
+        boolean inventoryFull = false;
+        boolean addedAny = false;
+        var remaining = new com.badlogic.gdx.utils.Array<ItemType>();
+
         for (ItemType itemType : inventory.getItemsToAdd()) {
+            if (inventoryFull) {
+                remaining.add(itemType);
+                continue;
+            }
+
             int slotIndex = emptySlotIndex(inventory);
             if (slotIndex == -1) {
-                eventBus.fire(new InventoryFullEvent());
-                return;
+                inventoryFull = true;
+                remaining.add(itemType);
+                continue;
             }
             addItem(inventory, itemType, slotIndex);
+            addedAny = true;
         }
         inventory.getItemsToAdd().clear();
-        eventBus.fire(new EntityAddItemEvent(player));
+        inventory.getItemsToAdd().addAll(remaining);
+        if (inventoryFull) eventBus.fire(new InventoryFullEvent());
+        if (addedAny) eventBus.fire(new EntityAddItemEvent(player));
     }
 
     private void addItem(Inventory inventory, ItemType itemType, int slotIndex) {
