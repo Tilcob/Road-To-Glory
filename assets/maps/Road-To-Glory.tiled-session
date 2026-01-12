@@ -28,8 +28,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 264,
-                "y": 159.75
+                "x": 253.5,
+                "y": 236.75
             }
         },
         "objects.tsx": {
@@ -44,8 +44,8 @@
             "scale": 4,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 8,
-                "y": 7.875
+                "x": 9.625,
+                "y": 37.375
             }
         },
         "terrain.tsx": {
@@ -69,7 +69,7 @@
         "player.tmx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "NpcType",
+    "property.type": "float",
     "recentFiles": [
         "player.tmx",
         "terrain.tsx",

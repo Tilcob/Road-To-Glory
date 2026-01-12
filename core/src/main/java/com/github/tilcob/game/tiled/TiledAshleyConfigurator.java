@@ -140,13 +140,15 @@ public class TiledAshleyConfigurator {
         if (damage == 0) return;
 
         float damageDelay = tile.getProperties().get(Constants.DAMAGE_DELAY, 0f, Float.class);
+        float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, damageDelay, Float.class);
+        float cooldown = tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
         String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
         SoundAsset soundAsset = null;
         if (!soundAssetStr.isBlank()) {
             soundAsset = SoundAsset.valueOf(soundAssetStr);
         }
 
-        entity.add(new Attack(damage, damageDelay, soundAsset));
+        entity.add(new Attack(damage, windup, cooldown, soundAsset));
     }
 
     private void addEntityCameraFollow(TiledMapTileMapObject object, Entity entity) {

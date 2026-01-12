@@ -8,36 +8,86 @@ import com.github.tilcob.game.assets.SoundAsset;
 public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
-    private float damage;
-    private float damageDelay;
+    private final float damage;
+    private final float windup;
+    private final float cooldown;
     private float attackTimer;
     private SoundAsset sfx;
+    private boolean startedThisFrame;
+    private boolean finishedThisFrame;
+    private State state;
 
-    public Attack (float damage, float damageDelay, SoundAsset soundAsset) {
+    public Attack (float damage, float windup, float cooldown, SoundAsset soundAsset) {
         this.damage = damage;
-        this.damageDelay = damageDelay;
+        this.windup = windup;
+        this.cooldown = cooldown;
         this.sfx = soundAsset;
         this.attackTimer = 0f;
+        this.startedThisFrame = false;
+        this.finishedThisFrame = false;
+        this.state = State.IDLE;
     }
 
     public boolean canAttack() {
-        return attackTimer == 0;
+        return state == State.IDLE;
     }
 
     public boolean isAttacking() {
-        return attackTimer > 0;
+        return state != State.IDLE;
     }
 
-    public boolean hasAttackStarted() {
-        return MathUtils.isEqual(attackTimer, damageDelay, .0001f);
+    public boolean isInWindup() {
+        return state == State.WINDUP;
+    }
+
+    public boolean isInRecovery() {
+        return state == State.RECOVERY;
+    }
+
+    public boolean consumeStarted() {
+        if (!startedThisFrame) return false;
+        startedThisFrame = false;
+        return true;
     }
 
     public void startAttack() {
-        attackTimer = damageDelay;
+        if (!canAttack()) return;
+        state = State.WINDUP;
+        attackTimer = Math.max(0f, windup);
+        startedThisFrame = true;
     }
 
-    public void decreaseAttackTimer(float delta) {
-        attackTimer = Math.max(0f, attackTimer - delta);
+    public boolean advance(float delta) {
+        boolean triggered = false;
+        finishedThisFrame = false;
+
+        if (state == State.WINDUP) {
+            attackTimer = Math.max(0f, attackTimer - delta);
+            if (attackTimer == 0f) {
+                triggered = true;
+                if (cooldown > 0f) {
+                    state = State.RECOVERY;
+                    attackTimer = cooldown;
+                } else {
+                    state = State.IDLE;
+                    finishedThisFrame = true;
+                }
+            }
+        } else if (state == State.RECOVERY) {
+            attackTimer = Math.max(0f, attackTimer - delta);
+            if (attackTimer == 0f) {
+                state = State.IDLE;
+                finishedThisFrame = true;
+            }
+        }
+
+        return triggered;
+    }
+
+    public boolean consumeFinished() {
+        if (!finishedThisFrame) return false;
+        finishedThisFrame = false;
+        return true;
     }
 
     public float getDamage() {
@@ -46,5 +96,11 @@ public class Attack implements Component {
 
     public SoundAsset getSfx() {
         return sfx;
+    }
+
+    public enum State {
+        IDLE,
+        WINDUP,
+        RECOVERY
     }
 }

@@ -59,15 +59,16 @@ public class PlayerFactory {
     private static void addEntityAttack(TiledMapTile tile, Entity entity) {
         float damage = tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
         if (damage == 0) return;
-
         float damageDelay = tile.getProperties().get(Constants.DAMAGE_DELAY, 0f, Float.class);
+        float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, damageDelay, Float.class);
+        float cooldown = tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
         String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
         SoundAsset soundAsset = null;
         if (!soundAssetStr.isBlank()) {
             soundAsset = SoundAsset.valueOf(soundAssetStr);
         }
 
-        entity.add(new Attack(damage, damageDelay, soundAsset));
+        entity.add(new Attack(damage, windup, cooldown, soundAsset));
     }
 
     private static void addEntityLife(TiledMapTile player, Entity entity) {
