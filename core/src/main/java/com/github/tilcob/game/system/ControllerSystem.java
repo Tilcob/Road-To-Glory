@@ -3,13 +3,18 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.screen.MenuScreen;
 import com.github.tilcob.game.screen.ScreenNavigator;
+
+import java.util.Iterator;
+import java.util.Map;
 
 public class ControllerSystem extends IteratingSystem {
     private final ScreenNavigator screenNavigator;
@@ -25,8 +30,15 @@ public class ControllerSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
         updateMovement(entity, controller);
-        for (Command command : controller.getPressedCommands()) {
-            switch (command) {
+        float nowSeconds = TimeUtils.millis() / 1000f;
+        for (Iterator<Map.Entry<Command, Float>> iterator = controller.getCommandBuffer().entrySet().iterator();
+             iterator.hasNext(); ) {
+            Map.Entry<Command, Float> entry = iterator.next();
+            if (nowSeconds - entry.getValue() > Constants.GAMEPLAY_COMMAND_BUFFER_SECONDS) {
+                iterator.remove();
+                continue;
+            }
+            switch (entry.getKey()) {
                 case SELECT -> startEntityAttack(entity);
                 case CANCEL -> {
                     screenNavigator.setScreen(MenuScreen.class);
@@ -34,7 +46,10 @@ public class ControllerSystem extends IteratingSystem {
                 }
                 case INTERACT -> interact(entity);
                 case INVENTORY -> showEntityInventory(entity);
+                default -> {
+                }
             }
+            iterator.remove();
         }
         controller.getPressedCommands().clear();
         controller.getReleasedCommands().clear();

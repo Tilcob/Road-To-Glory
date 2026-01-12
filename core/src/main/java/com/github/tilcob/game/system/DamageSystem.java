@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.github.tilcob.game.component.Damaged;
 import com.github.tilcob.game.component.Life;
-import com.github.tilcob.game.component.Player;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.ui.model.GameViewModel;
 

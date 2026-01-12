@@ -17,6 +17,7 @@ public class Constants {
     public static final float DEFAULT_ANIMATION_SPEED = 1f;
     public static final float DEFAULT_ARRIVAL_DISTANCE = 0.1f;
     public static final float DEFAULT_DAMAGE_DELAY = .2f;
+    public static final float GAMEPLAY_COMMAND_BUFFER_SECONDS = 0.15f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";

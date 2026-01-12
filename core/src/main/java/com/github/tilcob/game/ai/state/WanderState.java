@@ -5,10 +5,8 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.ai.NpcState;
-import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.component.MoveIntent;
 import com.github.tilcob.game.component.NpcFsm;
-import com.github.tilcob.game.input.Command;
 
 public class WanderState implements State<Entity> {
     @Override

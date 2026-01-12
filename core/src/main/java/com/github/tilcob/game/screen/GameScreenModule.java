@@ -2,7 +2,6 @@ package com.github.tilcob.game.screen;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
-import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.World;
@@ -12,7 +11,6 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.input.GameControllerState;
