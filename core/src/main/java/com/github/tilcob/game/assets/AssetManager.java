@@ -50,7 +50,7 @@ public class AssetManager implements Disposable {
 
     public TiledMapTile getPlayerTile() {
         if (playerMap == null) {
-            playerMap = get(PlayerMapAsset.PLAYER);
+            playerMap = loadSync(MapAsset.PLAYER);
         }
         TiledMapTileSet objects = playerMap.getTileSets().getTileSet("objects");
         return objects.getTile(Constants.PLAYER_ID);

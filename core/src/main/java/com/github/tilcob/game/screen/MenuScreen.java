@@ -12,6 +12,7 @@ import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardController;
 import com.github.tilcob.game.input.UiControllerState;
 import com.github.tilcob.game.ui.model.MenuViewModel;
@@ -23,13 +24,13 @@ public class MenuScreen extends ScreenAdapter {
     private final Skin skin;
     private final Viewport uiViewport;
     private final KeyboardController keyboardController;
-    private final InputMultiplexer inputMultiplexer;
+    private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
 
     public MenuScreen(
         GameServices services,
         com.badlogic.gdx.graphics.g2d.Batch batch,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         Viewport uiViewport,
         ScreenNavigator screenNavigator
     ) {
@@ -40,7 +41,7 @@ public class MenuScreen extends ScreenAdapter {
         this.keyboardController = new KeyboardController(
             UiControllerState.class, services.getEventBus(), GameState.MENU, null
         );
-        this.inputMultiplexer = inputMultiplexer;
+        this.inputManager = inputManager;
         this.screenNavigator = screenNavigator;
     }
 
@@ -51,7 +52,7 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        setInputProcessors(stage, keyboardController);
+        inputManager.setInputProcessors(stage, keyboardController);
         stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator)));
         services.getAudioManager().playMusic(MusicAsset.MENU);
     }
@@ -67,15 +68,6 @@ public class MenuScreen extends ScreenAdapter {
         stage.getBatch().setColor(Color.WHITE);
         stage.act(delta);
         stage.draw();
-    }
-
-    private void setInputProcessors(com.badlogic.gdx.InputProcessor... processors) {
-        inputMultiplexer.clear();
-        if (processors == null) return;
-
-        for (com.badlogic.gdx.InputProcessor processor : processors) {
-            inputMultiplexer.addProcessor(processor);
-        }
     }
 
     @Override

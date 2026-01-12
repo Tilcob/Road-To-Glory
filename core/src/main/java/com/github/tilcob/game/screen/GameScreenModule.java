@@ -1,6 +1,7 @@
 package com.github.tilcob.game.screen;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -15,26 +16,9 @@ import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.GameState;
+import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardController;
-import com.github.tilcob.game.system.AiSystem;
-import com.github.tilcob.game.system.AnimationSystem;
-import com.github.tilcob.game.system.AttackSystem;
-import com.github.tilcob.game.system.CameraSystem;
-import com.github.tilcob.game.system.ChestSystem;
-import com.github.tilcob.game.system.ControllerSystem;
-import com.github.tilcob.game.system.DamageSystem;
-import com.github.tilcob.game.system.DialogSystem;
-import com.github.tilcob.game.system.FacingSystem;
-import com.github.tilcob.game.system.FsmSystem;
-import com.github.tilcob.game.system.InventorySystem;
-import com.github.tilcob.game.system.LifeSystem;
-import com.github.tilcob.game.system.MapChangeSystem;
-import com.github.tilcob.game.system.PhysicDebugRenderSystem;
-import com.github.tilcob.game.system.PhysicMoveSystem;
-import com.github.tilcob.game.system.PhysicSystem;
-import com.github.tilcob.game.system.QuestSystem;
-import com.github.tilcob.game.system.RenderSystem;
-import com.github.tilcob.game.system.TriggerSystem;
+import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
@@ -45,7 +29,7 @@ public class GameScreenModule {
     private final Batch batch;
     private final OrthographicCamera camera;
     private final Viewport viewport;
-    private final InputMultiplexer inputMultiplexer;
+    private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
 
     public GameScreenModule(
@@ -53,14 +37,14 @@ public class GameScreenModule {
         Batch batch,
         OrthographicCamera camera,
         Viewport viewport,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         ScreenNavigator screenNavigator
     ) {
         this.services = services;
         this.batch = batch;
         this.camera = camera;
         this.viewport = viewport;
-        this.inputMultiplexer = inputMultiplexer;
+        this.inputManager = inputManager;
         this.screenNavigator = screenNavigator;
     }
 
@@ -93,26 +77,58 @@ public class GameScreenModule {
         InventoryViewModel inventoryViewModel = new InventoryViewModel(services);
         Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
 
-        engine.addSystem(new ControllerSystem(screenNavigator, services.getEventBus()));
-        engine.addSystem(new PhysicMoveSystem());
-        engine.addSystem(new AttackSystem(physicWorld, services.getAudioManager()));
-        engine.addSystem(new FsmSystem());
-        engine.addSystem(new AiSystem());
-        engine.addSystem(new FacingSystem());
-        engine.addSystem(new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL, services.getEventBus()));
-        engine.addSystem(new DamageSystem(gameViewModel));
-        engine.addSystem(new LifeSystem(gameViewModel));
-        engine.addSystem(new AnimationSystem(services.getAssetManager()));
-        engine.addSystem(new TriggerSystem(services.getAudioManager(), services.getEventBus()));
-        engine.addSystem(new MapChangeSystem(tiledManager, services.getEventBus(), services.getStateManager()));
-        engine.addSystem(new InventorySystem(services.getEventBus()));
-        engine.addSystem(new ChestSystem());
-        engine.addSystem(new QuestSystem(services.getEventBus()));
+        // Input
+        engine.addSystem(withPriority(
+            new ControllerSystem(screenNavigator, services.getEventBus()),
+            SystemOrder.INPUT
+        ));
+
+        // AI
+        engine.addSystem(withPriority(new FsmSystem(), SystemOrder.AI));
+        engine.addSystem(withPriority(new AiSystem(), SystemOrder.AI));
+
+        // Physics
+        engine.addSystem(withPriority(new PhysicMoveSystem(), SystemOrder.PHYSICS));
+        engine.addSystem(withPriority(new FacingSystem(), SystemOrder.PHYSICS));
+        engine.addSystem(withPriority(
+            new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL, services.getEventBus()),
+            SystemOrder.PHYSICS
+        ));
+
+        // Combat
+        engine.addSystem(withPriority(
+            new AttackSystem(physicWorld, services.getAudioManager()),
+            SystemOrder.COMBAT
+        ));
+        engine.addSystem(withPriority(new DamageSystem(gameViewModel), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(
+            new TriggerSystem(services.getAudioManager(), services.getEventBus()),
+            SystemOrder.COMBAT
+        ));
+
+        // Gameplay & UI
+        engine.addSystem(withPriority(
+            new MapChangeSystem(tiledManager, services.getEventBus(), services.getStateManager()),
+            SystemOrder.GAMEPLAY
+        ));
+        engine.addSystem(withPriority(new InventorySystem(services.getEventBus()), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new QuestSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         //this.engine.addSystem(new DialogRequestSystem());
-        engine.addSystem(new DialogSystem(services.getEventBus(), services.getAllDialogs()));
-        engine.addSystem(new CameraSystem(camera));
-        engine.addSystem(new RenderSystem(batch, viewport, camera));
-        engine.addSystem(new PhysicDebugRenderSystem(physicWorld, camera));
+        engine.addSystem(withPriority(
+            new DialogSystem(services.getEventBus(), services.getAllDialogs()),
+            SystemOrder.GAMEPLAY
+        ));
+
+        // Render
+        engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));
+        engine.addSystem(withPriority(new CameraSystem(camera), SystemOrder.RENDER));
+        engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
+        engine.addSystem(withPriority(
+            new PhysicDebugRenderSystem(physicWorld, camera),
+            SystemOrder.DEBUG_RENDER
+        ));
 
         return new Dependencies(
             engine,
@@ -124,9 +140,14 @@ public class GameScreenModule {
             gameViewModel,
             inventoryViewModel,
             skin,
-            inputMultiplexer,
+            inputManager,
             services.getAudioManager()
         );
+    }
+
+    public static <T extends EntitySystem> T withPriority(T system, SystemOrder order) {
+        system.priority = order.priority();
+        return system;
     }
 
     public record Dependencies(
@@ -139,7 +160,7 @@ public class GameScreenModule {
         GameViewModel gameViewModel,
         InventoryViewModel inventoryViewModel,
         Skin skin,
-        InputMultiplexer inputMultiplexer,
+        InputManager inputManager,
         com.github.tilcob.game.audio.AudioManager audioManager
     ) {}
 }

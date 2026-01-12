@@ -16,6 +16,7 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
@@ -40,6 +41,7 @@ public class GdxGame extends Game implements ScreenNavigator {
     private GLProfiler glProfiler;
     private FPSLogger fpsLogger;
     private InputMultiplexer inputMultiplexer;
+    private InputManager inputManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
     private GameServices services;
     private ScreenFactory screenFactory;
@@ -48,6 +50,7 @@ public class GdxGame extends Game implements ScreenNavigator {
     public void create() {
         Gdx.app.setLogLevel(Application.LOG_DEBUG);
         inputMultiplexer = new InputMultiplexer();
+        inputManager = new InputManager(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
 
         services = new GameServices(new InternalFileHandleResolver(),
@@ -58,7 +61,7 @@ public class GdxGame extends Game implements ScreenNavigator {
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
         glProfiler = new GLProfiler(Gdx.graphics);
         fpsLogger = new FPSLogger();
-        screenFactory = new ScreenFactory(services, batch, camera, viewport, inputMultiplexer, this);
+        screenFactory = new ScreenFactory(services, batch, camera, viewport, inputManager, this);
 
         glProfiler.enable();
         addScreen(screenFactory.createLoadingScreen(this::onLoadingFinished));
