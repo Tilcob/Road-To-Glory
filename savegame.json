@@ -1,16 +1,16 @@
 {
   "currentMapByName" : "MAIN",
   "playerState" : {
-    "posX" : 4.141721,
-    "posY" : 0.1263381,
-    "life" : 12.0,
-    "itemsByName" : [ ]
+    "posX" : 10.243217,
+    "posY" : 1.4025443,
+    "life" : 10.688807,
+    "itemsByName" : [ "HELMET", "BOOTS", "BOOTS" ]
   },
   "chestRegistryState" : {
     "chestsByName" : {
       "MAIN" : {
         "13" : {
-          "contentsByName" : [ "HELMET", "BOOTS", "BOOTS" ],
+          "contentsByName" : [ ],
           "opened" : false
         }
       },

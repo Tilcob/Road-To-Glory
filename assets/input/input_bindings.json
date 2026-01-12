@@ -1,0 +1,12 @@
+{
+    "bindings": {
+        "UP": "W",
+        "DOWN": "S",
+        "LEFT": "A",
+        "RIGHT": "D",
+        "SELECT": "SPACEBAR",
+        "CANCEL": "ESC",
+        "INTERACT": "E",
+        "INVENTORY": "I"
+    }
+}
