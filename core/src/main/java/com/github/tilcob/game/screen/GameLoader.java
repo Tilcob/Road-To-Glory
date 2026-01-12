@@ -1,11 +1,7 @@
 package com.github.tilcob.game.screen;
 
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.assets.AtlasAsset;
-import com.github.tilcob.game.assets.DialogAsset;
-import com.github.tilcob.game.assets.QuestAsset;
-import com.github.tilcob.game.assets.SkinAsset;
-import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.assets.*;
 import com.github.tilcob.game.dialog.DialogLoader;
 import com.github.tilcob.game.quest.QuestFactory;
 

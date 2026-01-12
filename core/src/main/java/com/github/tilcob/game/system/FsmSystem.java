@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.github.tilcob.game.component.AnimationFsm;
-import com.github.tilcob.game.component.NpcFsm;
 
 public class FsmSystem extends IteratingSystem {
 

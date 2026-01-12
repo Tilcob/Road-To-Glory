@@ -5,10 +5,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.Life;
 import com.github.tilcob.game.component.Transform;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.PlayerState;
-
-import java.util.List;
 
 public class PlayerStateExtractor {
     public static PlayerState fromEntity(Entity entity) {

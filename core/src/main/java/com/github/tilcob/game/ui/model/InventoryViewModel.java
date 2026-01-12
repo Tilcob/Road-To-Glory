@@ -1,10 +1,8 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;

@@ -6,9 +6,9 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.github.tilcob.game.save.registry.MigrationRegistry;
-import com.github.tilcob.game.save.states.chest.ChestRegistryState;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
+import com.github.tilcob.game.save.states.chest.ChestRegistryState;
 
 import java.io.IOException;
 

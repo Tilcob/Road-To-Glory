@@ -5,7 +5,6 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
-import com.github.tilcob.game.component.AnimationFsm;
 import com.github.tilcob.game.component.NpcFsm;
 
 public class ChaseState implements State<Entity> {

@@ -1,10 +1,8 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;

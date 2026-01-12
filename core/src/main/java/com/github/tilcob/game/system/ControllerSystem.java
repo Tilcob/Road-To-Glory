@@ -3,7 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.GameEventBus;

@@ -6,7 +6,6 @@ import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.Controller;
-import com.github.tilcob.game.component.AnimationFsm;
 import com.github.tilcob.game.component.NpcFsm;
 import com.github.tilcob.game.input.Command;
 

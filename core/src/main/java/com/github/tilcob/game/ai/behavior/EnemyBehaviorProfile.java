@@ -2,7 +2,6 @@ package com.github.tilcob.game.ai.behavior;
 
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.ai.NpcState;
-import com.github.tilcob.game.component.AnimationFsm;
 import com.github.tilcob.game.component.NpcFsm;
 
 public class EnemyBehaviorProfile extends BaseNpcBehaviorProfile {
