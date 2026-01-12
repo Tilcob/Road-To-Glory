@@ -12,6 +12,11 @@ public class UiControllerState implements ControllerState {
 
     @Override
     public void keyDown(Command command) {
-        eventBus.fire(new UiEvent(command));
+        eventBus.fire(new UiEvent(command, UiEvent.Action.PRESS));
+    }
+
+    @Override
+    public void keyUp(Command command) {
+        eventBus.fire(new UiEvent(command, UiEvent.Action.RELEASE));
     }
 }

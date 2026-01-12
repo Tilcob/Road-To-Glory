@@ -57,7 +57,7 @@ public class ControllerSystem extends IteratingSystem {
         Inventory inventory = Inventory.MAPPER.get(player);
         if (inventory == null) return;
 
-        eventBus.fire(new UiEvent(Command.INVENTORY));
+        eventBus.fire(new UiEvent(Command.INVENTORY, UiEvent.Action.PRESS));
     }
 
     private void interact(Entity player) {

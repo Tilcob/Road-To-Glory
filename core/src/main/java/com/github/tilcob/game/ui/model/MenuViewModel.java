@@ -21,6 +21,8 @@ public class MenuViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent uiEvent) {
+        if (uiEvent.action() == UiEvent.Action.RELEASE) return;
+
         switch (uiEvent.command()) {
             case LEFT ->  onLeft();
             case RIGHT ->  onRight();
