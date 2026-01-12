@@ -5,6 +5,8 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
+import com.github.tilcob.game.ai.behavior.NpcBehaviorRegistry;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.Command;
@@ -16,19 +18,7 @@ public enum NpcState implements State<Entity> {
 
         @Override
         public void update(Entity entity) {
-            Npc npc = Npc.MAPPER.get(entity);
-
-            switch (npc.getType()) {
-                case FRIEND -> {
-                    //Fsm.MAPPER.get(entity).getNpcFsm().changeState(WANDER);
-                }
-                case ENEMY -> {
-                    Entity player = findPlayer(entity);
-                    if (player != null && inAggroRange(entity, player)) {
-                        Fsm.MAPPER.get(entity).getNpcFsm().changeState(CHASE);
-                    }
-                }
-            }
+            behaviorProfile(entity).updateIdle(entity);
         }
 
         @Override
@@ -98,7 +88,8 @@ public enum NpcState implements State<Entity> {
         @Override
         public void update(Entity entity) {
             Entity player = findPlayer(entity);
-            if (player == null || !inAggroRange(entity, player)) {
+            NpcBehaviorProfile profile = behaviorProfile(entity);
+            if (player == null || !inAggroRange(entity, player, profile.getAggroRange())) {
                 Fsm.MAPPER.get(entity).getNpcFsm().changeState(IDLE);
                 return;
             }
@@ -120,29 +111,29 @@ public enum NpcState implements State<Entity> {
 
     }
 
-    void lookAtPlayer(Entity player, Entity entity) {
-        Facing facingEntity = Facing.MAPPER.get(entity);
-        Facing facingPlayer = Facing.MAPPER.get(player);
-
-        switch (facingPlayer.getDirection()) {
-            case UP -> facingEntity.setDirection(Facing.FacingDirection.DOWN);
-            case DOWN -> facingEntity.setDirection(Facing.FacingDirection.UP);
-            case LEFT -> facingEntity.setDirection(Facing.FacingDirection.RIGHT);
-            case RIGHT -> facingEntity.setDirection(Facing.FacingDirection.LEFT);
-        }
-    }
-
-    boolean inAggroRange(Entity entity, Entity player) {
+    boolean inAggroRange(Entity entity, Entity player, float aggroRange) {
         Vector2 entityPos = Transform.MAPPER.get(entity).getPosition();
         Vector2 playerPos = Transform.MAPPER.get(player).getPosition();
 
         float dx = playerPos.x - entityPos.x;
         float dy = playerPos.y - entityPos.y;
 
-        return dx * dx + dy * dy <= Constants.AGGRO_RANGE * Constants.AGGRO_RANGE;
+        return dx * dx + dy * dy <= aggroRange * aggroRange;
+    }
+
+    NpcBehaviorProfile behaviorProfile(Entity entity) {
+        Npc npc = Npc.MAPPER.get(entity);
+        if (npc == null) {
+            return NpcBehaviorRegistry.get(null);
+        }
+        return NpcBehaviorRegistry.get(npc.getType());
     }
 
     Entity findPlayer(Entity entity) {
-        return PlayerReference.MAPPER.get(entity).getPlayer();
+        PlayerReference playerReference = PlayerReference.MAPPER.get(entity);
+        if (playerReference == null) {
+            return null;
+        }
+        return playerReference.getPlayer();
     }
 }
