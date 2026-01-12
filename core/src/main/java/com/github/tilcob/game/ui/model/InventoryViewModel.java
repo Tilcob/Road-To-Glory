@@ -46,6 +46,7 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent event) {
+        if (event.action() != UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY) {
             boolean old = open;
             open = !open;
