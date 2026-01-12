@@ -38,7 +38,7 @@ public class PlayerFactory {
         ));
 
         entity.add(new Player());
-        entity.add(new Controller());
+        entity.add(new Controller(true));
         float speed = player.getProperties().get(Constants.SPEED, 0f, Float.class);
         entity.add(new Move(speed));
         addEntityAnimation(player, entity);

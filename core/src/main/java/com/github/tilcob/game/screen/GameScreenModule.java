@@ -11,8 +11,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SkinAsset;
+import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Controller;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
@@ -65,9 +67,8 @@ public class GameScreenModule {
             tiledManager
         );
         IdleControllerState idleControllerState = new IdleControllerState();
-        GameControllerState gameControllerState = new GameControllerState(
-            engine.getEntitiesFor(Family.all(Controller.class).get())
-        );
+        ActiveEntityReference activeEntityReference = new ActiveEntityReference();
+        GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
         Stage stage = new Stage(uiViewport, batch);
         GameViewModel gameViewModel = new GameViewModel(services, viewport);
         InventoryViewModel inventoryViewModel = new InventoryViewModel(services);
@@ -139,7 +140,8 @@ public class GameScreenModule {
             inventoryViewModel,
             skin,
             inputManager,
-            services.getAudioManager()
+            services.getAudioManager(),
+            activeEntityReference
         );
     }
 
@@ -160,6 +162,7 @@ public class GameScreenModule {
         InventoryViewModel inventoryViewModel,
         Skin skin,
         InputManager inputManager,
-        com.github.tilcob.game.audio.AudioManager audioManager
+        AudioManager audioManager,
+        ActiveEntityReference activeEntityReference
     ) {}
 }

@@ -18,6 +18,7 @@ import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
@@ -52,6 +53,7 @@ public class GameScreen extends ScreenAdapter {
     private Skin skin;
     private InputManager inputManager;
     private Entity player;
+    private ActiveEntityReference activeEntityReference;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -71,6 +73,7 @@ public class GameScreen extends ScreenAdapter {
         this.inventoryViewModel = dependencies.inventoryViewModel();
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
+        this.activeEntityReference = dependencies.activeEntityReference();
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
     }
 
@@ -109,6 +112,7 @@ public class GameScreen extends ScreenAdapter {
 
     private void createPlayer() {
         player = PlayerFactory.create(engine, services.getAssetManager(), physicWorld);
+        activeEntityReference.set(player);
         loadMap();
 
         if (services.getStateManager().getGameState().getPlayerState() != null) {
