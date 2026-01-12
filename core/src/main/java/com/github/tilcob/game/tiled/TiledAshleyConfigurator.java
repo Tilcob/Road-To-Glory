@@ -74,7 +74,7 @@ public class TiledAshleyConfigurator {
         addEntityChest(object, entity);
         addEntityNpc(object, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
-        entity.add(new Fsm(entity));
+        entity.add(new AnimationFsm(entity));
         entity.add(new Tiled(object));
         entity.add(new MapEntity());
 
@@ -87,9 +87,9 @@ public class TiledAshleyConfigurator {
         if (npcTypeStr.isBlank() || npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
         entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
-        //entity.add(new Controller());
         entity.add(new PlayerReference(null));
         entity.add(new Dialog());
+        entity.add(new NpcFsm(entity));
     }
 
     private void addEntityChest(MapObject object, Entity entity) {
