@@ -1,6 +1,5 @@
 package com.github.tilcob.game.screen;
 
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.utils.viewport.FitViewport;

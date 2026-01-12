@@ -3,10 +3,6 @@ package com.github.tilcob.game.screen;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.GdxGame;
-import com.github.tilcob.game.assets.*;
-import com.github.tilcob.game.dialog.DialogLoader;
-import com.github.tilcob.game.quest.QuestFactory;
 
 import java.util.function.Consumer;
 

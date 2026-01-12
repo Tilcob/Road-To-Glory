@@ -3,7 +3,6 @@ package com.github.tilcob.game.screen;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.core.Family;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.physics.box2d.World;
@@ -86,6 +85,7 @@ public class GameScreenModule {
         // AI
         engine.addSystem(withPriority(new FsmSystem(), SystemOrder.AI));
         engine.addSystem(withPriority(new AiSystem(), SystemOrder.AI));
+        engine.addSystem(withPriority(new NpcPathfindingSystem(), SystemOrder.AI));
 
         // Physics
         engine.addSystem(withPriority(new PhysicMoveSystem(), SystemOrder.PHYSICS));

@@ -4,7 +4,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.component.Npc;
+import com.github.tilcob.game.component.NpcFsm;
+import com.github.tilcob.game.component.Player;
+import com.github.tilcob.game.component.PlayerReference;
 
 public class AiSystem extends IteratingSystem {
 

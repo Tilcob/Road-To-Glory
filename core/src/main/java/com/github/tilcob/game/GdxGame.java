@@ -11,26 +11,13 @@ import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.github.tilcob.game.assets.AssetManager;
-import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.dialog.MapDialogData;
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.InputManager;
-import com.github.tilcob.game.item.ItemRegistry;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestLoader;
-import com.github.tilcob.game.save.SaveManager;
-import com.github.tilcob.game.save.registry.ChestRegistry;
-import com.github.tilcob.game.save.states.GameState;
-import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.screen.LoadingScreen;
 import com.github.tilcob.game.screen.MenuScreen;
 import com.github.tilcob.game.screen.ScreenFactory;
 import com.github.tilcob.game.screen.ScreenNavigator;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 

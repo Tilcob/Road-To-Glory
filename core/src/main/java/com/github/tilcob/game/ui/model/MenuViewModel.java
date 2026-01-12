@@ -2,7 +2,6 @@ package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiEvent;

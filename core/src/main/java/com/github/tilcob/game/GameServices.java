@@ -1,6 +1,5 @@
 package com.github.tilcob.game;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
@@ -13,7 +12,7 @@ import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
-import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Map;
 

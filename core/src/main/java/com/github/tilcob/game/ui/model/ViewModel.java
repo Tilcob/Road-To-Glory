@@ -1,7 +1,6 @@
 package com.github.tilcob.game.ui.model;
 
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.GdxGame;
 import com.github.tilcob.game.event.GameEventBus;
 
 import java.beans.PropertyChangeListener;

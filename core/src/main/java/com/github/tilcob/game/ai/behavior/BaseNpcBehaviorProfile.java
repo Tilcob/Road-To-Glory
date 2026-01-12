@@ -1,33 +1,38 @@
 package com.github.tilcob.game.ai.behavior;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.math.Vector2;
-import com.github.tilcob.game.component.PlayerReference;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.ai.NpcState;
+import com.github.tilcob.game.ai.state.NpcStateSupport;
 import com.github.tilcob.game.config.Constants;
 
 public abstract class BaseNpcBehaviorProfile implements NpcBehaviorProfile {
+    private final float aggroRange;
+    private final NpcState initialState;
+
+    protected BaseNpcBehaviorProfile() {
+        this(Constants.AGGRO_RANGE, NpcState.IDLE);
+    }
+
+    protected BaseNpcBehaviorProfile(float aggroRange, NpcState initialState) {
+        this.aggroRange = aggroRange;
+        this.initialState = initialState;
+    }
 
     @Override
     public float getAggroRange() {
-        return Constants.AGGRO_RANGE;
+        return aggroRange;
+    }
+
+    @Override
+    public NpcState getInitialNpcState() {
+        return initialState;
     }
 
     protected Entity findPlayer(Entity entity) {
-        PlayerReference reference = PlayerReference.MAPPER.get(entity);
-        if (reference == null) {
-            return null;
-        }
-        return reference.getPlayer();
+        return NpcStateSupport.findPlayer(entity);
     }
 
     protected boolean inAggroRange(Entity entity, Entity player, float aggroRange) {
-        Vector2 entityPos = Transform.MAPPER.get(entity).getPosition();
-        Vector2 playerPos = Transform.MAPPER.get(player).getPosition();
-
-        float dx = playerPos.x - entityPos.x;
-        float dy = playerPos.y - entityPos.y;
-
-        return dx * dx + dy * dy <= aggroRange * aggroRange;
+        return  NpcStateSupport.inAggroRange(entity, player, aggroRange);
     }
 }
