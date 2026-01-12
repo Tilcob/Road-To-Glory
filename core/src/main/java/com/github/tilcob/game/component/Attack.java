@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.config.Constants;
 
 public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
@@ -65,13 +66,8 @@ public class Attack implements Component {
             attackTimer = Math.max(0f, attackTimer - delta);
             if (attackTimer == 0f) {
                 triggered = true;
-                if (cooldown > 0f) {
-                    state = State.RECOVERY;
-                    attackTimer = cooldown;
-                } else {
-                    state = State.IDLE;
-                    finishedThisFrame = true;
-                }
+                state = State.RECOVERY;
+                attackTimer = Math.max(cooldown, Constants.FIXED_INTERVAL);
             }
         } else if (state == State.RECOVERY) {
             attackTimer = Math.max(0f, attackTimer - delta);

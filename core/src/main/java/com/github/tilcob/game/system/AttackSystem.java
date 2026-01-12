@@ -58,7 +58,7 @@ public class AttackSystem extends IteratingSystem {
             updateAttackAABB(attackerBody.getPosition(), attackShape);
 
             attackDamage = attack.getDamage();
-            world.QueryAABB(this::attackCallback, attackAABB.x, attackAABB.y, attackAABB.width, attackAABB.height);
+            world.QueryAABB(this::attackCallback, attackAABB.x, attackAABB.y, attackAABB.x + attackAABB.width, attackAABB.y + attackAABB.height);
         }
 
         if (attack.consumeFinished()) {

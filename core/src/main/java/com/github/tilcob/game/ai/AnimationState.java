@@ -78,7 +78,7 @@ public enum AnimationState implements State<Entity> {
         public void update(Entity entity) {
             Attack attack = Attack.MAPPER.get(entity);
             Animation2D animation2D = Animation2D.MAPPER.get(entity);
-            if (attack.canAttack() || attack.isInRecovery() || animation2D.isFinished()) {
+            if (attack.canAttack() || animation2D.isFinished()) {
                 AnimationFsm.MAPPER.get(entity).getAnimationFsm().changeState(IDLE);
             }
         }
