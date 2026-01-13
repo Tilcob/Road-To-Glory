@@ -24,8 +24,8 @@ public class GameView extends View<GameViewModel> {
     private final TypingLabel dialogText;
     private final TextraLabel speakerLabel;
     private final TextraLabel dialogProgressLabel;
-    private final VerticalGroup dialogChoices;
-    private final TextraLabel dialogHintLabel;
+    private VerticalGroup dialogChoices;
+    private TextraLabel dialogHintLabel;
 
     public GameView(Skin skin, Stage stage, GameViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -79,9 +79,12 @@ public class GameView extends View<GameViewModel> {
         dialogChoiceGroup.align(Align.left);
         dialogChoiceGroup.space(2f);
         dialogChoiceGroup.setVisible(false);
+        dialogChoices = dialogChoiceGroup;
 
         TextraLabel continueLabel = new TextraLabel("Continue with [E]", skin, "text_08");
+        continueLabel.setName("dialogHint");
         continueLabel.setColor(skin.getColor("BLACK"));
+        dialogHintLabel = continueLabel;
 
         dialogBox.add(dialogHeader).expandX().fillX().row();
         dialogBox.add(dialogLabel).expandX().fillX().padTop(4f).row();
@@ -109,6 +112,9 @@ public class GameView extends View<GameViewModel> {
         speakerLabel.setText(display.speaker());
         dialogProgressLabel.setText(display.line().index() + "/" + display.line().total());
         dialogText.setText(display.line().text());
+        if (dialogHintLabel != null) {
+            dialogHintLabel.setText("Continue with [E]");
+        }
         dialogText.restart();
     }
 
@@ -117,19 +123,25 @@ public class GameView extends View<GameViewModel> {
         dialogText.setText("");
         dialogProgressLabel.setText("");
         speakerLabel.setText("");
+        hideChoices();
     }
 
     private void showChoices(DialogChoiceDisplay display) {
+        if (dialogChoices == null) {
+            return;
+        }
         dialogChoices.clearChildren();
         Array<String> choices = display.choices();
         for (int i = 0; i < choices.size; i++) {
             String prefix = i == display.selectedIndex() ? "> " : "  ";
-            TextraLabel choiceLabel = new TextraLabel(prefix + choices.get(i), skin, "text_08");
+            TextraLabel choiceLabel = new TextraLabel(prefix + choices.get(i), skin, "text_10");
             choiceLabel.setColor(skin.getColor("BLACK"));
             dialogChoices.addActor(choiceLabel);
         }
         dialogChoices.setVisible(true);
-        dialogHintLabel.setText("Choose mit [W/S], accept mit [E]");
+        if (dialogHintLabel != null) {
+            dialogHintLabel.setText("Choose mit [W/S], accept mit [E]");
+        }
     }
 
     private void hideChoices() {
