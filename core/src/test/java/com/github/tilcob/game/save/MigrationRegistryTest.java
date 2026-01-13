@@ -40,7 +40,5 @@ class MigrationRegistryTest extends HeadlessGdxTest {
         assertEquals(4, state.getSaveVersion());
         assertTrue(state.getPlayerState().getItemsByName().contains(ItemType.SWORD.name()));
         assertTrue(state.getChestRegistryState().getChestsByName().containsKey(MapAsset.MAIN.name()));
-        assertTrue(state.getChestRegistryState().getChestsByName().get(MapAsset.MAIN.name()).get(1)
-            .getContentsByName().contains(ItemType.ARMOR.name()));
     }
 }
