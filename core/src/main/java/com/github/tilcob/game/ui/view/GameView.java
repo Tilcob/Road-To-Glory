@@ -1,6 +1,5 @@
 package com.github.tilcob.game.ui.view;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -9,7 +8,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.dialog.DialogLine;
 import com.github.tilcob.game.ui.model.DialogChoiceDisplay;
 import com.github.tilcob.game.ui.model.DialogDisplay;
 import com.github.tilcob.game.ui.model.GameViewModel;

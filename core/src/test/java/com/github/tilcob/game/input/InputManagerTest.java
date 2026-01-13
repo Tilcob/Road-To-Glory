@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InputManagerTest {
     @Test
@@ -27,6 +28,35 @@ class InputManagerTest {
 
         device.press(Command.UP);
         assertEquals(List.of(Command.UP), stateB.pressedCommands);
+    }
+
+    @Test
+    void ignoresDuplicatePressesForSameCommand() {
+        InputManager inputManager = new InputManager(new InputMultiplexer());
+        MockInputDevice device = new MockInputDevice();
+        inputManager.addDevice(device);
+
+        StateA stateA = new StateA();
+        inputManager.configureStates(StateA.class, stateA);
+
+        device.press(Command.UP);
+        device.press(Command.UP);
+
+        assertEquals(List.of(Command.UP), stateA.pressedCommands);
+    }
+
+    @Test
+    void ignoresReleaseBeforePress() {
+        InputManager inputManager = new InputManager(new InputMultiplexer());
+        MockInputDevice device = new MockInputDevice();
+        inputManager.addDevice(device);
+
+        StateA stateA = new StateA();
+        inputManager.configureStates(StateA.class, stateA);
+
+        device.release(Command.DOWN);
+
+        assertTrue(stateA.releasedCommands.isEmpty());
     }
 
     private static class MockInputDevice implements InputDevice {

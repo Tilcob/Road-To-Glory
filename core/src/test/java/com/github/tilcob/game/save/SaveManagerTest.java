@@ -15,8 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class SaveManagerTest extends HeadlessGdxTest {
 
@@ -54,5 +53,28 @@ class SaveManagerTest extends HeadlessGdxTest {
         assertTrue(loaded.getChestRegistryState().getChests().containsKey(MapAsset.MAIN));
         assertTrue(loaded.getChestRegistryState().getChests().get(MapAsset.MAIN).get(1)
             .getContents().contains(ItemType.ARMOR));
+    }
+
+    @Test
+    void saveThrowsWhenRequiredFieldsAreMissing() {
+        SaveManager saveManager = new SaveManager("build/test-saves/invalid-save.json");
+
+        GameState state = new GameState();
+        PlayerState playerState = new PlayerState();
+        playerState.setItemsByName(null);
+        state.setPlayerState(playerState);
+        state.setChestRegistryState(new ChestRegistryState());
+
+        assertThrows(IllegalStateException.class, () -> saveManager.save(state));
+    }
+
+    @Test
+    void loadThrowsWhenSaveFileIsMissing() {
+        FileHandle saveFile = Gdx.files.local("build/test-saves/missing-save.json");
+        saveFile.delete();
+
+        SaveManager saveManager = new SaveManager(saveFile.path());
+
+        assertThrows(java.io.IOException.class, saveManager::load);
     }
 }
