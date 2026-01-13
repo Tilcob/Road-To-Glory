@@ -24,8 +24,15 @@ public class ChestSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity player, float deltaTime) {
         Entity chestEntity = OpenChestRequest.MAPPER.get(player).getChest();
+        if (chestEntity == null) {
+            player.remove(OpenChestRequest.class);
+            return;
+        }
         Chest chest = Chest.MAPPER.get(chestEntity);
-        if (chest == null) return;
+        if (chest == null) {
+            player.remove(OpenChestRequest.class);
+            return;
+        }
 
         if (chest.isOpen()) {
             Inventory inventory = Inventory.MAPPER.get(player);

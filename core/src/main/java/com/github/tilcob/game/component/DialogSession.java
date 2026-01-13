@@ -16,14 +16,18 @@ public class DialogSession implements Component {
     private int index;
     private int choiceIndex;
     private boolean awaitingChoice;
+    private final boolean repeatableChoices;
+    private boolean choiceConsumed;
 
-    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices) {
+    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices, boolean repeatableChoices) {
         this.npc = npc;
         this.lines = lines == null ? new Array<>() : lines;
-        this.choices = choices == null ? new Array<>() : choices;
+        this.choices = choices == null ? new Array<>() : new Array<>(choices);
         this.index = 0;
         this.choiceIndex = 0;
         this.awaitingChoice = false;
+        this.repeatableChoices = repeatableChoices;
+        this.choiceConsumed = false;
     }
 
     public Entity getNpc() {
@@ -55,7 +59,7 @@ public class DialogSession implements Component {
     }
 
     public void beginChoice() {
-        if (!hasChoices()) {
+        if (!hasChoices() || choiceConsumed) {
             return;
         }
         awaitingChoice = true;
@@ -75,8 +79,13 @@ public class DialogSession implements Component {
         }
         DialogChoice choice = choices.get(choiceIndex);
         awaitingChoice = false;
-        choices.clear();
+        choiceConsumed = true;
+        if (!repeatableChoices) choices.clear();
         return choice;
+    }
+
+    public boolean hasRemainingChoices() {
+        return !choiceConsumed && hasChoices();
     }
 
     public Array<DialogChoice> getChoices() {
