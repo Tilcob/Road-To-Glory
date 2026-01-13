@@ -1,13 +1,24 @@
 {
     "quests": [
         {
+            "questId": "Welcome_To_Town",
+            "title": "Welcome to Town",
+            "description": "Get to know the locals and settle in.",
+            "steps": [
+                {
+                    "type": "talk",
+                    "npc": "Npc-2"
+                }
+            ]
+        },
+        {
             "questId": "Talk_To_Jakob",
             "title": "Talk To Jakob",
             "description": "Introduce yourself to Jakob in town.",
             "steps" : [
                 {
                     "type": "talk",
-                    "npc": "Jakob"
+                    "npc": "Npc-2"
                 }
             ]
         },

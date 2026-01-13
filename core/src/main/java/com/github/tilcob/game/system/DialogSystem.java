@@ -16,6 +16,7 @@ import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.event.quest.TalkEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestState;
 import com.github.tilcob.game.quest.step.QuestStep;
 
 import java.util.Map;
@@ -70,7 +71,12 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
         DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
         if (dialogData == null || dialogData.questDialog() == null) return;
-        Quest quest = questLog.getQuestById(dialogData.questDialog().questId());
+        String questId = dialogData.questDialog().questId();
+        QuestState questState = questLog.getQuestStateById(questId);
+        if (questState == QuestState.NOT_STARTED) {
+            eventBus.fire(new AddQuestEvent(player, questId));
+        }
+        Quest quest = questLog.getQuestById(questId);
         if (quest != null && !quest.isCompleted()) {
             eventBus.fire(new TalkEvent(npc.getName()));
         }
