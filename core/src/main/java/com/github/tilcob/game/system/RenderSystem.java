@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.SortedIteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.maps.MapGroupLayer;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.renderers.OrthogonalTiledMapRenderer;
@@ -85,6 +86,7 @@ public class RenderSystem extends SortedIteratingSystem implements Disposable {
 
         foreGroundLayers.clear();
         backgroundLayers.clear();
+        if (map == null) return;
         List<MapLayer> currentLayers = backgroundLayers;
 
         for (MapLayer layer : map.getLayers()) {
@@ -92,12 +94,20 @@ public class RenderSystem extends SortedIteratingSystem implements Disposable {
                 currentLayers = foreGroundLayers;
                 continue;
             }
-            if (layer.getClass().equals(MapLayer.class)) {
-                continue;
-            }
-
-            currentLayers.add(layer);
+            addRenderableLayer(layer, currentLayers);
         }
+    }
+
+    private void addRenderableLayer(MapLayer layer, List<MapLayer> target) {
+        if (layer instanceof MapGroupLayer groupLayer) {
+            for (MapLayer child : groupLayer.getLayers()) {
+                addRenderableLayer(child, target);
+            }
+            return;
+        }
+        if (layer.getClass().equals(MapLayer.class)) return;
+        if (Constants.OBJECT_LAYER.equals(layer.getName()) || !layer.isVisible()) return;
+        target.add(layer);
     }
 
     @Override
