@@ -16,14 +16,16 @@ public class DialogSession implements Component {
     private int index;
     private int choiceIndex;
     private boolean awaitingChoice;
+    private final boolean repeatableChoices;
 
-    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices) {
+    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices, boolean repeatableChoices) {
         this.npc = npc;
         this.lines = lines == null ? new Array<>() : lines;
         this.choices = choices == null ? new Array<>() : choices;
         this.index = 0;
         this.choiceIndex = 0;
         this.awaitingChoice = false;
+        this.repeatableChoices = repeatableChoices;
     }
 
     public Entity getNpc() {
@@ -75,7 +77,7 @@ public class DialogSession implements Component {
         }
         DialogChoice choice = choices.get(choiceIndex);
         awaitingChoice = false;
-        choices.clear();
+        if (!repeatableChoices) choices.clear();
         return choice;
     }
 
