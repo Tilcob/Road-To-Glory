@@ -1,6 +1,7 @@
 package com.github.tilcob.game.ui.model;
 
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SoundAsset;
@@ -9,6 +10,8 @@ import com.github.tilcob.game.component.Dialog;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.dialog.DialogChoice;
+import com.github.tilcob.game.event.DialogChoiceEvent;
 import com.github.tilcob.game.event.DialogEvent;
 import com.github.tilcob.game.event.ExitTriggerEvent;
 import com.github.tilcob.game.event.FinishedDialogEvent;
@@ -33,6 +36,7 @@ public class GameViewModel extends ViewModel {
         this.tmpVec2 = new Vector2();
 
         getEventBus().subscribe(DialogEvent.class, this::onDialog);
+        getEventBus().subscribe(DialogChoiceEvent.class, this::onDialogChoices);
         getEventBus().subscribe(ExitTriggerEvent.class, this::onExitTrigger);
         getEventBus().subscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }
@@ -46,6 +50,24 @@ public class GameViewModel extends ViewModel {
             Constants.SHOW_DIALOG,
             null,
             new DialogDisplay(speaker, event.line())
+        );
+    }
+
+    private void onDialogChoices(DialogChoiceEvent event) {
+        Array<String> labels = new Array<>();
+        if (event.choices() != null) {
+            for (DialogChoice choice : event.choices()) {
+                labels.add(choice.text());
+            }
+        }
+        if (labels.isEmpty()) {
+            this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG_CHOICES, null, true);
+            return;
+        }
+        this.propertyChangeSupport.firePropertyChange(
+            Constants.SHOW_DIALOG_CHOICES,
+            null,
+            new DialogChoiceDisplay(labels, event.selectedIndex())
         );
     }
 
@@ -105,6 +127,7 @@ public class GameViewModel extends ViewModel {
     @Override
     public void dispose() {
         getEventBus().unsubscribe(DialogEvent.class, this::onDialog);
+        getEventBus().unsubscribe(DialogChoiceEvent.class, this::onDialogChoices);
         getEventBus().unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
         getEventBus().unsubscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }

@@ -94,6 +94,8 @@ public class Constants {
     public static final String ADD_QUESTS = "addQuests";
     public static final String SHOW_DIALOG = "showDialog";
     public static final String HIDE_DIALOG = "hideDialog";
+    public static final String SHOW_DIALOG_CHOICES = "showDialogChoices";
+    public static final String HIDE_DIALOG_CHOICES = "hideDialogChoices";
 
     // Player properties
     public static final int PLAYER_ID = 4;

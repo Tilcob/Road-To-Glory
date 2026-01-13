@@ -22,6 +22,20 @@
             "idle": [
                 "Welcome in my shop!",
                 "Would you like to see my wares?"
+            ],
+            "choices": [
+                {
+                    "text": "Show me your wares.",
+                    "lines": [
+                        "I'm still setting up. Come back soon!"
+                    ]
+                },
+                {
+                    "text": "Just browsing.",
+                    "lines": [
+                        "Take your time."
+                    ]
+                }
             ]
         }
     }

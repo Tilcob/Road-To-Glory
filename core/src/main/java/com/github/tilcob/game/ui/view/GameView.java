@@ -5,14 +5,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
-import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogLine;
+import com.github.tilcob.game.ui.model.DialogChoiceDisplay;
 import com.github.tilcob.game.ui.model.DialogDisplay;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tommyettinger.textra.TextraLabel;
@@ -26,6 +24,8 @@ public class GameView extends View<GameViewModel> {
     private final TypingLabel dialogText;
     private final TextraLabel speakerLabel;
     private final TextraLabel dialogProgressLabel;
+    private VerticalGroup dialogChoices;
+    private TextraLabel dialogHintLabel;
 
     public GameView(Skin skin, Stage stage, GameViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -34,6 +34,8 @@ public class GameView extends View<GameViewModel> {
         this.dialogText = findActor("dialogText");
         this.speakerLabel = findActor("dialogSpeaker");
         this.dialogProgressLabel = findActor("dialogProgress");
+        this.dialogChoices = findActor("dialogChoices");
+        this.dialogHintLabel = findActor("dialogHint");
         updateLife(viewModel.getLifePoints());
     }
 
@@ -72,11 +74,21 @@ public class GameView extends View<GameViewModel> {
         dialogLabel.setColor(skin.getColor("BLACK"));
         dialogLabel.setWrap(true);
 
+        VerticalGroup dialogChoiceGroup = new VerticalGroup();
+        dialogChoiceGroup.setName("dialogChoices");
+        dialogChoiceGroup.align(Align.left);
+        dialogChoiceGroup.space(2f);
+        dialogChoiceGroup.setVisible(false);
+        dialogChoices = dialogChoiceGroup;
+
         TextraLabel continueLabel = new TextraLabel("Continue with [E]", skin, "text_08");
+        continueLabel.setName("dialogHint");
         continueLabel.setColor(skin.getColor("BLACK"));
+        dialogHintLabel = continueLabel;
 
         dialogBox.add(dialogHeader).expandX().fillX().row();
         dialogBox.add(dialogLabel).expandX().fillX().padTop(4f).row();
+        dialogBox.add(dialogChoiceGroup).expandX().fillX().left().padTop(6f).row();
         dialogBox.add(continueLabel).right().padTop(6f);
 
         row();
@@ -91,6 +103,8 @@ public class GameView extends View<GameViewModel> {
         viewModel.onPropertyChange(Constants.PLAYER_DAMAGE_PC, Map.Entry.class, this::showDamage);
         viewModel.onPropertyChange(Constants.SHOW_DIALOG, DialogDisplay.class, this::showDialog);
         viewModel.onPropertyChange(Constants.HIDE_DIALOG, Boolean.class, value -> hideDialog());
+        viewModel.onPropertyChange(Constants.SHOW_DIALOG_CHOICES, DialogChoiceDisplay.class, this::showChoices);
+        viewModel.onPropertyChange(Constants.HIDE_DIALOG_CHOICES, Boolean.class, value -> hideChoices());
     }
 
     private void showDialog(DialogDisplay display) {
@@ -98,6 +112,9 @@ public class GameView extends View<GameViewModel> {
         speakerLabel.setText(display.speaker());
         dialogProgressLabel.setText(display.line().index() + "/" + display.line().total());
         dialogText.setText(display.line().text());
+        if (dialogHintLabel != null) {
+            dialogHintLabel.setText("Continue with [E]");
+        }
         dialogText.restart();
     }
 
@@ -106,6 +123,30 @@ public class GameView extends View<GameViewModel> {
         dialogText.setText("");
         dialogProgressLabel.setText("");
         speakerLabel.setText("");
+        hideChoices();
+    }
+
+    private void showChoices(DialogChoiceDisplay display) {
+        if (dialogChoices == null) {
+            return;
+        }
+        dialogChoices.clearChildren();
+        Array<String> choices = display.choices();
+        for (int i = 0; i < choices.size; i++) {
+            String prefix = i == display.selectedIndex() ? "> " : "  ";
+            TextraLabel choiceLabel = new TextraLabel(prefix + choices.get(i), skin, "text_10");
+            choiceLabel.setColor(skin.getColor("BLACK"));
+            dialogChoices.addActor(choiceLabel);
+        }
+        dialogChoices.setVisible(true);
+        if (dialogHintLabel != null) {
+            dialogHintLabel.setText("Choose mit [W/S], accept mit [E]");
+        }
+    }
+
+    private void hideChoices() {
+        dialogChoices.setVisible(false);
+        dialogChoices.clearChildren();
     }
 
     private void updateLife(int lifePoints) {
