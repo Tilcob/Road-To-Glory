@@ -9,10 +9,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
-import com.github.tilcob.game.dialog.DialogData;
-import com.github.tilcob.game.dialog.DialogLine;
-import com.github.tilcob.game.dialog.DialogSelector;
-import com.github.tilcob.game.dialog.MapDialogData;
+import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
@@ -30,6 +27,8 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         this.allDialogs = allDialogs;
 
         eventBus.subscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
+        eventBus.subscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
+        eventBus.subscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.subscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.subscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.subscribe(FinishedDialogEvent.class, this::onFinishedDialog);
@@ -104,7 +103,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(player);
 
         Array<String> lines = DialogSelector.select(dialogData.idle(), dialogData.questDialog(), questLog);
-        DialogSession session = new DialogSession(npcEntity, lines);
+        DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices());
         if (!session.hasLines()) {
             dialog.setState(Dialog.State.IDLE);
             return;
@@ -145,9 +144,42 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (session.advance()) {
             eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
         } else {
+            if (session.hasChoices() && !session.isAwaitingChoice()) {
+                session.beginChoice();
+                eventBus.fire(new DialogChoiceEvent(session.getChoices(), session.getChoiceIndex(), session.getNpc()));
+            } else {
+                player.remove(DialogSession.class);
+                eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
+            }
+        }
+    }
+
+    private void onChoiceNavigate(DialogChoiceNavigateEvent event) {
+        Entity player = event.player();
+        DialogSession session = DialogSession.MAPPER.get(player);
+        if (session == null || !session.isAwaitingChoice()) {
+            return;
+        }
+        session.moveChoice(event.delta());
+        eventBus.fire(new DialogChoiceEvent(session.getChoices(), session.getChoiceIndex(), session.getNpc()));
+    }
+
+    private void onChoiceSelect(DialogChoiceSelectEvent event) {
+        Entity player = event.player();
+        DialogSession session = DialogSession.MAPPER.get(player);
+        if (session == null || !session.isAwaitingChoice()) return;
+
+        DialogChoice choice = session.selectChoice();
+        eventBus.fire(new DialogChoiceEvent(new Array<>(), 0, session.getNpc()));
+        if (choice == null) return;
+
+        session.setLines(choice.lines());
+        if (!session.hasLines()) {
             player.remove(DialogSession.class);
             eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
+            return;
         }
+        eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
     }
 
     private void onExitTrigger(ExitTriggerEvent event) {
@@ -173,6 +205,8 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     @Override
     public void dispose() {
         eventBus.unsubscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
+        eventBus.unsubscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
+        eventBus.unsubscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.unsubscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.unsubscribe(FinishedDialogEvent.class, this::onFinishedDialog);

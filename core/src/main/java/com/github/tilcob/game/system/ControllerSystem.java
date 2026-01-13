@@ -6,10 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.AutosaveEvent;
-import com.github.tilcob.game.event.DialogAdvanceEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.UiEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.screen.MenuScreen;
 import com.github.tilcob.game.screen.ScreenNavigator;
@@ -30,8 +27,12 @@ public class ControllerSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
+        DialogSession dialogSession = DialogSession.MAPPER.get(entity);
+        boolean choosingDialog = dialogSession != null && dialogSession.isAwaitingChoice();
+
         updateMovement(entity, controller);
         float nowSeconds = TimeUtils.millis() / 1000f;
+
         for (Iterator<Map.Entry<Command, Float>> iterator = controller.getCommandBuffer().entrySet().iterator();
              iterator.hasNext(); ) {
             Map.Entry<Command, Float> entry = iterator.next();
@@ -40,6 +41,12 @@ public class ControllerSystem extends IteratingSystem {
                 continue;
             }
             switch (entry.getKey()) {
+                case UP -> {
+                    if (choosingDialog) eventBus.fire(new DialogChoiceNavigateEvent(entity, -1));
+                }
+                case DOWN -> {
+                    if (choosingDialog) eventBus.fire(new DialogChoiceNavigateEvent(entity, 1));
+                }
                 case SELECT -> startEntityAttack(entity);
                 case CANCEL -> {
                     screenNavigator.setScreen(MenuScreen.class);
@@ -59,6 +66,11 @@ public class ControllerSystem extends IteratingSystem {
     private void updateMovement(Entity entity, Controller controller) {
         Move move = Move.MAPPER.get(entity);
         if (move == null) return;
+        DialogSession session = DialogSession.MAPPER.get(entity);
+        if (session != null && session.isAwaitingChoice()) {
+            move.getDirection().set(0f, 0f);
+            return;
+        }
 
         float x = 0f;
         float y = 0f;
@@ -77,8 +89,13 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
-        if (DialogSession.MAPPER.get(player) != null) {
-            eventBus.fire(new DialogAdvanceEvent(player));
+        DialogSession dialogSession = DialogSession.MAPPER.get(player);
+        if (dialogSession != null) {
+            if (dialogSession.isAwaitingChoice()) {
+                eventBus.fire(new DialogChoiceSelectEvent(player));
+            } else {
+                eventBus.fire(new DialogAdvanceEvent(player));
+            }
             return;
         }
 
