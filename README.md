@@ -1,11 +1,3 @@
-# Road To Glory
-
-A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://github.com/libgdx/gdx-liftoff).
-
-This project was generated with a template including simple application launchers and a main class extending `Game` that sets the first screen.
-
-## Platforms
-
 - `core`: Main module with the application logic shared by all platforms.
 - `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
 
@@ -31,3 +23,26 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+
+## Development
+
+### Run the game
+
+```
+./gradlew lwjgl3:run
+```
+
+### Run tests
+
+```
+./gradlew test
+```
+
+### Build configuration flags
+
+These are defined in `gradle.properties` and can be overridden on the command line.
+
+- `useMavenLocal`: enable `mavenLocal()` repositories for local dependency testing.
+- `useSnapshots`: enable snapshot repository access.
+- `enableDependencyLocking`: enable dependency locking (run `./gradlew --write-locks` to generate lock files).
+- `generateAssetList`: controls whether `assets/assets.txt` is generated during `processResources`.
