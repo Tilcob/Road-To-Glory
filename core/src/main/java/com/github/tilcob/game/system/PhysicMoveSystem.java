@@ -22,7 +22,8 @@ public class PhysicMoveSystem extends IteratingSystem {
         Move move = Move.MAPPER.get(entity);
         Body body = Physic.MAPPER.get(entity).getBody();
         if (move == null || body == null) return;
-        if (move.isRooted() || move.getDirection().isZero()) {
+        boolean isIdle = move.getDirection().isZero();
+        if (move.isRooted() || isIdle) {
             body.setLinearVelocity(0f, 0f);
             return;
         }

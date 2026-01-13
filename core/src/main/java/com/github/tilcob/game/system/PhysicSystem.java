@@ -46,7 +46,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
     @Override
     public void entityRemoved(Entity entity) {
         Physic physic = Physic.MAPPER.get(entity);
-        if (physic != null) {
+        if (physic != null && physic.getBody() != null) {
             world.destroyBody(physic.getBody());
         }
     }
@@ -57,14 +57,14 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
         while (accumulator >= interval) {
             accumulator -= interval;
-            super.update(deltaTime);
+            super.update(interval);
             world.step(interval, 6, 2);
         }
         world.clearForces();
 
         // interpolation
 
-        float alpha = accumulator / interval; // alpha is between [0,1)
+        float alpha = accumulator / interval; // alpha is between [0,1) for render interpolation
 
         for (int i = 0; i < getEntities().size(); i++) {
             interpolateEntity(getEntities().get(i), alpha);
@@ -75,7 +75,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
     private void interpolateEntity(Entity entity, float alpha) {
         Transform transform = Transform.MAPPER.get(entity);
         Physic physic = Physic.MAPPER.get(entity);
-
+        // interpolate between previous and current physics step positions for smooth rendering
         transform.getPosition().set(
             MathUtils.lerp(physic.getPrevPosition().x, physic.getBody().getPosition().x, alpha),
             MathUtils.lerp(physic.getPrevPosition().y, physic.getBody().getPosition().y, alpha)
@@ -111,20 +111,20 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     private void onEnter(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
         Trigger trigger = Trigger.MAPPER.get(entityA);
-        boolean isPlayer = Player.MAPPER.get(entityB) != null && !fixtureB.isSensor();
+        boolean isPlayer = isPlayer(entityB, fixtureB);
         if (trigger != null && isPlayer) {
             trigger.add(entityB);
             return;
         }
 
         trigger = Trigger.MAPPER.get(entityB);
-        isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
+        isPlayer = isPlayer(entityA, fixtureA);
         if (trigger != null && isPlayer) {
             trigger.add(entityA);
             return;
         }
 
-        if (isDialogSensor(fixtureA) && Player.MAPPER.get(entityB) != null) {
+        if (isDialogSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
             trigger = Trigger.MAPPER.get(entityA);
             if (trigger != null) {
                 trigger.add(entityB);
@@ -134,7 +134,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
             return;
         }
 
-        if (isDialogSensor(fixtureB) && Player.MAPPER.get(entityA) != null) {
+        if (isDialogSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
             trigger = Trigger.MAPPER.get(entityB);
             if (trigger != null) {
                 trigger.add(entityA);
@@ -143,6 +143,10 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
             }
         }
 
+    }
+
+    private boolean isPlayer(Entity entity, Fixture fixture) {
+        return Player.MAPPER.get(entity) != null && !fixture.isSensor();
     }
 
     @Override
@@ -159,7 +163,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     private void onExit(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
         Trigger trigger = Trigger.MAPPER.get(entityA);
-        boolean isPlayer = Player.MAPPER.get(entityB) != null && !fixtureB.isSensor();
+        boolean isPlayer = isPlayer(entityB, fixtureB);
         if (trigger != null && isPlayer) {
             trigger.remove(entityB);
             eventBus.fire(new ExitTriggerEvent(entityB, entityA));
@@ -167,13 +171,13 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         }
 
         trigger = Trigger.MAPPER.get(entityB);
-        isPlayer = Player.MAPPER.get(entityA) != null && !fixtureA.isSensor();
+        isPlayer = isPlayer(entityA, fixtureA);
         if (trigger != null && isPlayer) {
             trigger.remove(entityA);
             eventBus.fire(new ExitTriggerEvent(entityA, entityB));
         }
 
-        if (isDialogSensor(fixtureA) && Player.MAPPER.get(entityB) != null) {
+        if (isDialogSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
             trigger = Trigger.MAPPER.get(entityA);
             if (trigger != null) {
                 trigger.remove(entityB);
@@ -184,7 +188,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
             return;
         }
 
-        if (isDialogSensor(fixtureB) && Player.MAPPER.get(entityA) != null) {
+        if (isDialogSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
             trigger = Trigger.MAPPER.get(entityB);
             if (trigger != null) {
                 trigger.remove(entityA);
