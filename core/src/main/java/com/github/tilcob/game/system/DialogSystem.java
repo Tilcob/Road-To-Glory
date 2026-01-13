@@ -11,7 +11,6 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
 
 import java.util.Map;

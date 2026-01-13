@@ -38,7 +38,8 @@ public class GdxGame extends Game implements ScreenNavigator {
 
     @Override
     public void create() {
-        Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        if (Constants.DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
+
         inputMultiplexer = new InputMultiplexer();
         inputManager = new InputManager(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
@@ -57,7 +58,7 @@ public class GdxGame extends Game implements ScreenNavigator {
         fpsLogger = new FPSLogger();
         screenFactory = new ScreenFactory(services, batch, camera, viewport, inputManager, this);
 
-        glProfiler.enable();
+        if (Constants.DEBUG) glProfiler.enable();
         addScreen(screenFactory.createLoadingScreen(this::onLoadingFinished));
         setScreen(LoadingScreen.class);
     }
@@ -70,14 +71,16 @@ public class GdxGame extends Game implements ScreenNavigator {
 
     @Override
     public void render() {
-        glProfiler.reset();
+        if (Constants.DEBUG) glProfiler.reset();
         Gdx.gl.glClearColor(0, 0, 0, 1);
         Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 
         super.render();
 
-        Gdx.graphics.setTitle("GdxGame - Draw Cals: " + glProfiler.getDrawCalls()); // Draw calls should be minimized!!
-        fpsLogger.log();
+        if (Constants.DEBUG) {
+            Gdx.graphics.setTitle("GdxGame - Draw Cals: " + glProfiler.getDrawCalls()); // Draw calls should be minimized!!
+            fpsLogger.log();
+        }
     }
 
     public void addScreen(Screen screen) {
@@ -136,7 +139,7 @@ public class GdxGame extends Game implements ScreenNavigator {
         screenCache.values().forEach(Screen::dispose);
         screenCache.clear();
         batch.dispose();
-        services.getAssetManager().debugDiagnostics();
+        if (Constants.DEBUG) services.getAssetManager().debugDiagnostics();
         services.getAssetManager().dispose();
 
     }
