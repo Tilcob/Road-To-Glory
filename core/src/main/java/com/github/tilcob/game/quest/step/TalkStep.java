@@ -1,7 +1,7 @@
 package com.github.tilcob.game.quest.step;
 
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.quest.TalkEvent;
+import com.github.tilcob.game.event.QuestStepEvent;
 
 public class TalkStep implements QuestStep {
     private final String npc;
@@ -24,11 +24,11 @@ public class TalkStep implements QuestStep {
 
     @Override
     public void start() {
-        eventBus.subscribe(TalkEvent.class, this::onEvent);
+        eventBus.subscribe(QuestStepEvent.class, this::onEvent);
     }
 
-    private void onEvent(TalkEvent event) {
-        if (event.npc().equals(npc)) {
+    private void onEvent(QuestStepEvent event) {
+        if (event.type() == QuestStepEvent.Type.TALK && event.target().equals(npc)) {
             completed = true;
             end();
         }
@@ -36,6 +36,6 @@ public class TalkStep implements QuestStep {
 
     @Override
     public void end() {
-        eventBus.unsubscribe(TalkEvent.class, this::onEvent);
+        eventBus.unsubscribe(QuestStepEvent.class, this::onEvent);
     }
 }
