@@ -5,6 +5,8 @@ import com.badlogic.gdx.math.Vector2;
 public class Constants {
     private Constants() {}
 
+    public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("game.debug", "false"));
+
     // Window
     // 16 units wide and 9 units high. 1 unit ~ 1 Tile (32px * 32px || 16px * 16px || ...)
     public static final float WIDTH = 16f;

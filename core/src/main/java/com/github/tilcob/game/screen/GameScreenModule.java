@@ -120,10 +120,12 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));
         engine.addSystem(withPriority(new CameraSystem(camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
-        engine.addSystem(withPriority(
-            new PhysicDebugRenderSystem(physicWorld, camera),
-            SystemOrder.DEBUG_RENDER
-        ));
+        if (Constants.DEBUG) {
+            engine.addSystem(withPriority(
+                new PhysicDebugRenderSystem(physicWorld, camera),
+                SystemOrder.DEBUG_RENDER
+            ));
+        }
 
         return new Dependencies(
             engine,

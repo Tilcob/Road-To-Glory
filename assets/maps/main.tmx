@@ -68,18 +68,6 @@
    </properties>
    <ellipse/>
   </object>
-  <object id="24" type="Trigger" x="295" y="221" width="10" height="15">
-   <properties>
-    <property name="questId" value="Talk_To_Jakob"/>
-    <property name="triggerType" propertytype="TriggerType" value="QUEST"/>
-   </properties>
-  </object>
-  <object id="25" type="Trigger" x="304.5" y="179" width="10" height="15">
-   <properties>
-    <property name="questId" value="Talk"/>
-    <property name="triggerType" propertytype="TriggerType" value="QUEST"/>
-   </properties>
-  </object>
  </objectgroup>
  <layer id="4" name="foreground" width="30" height="20">
   <data encoding="base64" compression="zlib">

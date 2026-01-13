@@ -32,6 +32,12 @@ For example, `core:clean` removes `build` folder only from the `core` project.
 ./gradlew lwjgl3:run
 ```
 
+To enable debug diagnostics (profiler, FPS logging, debug renderer), pass the JVM flag:
+
+```
+./gradlew lwjgl3:run -Dgame.debug=true
+```
+
 ### Run tests
 
 ```
