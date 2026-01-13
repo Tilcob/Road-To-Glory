@@ -15,6 +15,7 @@ import java.util.Map;
 public class QuestFactory {
     private final GameEventBus eventBus;
     private final ObjectMapper mapper = new ObjectMapper();
+    private final Map<String, QuestJson> definitions = new HashMap<>();
 
     public QuestFactory(GameEventBus eventBus) {
         this.eventBus = eventBus;
@@ -26,6 +27,7 @@ public class QuestFactory {
             Map<String, Quest> quests = new HashMap<>();
 
             for (QuestJson q : file.quests) {
+                definitions.put(q.questId, q);
                 quests.put(q.questId, createQuestFromJson(q));
             }
             return quests;
@@ -35,7 +37,7 @@ public class QuestFactory {
     }
 
     public Quest createQuestFromJson(QuestJson json) {
-        Quest quest = new Quest(json.questId);
+        Quest quest = new Quest(json.questId, json.title, json.description);
 
         for (StepJson step : json.steps) {
             quest.getSteps().add(createStep(step));
@@ -52,6 +54,18 @@ public class QuestFactory {
     }
 
     public Quest create(String questId) {
+        if (definitions.isEmpty()) {
+            loadAllDefinitions();
+        }
+        QuestJson definition = definitions.get(questId);
+        if (definition != null) {
+            return createQuestFromJson(definition);
+        }
+
+        throw new IllegalArgumentException("Quest not found: " + questId);
+    }
+
+    private void loadAllDefinitions() {
         for (QuestAsset asset : QuestAsset.values()) {
             QuestFile file;
             try {
@@ -59,21 +73,16 @@ public class QuestFactory {
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-
-            for (QuestJson q : file.quests) {
-                if (q.questId.equals(questId)) {
-                    return createQuestFromJson(q);
-                }
+            for (QuestJson questJson : file.quests) {
+                definitions.put(questJson.questId, questJson);
             }
         }
-
-        throw new IllegalArgumentException("Quest not found: " + questId);
     }
 
 
     public record QuestFile(List<QuestJson> quests) { }
 
-    public record QuestJson(String questId, List<StepJson> steps) { }
+    public record QuestJson(String questId, String title, String description, List<StepJson> steps) { }
 
     public record StepJson(String type, String npc, String item, int amount, String enemy) { }
 }

@@ -1,19 +1,23 @@
 {
-  "quests": [
-    {
-      "questId": "Talk_To_Jakob",
-      "steps" : [
+    "quests": [
         {
-          "type": "talk",
-          "npc": "Jakob"
-        }
-      ]
-    },
-    {
-      "questId": "Talk",
-      "steps": [
+            "questId": "Talk_To_Jakob",
+            "title": "Talk To Jakob",
+            "description": "Introduce yourself to Jakob in town.",
+            "steps" : [
+                {
+                    "type": "talk",
+                    "npc": "Jakob"
+                }
+            ]
+        },
+        {
+            "questId": "Talk",
+            "title": "Small Talk",
+            "description": "Have a conversation with a villager.",
+            "steps": [
 
-      ]
-    }
-  ]
+            ]
+        }
+    ]
 }

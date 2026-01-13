@@ -14,6 +14,7 @@ import com.github.tilcob.game.dialog.DialogLine;
 import com.github.tilcob.game.dialog.DialogSelector;
 import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.event.quest.TalkEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.step.QuestStep;
 
@@ -51,10 +52,10 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void finishDialog(Entity npcEntity, Dialog dialog) {
         dialog.setState(Dialog.State.IDLE);
 
-        updateQuestProgress(npcEntity);
+        notifyQuestTalk(npcEntity);
     }
 
-    private void updateQuestProgress(Entity npcEntity) {
+    private void notifyQuestTalk(Entity npcEntity) {
         PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
         if (playerReference == null) return;
         Entity player = playerReference.getPlayer();
@@ -70,7 +71,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
         if (dialogData == null || dialogData.questDialog() == null) return;
         Quest quest = questLog.getQuestById(dialogData.questDialog().questId());
-        if (quest != null && !quest.isCompleted()) quest.incCurrentStep();
+        if (quest != null && !quest.isCompleted()) {
+            eventBus.fire(new TalkEvent(npc.getName()));
+        }
 
         Telegram telegram = new Telegram();
         telegram.message = Messages.DIALOG_FINISHED;
