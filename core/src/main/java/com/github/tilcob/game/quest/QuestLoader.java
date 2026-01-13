@@ -22,7 +22,6 @@ public class QuestLoader {
         for (int i = 0; i < data.size(); i++) {
             steps.get(i).loadData(data.get(i));
         }
-        if (quest.getCurrentStep() < steps.size()) steps.get(quest.getCurrentStep()).start();
         return quest;
     }
 

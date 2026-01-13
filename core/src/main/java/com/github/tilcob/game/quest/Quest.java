@@ -7,15 +7,27 @@ import java.util.List;
 
 public class Quest {
     private final String questId;
+    private final String title;
+    private final String description;
     private final List<QuestStep> steps = new ArrayList<>();
     private int currentStep = 0;
 
-    public Quest(String questId) {
+    public Quest(String questId, String title, String description) {
         this.questId = questId;
+        this.title = title;
+        this.description = description;
     }
 
     public String getQuestId() {
         return questId;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getDescription() {
+        return description;
     }
 
     public List<QuestStep> getSteps() {

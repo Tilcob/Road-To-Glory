@@ -82,8 +82,11 @@ public class InventoryView extends View<InventoryViewModel> {
     private void updateQuests(Array<Quest> quests) {
         questLog.clear();
         for (Quest quest : quests) {
-            String questId = quest.getQuestId().replace("_", " ");
-            Label label = new Label(questId, skin, "text_08");
+            String questTitle = quest.getTitle();
+            if (questTitle == null || questTitle.isBlank()) {
+                questTitle = quest.getQuestId().replace("_", " ");
+            }
+            Label label = new Label(questTitle, skin, "text_08");
             label.setColor(skin.getColor("BLACK"));
             Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
             image.setVisible(quest.isCompleted());

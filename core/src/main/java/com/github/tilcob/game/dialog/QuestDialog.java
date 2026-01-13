@@ -1,12 +1,14 @@
 package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class QuestDialog {
     private String questId;
     private Array<String> notStarted;
     private Array<String> inProgress;
     private Array<String> completed;
+    private ObjectMap<String, Array<String>> stepDialogs;
 
     public QuestDialog(String questId, Array<String> notStarted, Array<String> inProgress, Array<String> completed) {
         this.questId = questId;
@@ -31,5 +33,9 @@ public class QuestDialog {
 
     public Array<String> completed() {
         return completed;
+    }
+
+    public ObjectMap<String, Array<String>> stepDialogs() {
+        return stepDialogs;
     }
 }

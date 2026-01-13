@@ -27,18 +27,20 @@ public class QuestSystem extends IteratingSystem implements Disposable {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         QuestLog questLog = QuestLog.MAPPER.get(entity);
+        boolean updated = false;
 
         for (Quest quest : questLog.getQuests()) {
             if (quest.isCompleted()) continue;
             QuestStep step = quest.getSteps().get(quest.getCurrentStep());
             if (step.isCompleted()) {
                 quest.incCurrentStep();
+                updated = true;
                 if (quest.getCurrentStep() < quest.getSteps().size()) {
                     quest.getSteps().get(quest.getCurrentStep()).start();
                 }
             }
         }
-        eventBus.fire(new UpdateQuestLogEvent(entity));
+        if (updated) eventBus.fire(new UpdateQuestLogEvent(entity));
     }
 
     private void addQuest(AddQuestEvent event) {

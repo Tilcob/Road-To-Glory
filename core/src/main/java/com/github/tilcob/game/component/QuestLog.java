@@ -17,7 +17,8 @@ public class QuestLog implements Component {
 
     public void add(Quest quest) {
         quests.add(quest);
-        if (!quest.getSteps().isEmpty()) quest.getSteps().get(0).start();
+        int currentStep = quest.getCurrentStep();
+        if (currentStep < quest.getSteps().size()) quest.getSteps().get(currentStep).start();
     }
 
     public void remove(Quest quest) {
