@@ -5,8 +5,10 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.DialogEvent;
+import com.github.tilcob.game.event.FinishedDialogEvent;
 
 import java.util.Map;
 
@@ -28,10 +30,23 @@ public class GameViewModel extends ViewModel {
         this.tmpVec2 = new Vector2();
 
         getEventBus().subscribe(DialogEvent.class, this::onDialog);
+        getEventBus().subscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }
 
     private void onDialog(DialogEvent event) {
-        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, event.line());
+        String speaker = "NPC";
+        if (event.entity() != null && Npc.MAPPER.get(event.entity()) != null) {
+            speaker = Npc.MAPPER.get(event.entity()).getName();
+        }
+        this.propertyChangeSupport.firePropertyChange(
+            Constants.SHOW_DIALOG,
+            null,
+            new DialogDisplay(speaker, event.line())
+        );
+    }
+
+    private void onDialogFinished(FinishedDialogEvent event) {
+        this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG, null, true);
     }
 
     public void playerDamage(int amount, float x, float y) {
@@ -79,5 +94,6 @@ public class GameViewModel extends ViewModel {
     @Override
     public void dispose() {
         getEventBus().unsubscribe(DialogEvent.class, this::onDialog);
+        getEventBus().unsubscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }
 }
