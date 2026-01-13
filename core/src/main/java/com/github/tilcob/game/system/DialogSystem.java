@@ -145,7 +145,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (session.advance()) {
             eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
         } else {
-            if (session.hasChoices() && !session.isAwaitingChoice()) {
+            if (session.hasRemainingChoices() && !session.isAwaitingChoice()) {
                 session.beginChoice();
                 eventBus.fire(new DialogChoiceEvent(session.getChoices(), session.getChoiceIndex(), session.getNpc()));
             } else {
