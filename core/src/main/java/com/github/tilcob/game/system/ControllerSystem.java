@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.AutosaveEvent;
+import com.github.tilcob.game.event.DialogAdvanceEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
@@ -76,10 +77,16 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
+        if (DialogSession.MAPPER.get(player) != null) {
+            eventBus.fire(new DialogAdvanceEvent(player));
+            return;
+        }
+
         if (OpenChestRequest.MAPPER.get(player) != null) {
             OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);
             Entity chestEntity = openChestRequest.getChest();
             Chest.MAPPER.get(chestEntity).open();
+            return;
         }
         if (StartDialogRequest.MAPPER.get(player) != null) {
             StartDialogRequest startDialogRequest = StartDialogRequest.MAPPER.get(player);

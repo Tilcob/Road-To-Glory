@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.dialog.DialogLine;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tommyettinger.textra.TextraLabel;
 import com.github.tommyettinger.textra.TypingLabel;
@@ -43,11 +44,11 @@ public class GameView extends View<GameViewModel> {
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.LIFE_POINTS_PC, Integer.class, this::updateLife);
         viewModel.onPropertyChange(Constants.PLAYER_DAMAGE_PC, Map.Entry.class, this::showDamage);
-        viewModel.onPropertyChange(Constants.SHOW_DIALOG, Array.class, this::showDialog);
+        viewModel.onPropertyChange(Constants.SHOW_DIALOG, DialogLine.class, this::showDialog);
     }
 
-    private void showDialog(Array<String> array) {
-        Gdx.app.log("showDialog", array.toString());
+    private void showDialog(DialogLine line) {
+        Gdx.app.log("showDialog", line.index() + "/" + line.total() + ": " + line.text());
     }
 
     private void updateLife(int lifePoints) {

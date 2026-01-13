@@ -3,12 +3,10 @@ package com.github.tilcob.game.ui.model;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.DialogEvent;
-import com.github.tilcob.game.event.FinishedDialogEvent;
 
 import java.util.Map;
 
@@ -33,8 +31,7 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onDialog(DialogEvent event) {
-        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, event.lines());
-        getEventBus().fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, event.entity()));
+        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, event.line());
     }
 
     public void playerDamage(int amount, float x, float y) {
