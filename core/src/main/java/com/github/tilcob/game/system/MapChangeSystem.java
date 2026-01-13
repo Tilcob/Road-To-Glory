@@ -13,13 +13,15 @@ import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.tiled.TiledManager;
 
+import java.util.Locale;
+
 public class MapChangeSystem extends IteratingSystem {
     private final TiledManager tiledManager;
     private final GameEventBus eventBus;
     private final StateManager stateManager;
 
     public MapChangeSystem(TiledManager tiledManager, GameEventBus eventBus, StateManager stateManager) {
-        super(Family.all(MapChange.class).get());
+        super(Family.all(MapChange.class, Transform.class, Physic.class).get());
         this.tiledManager = tiledManager;
         this.eventBus = eventBus;
         this.stateManager = stateManager;
@@ -28,14 +30,22 @@ public class MapChangeSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         MapChange mapChange = MapChange.MAPPER.get(entity);
+        Transform transform = Transform.MAPPER.get(entity);
+        Physic physic = Physic.MAPPER.get(entity);
         stateManager.saveMap(mapChange.getMapAsset());
         tiledManager.setMap(tiledManager.loadMap(mapChange.getMapAsset()));
         Vector2 spawn = tiledManager.getSpawnPoint();
         eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
-        eventBus.fire(new MapChangeEvent(mapChange.getMapAsset().name().toLowerCase()));
+        eventBus.fire(new MapChangeEvent(mapChange.getMapAsset().name().toLowerCase(Locale.ROOT)));
 
-        Transform.MAPPER.get(entity).getPosition().set(spawn.x, spawn.y);
-        Physic.MAPPER.get(entity).getBody().setTransform(spawn.x, spawn.y, 0);
+        float spawnX = transform.getPosition().x;
+        float spawnY = transform.getPosition().y;
+        if (spawn != null) {
+            spawnX = spawn.x;
+            spawnY = spawn.y;
+        }
+        transform.getPosition().set(spawnX, spawnY);
+        physic.getBody().setTransform(spawnX, spawnY, 0);
         entity.remove(MapChange.class);
     }
 }

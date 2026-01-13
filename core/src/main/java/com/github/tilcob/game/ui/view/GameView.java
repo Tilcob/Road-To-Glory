@@ -8,10 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.HorizontalGroup;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogLine;
+import com.github.tilcob.game.ui.model.DialogDisplay;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tommyettinger.textra.TextraLabel;
 import com.github.tommyettinger.textra.TypingLabel;
@@ -20,35 +22,90 @@ import java.util.Map;
 
 public class GameView extends View<GameViewModel> {
     private final HorizontalGroup lifeGroup;
+    private final Table dialogContainer;
+    private final TypingLabel dialogText;
+    private final TextraLabel speakerLabel;
+    private final TextraLabel dialogProgressLabel;
 
     public GameView(Skin skin, Stage stage, GameViewModel viewModel) {
         super(skin, stage, viewModel);
         this.lifeGroup = findActor("lifeGroup");
+        this.dialogContainer = findActor("dialogContainer");
+        this.dialogText = findActor("dialogText");
+        this.speakerLabel = findActor("dialogSpeaker");
+        this.dialogProgressLabel = findActor("dialogProgress");
         updateLife(viewModel.getLifePoints());
     }
 
     @Override
     protected void setupUI() {
-        align(Align.bottomLeft);
+        align(Align.topLeft);
         setFillParent(true);
 
         HorizontalGroup horizontalGroup = new HorizontalGroup();
         horizontalGroup.setName("lifeGroup");
+        horizontalGroup.align(Align.topLeft);
         horizontalGroup.padLeft(5.0f);
-        horizontalGroup.padBottom(5.0f);
+        horizontalGroup.padTop(5.0f);
         horizontalGroup.space(5.0f);
-        add(horizontalGroup);
+        add(horizontalGroup).left().top().expandX().padLeft(5.0f).padTop(5.0f);
+
+        Table dialogBox = new Table(skin);
+        dialogBox.setName("dialogContainer");
+        dialogBox.setBackground(skin.getDrawable("Other_panel_brown"));
+        dialogBox.pad(8f, 12f, 8f, 12f);
+        dialogBox.setVisible(false);
+
+        Table dialogHeader = new Table(skin);
+        dialogHeader.align(Align.left);
+        TextraLabel dialogSpeaker = new TextraLabel("", skin, "text_12");
+        dialogSpeaker.setName("dialogSpeaker");
+        dialogSpeaker.setColor(skin.getColor("BLACK"));
+        TextraLabel dialogProgress = new TextraLabel("", skin, "text_10");
+        dialogProgress.setName("dialogProgress");
+        dialogProgress.setColor(skin.getColor("BLACK"));
+        dialogHeader.add(dialogSpeaker).left().expandX();
+        dialogHeader.add(dialogProgress).right();
+
+        TypingLabel dialogLabel = new TypingLabel("", skin, "text_10");
+        dialogLabel.setName("dialogText");
+        dialogLabel.setColor(skin.getColor("BLACK"));
+        dialogLabel.setWrap(true);
+
+        TextraLabel continueLabel = new TextraLabel("Continue with [E]", skin, "text_08");
+        continueLabel.setColor(skin.getColor("BLACK"));
+
+        dialogBox.add(dialogHeader).expandX().fillX().row();
+        dialogBox.add(dialogLabel).expandX().fillX().padTop(4f).row();
+        dialogBox.add(continueLabel).right().padTop(6f);
+
+        row();
+        add().expandY();
+        row();
+        add(dialogBox).expandX().fillX().bottom().padLeft(10f).padRight(10f).padBottom(8f);
     }
 
     @Override
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.LIFE_POINTS_PC, Integer.class, this::updateLife);
         viewModel.onPropertyChange(Constants.PLAYER_DAMAGE_PC, Map.Entry.class, this::showDamage);
-        viewModel.onPropertyChange(Constants.SHOW_DIALOG, DialogLine.class, this::showDialog);
+        viewModel.onPropertyChange(Constants.SHOW_DIALOG, DialogDisplay.class, this::showDialog);
+        viewModel.onPropertyChange(Constants.HIDE_DIALOG, Boolean.class, value -> hideDialog());
     }
 
-    private void showDialog(DialogLine line) {
-        Gdx.app.log("showDialog", line.index() + "/" + line.total() + ": " + line.text());
+    private void showDialog(DialogDisplay display) {
+        dialogContainer.setVisible(true);
+        speakerLabel.setText(display.speaker());
+        dialogProgressLabel.setText(display.line().index() + "/" + display.line().total());
+        dialogText.setText(display.line().text());
+        dialogText.restart();
+    }
+
+    private void hideDialog() {
+        dialogContainer.setVisible(false);
+        dialogText.setText("");
+        dialogProgressLabel.setText("");
+        speakerLabel.setText("");
     }
 
     private void updateLife(int lifePoints) {

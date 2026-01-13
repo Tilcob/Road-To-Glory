@@ -5,8 +5,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Dialog;
+import com.github.tilcob.game.component.Npc;
+import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.DialogEvent;
+import com.github.tilcob.game.event.ExitTriggerEvent;
+import com.github.tilcob.game.event.FinishedDialogEvent;
 
 import java.util.Map;
 
@@ -28,16 +33,37 @@ public class GameViewModel extends ViewModel {
         this.tmpVec2 = new Vector2();
 
         getEventBus().subscribe(DialogEvent.class, this::onDialog);
+        getEventBus().subscribe(ExitTriggerEvent.class, this::onExitTrigger);
+        getEventBus().subscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }
 
     private void onDialog(DialogEvent event) {
-        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, event.line());
+        String speaker = "NPC";
+        if (event.entity() != null && Npc.MAPPER.get(event.entity()) != null) {
+            speaker = Npc.MAPPER.get(event.entity()).getName();
+        }
+        this.propertyChangeSupport.firePropertyChange(
+            Constants.SHOW_DIALOG,
+            null,
+            new DialogDisplay(speaker, event.line())
+        );
+    }
+
+    private void onDialogFinished(FinishedDialogEvent event) {
+        this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG, null, true);
     }
 
     public void playerDamage(int amount, float x, float y) {
         Vector2 position = new Vector2(x, y);
         this.playerDamage = Map.entry(position, amount);
         this.propertyChangeSupport.firePropertyChange(Constants.PLAYER_DAMAGE_PC, null, this.playerDamage);
+    }
+
+    private void onExitTrigger(ExitTriggerEvent event) {
+        Trigger trigger = Trigger.MAPPER.get(event.trigger());
+        if (trigger != null && trigger.getType() != Trigger.Type.DIALOG) return;
+        if (trigger == null && Dialog.MAPPER.get(event.trigger()) == null) return;
+        this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG, null, true);
     }
 
     public Vector2 toScreenCoords(Vector2 position) {
@@ -79,5 +105,7 @@ public class GameViewModel extends ViewModel {
     @Override
     public void dispose() {
         getEventBus().unsubscribe(DialogEvent.class, this::onDialog);
+        getEventBus().unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
+        getEventBus().unsubscribe(FinishedDialogEvent.class, this::onDialogFinished);
     }
 }

@@ -62,6 +62,8 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
         QuestLog questLog = QuestLog.MAPPER.get(player);
         Npc npc = Npc.MAPPER.get(npcEntity);
+        if (npc == null) return;
+        eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
 
         if (mapId == null) return;
         MapDialogData mapDialogData = allDialogs.get(mapId);
@@ -73,10 +75,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestState questState = questLog.getQuestStateById(questId);
         if (questState == QuestState.NOT_STARTED) {
             eventBus.fire(new AddQuestEvent(player, questId));
-        }
-        Quest quest = questLog.getQuestById(questId);
-        if (quest != null && !quest.isCompleted()) {
-            eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
         }
 
         Telegram telegram = new Telegram();
