@@ -10,12 +10,10 @@ import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.DialogLine;
 import com.github.tilcob.game.dialog.DialogSelector;
 import com.github.tilcob.game.dialog.MapDialogData;
-import com.github.tilcob.game.event.DialogEvent;
-import com.github.tilcob.game.event.FinishedDialogEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.MapChangeEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.step.QuestStep;
 
@@ -31,6 +29,8 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         this.eventBus = eventBus;
         this.allDialogs = allDialogs;
 
+        eventBus.subscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
+        eventBus.subscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.subscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.subscribe(FinishedDialogEvent.class, this::onFinishedDialog);
     }
@@ -55,19 +55,22 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     }
 
     private void updateQuestProgress(Entity npcEntity) {
-        Entity player = PlayerReference.MAPPER.get(npcEntity).getPlayer();
+        PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
+        if (playerReference == null) return;
+        Entity player = playerReference.getPlayer();
+        if (player == null) return;
+
         QuestLog questLog = QuestLog.MAPPER.get(player);
         Npc npc = Npc.MAPPER.get(npcEntity);
 
+        if (mapId == null) return;
         MapDialogData mapDialogData = allDialogs.get(mapId);
+        if (mapDialogData == null) return;
+
         DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
-        if (dialogData.questDialog() != null) {
-            Quest quest = questLog.getQuestById(dialogData.questDialog().questId());
-            if (quest != null && !quest.isCompleted()) {
-                QuestStep step = quest.getSteps().get(quest.getCurrentStep());
-                quest.incCurrentStep();
-            }
-        }
+        if (dialogData == null || dialogData.questDialog() == null) return;
+        Quest quest = questLog.getQuestById(dialogData.questDialog().questId());
+        if (quest != null && !quest.isCompleted()) quest.incCurrentStep();
 
         Telegram telegram = new Telegram();
         telegram.message = Messages.DIALOG_FINISHED;
@@ -75,17 +78,40 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     }
 
     private void startDialog(Entity npcEntity, Dialog dialog) {
-        dialog.setState(Dialog.State.ACTIVE);
-        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
-
         Npc npc = Npc.MAPPER.get(npcEntity);
-        Entity player = PlayerReference.MAPPER.get(npcEntity).getPlayer();
+        PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
+        Entity player = playerReference == null ? null : playerReference.getPlayer();
+        if (player == null || mapId == null) {
+            dialog.setState(Dialog.State.IDLE);
+            return;
+        }
+        if (DialogSession.MAPPER.get(player) != null) return;
         MapDialogData mapDialogData = allDialogs.get(mapId);
+        if (mapDialogData == null) {
+            dialog.setState(Dialog.State.IDLE);
+            return;
+        }
         DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
+        if (dialogData == null) {
+            dialog.setState(Dialog.State.IDLE);
+            return;
+        }
         QuestLog questLog = QuestLog.MAPPER.get(player);
 
         Array<String> lines = DialogSelector.select(dialogData.idle(), dialogData.questDialog(), questLog);
-        eventBus.fire(new DialogEvent(lines, npcEntity));
+        DialogSession session = new DialogSession(npcEntity, lines);
+        if (!session.hasLines()) {
+            dialog.setState(Dialog.State.IDLE);
+            return;
+        }
+        dialog.setState(Dialog.State.ACTIVE);
+        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
+        player.add(session);
+        eventBus.fire(new DialogEvent(toDialogLine(session), npcEntity));
+    }
+
+    private DialogLine toDialogLine(DialogSession session) {
+        return new DialogLine(session.currentLine(), session.getIndex() + 1, session.getTotal());
     }
 
     private void onMapChange(MapChangeEvent event) {
@@ -94,12 +120,55 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
     private void onFinishedDialog(FinishedDialogEvent event) {
         Entity npc = event.entity();
+        PlayerReference playerReference = PlayerReference.MAPPER.get(npc);
+        if (playerReference != null) {
+            Entity player = playerReference.getPlayer();
+            if (player != null && DialogSession.MAPPER.get(player) != null) {
+                player.remove(DialogSession.class);
+            }
+        }
         Dialog dialog = Dialog.MAPPER.get(npc);
         dialog.setState(Dialog.State.FINISHED);
     }
 
+    private void onDialogAdvance(DialogAdvanceEvent event) {
+        Entity player = event.player();
+        DialogSession session = DialogSession.MAPPER.get(player);
+        if (session == null) {
+            return;
+        }
+        if (session.advance()) {
+            eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
+        } else {
+            player.remove(DialogSession.class);
+            eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
+        }
+    }
+
+    private void onExitTrigger(ExitTriggerEvent event) {
+        Entity player = event.player();
+        DialogSession session = DialogSession.MAPPER.get(player);
+        if (session == null) {
+            return;
+        }
+        Entity npcEntity = session.getNpc();
+        if (npcEntity != null && npcEntity.equals(event.trigger())) {
+            player.remove(DialogSession.class);
+            Dialog dialog = Dialog.MAPPER.get(npcEntity);
+            if (dialog != null) {
+                dialog.setState(Dialog.State.IDLE);
+            }
+            NpcFsm npcFsm = NpcFsm.MAPPER.get(npcEntity);
+            if (npcFsm != null) {
+                npcFsm.getNpcFsm().changeState(NpcState.IDLE);
+            }
+        }
+    }
+
     @Override
     public void dispose() {
+        eventBus.unsubscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
+        eventBus.unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.unsubscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.unsubscribe(FinishedDialogEvent.class, this::onFinishedDialog);
     }
