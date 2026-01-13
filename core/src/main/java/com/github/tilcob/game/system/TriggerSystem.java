@@ -95,6 +95,7 @@ public class TriggerSystem extends IteratingSystem implements Disposable {
     }
 
     private void addEntityToIndex(Entity entity) {
+        if (Trigger.MAPPER.get(entity) != null) return;
         Tiled tiled = Tiled.MAPPER.get(entity);
         if (tiled == null) return;
         int id = tiled.getId();
