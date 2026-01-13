@@ -132,6 +132,7 @@ public class GdxGame extends Game implements ScreenNavigator {
 
     @Override
     public void dispose() {
+        super.dispose();
         screenCache.values().forEach(Screen::dispose);
         screenCache.clear();
         batch.dispose();
