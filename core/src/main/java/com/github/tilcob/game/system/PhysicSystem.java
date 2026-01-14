@@ -5,8 +5,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.*;
+import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
@@ -87,12 +89,6 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
     protected void processEntity(Entity entity, float deltaTime) {
         Physic physic = Physic.MAPPER.get(entity);
         physic.getPrevPosition().set(physic.getBody().getPosition());
-
-    }
-
-    private boolean isDialogSensor(Fixture fixture) {
-        Object data = fixture.getUserData();
-        return data instanceof String && ((String) data).equals(Constants.DIALOG_REQUEST);
     }
 
     // Don't add or remove bodies here!!!!
@@ -105,48 +101,25 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         Object userDataB = fixtureB.getBody().getUserData();
 
         if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
-
+        if (isPlayer(entityA, fixtureA) && isAttackFixture(fixtureA)) return;
+        if (isPlayer(entityB, fixtureB) && isAttackFixture(fixtureB)) return;
         onEnter(entityA, fixtureA, entityB, fixtureB);
     }
 
+
+
     private void onEnter(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
-        Trigger trigger = Trigger.MAPPER.get(entityA);
-        boolean isPlayer = isPlayer(entityB, fixtureB);
-        if (trigger != null && isPlayer) {
+        if (hasTriggerComponent(entityA) && isPlayer(entityB, fixtureB)) {
+            Trigger trigger = Trigger.MAPPER.get(entityA);
             trigger.add(entityB);
-            return;
-        }
-
-        trigger = Trigger.MAPPER.get(entityB);
-        isPlayer = isPlayer(entityA, fixtureA);
-        if (trigger != null && isPlayer) {
+        } else if (hasTriggerComponent(entityB) && isPlayer(entityA, fixtureA)) {
+            Trigger trigger = Trigger.MAPPER.get(entityB);
             trigger.add(entityA);
-            return;
+        } else if (isSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
+            addTrigger(fixtureA, entityA, entityB);
+        } else if (isSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
+            addTrigger(fixtureB, entityB, entityA);
         }
-
-        if (isDialogSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
-            trigger = Trigger.MAPPER.get(entityA);
-            if (trigger != null) {
-                trigger.add(entityB);
-            } else {
-                entityB.add(new StartDialogRequest(entityA));
-            }
-            return;
-        }
-
-        if (isDialogSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
-            trigger = Trigger.MAPPER.get(entityB);
-            if (trigger != null) {
-                trigger.add(entityA);
-            } else {
-                entityA.add(new StartDialogRequest(entityB));
-            }
-        }
-
-    }
-
-    private boolean isPlayer(Entity entity, Fixture fixture) {
-        return Player.MAPPER.get(entity) != null && !fixture.isSensor();
     }
 
     @Override
@@ -157,43 +130,31 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         Object userDataB = fixtureB.getBody().getUserData();
 
         if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
+        if (isPlayer(entityA, fixtureA) && isAttackFixture(fixtureA)) return;
+        if (isPlayer(entityB, fixtureB) && isAttackFixture(fixtureB)) return;
 
         onExit(entityA, fixtureA, entityB, fixtureB);
     }
 
     private void onExit(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
-        Trigger trigger = Trigger.MAPPER.get(entityA);
-        boolean isPlayer = isPlayer(entityB, fixtureB);
-        if (trigger != null && isPlayer) {
+        if (hasTriggerComponent(entityA) && isPlayer(entityB, fixtureB)) {
+            Trigger trigger = Trigger.MAPPER.get(entityA);
             trigger.remove(entityB);
             eventBus.fire(new ExitTriggerEvent(entityB, entityA));
-            return;
-        }
-
-        trigger = Trigger.MAPPER.get(entityB);
-        isPlayer = isPlayer(entityA, fixtureA);
-        if (trigger != null && isPlayer) {
+        } else if (hasTriggerComponent(entityB) && isPlayer(entityA, fixtureA)) {
+            Trigger trigger = Trigger.MAPPER.get(entityB);
             trigger.remove(entityA);
             eventBus.fire(new ExitTriggerEvent(entityA, entityB));
-        }
-
-        if (isDialogSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
-            trigger = Trigger.MAPPER.get(entityA);
-            if (trigger != null) {
+        } else if (isSensor(fixtureA) && isPlayer(entityB, fixtureB)) {
+            if (hasTriggerComponent(entityA)) {
+                Trigger trigger = Trigger.MAPPER.get(entityA);
                 trigger.remove(entityB);
-            } else {
-                entityA.add(new Trigger(Trigger.Type.DIALOG));
             }
             eventBus.fire(new ExitTriggerEvent(entityB, entityA));
-            return;
-        }
-
-        if (isDialogSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
-            trigger = Trigger.MAPPER.get(entityB);
-            if (trigger != null) {
+        } else if (isSensor(fixtureB) && isPlayer(entityA, fixtureA)) {
+            if (hasTriggerComponent(entityB)) {
+                Trigger trigger = Trigger.MAPPER.get(entityB);
                 trigger.remove(entityA);
-            } else {
-                entityB.add(new Trigger(Trigger.Type.DIALOG));
             }
             eventBus.fire(new ExitTriggerEvent(entityA, entityB));
         }
@@ -205,5 +166,45 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     @Override
     public void postSolve(Contact contact, ContactImpulse impulse) {
+    }
+
+    private static void addTrigger(Fixture trigger, Entity triggerEntity, Entity player) {
+        MapObject mapObject = (MapObject) trigger.getUserData();
+        if (mapObject == null) return;
+
+        String typeStr = mapObject.getProperties().get(Constants.TRIGGER_TYPE, "", String.class);
+        String questId = mapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
+        if (typeStr.isBlank()) throw new GdxRuntimeException("Missing or false trigger type: " + typeStr);
+
+        Trigger triggerComp = new Trigger(Trigger.Type.valueOf(typeStr));
+        triggerComp.add(player);
+        triggerEntity.add(triggerComp);
+        if (!questId.isBlank()) triggerEntity.add(new Quest(questId));
+    }
+
+    private boolean isSensor(Fixture fixture) {
+        if (fixture.getUserData() instanceof MapObject mapObject) {
+            return mapObject.getProperties().get(Constants.TYPE, "", String.class)
+                .equals(Constants.TRIGGER_CLASS)
+                && mapObject.getProperties().get(Constants.SENSOR, false, Boolean.class);
+        }
+        return false;
+    }
+
+    private boolean hasTriggerComponent(Entity triggerEntity) {
+        Trigger trigger = Trigger.MAPPER.get(triggerEntity);
+        return trigger != null;
+    }
+
+    private boolean isPlayer(Entity entity, Fixture fixture) {
+        return Player.MAPPER.get(entity) != null && !fixture.isSensor();
+    }
+
+    private boolean isAttackFixture(Fixture fixture) {
+        if (fixture.getUserData() instanceof MapObject mapObject) {
+            return mapObject.getName().contains("attack")
+                && mapObject.getProperties().get(Constants.SENSOR, false, Boolean.class);
+        }
+        return false;
     }
 }

@@ -14,10 +14,10 @@
                 3
             ],
             "scale": 2,
-            "selectedLayer": 2,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 80,
-                "y": 79.75
+                "x": 78.25,
+                "y": 109.25
             }
         },
         "main.tmx": {
@@ -25,11 +25,11 @@
                 5,
                 3
             ],
-            "scale": 1.5,
-            "selectedLayer": 2,
+            "scale": 2,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 272,
-                "y": 159.66666666666663
+                "x": 309.25,
+                "y": 299.75
             }
         },
         "objects.tsx": {
@@ -68,7 +68,7 @@
         "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "float",
+    "property.type": "bool",
     "recentFiles": [
         "terrain.tsx",
         "objects.tsx",

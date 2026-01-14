@@ -9,6 +9,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.FileTextureData;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapObjects;
+import com.badlogic.gdx.maps.MapProperties;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.PolygonMapObject;
 import com.badlogic.gdx.maps.objects.PolylineMapObject;
@@ -268,7 +269,7 @@ public class TiledAshleyConfigurator {
             FixtureDef fixtureDef = TiledPhysics.fixtureDefOf(object, scaling, relativeTo);
             if (fixtureDef == null) continue;
             Fixture fixture = body.createFixture(fixtureDef);
-            fixture.setUserData(object.getName());
+            fixture.setUserData(object);
             fixtureDef.shape.dispose();
 
         }
@@ -303,13 +304,7 @@ public class TiledAshleyConfigurator {
             triggerMapObject, BodyDef.BodyType.StaticBody,
             tmpVec2.set(rectangle.getX(), rectangle.getY()).scl(Constants.UNIT_SCALE), entity
         );
-        entity.add(new Trigger(type));
-        String questId = rectMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
-        if (!questId.isBlank()) entity.add(new Quest(questId));
-        entity.add(new Tiled(rectMapObject));
-        entity.add(new MapEntity());
-
-        engine.addEntity(entity);
+        createTrigger(entity, type, rectMapObject.getProperties(), new Tiled(rectMapObject));
     }
 
     private void makeEllipseTriggerEntity(MapObject triggerMapObject,
@@ -328,13 +323,7 @@ public class TiledAshleyConfigurator {
             tmpVec2.set(ellipse.x + ellipse.width * .5f, ellipse.y + ellipse.height * .5f).scl(Constants.UNIT_SCALE),
             entity
         );
-        entity.add(new Trigger(type));
-        String questId = ellipseMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
-        if (!questId.isBlank()) entity.add(new Quest(questId));
-        entity.add(new Tiled(ellipseMapObject));
-        entity.add(new MapEntity());
-
-        engine.addEntity(entity);
+        createTrigger(entity, type, ellipseMapObject.getProperties(), new Tiled(ellipseMapObject));
     }
 
     private void makePolygonTriggerEntity(MapObject triggerMapObject,
@@ -353,13 +342,7 @@ public class TiledAshleyConfigurator {
             triggerMapObject, BodyDef.BodyType.StaticBody,
             tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
         );
-        entity.add(new Trigger(type));
-        String questId = polygonMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
-        if (!questId.isBlank()) entity.add(new Quest(questId));
-        entity.add(new Tiled(polygonMapObject));
-        entity.add(new MapEntity());
-
-        engine.addEntity(entity);
+        createTrigger(entity, type, polygonMapObject.getProperties(), new Tiled(polygonMapObject));
     }
 
     private void makePolylineTriggerEntity(MapObject triggerMapObject,
@@ -378,12 +361,15 @@ public class TiledAshleyConfigurator {
             triggerMapObject, BodyDef.BodyType.StaticBody,
             tmpVec2.set(x, y).scl(Constants.UNIT_SCALE), entity
         );
-        entity.add(new Trigger(type));
-        String questId = polylineMapObject.getProperties().get(Constants.QUEST_ID, "", String.class);
-        if (!questId.isBlank()) entity.add(new Quest(questId));
-        entity.add(new Tiled(polylineMapObject));
-        entity.add(new MapEntity());
+        createTrigger(entity, type, polylineMapObject.getProperties(), new Tiled(polylineMapObject));
+    }
 
+    private void createTrigger(Entity entity, Trigger.Type type, MapProperties properties, Tiled tile) {
+        entity.add(new Trigger(type));
+        String questId = properties.get(Constants.QUEST_ID, "", String.class);
+        if (!questId.isBlank()) entity.add(new Quest(questId));
+        entity.add(tile);
+        entity.add(new MapEntity());
         engine.addEntity(entity);
     }
 }
