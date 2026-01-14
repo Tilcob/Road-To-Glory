@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
@@ -35,7 +36,9 @@ public class QuestSystem extends IteratingSystem implements Disposable {
             if (step.isCompleted()) {
                 quest.incCurrentStep();
                 updated = true;
-                if (quest.getCurrentStep() < quest.getSteps().size()) {
+                if (quest.getCurrentStep() == quest.getSteps().size()) {
+                    eventBus.fire(new QuestCompletedEvent(entity, quest.getQuestId()));
+                } else if (quest.getCurrentStep() < quest.getSteps().size()) {
                     quest.getSteps().get(quest.getCurrentStep()).start();
                 }
             }
