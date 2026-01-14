@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.AutosaveEvent;
@@ -120,6 +121,7 @@ public class GameScreen extends ScreenAdapter {
         } else {
             Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
         }
+        services.getStateManager().loadDialogFlags(DialogFlags.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
         services.getEventBus().fire(new UpdateInventoryEvent(player));
     }
@@ -151,6 +153,7 @@ public class GameScreen extends ScreenAdapter {
     private void autosave(AutosaveEvent event) {
         if (player == null) return;
         services.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
+        services.getStateManager().saveDialogFlags(DialogFlags.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
         services.saveGame();
     }

@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.Array;
 public class DialogChoice {
     private String text;
     private Array<String> lines;
+    private Array<DialogEffect> effects;
 
     public DialogChoice(String text, Array<String> lines) {
         this.text = text;
@@ -20,5 +21,9 @@ public class DialogChoice {
 
     public Array<String> lines() {
         return lines;
+    }
+
+    public Array<DialogEffect> effects() {
+        return effects;
     }
 }

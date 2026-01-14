@@ -4,6 +4,9 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tilcob.game.assets.QuestAsset;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.quest.step.CollectItemStep;
+import com.github.tilcob.game.quest.step.KillStep;
 import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.quest.step.TalkStep;
 
@@ -48,7 +51,8 @@ public class QuestFactory {
     public QuestStep createStep(StepJson step) {
         return switch (step.type) {
             case "talk"  -> new TalkStep(step.npc, eventBus);
-            //case "collect" ->
+            case "collect" -> new CollectItemStep(ItemType.valueOf(step.item), step.amount, eventBus);
+            case "kill" -> new KillStep(step.enemy, step.amount, eventBus);
             default -> throw new IllegalArgumentException("Unknown step type: " + step.type);
         };
     }

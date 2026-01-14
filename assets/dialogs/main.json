@@ -23,17 +23,39 @@
                 "Welcome in my shop!",
                 "Would you like to see my wares?"
             ],
+            "flagDialogs": [
+                {
+                    "flag": "shop_seen",
+                    "lines": [
+                        "Good to see you again."
+                    ]
+                }
+            ],
             "choices": [
                 {
                     "text": "Show me your wares.",
                     "lines": [
                         "I'm still setting up. Come back soon!"
+                    ],
+                    "effects": [
+                        {
+                            "type": "SET_FLAG",
+                            "flag": "shop_seen",
+                            "value": true
+                        }
                     ]
                 },
                 {
                     "text": "Just browsing.",
                     "lines": [
                         "Take your time."
+                    ],
+                    "effects": [
+                        {
+                            "type": "SET_FLAG",
+                            "flag": "shop_seen",
+                            "value": true
+                        }
                     ]
                 }
             ]

@@ -9,7 +9,9 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemType;
+import com.badlogic.gdx.utils.ObjectIntMap;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
@@ -32,6 +34,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         boolean inventoryFull = false;
         boolean addedAny = false;
         var remaining = new com.badlogic.gdx.utils.Array<ItemType>();
+        ObjectIntMap<ItemType> addedCounts = new ObjectIntMap<>();
 
         for (ItemType itemType : inventory.getItemsToAdd()) {
             if (inventoryFull) {
@@ -47,11 +50,17 @@ public class InventorySystem extends IteratingSystem implements Disposable {
             }
             addItem(inventory, itemType, slotIndex);
             addedAny = true;
+            addedCounts.getAndIncrement(itemType, 0, 1);
         }
         inventory.getItemsToAdd().clear();
         inventory.getItemsToAdd().addAll(remaining);
         if (inventoryFull) eventBus.fire(new InventoryFullEvent());
-        if (addedAny) eventBus.fire(new EntityAddItemEvent(player));
+        if (addedAny) {
+            eventBus.fire(new EntityAddItemEvent(player));
+            for (ObjectIntMap.Entry<ItemType> entry : addedCounts) {
+                eventBus.fire(new CollectItemEvent(entry.key, entry.value));
+            }
+        }
     }
 
     private void addItem(Inventory inventory, ItemType itemType, int slotIndex) {

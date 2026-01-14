@@ -2,6 +2,7 @@ package com.github.tilcob.game.save.states;
 
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.player.PlayerStateExtractor;
 import com.github.tilcob.game.quest.Quest;
@@ -52,6 +53,26 @@ public class StateManager {
         for (QuestState state : gameState.getQuests()) {
             Quest quest = loader.loadQuest(state);
             questLog.add(quest);
+        }
+    }
+
+    public void saveDialogFlags(DialogFlags dialogFlags) {
+        gameState.getDialogFlags().clear();
+        if (dialogFlags == null) {
+            return;
+        }
+        for (var entry : dialogFlags.getFlags()) {
+            gameState.getDialogFlags().put(entry.key, entry.value);
+        }
+    }
+
+    public void loadDialogFlags(DialogFlags dialogFlags) {
+        if (dialogFlags == null) {
+            return;
+        }
+        dialogFlags.getFlags().clear();
+        for (var entry : gameState.getDialogFlags().entrySet()) {
+            dialogFlags.set(entry.getKey(), entry.getValue() != null && entry.getValue());
         }
     }
 }
