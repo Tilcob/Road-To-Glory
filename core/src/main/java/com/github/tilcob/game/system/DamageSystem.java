@@ -29,7 +29,9 @@ public class DamageSystem extends IteratingSystem {
         entity.remove(Damaged.class);
 
         Life life = Life.MAPPER.get(entity);
+        float dealtDamage = damaged.getDamage();
         if (life != null) {
+            dealtDamage = Math.min(damaged.getDamage(), life.getLife());
             life.addLife(-damaged.getDamage());
             if (life.getLife() <= 0 && Player.MAPPER.get(entity) == null) {
                 Npc npc = Npc.MAPPER.get(entity);
@@ -42,10 +44,10 @@ public class DamageSystem extends IteratingSystem {
         }
 
         Transform transform = Transform.MAPPER.get(entity);
-        if (transform != null) {
+        if (transform != null && dealtDamage > 0f) {
             float x = transform.getPosition().x + transform.getSize().x * .5f;
             float y = transform.getPosition().y;
-            viewModel.playerDamage((int) damaged.getDamage(), x, y);
+            viewModel.playerDamage((int) dealtDamage, x, y);
         }
     }
 }

@@ -69,10 +69,11 @@ public class Attack implements Component {
         finishedThisFrame = false;
         triggeredThisFrame = false;
 
-        if (state != State.IDLE) {
+        if (state != State.IDLE && damageTimer > 0f) {
             damageTimer = Math.max(0f, damageTimer - delta);
             if (damageTimer == 0f) {
                 triggeredThisFrame = true;
+                damageTimer = -1f;
             }
         }
 
