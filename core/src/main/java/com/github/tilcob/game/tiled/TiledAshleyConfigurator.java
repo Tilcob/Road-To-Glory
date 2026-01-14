@@ -93,6 +93,7 @@ public class TiledAshleyConfigurator {
         entity.add(new Dialog());
         entity.add(new MoveIntent());
         entity.add(new NpcFsm(entity));
+        entity.add(new WanderTimer());
     }
 
     private void addEntityChest(MapObject object, Entity entity) {

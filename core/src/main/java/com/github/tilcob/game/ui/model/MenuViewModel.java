@@ -33,23 +33,23 @@ public class MenuViewModel extends ViewModel {
     }
 
     private void onSelect() {
-        this.propertyChangeSupport.firePropertyChange(Constants.ON_SELECT, null, null);
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_SELECT, null, true);
     }
 
     private void onDown() {
-        this.propertyChangeSupport.firePropertyChange(Constants.ON_DOWN, null, null);
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_DOWN, null, true);
     }
 
     private void onUp() {
-        this.propertyChangeSupport.firePropertyChange(Constants.ON_UP, null, null);
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_UP, null, true);
     }
 
     private void onRight() {
-        this.propertyChangeSupport.firePropertyChange(Constants.ON_RIGHT, null, null);
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_RIGHT, null, true);
     }
 
     private void onLeft() {
-        this.propertyChangeSupport.firePropertyChange(Constants.ON_LEFT, null, null);
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_LEFT, null, true);
     }
 
 

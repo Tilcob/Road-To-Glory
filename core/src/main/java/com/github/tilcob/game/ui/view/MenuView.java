@@ -114,11 +114,11 @@ public class MenuView extends View<MenuViewModel> {
 
     @Override
     protected void setupPropertyChanges() {
-        viewModel.onPropertyChange(Constants.ON_DOWN, null, this::onDown);
-        viewModel.onPropertyChange(Constants.ON_UP, null, this::onUp);
-        viewModel.onPropertyChange(Constants.ON_RIGHT, null, this::onRight);
-        viewModel.onPropertyChange(Constants.ON_LEFT, null, this::onLeft);
-        viewModel.onPropertyChange(Constants.ON_SELECT, null, this::onSelect);
+        viewModel.onPropertyChange(Constants.ON_DOWN, Boolean.class, this::onDown);
+        viewModel.onPropertyChange(Constants.ON_UP, Boolean.class, this::onUp);
+        viewModel.onPropertyChange(Constants.ON_RIGHT, Boolean.class, this::onRight);
+        viewModel.onPropertyChange(Constants.ON_LEFT, Boolean.class, this::onLeft);
+        viewModel.onPropertyChange(Constants.ON_SELECT, Boolean.class, this::onSelect);
     }
 
     /**

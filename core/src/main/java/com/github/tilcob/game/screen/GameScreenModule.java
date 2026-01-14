@@ -96,7 +96,7 @@ public class GameScreenModule {
             new AttackSystem(physicWorld, services.getAudioManager()),
             SystemOrder.COMBAT
         ));
-        engine.addSystem(withPriority(new DamageSystem(gameViewModel), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(new DamageSystem(gameViewModel, services.getEventBus()), SystemOrder.COMBAT));
         engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
         engine.addSystem(withPriority(
             new TriggerSystem(services.getAudioManager(), services.getEventBus()),
@@ -111,6 +111,7 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new InventorySystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new QuestSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new DialogConsequenceSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
             new DialogSystem(services.getEventBus(), services.getAllDialogs()),
             SystemOrder.GAMEPLAY

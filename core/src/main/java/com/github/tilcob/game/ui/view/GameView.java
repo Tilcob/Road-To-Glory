@@ -79,7 +79,7 @@ public class GameView extends View<GameViewModel> {
         dialogChoiceGroup.setVisible(false);
         dialogChoices = dialogChoiceGroup;
 
-        TextraLabel continueLabel = new TextraLabel("Continue with [E]", skin, "text_08");
+        TextraLabel continueLabel = new TextraLabel("Continue with E", skin, "text_08");
         continueLabel.setName("dialogHint");
         continueLabel.setColor(skin.getColor("BLACK"));
         dialogHintLabel = continueLabel;
@@ -111,7 +111,7 @@ public class GameView extends View<GameViewModel> {
         dialogProgressLabel.setText(display.line().index() + "/" + display.line().total());
         dialogText.setText(display.line().text());
         if (dialogHintLabel != null) {
-            dialogHintLabel.setText("Continue with [E]");
+            dialogHintLabel.setText("Continue with E");
         }
         dialogText.restart();
     }
@@ -131,14 +131,14 @@ public class GameView extends View<GameViewModel> {
         dialogChoices.clearChildren();
         Array<String> choices = display.choices();
         for (int i = 0; i < choices.size; i++) {
-            String prefix = i == display.selectedIndex() ? "> " : "  ";
+            String prefix = i == display.selectedIndex() ? "> " : "";
             TextraLabel choiceLabel = new TextraLabel(prefix + choices.get(i), skin, "text_10");
             choiceLabel.setColor(skin.getColor("BLACK"));
             dialogChoices.addActor(choiceLabel);
         }
         dialogChoices.setVisible(true);
         if (dialogHintLabel != null) {
-            dialogHintLabel.setText("Choose mit [W/S], accept mit [E]");
+            dialogHintLabel.setText("Choose mit W/S, accept mit E");
         }
     }
 

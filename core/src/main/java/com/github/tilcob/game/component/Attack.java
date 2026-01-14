@@ -62,16 +62,18 @@ public class Attack implements Component {
         state = State.WINDUP;
         attackTimer = Math.max(0f, windup);
         startedThisFrame = true;
+        damageTimer = .1f;
     }
 
     public void advance(float delta) {
         finishedThisFrame = false;
         triggeredThisFrame = false;
 
-        if (state != State.IDLE) {
+        if (state != State.IDLE && damageTimer > 0f) {
             damageTimer = Math.max(0f, damageTimer - delta);
             if (damageTimer == 0f) {
                 triggeredThisFrame = true;
+                damageTimer = -1f;
             }
         }
 

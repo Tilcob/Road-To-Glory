@@ -9,7 +9,9 @@ import com.github.tilcob.game.save.states.chest.ChestState;
 import com.github.tilcob.game.save.states.quest.QuestState;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GameState {
@@ -19,6 +21,7 @@ public class GameState {
     private PlayerState playerState;
     private ChestRegistryState chestRegistryState;
     private List<QuestState> quests = new ArrayList<>();
+    private Map<String, Boolean> dialogFlags = new HashMap<>();
     private int saveVersion = 1;
 
     public GameState() {}
@@ -45,6 +48,14 @@ public class GameState {
 
     public void setQuests(List<QuestState> quests) {
         this.quests = quests;
+    }
+
+    public Map<String, Boolean> getDialogFlags() {
+        return dialogFlags;
+    }
+
+    public void setDialogFlags(Map<String, Boolean> dialogFlags) {
+        this.dialogFlags = dialogFlags;
     }
 
     @JsonIgnore

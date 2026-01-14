@@ -3,6 +3,7 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -12,6 +13,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.npc.NpcType;
 
 public class AttackSystem extends IteratingSystem {
     private static final Rectangle attackAABB = new Rectangle();
@@ -95,6 +97,9 @@ public class AttackSystem extends IteratingSystem {
         if (body.equals(attackerBody)) return true;
         if (!(body.getUserData() instanceof Entity entity)) return true;
 
+        Npc npc = Npc.MAPPER.get(entity);
+        if (npc != null && npc.getType() == NpcType.FRIEND) return true;
+
         Life life = Life.MAPPER.get(entity);
         if (life == null) {
             return true;
@@ -116,11 +121,20 @@ public class AttackSystem extends IteratingSystem {
         Array<Fixture> fixtureList = body.getFixtureList();
         String fixtureName = Constants.ATTACK_SENSOR + facingDirection.getAtlasKey();
         for (Fixture fixture : fixtureList) {
-            if (fixtureName.equals(fixture.getUserData()) && Shape.Type.Polygon.equals(fixture.getShape().getType())) {
+            if ((getName(fixture) != null && fixtureName.equals(getName(fixture)))
+                && Shape.Type.Polygon.equals(fixture.getShape().getType())) {
                 return (PolygonShape) fixture.getShape();
             }
         }
 
         throw new GdxRuntimeException("Entity has no attack sensors of name: " + fixtureName);
+    }
+
+    private String getName(Fixture fixture) {
+        if (fixture.getUserData() instanceof MapObject mapObject) {
+            return mapObject.getName();
+        } else {
+            return fixture.getUserData() != null ? fixture.getUserData().toString() : null;
+        }
     }
 }
