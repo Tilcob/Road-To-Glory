@@ -3,6 +3,7 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
@@ -116,11 +117,20 @@ public class AttackSystem extends IteratingSystem {
         Array<Fixture> fixtureList = body.getFixtureList();
         String fixtureName = Constants.ATTACK_SENSOR + facingDirection.getAtlasKey();
         for (Fixture fixture : fixtureList) {
-            if (fixtureName.equals(fixture.getUserData()) && Shape.Type.Polygon.equals(fixture.getShape().getType())) {
+            if ((getName(fixture) != null && fixtureName.equals(getName(fixture)))
+                && Shape.Type.Polygon.equals(fixture.getShape().getType())) {
                 return (PolygonShape) fixture.getShape();
             }
         }
 
         throw new GdxRuntimeException("Entity has no attack sensors of name: " + fixtureName);
+    }
+
+    private String getName(Fixture fixture) {
+        if (fixture.getUserData() instanceof MapObject mapObject) {
+            return mapObject.getName();
+        } else {
+            return fixture.getUserData() != null ? fixture.getUserData().toString() : null;
+        }
     }
 }
