@@ -12,6 +12,7 @@ public class NpcBehaviorRegistry {
     static {
         register(NpcType.FRIEND, new FriendBehaviorProfile());
         register(NpcType.ENEMY, new EnemyBehaviorProfile());
+        register(NpcType.GUARD, new GuardBehaviorProfile());
     }
 
     private NpcBehaviorRegistry() {}

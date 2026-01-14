@@ -21,6 +21,10 @@ public class Constants {
     public static final float DEFAULT_DAMAGE_DELAY = .2f;
     public static final float GAMEPLAY_COMMAND_BUFFER_SECONDS = 0.15f;
     public static final float WANDER_RADIUS = 1.5f;
+    public static final float HEARING_RANGE = 2.5f;
+    public static final float AGGRO_FORGET_TIME = 2.5f;
+    public static final float LEASH_RANGE = 6f;
+    public static final float PATROL_WAIT_TIME = 1.5f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -63,6 +67,9 @@ public class Constants {
     public static final String QUEST_ID = "questId";
     public static final String NPC_TYPE = "npcType";
     public static final String DIALOG_REQUEST = "dialog_request";
+    public static final String PATROL_POINTS = "patrolPoints";
+    public static final String PATROL_LOOP = "patrolLoop";
+    public static final String PATROL_WAIT = "patrolWait";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";

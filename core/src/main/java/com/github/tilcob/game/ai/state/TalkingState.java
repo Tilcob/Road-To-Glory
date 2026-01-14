@@ -10,8 +10,10 @@ import com.github.tilcob.game.component.NpcFsm;
 public class TalkingState implements State<Entity> {
     @Override
     public void enter(Entity entity) {
-        //Controller.MAPPER.get(entity).getPressedCommands().clear();
-        //NpcStateSupport.lookAtPlayer(NpcStateSupport.findPlayer(entity), entity);
+        Entity player = NpcStateSupport.findPlayer(entity);
+        if (player != null) {
+            NpcStateSupport.lookAtPlayer(player, entity);
+        }
     }
 
     @Override
