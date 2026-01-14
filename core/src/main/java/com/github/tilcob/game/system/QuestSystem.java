@@ -30,19 +30,29 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(entity);
         boolean updated = false;
 
-        for (Quest quest : questLog.getQuests()) {
+        var quests = questLog.getQuests();
+
+        for (int i = 0; i < quests.size; i++) {
+            Quest quest = quests.get(i);
             if (quest.isCompleted()) continue;
-            QuestStep step = quest.getSteps().get(quest.getCurrentStep());
+
+            int currentStep = quest.getCurrentStep();
+            QuestStep step = quest.getSteps().get(currentStep);
+
             if (step.isCompleted()) {
                 quest.incCurrentStep();
                 updated = true;
+
                 if (quest.getCurrentStep() == quest.getSteps().size()) {
                     eventBus.fire(new QuestCompletedEvent(entity, quest.getQuestId()));
-                } else if (quest.getCurrentStep() < quest.getSteps().size()) {
-                    quest.getSteps().get(quest.getCurrentStep()).start();
+                } else {
+                    quest.getSteps()
+                        .get(quest.getCurrentStep())
+                        .start();
                 }
             }
         }
+
         if (updated) eventBus.fire(new UpdateQuestLogEvent(entity));
     }
 
