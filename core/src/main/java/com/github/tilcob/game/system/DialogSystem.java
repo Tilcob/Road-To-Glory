@@ -100,8 +100,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             return;
         }
         QuestLog questLog = QuestLog.MAPPER.get(player);
+        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        Array<String> lines = DialogSelector.select(dialogData.idle(), dialogData.questDialog(), questLog);
+        Array<String> lines = DialogSelector.select(dialogData, questLog, dialogFlags);
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices(), repeatChoices);
         if (!session.hasLines()) {
@@ -173,6 +174,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         eventBus.fire(new DialogChoiceEvent(new Array<>(), 0, session.getNpc()));
         if (choice == null) return;
 
+        eventBus.fire(new DialogChoiceResolvedEvent(player, session.getNpc(), choice));
         session.setLines(choice.lines());
         if (!session.hasLines()) {
             player.remove(DialogSession.class);
