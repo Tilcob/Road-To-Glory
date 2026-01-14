@@ -1,0 +1,22 @@
+{
+  "currentMapByName" : null,
+  "playerState" : {
+    "posX" : 10.0,
+    "posY" : 20.0,
+    "life" : 0.0,
+    "itemsByName" : [ "SWORD", "BOOTS" ]
+  },
+  "chestRegistryState" : {
+    "chestsByName" : {
+      "MAIN" : {
+        "1" : {
+          "contentsByName" : [ "ARMOR" ],
+          "opened" : false
+        }
+      }
+    }
+  },
+  "quests" : [ ],
+  "dialogFlags" : { },
+  "saveVersion" : 4
+}

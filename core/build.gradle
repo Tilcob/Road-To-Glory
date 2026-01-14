@@ -30,4 +30,5 @@ dependencies {
 
 test {
   useJUnitPlatform()
+  workingDir = new File("../assets")
 }
