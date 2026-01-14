@@ -26,10 +26,10 @@
                 3
             ],
             "scale": 1.5,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 238.33333333333331,
-                "y": 101.66666666666666
+                "x": 243.66666666666669,
+                "y": 193.66666666666669
             }
         },
         "objects.tsx": {
@@ -68,7 +68,7 @@
         "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "bool",
+    "property.type": "float",
     "recentFiles": [
         "terrain.tsx",
         "objects.tsx",

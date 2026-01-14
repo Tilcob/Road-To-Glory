@@ -4,7 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 public enum DialogAsset {
-    MAIN("main.json"),;
+    MAIN("main.json"),
+    HOUSE("house.json"),;
 
     private final String fileName;
 

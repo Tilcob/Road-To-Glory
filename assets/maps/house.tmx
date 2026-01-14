@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="6">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="10" height="10" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="7">
  <tileset firstgid="1" source="terrain.tsx"/>
  <tileset firstgid="193" source="objects.tsx"/>
  <layer id="1" name="ground" width="10" height="10">
@@ -21,6 +21,18 @@
    </properties>
   </object>
   <object id="4" type="PlayerSpawn" x="18.75" y="22" width="7.5" height="10"/>
+  <object id="6" name="Guard" gid="196" x="11" y="143" width="32" height="32">
+   <properties>
+    <property name="cameraFollow" type="bool" value="false"/>
+    <property name="controller" type="bool" value="false"/>
+    <property name="hasInventory" type="bool" value="false"/>
+    <property name="npcType" propertytype="NpcType" value="GUARD"/>
+    <property name="patrolLoop" type="bool" value="true"/>
+    <property name="patrolPoints" value="15,144;126,144;126,93;15,93"/>
+    <property name="patrolWait" type="float" value="1"/>
+    <property name="speed" type="float" value="1"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="4" name="trigger">
   <object id="3" type="Trigger" x="75.0693" y="148.199" width="15.5125" height="11.6343">

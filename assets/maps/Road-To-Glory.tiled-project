@@ -80,7 +80,8 @@
             "values": [
                 "ENEMY",
                 "FRIEND",
-                "UNDEFINED"
+                "UNDEFINED",
+                "GUARD"
             ],
             "valuesAsFlags": false
         },
