@@ -96,7 +96,7 @@ public class GameScreenModule {
             new AttackSystem(physicWorld, services.getAudioManager()),
             SystemOrder.COMBAT
         ));
-        engine.addSystem(withPriority(new DamageSystem(gameViewModel), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(new DamageSystem(gameViewModel, services.getEventBus()), SystemOrder.COMBAT));
         engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
         engine.addSystem(withPriority(
             new TriggerSystem(services.getAudioManager(), services.getEventBus()),

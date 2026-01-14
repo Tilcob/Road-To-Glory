@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.MoveIntent;
 import com.github.tilcob.game.component.NpcFsm;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.component.Attack;
 
 public class ChaseState implements State<Entity> {
 
@@ -38,12 +39,33 @@ public class ChaseState implements State<Entity> {
         if (moveIntent != null) {
             moveIntent.setTarget(Transform.MAPPER.get(player).getPosition(), Constants.DEFAULT_ARRIVAL_DISTANCE);
         }
+        tryAttack(entity, player);
     }
 
     @Override
     public void exit(Entity entity) {
         MoveIntent moveIntent = MoveIntent.MAPPER.get(entity);
         if (moveIntent != null) moveIntent.clear();
+    }
+
+    private void tryAttack(Entity entity, Entity player) {
+        Attack attack = Attack.MAPPER.get(entity);
+        if (attack == null || !attack.canAttack()) {
+            return;
+        }
+        Transform playerTransform = Transform.MAPPER.get(player);
+        Transform selfTransform = Transform.MAPPER.get(entity);
+        if (playerTransform == null || selfTransform == null) {
+            return;
+        }
+        float distance = playerTransform.getPosition().dst(selfTransform.getPosition());
+        if (distance <= Constants.ENEMY_ATTACK_RANGE) {
+            attack.startAttack();
+            MoveIntent moveIntent = MoveIntent.MAPPER.get(entity);
+            if (moveIntent != null) {
+                moveIntent.clear();
+            }
+        }
     }
 
     @Override

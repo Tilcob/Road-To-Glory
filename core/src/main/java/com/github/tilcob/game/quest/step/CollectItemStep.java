@@ -1,0 +1,62 @@
+package com.github.tilcob.game.quest.step;
+
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.quest.CollectItemEvent;
+import com.github.tilcob.game.item.ItemType;
+
+public class CollectItemStep implements QuestStep {
+    private final ItemType item;
+    private final int amount;
+    private final GameEventBus eventBus;
+    private int collected;
+    private boolean completed;
+
+    public CollectItemStep(ItemType item, int amount, GameEventBus eventBus) {
+        this.item = item;
+        this.amount = amount;
+        this.eventBus = eventBus;
+        this.collected = 0;
+        this.completed = false;
+    }
+
+    @Override
+    public boolean isCompleted() {
+        return completed;
+    }
+
+    @Override
+    public void start() {
+        eventBus.subscribe(CollectItemEvent.class, this::onEvent);
+    }
+
+    private void onEvent(CollectItemEvent event) {
+        if (completed || event.item() != item) {
+            return;
+        }
+        collected += event.count();
+        if (collected >= amount) {
+            completed = true;
+            end();
+        }
+    }
+
+    @Override
+    public void end() {
+        eventBus.unsubscribe(CollectItemEvent.class, this::onEvent);
+    }
+
+    @Override
+    public Object saveData() {
+        return collected;
+    }
+
+    @Override
+    public void loadData(Object data) {
+        if (data instanceof Integer value) {
+            collected = value;
+            if (collected >= amount) {
+                completed = true;
+            }
+        }
+    }
+}
