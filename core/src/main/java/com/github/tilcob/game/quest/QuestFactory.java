@@ -11,6 +11,7 @@ import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.quest.step.TalkStep;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -40,12 +41,22 @@ public class QuestFactory {
     }
 
     public Quest createQuestFromJson(QuestJson json) {
-        Quest quest = new Quest(json.questId, json.title, json.description);
+        QuestReward reward = createReward(json.reward);
+        Quest quest = new Quest(json.questId, json.title, json.description, reward);
 
         for (StepJson step : json.steps) {
             quest.getSteps().add(createStep(step));
         }
         return quest;
+    }
+
+    private QuestReward createReward(RewardJson rewardJson) {
+        if (rewardJson == null) {
+            return null;
+        }
+        List<ItemType> items = new ArrayList<>();
+        rewardJson.items.forEach(item -> items.add(ItemType.valueOf(item)));
+        return new QuestReward(rewardJson.gold, items);
     }
 
     public QuestStep createStep(StepJson step) {
@@ -86,7 +97,9 @@ public class QuestFactory {
 
     public record QuestFile(List<QuestJson> quests) { }
 
-    public record QuestJson(String questId, String title, String description, List<StepJson> steps) { }
+    public record QuestJson(String questId, String title, String description, List<StepJson> steps, RewardJson reward) { }
 
     public record StepJson(String type, String npc, String item, int amount, String enemy) { }
+
+    public record RewardJson(int gold, List<String> items) { }
 }

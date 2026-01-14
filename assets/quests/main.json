@@ -9,7 +9,13 @@
                     "type": "talk",
                     "npc": "Npc-2"
                 }
-            ]
+            ],
+            "rewards": {
+                "gold": 50,
+                "items": [
+                    "SWORD"
+                ]
+            }
         },
         {
             "questId": "Talk_To_Jakob",
