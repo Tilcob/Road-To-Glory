@@ -10,6 +10,9 @@
   <image source="objects/chest.png" width="16" height="16"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
+   <object id="2" type="Trigger" x="-0.5" y="14.375" width="17.125" height="6.75">
+    <ellipse/>
+   </object>
   </objectgroup>
  </tile>
  <tile id="1" type="Prop">
@@ -90,7 +93,7 @@
   <image source="objects/training_dummy.png" width="32" height="32"/>
   <objectgroup draworder="index" id="2">
    <object id="1" x="3" y="5" width="26" height="23"/>
-   <object id="3" name="dialog_request" type="Trigger" x="-3" y="-3" width="38" height="38">
+   <object id="3" type="Trigger" x="3.125" y="5" width="26" height="23">
     <properties>
      <property name="triggerType" propertytype="TriggerType" value="DIALOG"/>
     </properties>
@@ -104,5 +107,12 @@
    <property name="z" type="int" value="0"/>
   </properties>
   <image source="objects/trap.png" width="16" height="16"/>
+  <objectgroup draworder="index" id="2">
+   <object id="1" type="Trigger" x="0" y="0" width="16" height="16">
+    <properties>
+     <property name="triggerType" propertytype="TriggerType" value="TRAP"/>
+    </properties>
+   </object>
+  </objectgroup>
  </tile>
 </tileset>

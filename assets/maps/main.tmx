@@ -48,18 +48,6 @@
   </object>
  </objectgroup>
  <objectgroup id="5" name="trigger">
-  <object id="9" type="Trigger" x="255.333" y="271.697" width="16.3636" height="16.7273">
-   <properties>
-    <property name="id" type="int" value="11"/>
-    <property name="triggerType" value="TRAP"/>
-   </properties>
-  </object>
-  <object id="17" type="Trigger" x="136.5" y="269.5" width="16.5" height="11.5">
-   <properties>
-    <property name="id" type="int" value="13"/>
-   </properties>
-   <ellipse/>
-  </object>
   <object id="18" type="Trigger" x="366" y="222" width="13.25" height="9.5">
    <properties>
     <property name="id" type="int" value="0"/>

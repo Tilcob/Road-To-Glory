@@ -29,12 +29,6 @@
     <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
    </properties>
   </object>
-  <object id="5" type="Trigger" x="109.5" y="107" width="17" height="9">
-   <properties>
-    <property name="id" type="int" value="2"/>
-   </properties>
-   <ellipse/>
-  </object>
  </objectgroup>
  <layer id="5" name="foreground" width="10" height="10">
   <data encoding="base64" compression="zlib">

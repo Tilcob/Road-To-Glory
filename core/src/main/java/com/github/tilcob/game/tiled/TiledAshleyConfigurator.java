@@ -268,7 +268,7 @@ public class TiledAshleyConfigurator {
             FixtureDef fixtureDef = TiledPhysics.fixtureDefOf(object, scaling, relativeTo);
             if (fixtureDef == null) continue;
             Fixture fixture = body.createFixture(fixtureDef);
-            fixture.setUserData(object.getName());
+            fixture.setUserData(object);
             fixtureDef.shape.dispose();
 
         }
