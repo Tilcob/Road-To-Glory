@@ -50,7 +50,6 @@
  <objectgroup id="5" name="trigger">
   <object id="18" type="Trigger" x="366" y="222" width="13.25" height="9.5">
    <properties>
-    <property name="id" type="int" value="0"/>
     <property name="toMap" value="HOUSE"/>
     <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
    </properties>
