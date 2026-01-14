@@ -34,6 +34,7 @@
             "choices": [
                 {
                     "text": "Show me your wares.",
+                    "next": "shop_wares",
                     "lines": [
                         "I'm still setting up. Come back soon!"
                     ],
@@ -47,6 +48,7 @@
                 },
                 {
                     "text": "Just browsing.",
+                    "next": "shop_browsing",
                     "lines": [
                         "Take your time."
                     ],
@@ -56,6 +58,20 @@
                             "flag": "shop_seen",
                             "value": true
                         }
+                    ]
+                }
+            ],
+            "nodes": [
+                {
+                    "id": "shop_wares",
+                    "lines": [
+                        "I'm still setting up. Come back soon!"
+                    ]
+                },
+                {
+                    "id": "shop_browsing",
+                    "lines": [
+                        "Take your time."
                     ]
                 }
             ]

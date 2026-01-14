@@ -7,12 +7,15 @@ public class DialogData {
     private Array<DialogChoice> choices;
     private Array<DialogFlagDialog> flagDialogs;
     private QuestDialog questDialog;
+    private Array<DialogNode> nodes;
 
-    public DialogData(Array<String> idle, Array<DialogChoice> choices, Array<DialogFlagDialog> flagDialogs, QuestDialog questDialog) {
+    public DialogData(Array<String> idle, Array<DialogChoice> choices, Array<DialogFlagDialog> flagDialogs,
+                      QuestDialog questDialog, Array<DialogNode> nodes) {
         this.idle = idle;
         this.choices = choices;
         this.flagDialogs = flagDialogs;
         this.questDialog = questDialog;
+        this.nodes = nodes;
     }
 
     public DialogData() {
@@ -32,5 +35,9 @@ public class DialogData {
 
     public QuestDialog questDialog() {
         return questDialog;
+    }
+
+    public Array<DialogNode> getNodes() {
+        return nodes;
     }
 }
