@@ -62,6 +62,7 @@ public class Attack implements Component {
         state = State.WINDUP;
         attackTimer = Math.max(0f, windup);
         startedThisFrame = true;
+        damageTimer = .1f;
     }
 
     public void advance(float delta) {
