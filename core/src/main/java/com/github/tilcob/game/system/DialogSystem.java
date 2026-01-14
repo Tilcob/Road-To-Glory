@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
@@ -104,7 +105,8 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
         Array<String> lines = DialogSelector.select(dialogData, questLog, dialogFlags);
         boolean repeatChoices = dialogData.questDialog() == null;
-        DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices(), repeatChoices);
+        DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices(),
+            repeatChoices, buildNodeMap(dialogData));
         if (!session.hasLines()) {
             dialog.setState(Dialog.State.IDLE);
             return;
@@ -175,13 +177,27 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (choice == null) return;
 
         eventBus.fire(new DialogChoiceResolvedEvent(player, session.getNpc(), choice));
-        session.setLines(choice.lines());
+        boolean moveToNode = session.setNode(choice.next());
+        if (!moveToNode) session.setLines(choice.lines());
+
         if (!session.hasLines()) {
             player.remove(DialogSession.class);
             eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
             return;
         }
         eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
+    }
+
+    private ObjectMap<String, DialogNode> buildNodeMap(DialogData dialogData) {
+        ObjectMap<String, DialogNode> nodes = new ObjectMap<>();
+        if (dialogData == null || dialogData.getNodes() == null) {
+            return nodes;
+        }
+        for (DialogNode node : dialogData.getNodes()) {
+            if (node == null || node.id() == null) continue;
+            nodes.put(node.id(), node);
+        }
+        return nodes;
     }
 
     private void onExitTrigger(ExitTriggerEvent event) {

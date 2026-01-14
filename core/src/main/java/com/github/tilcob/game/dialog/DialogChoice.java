@@ -6,6 +6,7 @@ public class DialogChoice {
     private String text;
     private Array<String> lines;
     private Array<DialogEffect> effects;
+    private String next;
 
     public DialogChoice(String text, Array<String> lines) {
         this.text = text;
@@ -25,5 +26,9 @@ public class DialogChoice {
 
     public Array<DialogEffect> effects() {
         return effects;
+    }
+
+    public String next() {
+        return next;
     }
 }

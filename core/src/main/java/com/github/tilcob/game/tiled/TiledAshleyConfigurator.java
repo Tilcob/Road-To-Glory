@@ -94,6 +94,32 @@ public class TiledAshleyConfigurator {
         entity.add(new MoveIntent());
         entity.add(new NpcFsm(entity));
         entity.add(new WanderTimer());
+        entity.add(new AggroMemory());
+        Transform transform = Transform.MAPPER.get(entity);
+        if (transform != null) {
+            entity.add(new SpawnPoint(transform.getPosition()));
+        }
+        addPatrolRoute(object, entity);
+    }
+
+    private void addPatrolRoute(MapObject object, Entity entity) {
+        String patrolPointsStr = object.getProperties().get(Constants.PATROL_POINTS, "", String.class);
+        if (patrolPointsStr.isBlank()) return;
+
+        Array<Vector2> points = new Array<>();
+        String[] pairs = patrolPointsStr.split(";");
+        for (String pair : pairs) {
+            String[] values = pair.trim().split(",");
+            if (values.length != 2) continue;
+            float x = Float.parseFloat(values[0].trim());
+            float y = Float.parseFloat(values[1].trim());
+            points.add(new Vector2(x, y).scl(Constants.UNIT_SCALE));
+        }
+        if (points.isEmpty()) return;
+
+        boolean loop = object.getProperties().get(Constants.PATROL_LOOP, true, Boolean.class);
+        float waitTime = object.getProperties().get(Constants.PATROL_WAIT, Constants.PATROL_WAIT_TIME, Float.class);
+        entity.add(new PatrolRoute(points, loop, waitTime));
     }
 
     private void addEntityChest(MapObject object, Entity entity) {

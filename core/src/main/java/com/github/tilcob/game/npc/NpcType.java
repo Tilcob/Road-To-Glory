@@ -4,4 +4,5 @@ public enum NpcType {
     UNDEFINED,
     ENEMY,
     FRIEND,
+    GUARD,
 }

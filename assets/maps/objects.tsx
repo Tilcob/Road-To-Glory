@@ -78,6 +78,11 @@
      <property name="sensor" type="bool" value="true"/>
     </properties>
    </object>
+   <object id="12" type="Trigger" x="9.09091" y="5.09091" width="12.9091" height="17.9091">
+    <properties>
+     <property name="triggerType" propertytype="TriggerType" value="DIALOG"/>
+    </properties>
+   </object>
   </objectgroup>
  </tile>
  <tile id="4" type="GameObject">

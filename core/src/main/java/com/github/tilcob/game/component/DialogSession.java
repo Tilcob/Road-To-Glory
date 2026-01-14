@@ -3,9 +3,12 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.dialog.DialogChoice;
+import com.github.tilcob.game.dialog.DialogNode;
 
 public class DialogSession implements Component {
     public static final ComponentMapper<DialogSession> MAPPER = ComponentMapper.getFor(DialogSession.class);
@@ -13,21 +16,30 @@ public class DialogSession implements Component {
     private final Entity npc;
     private Array<String> lines;
     private Array<DialogChoice> choices;
+    private final ObjectMap<String, DialogNode> nodes;
+    private String currNodeId;
     private int index;
     private int choiceIndex;
     private boolean awaitingChoice;
     private final boolean repeatableChoices;
     private boolean choiceConsumed;
 
-    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices, boolean repeatableChoices) {
+    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices,
+                         boolean repeatableChoices, ObjectMap<String, DialogNode> nodes) {
         this.npc = npc;
         this.lines = lines == null ? new Array<>() : lines;
         this.choices = choices == null ? new Array<>() : new Array<>(choices);
+        this.nodes = nodes == null ? new ObjectMap<>() : nodes;
+        this.currNodeId = null;
         this.index = 0;
         this.choiceIndex = 0;
         this.awaitingChoice = false;
         this.repeatableChoices = repeatableChoices;
         this.choiceConsumed = false;
+    }
+
+    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices, boolean repeatableChoices) {
+        this(npc, lines, choices, repeatableChoices, null);
     }
 
     public Entity getNpc() {
@@ -39,6 +51,10 @@ public class DialogSession implements Component {
             return "";
         }
         return lines.get(index);
+    }
+
+    public String getCurrentNodeId() {
+        return currNodeId;
     }
 
     public boolean hasLines() {
@@ -107,5 +123,27 @@ public class DialogSession implements Component {
     public void setLines(Array<String> lines) {
         this.lines = lines == null ? new Array<>() : lines;
         this.index = 0;
+        this.currNodeId = null;
+    }
+
+    public boolean setNode(String nodeId) {
+        if (nodeId == null || nodes == null || nodes.isEmpty()) {
+            return false;
+        }
+        DialogNode node = nodes.get(nodeId);
+        if (node == null) {
+            if (Gdx.app != null) {
+                Gdx.app.debug("DialogSession", "Dialog node not found: " + nodeId);
+            }
+            return false;
+        }
+        this.currNodeId = nodeId;
+        this.lines = node.lines() == null ? new Array<>() : node.lines();
+        this.choices = node.choices() == null ? new Array<>() : new Array<>(node.choices());
+        this.index = 0;
+        this.choiceIndex = 0;
+        this.awaitingChoice = false;
+        this.choiceConsumed = false;
+        return true;
     }
 }

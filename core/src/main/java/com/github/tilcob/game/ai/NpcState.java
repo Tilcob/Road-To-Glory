@@ -5,6 +5,8 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.state.ChaseState;
 import com.github.tilcob.game.ai.state.IdleState;
+import com.github.tilcob.game.ai.state.PatrolState;
+import com.github.tilcob.game.ai.state.ReturnState;
 import com.github.tilcob.game.ai.state.TalkingState;
 import com.github.tilcob.game.ai.state.WanderState;
 
@@ -12,7 +14,9 @@ public enum NpcState implements State<Entity> {
     IDLE(new IdleState()),
     TALKING(new TalkingState()),
     WANDER(new WanderState()),
-    CHASE(new ChaseState()),;
+    CHASE(new ChaseState()),
+    PATROL(new PatrolState()),
+    RETURN(new ReturnState()),;
 
     private final State<Entity> delegate;
 
