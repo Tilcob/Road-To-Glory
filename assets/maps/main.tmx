@@ -50,8 +50,11 @@
    <properties>
     <property name="cameraFollow" type="bool" value="false"/>
     <property name="controller" type="bool" value="false"/>
+    <property name="damage" type="float" value="5"/>
     <property name="hasInventory" type="bool" value="false"/>
+    <property name="life" type="int" value="20"/>
     <property name="npcType" propertytype="NpcType" value="ENEMY"/>
+    <property name="speed" type="float" value="2"/>
    </properties>
   </object>
  </objectgroup>
