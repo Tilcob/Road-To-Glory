@@ -53,7 +53,10 @@ public class RewardSystem extends EntitySystem implements Disposable {
     private void applyItems(Entity player, QuestReward reward) {
         if (reward.items().isEmpty()) return;
         Inventory inventory = Inventory.MAPPER.get(player);
-        if (inventory == null) return;
+        if (inventory == null) {
+            inventory = new Inventory();
+            player.add(inventory);
+        }
         for (var itemType : reward.items()) {
             inventory.getItemsToAdd().add(itemType);
         }

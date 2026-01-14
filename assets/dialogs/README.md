@@ -122,9 +122,8 @@ Within `choices`, set `next` to the target node ID. When a choice is selected, t
 {
   "effects": [
     {
-      "type": "QUEST_STEP",
-      "questId": "Welcome_To_Town",
-      "step": 1
+      "stepType": "TALK",
+      "target": "Npc-2"
     }
   ]
 }

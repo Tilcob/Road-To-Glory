@@ -61,7 +61,9 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         for (Quest quest : questLog.getQuests()) {
             if (quest.getQuestId().equals(event.questId())) return;
         }
-        questLog.add(factory.create(event.questId()));
+        Quest quest = factory.create(event.questId());
+        questLog.add(quest);
+        if (quest.getSteps().isEmpty()) eventBus.fire(new QuestCompletedEvent(event.player(), event.questId()));
         eventBus.fire(new UpdateQuestLogEvent(event.player()));
     }
 

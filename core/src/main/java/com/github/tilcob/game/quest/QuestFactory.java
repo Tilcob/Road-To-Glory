@@ -55,7 +55,7 @@ public class QuestFactory {
             return null;
         }
         List<ItemType> items = new ArrayList<>();
-        rewardJson.items.forEach(item -> items.add(ItemType.valueOf(item)));
+        if (rewardJson.items != null) rewardJson.items.forEach(item -> items.add(ItemType.valueOf(item)));
         return new QuestReward(rewardJson.gold, items);
     }
 
@@ -73,9 +73,7 @@ public class QuestFactory {
             loadAllDefinitions();
         }
         QuestJson definition = definitions.get(questId);
-        if (definition != null) {
-            return createQuestFromJson(definition);
-        }
+        if (definition != null) return createQuestFromJson(definition);
 
         throw new IllegalArgumentException("Quest not found: " + questId);
     }
@@ -93,7 +91,6 @@ public class QuestFactory {
             }
         }
     }
-
 
     public record QuestFile(List<QuestJson> quests) { }
 

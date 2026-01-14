@@ -3,6 +3,7 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -131,6 +132,9 @@ public class DialogSession implements Component {
         }
         DialogNode node = nodes.get(nodeId);
         if (node == null) {
+            if (Gdx.app != null) {
+                Gdx.app.debug("DialogSession", "Dialog node not found: " + nodeId);
+            }
             return false;
         }
         this.currNodeId = nodeId;
