@@ -51,6 +51,7 @@ public class PlayerFactory {
         entity.add(new AnimationFsm(entity));
         entity.add(new Inventory());
         entity.add(new QuestLog());
+        entity.add(new DialogFlags());
 
         engine.addEntity(entity);
         return entity;
