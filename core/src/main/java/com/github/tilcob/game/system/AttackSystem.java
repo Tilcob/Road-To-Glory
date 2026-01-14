@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.npc.NpcType;
 
 public class AttackSystem extends IteratingSystem {
     private static final Rectangle attackAABB = new Rectangle();
@@ -95,6 +96,9 @@ public class AttackSystem extends IteratingSystem {
 
         if (body.equals(attackerBody)) return true;
         if (!(body.getUserData() instanceof Entity entity)) return true;
+
+        Npc npc = Npc.MAPPER.get(entity);
+        if (npc != null && npc.getType() == NpcType.FRIEND) return true;
 
         Life life = Life.MAPPER.get(entity);
         if (life == null) {
