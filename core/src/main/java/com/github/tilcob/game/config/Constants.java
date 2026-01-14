@@ -80,6 +80,7 @@ public class Constants {
     public static final int MAX_NUM_OF_VERTICES = 8; // must be in between 3 and 8
     public static final float AGGRO_RANGE = 5f; // 5 tiles range
     public static final float ENEMY_ATTACK_RANGE = 0.75f;
+    public static final float WANDER_TIMER_INTERVAL = 5f;
 
     // Camera
     public static final float CAMERA_OFFSET_Y = 1f;

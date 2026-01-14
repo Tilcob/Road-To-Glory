@@ -106,8 +106,6 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
         onEnter(entityA, fixtureA, entityB, fixtureB);
     }
 
-
-
     private void onEnter(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
         if (hasTriggerComponent(entityA) && isPlayer(entityB, fixtureB)) {
             Trigger trigger = Trigger.MAPPER.get(entityA);

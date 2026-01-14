@@ -40,7 +40,7 @@
    <property name="animation" value="IDLE"/>
    <property name="animationSpeed" type="float" value="1"/>
    <property name="atlasAsset" value="OBJECTS"/>
-   <property name="attackCooldown" type="float" value="0.5"/>
+   <property name="attackCooldown" type="float" value="0.3"/>
    <property name="attackSound" value="SWING"/>
    <property name="attackWindup" type="float" value="1"/>
    <property name="bodyType" value="DynamicBody"/>
