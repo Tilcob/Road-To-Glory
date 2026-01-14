@@ -54,9 +54,43 @@ Within `choices`, set `next` to the target node ID. When a choice is selected, t
 }
 ```
 
+## Example: node-local choices
 
+```json
+{
+  "npcs": {
+    "Guard": {
+      "idle": [
+        "State your business."
+      ],
+      "nodes": [
+        {
+          "id": "warning",
+          "lines": [
+            "Keep the peace."
+          ],
+          "choices": [
+            {
+              "text": "Understood.",
+              "lines": [
+                "Move along."
+              ]
+            }
+          ]
+        }
+      ],
+      "choices": [
+        {
+          "text": "I'm just passing through.",
+          "next": "warning"
+        }
+      ]
+    }
+  }
+}
+```
 
-## Example
+## Example: SET_FLAG
 
 ```json
 {
@@ -65,6 +99,32 @@ Within `choices`, set `next` to the target node ID. When a choice is selected, t
       "type": "SET_FLAG",
       "flag": "shop_seen",
       "value": true
+    }
+  ]
+}
+```
+## Example: ADD_QUEST
+
+```json
+{
+  "effects": [
+    {
+      "type": "ADD_QUEST",
+      "questId": "Welcome_To_Town"
+    }
+  ]
+}
+```
+
+## Example: QUEST_STEP
+
+```json
+{
+  "effects": [
+    {
+      "type": "QUEST_STEP",
+      "questId": "Welcome_To_Town",
+      "step": 1
     }
   ]
 }
