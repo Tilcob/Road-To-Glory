@@ -5,11 +5,14 @@ import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
+import com.github.tilcob.game.component.AggroMemory;
 import com.github.tilcob.game.component.MoveIntent;
 import com.github.tilcob.game.component.NpcFsm;
+import com.github.tilcob.game.component.SpawnPoint;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.component.Attack;
+import com.badlogic.gdx.Gdx;
 
 public class ChaseState implements State<Entity> {
 
@@ -17,7 +20,7 @@ public class ChaseState implements State<Entity> {
     public void enter(Entity entity) {
         Entity player = NpcStateSupport.findPlayer(entity);
         NpcBehaviorProfile behaviorProfile = NpcStateSupport.behaviorProfile(entity);
-        if (player == null || !NpcStateSupport.inAggroRange(entity, player, behaviorProfile.getAggroRange())) {
+        if (player == null || !behaviorProfile.canChase() || !NpcStateSupport.canAggro(entity, player)) {
             NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
             return;
         }
@@ -31,15 +34,40 @@ public class ChaseState implements State<Entity> {
         Entity player = NpcStateSupport.findPlayer(entity);
         MoveIntent moveIntent = MoveIntent.MAPPER.get(entity);
         NpcBehaviorProfile behaviorProfile = NpcStateSupport.behaviorProfile(entity);
-        if (player == null || !NpcStateSupport.inAggroRange(entity, player, behaviorProfile.getAggroRange())) {
+        if (player == null || !behaviorProfile.canChase()) {
             if (moveIntent != null) moveIntent.clear();
             NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
             return;
         }
-        if (moveIntent != null) {
-            moveIntent.setTarget(Transform.MAPPER.get(player).getPosition(), Constants.DEFAULT_ARRIVAL_DISTANCE);
+
+        AggroMemory memory = AggroMemory.MAPPER.get(entity);
+        if (NpcStateSupport.canAggro(entity, player)) {
+            if (moveIntent != null) {
+                moveIntent.setTarget(Transform.MAPPER.get(player).getPosition(), Constants.DEFAULT_ARRIVAL_DISTANCE);
+            }
+            tryAttack(entity, player);
+            return;
         }
-        tryAttack(entity, player);
+
+        if (memory != null) {
+            memory.decay(Gdx.graphics.getDeltaTime());
+            if (memory.isExpired(behaviorProfile.getAggroForgetTime())) {
+                memory.clear();
+                if (moveIntent != null) moveIntent.clear();
+                NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(shouldReturnToSpawn(entity, behaviorProfile));
+                return;
+            }
+        }
+
+        if (moveIntent != null && memory != null) {
+            moveIntent.setTarget(memory.getLastKnownPosition(), Constants.DEFAULT_ARRIVAL_DISTANCE);
+        }
+
+        if (behaviorProfile.canReturnToSpawn() && isOutsideLeash(entity, behaviorProfile)) {
+            if (moveIntent != null) moveIntent.clear();
+            NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.RETURN);
+            return;
+        }
     }
 
     @Override
@@ -66,6 +94,22 @@ public class ChaseState implements State<Entity> {
                 moveIntent.clear();
             }
         }
+    }
+
+    private NpcState shouldReturnToSpawn(Entity entity, NpcBehaviorProfile behaviorProfile) {
+        if (behaviorProfile.canReturnToSpawn() && SpawnPoint.MAPPER.get(entity) != null) {
+            return NpcState.RETURN;
+        }
+        return NpcState.IDLE;
+    }
+
+    private boolean isOutsideLeash(Entity entity, NpcBehaviorProfile behaviorProfile) {
+        if (!behaviorProfile.canReturnToSpawn()) return false;
+        SpawnPoint spawnPoint = SpawnPoint.MAPPER.get(entity);
+        Transform transform = Transform.MAPPER.get(entity);
+        if (spawnPoint == null || transform == null) return false;
+        float leashRange = behaviorProfile.getLeashRange();
+        return transform.getPosition().dst2(spawnPoint.getPosition()) > leashRange * leashRange;
     }
 
     @Override

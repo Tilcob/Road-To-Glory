@@ -4,10 +4,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorRegistry;
+import com.github.tilcob.game.component.AggroMemory;
 import com.github.tilcob.game.component.Facing;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.PlayerReference;
+import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.config.Constants;
 
 public final class NpcStateSupport {
     private NpcStateSupport() {
@@ -36,6 +39,50 @@ public final class NpcStateSupport {
         float dy = playerPos.y - entityPos.y;
 
         return dx * dx + dy * dy <= aggroRange * aggroRange;
+    }
+
+    public static boolean canAggro(Entity entity, Entity player) {
+        if (player == null) return false;
+        NpcBehaviorProfile profile = behaviorProfile(entity);
+        if (!profile.canChase()) return false;
+
+        Transform playerTransform = Transform.MAPPER.get(player);
+        if (playerTransform == null) return false;
+
+        boolean canSee = inAggroRange(entity, player, profile.getAggroRange())
+            && hasLineOfSight(entity, player);
+        boolean canHear = profile.getHearingRange() > 0f
+            && inAggroRange(entity, player, profile.getHearingRange());
+
+        if (canSee || canHear) {
+            AggroMemory memory = AggroMemory.MAPPER.get(entity);
+            if (memory != null) {
+                memory.markSeen(playerTransform.getPosition());
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean hasLineOfSight(Entity entity, Entity player) {
+        Physic physic = Physic.MAPPER.get(entity);
+        if (physic == null) return true;
+
+        Vector2 from = Transform.MAPPER.get(entity).getPosition();
+        Vector2 to = Transform.MAPPER.get(player).getPosition();
+        if (from == null || to == null) return true;
+
+        final boolean[] blocked = {false};
+        physic.getBody().getWorld().rayCast((fixture, point, normal, fraction) -> {
+            Object bodyUserData = fixture.getBody().getUserData();
+            if (Constants.ENVIRONMENT.equals(bodyUserData)) {
+                blocked[0] = true;
+                return 0;
+            }
+            return -1;
+        }, from, to);
+
+        return !blocked[0];
     }
 
     public static Entity findPlayer(Entity entity) {
