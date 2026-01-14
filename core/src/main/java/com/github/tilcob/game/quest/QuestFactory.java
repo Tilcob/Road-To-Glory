@@ -41,7 +41,7 @@ public class QuestFactory {
     }
 
     public Quest createQuestFromJson(QuestJson json) {
-        QuestReward reward = createReward(json.reward);
+        QuestReward reward = createReward(json.rewards);
         Quest quest = new Quest(json.questId, json.title, json.description, reward);
 
         for (StepJson step : json.steps) {
@@ -97,7 +97,7 @@ public class QuestFactory {
 
     public record QuestFile(List<QuestJson> quests) { }
 
-    public record QuestJson(String questId, String title, String description, List<StepJson> steps, RewardJson reward) { }
+    public record QuestJson(String questId, String title, String description, List<StepJson> steps, RewardJson rewards) { }
 
     public record StepJson(String type, String npc, String item, int amount, String enemy) { }
 
