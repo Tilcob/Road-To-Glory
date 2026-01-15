@@ -1,0 +1,37 @@
+title: idle
+tags: idle
+---
+Good day my friend!
+Don't anger the guard!
+===
+
+title: start
+tags: start, root
+---
+-> In wont sir.
+    Then have a great day!
+    <<jump guard_polite>>
+
+-> Then What?!
+    Don't make me Angry!
+    I am gonna whoop your ass!
+    <<set_flag guard_angry true>>
+    <<jump guard_threat>>
+===
+
+title: flag_guard_angry
+tags: flag_guard_angry
+---
+YOU again! Go away!.
+===
+
+title: guard_polite
+---
+Then have a great day!
+===
+
+title: guard_threat
+---
+Don't make me Angry!
+I am gonna whoop your ass!
+===
