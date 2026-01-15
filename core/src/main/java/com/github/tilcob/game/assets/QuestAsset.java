@@ -4,16 +4,10 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 public enum QuestAsset {
-    MAIN("main.json"),
-    HOUSE("house.json"),;
-
-    private final String fileName;
-
-    QuestAsset(String fileName) {
-        this.fileName = fileName;
-    }
+    Welcome_To_Town,
+    Talk_To_Jakob,;
 
     public FileHandle getFile() {
-        return Gdx.files.internal("quests/" + fileName);
+        return Gdx.files.internal("quests/" + name() + ".json");
     }
 }

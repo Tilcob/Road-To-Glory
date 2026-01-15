@@ -2,6 +2,7 @@ package com.github.tilcob.game.tiled;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -67,7 +68,7 @@ public class TiledAshleyConfigurator {
         addEntityController(object, entity);
         addEntityMove(tile, entity);
         addEntityAnimation(tile, entity);
-        BodyDef.BodyType bodyType = getObjectBodyType(tile);
+        BodyDef.BodyType bodyType = getObjectBodyType(tile, object);
         addEntityPhysic(tile.getObjects(), bodyType, Vector2.Zero, entity);
         addEntityCameraFollow(object, entity);
         addEntityLife(tile, entity);
@@ -186,14 +187,12 @@ public class TiledAshleyConfigurator {
         entity.add(new CameraFollow());
     }
 
-    private BodyDef.BodyType getObjectBodyType(TiledMapTile tile) {
+    private BodyDef.BodyType getObjectBodyType(TiledMapTile tile, MapObject object) {
         String classType = tile.getProperties().get(Constants.TYPE, "", String.class);
+        if (Constants.PROP.equals(classType)) return BodyDef.BodyType.StaticBody;
 
-        if (Constants.PROP.equals(classType)) {
-            return BodyDef.BodyType.StaticBody;
-        }
-
-        String bodyTypeStr = tile.getProperties().get(Constants.BODY_TYPE, "DynamicBody", String.class);
+        String bodyTypeStr = object.getProperties().get(Constants.BODY_TYPE, "", String.class);
+        if (bodyTypeStr.isBlank()) bodyTypeStr = tile.getProperties().get(Constants.BODY_TYPE, "DynamicBody", String.class);
         return BodyDef.BodyType.valueOf(bodyTypeStr);
     }
 
