@@ -1,13 +1,15 @@
 package com.github.tilcob.game.quest;
 
+import com.github.tilcob.game.assets.QuestAsset;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class QuestFactoryTest {
+class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
     void createQuestFromJsonAllowsNullRewardItems() {
@@ -26,5 +28,20 @@ class QuestFactoryTest {
         assertNotNull(quest.getReward());
         assertEquals(25, quest.getReward().money());
         assertTrue(quest.getReward().items().isEmpty());
+    }
+
+    @Test
+    void loadAllReadsQuestAssetJson() {
+        QuestFactory factory = new QuestFactory(new GameEventBus());
+
+        Quest quest = factory.loadAll(QuestAsset.Welcome_To_Town).get("Welcome_To_Town");
+
+        assertNotNull(quest);
+        assertEquals("Welcome_To_Town", quest.getQuestId());
+        assertEquals("Welcome to Town", quest.getTitle());
+        assertEquals(1, quest.getSteps().size());
+        assertNotNull(quest.getReward());
+        assertEquals(50, quest.getReward().money());
+        assertEquals(1, quest.getReward().items().size());
     }
 }

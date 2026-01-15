@@ -1,0 +1,11 @@
+{
+    "questId": "Talk_To_Jakob",
+    "title": "Talk To Jakob",
+    "description": "Introduce yourself to Jakob in town.",
+    "steps": [
+        {
+            "type": "talk",
+            "npc": "Npc-2"
+        }
+    ]
+}

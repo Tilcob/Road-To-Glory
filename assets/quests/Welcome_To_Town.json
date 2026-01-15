@@ -1,0 +1,17 @@
+{
+    "questId": "Welcome_To_Town",
+    "title": "Welcome to Town",
+    "description": "Get to know the locals and settle in.",
+    "steps": [
+        {
+            "type": "talk",
+            "npc": "Npc-2"
+        }
+    ],
+    "rewards": {
+        "gold": 50,
+        "items": [
+            "SWORD"
+        ]
+    }
+}

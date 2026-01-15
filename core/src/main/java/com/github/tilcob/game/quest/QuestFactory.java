@@ -27,15 +27,15 @@ public class QuestFactory {
 
     public Map<String, Quest> loadAll(QuestAsset asset) {
         try {
-            QuestFile file = mapper.readValue(asset.getFile().readString(), QuestFile.class);
+            QuestJson questJson = mapper.readValue(asset.getFile().readString(), QuestJson.class);
             Map<String, Quest> quests = new HashMap<>();
 
-            for (QuestJson q : file.quests) {
-                definitions.put(q.questId, q);
-                quests.put(q.questId, createQuestFromJson(q));
-            }
+            validateQuestId(asset, questJson);
+            definitions.put(questJson.questId, questJson);
+            quests.put(questJson.questId, createQuestFromJson(questJson));
+
             return quests;
-        } catch (JsonProcessingException e) {
+        } catch (IOException e) {
             throw new RuntimeException(e);
         }
     }
@@ -80,19 +80,23 @@ public class QuestFactory {
 
     private void loadAllDefinitions() {
         for (QuestAsset asset : QuestAsset.values()) {
-            QuestFile file;
+            QuestJson questJson;
             try {
-                file = mapper.readValue(asset.getFile().readString(), QuestFile.class);
+                questJson = mapper.readValue(asset.getFile().readString(), QuestJson.class);
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
-            for (QuestJson questJson : file.quests) {
-                definitions.put(questJson.questId, questJson);
-            }
+            validateQuestId(asset, questJson);
+            definitions.put(questJson.questId, questJson);
         }
     }
 
-    public record QuestFile(List<QuestJson> quests) { }
+    private void validateQuestId(QuestAsset asset, QuestJson questJson) {
+        if (!asset.name().equals(questJson.questId)) {
+            throw new IllegalStateException("Quest ID mismatch for asset " + asset.name()
+                + ": expected " + asset.name() + " but found " + questJson.questId);
+        }
+    }
 
     public record QuestJson(String questId, String title, String description, List<StepJson> steps, RewardJson rewards) { }
 
