@@ -7,6 +7,7 @@ import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
@@ -16,10 +17,7 @@ import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
-import com.github.tilcob.game.event.AutosaveEvent;
-import com.github.tilcob.game.event.MapChangeEvent;
-import com.github.tilcob.game.event.PauseEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -41,6 +39,7 @@ import java.util.function.Consumer;
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
+    private final Group gameUiGroup;
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
@@ -57,14 +56,13 @@ public class GameScreen extends ScreenAdapter {
     private InputManager inputManager;
     private Entity player;
     private ActiveEntityReference activeEntityReference;
-    private GameView gameView;
-    private InventoryView inventoryView;
     private PauseView pauseView;
     private boolean paused;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
         this.uiViewport = uiViewport;
+        this.gameUiGroup = new Group();
     }
 
     void initialize(GameScreenModule.Dependencies dependencies) {
@@ -99,10 +97,10 @@ public class GameScreen extends ScreenAdapter {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState, uiControllerState);
 
-        gameView = new GameView(skin, stage, gameViewModel);
-        stage.addActor(gameView);
-        inventoryView = new InventoryView(skin, stage, inventoryViewModel);
-        stage.addActor(inventoryView);
+        stage.addActor(gameUiGroup);
+        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
+        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
+
         pauseView = new PauseView(skin, stage, pauseViewModel);
         pauseView.setVisible(false);
         stage.addActor(pauseView);
@@ -190,8 +188,7 @@ public class GameScreen extends ScreenAdapter {
         }
         this.paused = paused;
         pauseView.setVisible(paused);
-        gameView.setVisible(!paused);
-        inventoryView.setVisible(!paused);
+        gameUiGroup.setVisible(!paused);
         if (paused) {
             pauseView.toFront();
             pauseView.resetSelection();
