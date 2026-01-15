@@ -58,6 +58,7 @@ public class GameScreen extends ScreenAdapter {
     private Entity player;
     private ActiveEntityReference activeEntityReference;
     private GameView gameView;
+    private InventoryView inventoryView;
     private PauseView pauseView;
     private boolean paused;
 
@@ -100,7 +101,8 @@ public class GameScreen extends ScreenAdapter {
 
         gameView = new GameView(skin, stage, gameViewModel);
         stage.addActor(gameView);
-        stage.addActor(new InventoryView(skin, stage, inventoryViewModel));
+        inventoryView = new InventoryView(skin, stage, inventoryViewModel);
+        stage.addActor(inventoryView);
         pauseView = new PauseView(skin, stage, pauseViewModel);
         pauseView.setVisible(false);
         stage.addActor(pauseView);
@@ -189,8 +191,10 @@ public class GameScreen extends ScreenAdapter {
         this.paused = paused;
         pauseView.setVisible(paused);
         gameView.setVisible(!paused);
+        inventoryView.setVisible(!paused);
         if (paused) {
             pauseView.toFront();
+            pauseView.resetSelection();
             inputManager.setActiveState(UiControllerState.class);
         } else {
             inputManager.setActiveState(GameControllerState.class);

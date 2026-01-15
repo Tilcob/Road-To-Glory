@@ -119,6 +119,13 @@ public class PauseView extends View<PauseViewModel> {
         }
     }
 
+    public void resetSelection() {
+        Group resumeItem = findActor(PauseOption.RESUME.name());
+        if (resumeItem != null) {
+            selectMenuItem(resumeItem);
+        }
+    }
+
     private enum PauseOption {
         RESUME,
         QUIT
