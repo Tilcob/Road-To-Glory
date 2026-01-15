@@ -82,6 +82,10 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
+        if (RewardDialogState.MAPPER.get(player) != null) {
+            eventBus.fire(new DialogAdvanceEvent(player));
+            return;
+        }
         DialogSession dialogSession = DialogSession.MAPPER.get(player);
         if (dialogSession != null) {
             if (dialogSession.isAwaitingChoice()) {

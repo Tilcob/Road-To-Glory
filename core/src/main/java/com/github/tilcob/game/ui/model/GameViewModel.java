@@ -1,5 +1,6 @@
 package com.github.tilcob.game.ui.model;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -8,6 +9,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Dialog;
 import com.github.tilcob.game.component.Npc;
+import com.github.tilcob.game.component.RewardDialogState;
 import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogChoice;
@@ -24,6 +26,7 @@ public class GameViewModel extends ViewModel {
     private Map.Entry<Vector2, Integer> playerDamage;
     private final Vector2 tmpVec2;
     private boolean rewardVisible;
+    private Entity rewardOwner;
 
     public GameViewModel(GameServices services, Viewport viewport) {
         super(services);
@@ -34,6 +37,7 @@ public class GameViewModel extends ViewModel {
         this.playerDamage = null;
         this.tmpVec2 = new Vector2();
         this.rewardVisible = false;
+        this.rewardOwner = null;
 
         getEventBus().subscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
         getEventBus().subscribe(DialogEvent.class, this::onDialog);
@@ -47,6 +51,7 @@ public class GameViewModel extends ViewModel {
         if (rewardVisible) {
             rewardVisible = false;
             this.propertyChangeSupport.firePropertyChange(Constants.HIDE_REWARD_DIALOG, null, true);
+            clearRewardOwner();
         }
 
         String speaker = "NPC";
@@ -86,6 +91,7 @@ public class GameViewModel extends ViewModel {
         if (!rewardVisible) return;
         rewardVisible = false;
         this.propertyChangeSupport.firePropertyChange(Constants.HIDE_REWARD_DIALOG, null, true);
+        clearRewardOwner();
     }
 
     private void onRewardGranted(RewardGrantedEvent event) {
@@ -98,7 +104,19 @@ public class GameViewModel extends ViewModel {
             : event.questTitle();
         RewardDisplay display = new RewardDisplay(title, event.reward().money(), items);
         rewardVisible = true;
+        rewardOwner = event.player();
+        if (rewardOwner != null) {
+            rewardOwner.add(new RewardDialogState());
+        }
         this.propertyChangeSupport.firePropertyChange(Constants.SHOW_REWARD_DIALOG, null, display);
+    }
+
+    private void clearRewardOwner() {
+        if (rewardOwner == null) {
+            return;
+        }
+        rewardOwner.remove(RewardDialogState.class);
+        rewardOwner = null;
     }
 
     public void playerDamage(int amount, float x, float y) {
