@@ -82,10 +82,23 @@ public class InventoryViewModel extends ViewModel {
     private void onPauseEvent(PauseEvent event) {
         if (event == null) return;
         switch (event.action()) {
-            case PAUSE -> paused = true;
+            case PAUSE -> {
+                paused = true;
+                closeInventory();
+            }
             case RESUME -> paused = false;
-            case TOGGLE -> paused = !paused;
+            case TOGGLE -> {
+                paused = !paused;
+                if (paused) closeInventory();
+            }
         }
+    }
+
+    private void closeInventory() {
+        if (!open) return;
+        boolean old = true;
+        open = false;
+        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, false);
     }
 
     @Override
