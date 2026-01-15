@@ -10,14 +10,23 @@ import java.util.Map;
 
 public class DialogLoader {
     private final Json json;
+    private final YarnDialogLoader yarnDialogLoader;
 
     public DialogLoader() {
         this.json = new Json();
+        this.yarnDialogLoader = new YarnDialogLoader();
         json.setIgnoreDeprecated(true);
     }
 
     public Map<String, DialogData> load(DialogAsset asset) {
         FileHandle file = asset.getFileHandle();
+
+        if ("yarn".equalsIgnoreCase(file.extension())) {
+            Map<String, DialogData> dialogs = new HashMap<>();
+            dialogs.put(file.nameWithoutExtension(), yarnDialogLoader.load(file));
+            return dialogs;
+        }
+
         MapDialogData mapDialogData = json.fromJson(MapDialogData.class, file);
         Map<String, DialogData> dialogs = new HashMap<>();
         if (mapDialogData == null || mapDialogData.getNpcs() == null) {

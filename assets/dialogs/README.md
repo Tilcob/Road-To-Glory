@@ -1,5 +1,58 @@
 # Dialog JSON conventions
 
+## Yarn Spinner (.yarn) conventions
+
+Yarn dialog files are parsed with the **Yarn Spinner Java** format (dependency `org.yarnspinner:yarnspinner:2.4.0`). The loader expects the standard header/body separators:
+
+- Header fields like `title:` and optional `tags:`
+- `---` marks the start of the body
+- `===` ends a node
+
+### Node → `DialogData` mapping
+
+- `title:` becomes `DialogNode.id`
+- Body lines (non-command lines) become `DialogNode.lines`
+- `-> Option text` becomes a `DialogChoice` with `text = "Option text"`
+- Indented lines under an option become `DialogChoice.lines`
+- `<<jump NodeId>>` or `<<goto NodeId>>` inside an option sets `DialogChoice.next`
+
+### Entry points and tags
+
+Use tags to decide how nodes populate the top-level dialog fields:
+
+- Tag `idle` supplies `DialogData.idle`
+- Tag `root` or `start` supplies `DialogData.choices`
+- All other nodes are added to `DialogData.nodes`
+
+If no tagged root exists, the loader falls back to the node named `Start`.
+
+### File name → NPC mapping
+
+Each `.yarn` file produces a single `DialogData` entry keyed by the file name (without extension). For example, `Shopkeeper.yarn` creates the dialog entry `Shopkeeper`.
+
+### Example
+
+```yarn
+title: Start
+tags: root
+---
+Hello there.
+-> Show me your wares.
+    <<jump shop_wares>>
+===
+
+title: Idle
+tags: idle
+---
+Welcome in my shop!
+===
+
+title: shop_wares
+---
+I'm still setting up. Come back soon!
+===
+```
+
 ## Effects
 
 Dialog effects are intentionally limited to quest and flag state changes:

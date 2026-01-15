@@ -13,6 +13,13 @@ public class DialogChoice {
         this.lines = lines;
     }
 
+    public DialogChoice(String text, Array<String> lines, Array<DialogEffect> effects, String next) {
+        this.text = text;
+        this.lines = lines;
+        this.effects = effects;
+        this.next = next;
+    }
+
     public DialogChoice() {
     }
 
