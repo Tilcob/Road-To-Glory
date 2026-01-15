@@ -11,6 +11,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.ui.model.DialogChoiceDisplay;
 import com.github.tilcob.game.ui.model.DialogDisplay;
 import com.github.tilcob.game.ui.model.GameViewModel;
+import com.github.tilcob.game.ui.model.RewardDisplay;
 import com.github.tommyettinger.textra.TextraLabel;
 import com.github.tommyettinger.textra.TypingLabel;
 
@@ -24,6 +25,11 @@ public class GameView extends View<GameViewModel> {
     private final TextraLabel dialogProgressLabel;
     private VerticalGroup dialogChoices;
     private TextraLabel dialogHintLabel;
+    private final Table rewardContainer;
+    private final TextraLabel rewardTitleLabel;
+    private final TextraLabel rewardGoldLabel;
+    private final VerticalGroup rewardItems;
+    private final TextraLabel rewardHintLabel;
 
     public GameView(Skin skin, Stage stage, GameViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -34,6 +40,12 @@ public class GameView extends View<GameViewModel> {
         this.dialogProgressLabel = findActor("dialogProgress");
         this.dialogChoices = findActor("dialogChoices");
         this.dialogHintLabel = findActor("dialogHint");
+        this.rewardContainer = findActor("rewardContainer");
+        this.rewardTitleLabel = findActor("rewardTitle");
+        this.rewardGoldLabel = findActor("rewardGold");
+        this.rewardItems = findActor("rewardItems");
+        this.rewardHintLabel = findActor("rewardHint");
+
         updateLife(viewModel.getLifePoints());
     }
 
@@ -89,9 +101,37 @@ public class GameView extends View<GameViewModel> {
         dialogBox.add(dialogChoiceGroup).expandX().fillX().left().padTop(6f).row();
         dialogBox.add(continueLabel).right().padTop(6f);
 
-        row();
-        add().expandY();
-        row();
+        Table rewardBox = new Table(skin);
+        rewardBox.setName("rewardContainer");
+        rewardBox.setBackground(skin.getDrawable("Other_panel_brown"));
+        rewardBox.pad(8f, 12f, 8f, 12f);
+        rewardBox.setVisible(false);
+
+        TextraLabel rewardTitle = new TextraLabel("Quest Reward", skin, "text_12");
+        rewardTitle.setName("rewardTitle");
+        rewardTitle.setColor(skin.getColor("BLACK"));
+
+        TextraLabel rewardGold = new TextraLabel("", skin, "text_10");
+        rewardGold.setName("rewardGold");
+        rewardGold.setColor(skin.getColor("BLACK"));
+
+        VerticalGroup rewardItemsGroup = new VerticalGroup();
+        rewardItemsGroup.setName("rewardItems");
+        rewardItemsGroup.align(Align.left);
+        rewardItemsGroup.space(2f);
+
+        TextraLabel rewardHint = new TextraLabel("Continue with E", skin, "text_08");
+        rewardHint.setName("rewardHint");
+        rewardHint.setColor(skin.getColor("BLACK"));
+
+        rewardBox.add(rewardTitle).center().row();
+        rewardBox.add(rewardGold).center().padTop(4f).row();
+        rewardBox.add(rewardItemsGroup).expand().center().padTop(4f).row();
+        rewardBox.add(rewardHint).right().padTop(6f).row();
+
+        add().expandY().row();
+
+        add(rewardBox).expand().center().padLeft(10f).padRight(10f).padBottom(8f).row();
         add(dialogBox).expandX().fillX().bottom().padLeft(10f).padRight(10f).padBottom(8f);
     }
 
@@ -103,6 +143,8 @@ public class GameView extends View<GameViewModel> {
         viewModel.onPropertyChange(Constants.HIDE_DIALOG, Boolean.class, value -> hideDialog());
         viewModel.onPropertyChange(Constants.SHOW_DIALOG_CHOICES, DialogChoiceDisplay.class, this::showChoices);
         viewModel.onPropertyChange(Constants.HIDE_DIALOG_CHOICES, Boolean.class, value -> hideChoices());
+        viewModel.onPropertyChange(Constants.SHOW_REWARD_DIALOG, RewardDisplay.class, this::showRewardDialog);
+        viewModel.onPropertyChange(Constants.HIDE_REWARD_DIALOG, Boolean.class, value -> hideRewardDialog());
     }
 
     private void showDialog(DialogDisplay display) {
@@ -122,6 +164,28 @@ public class GameView extends View<GameViewModel> {
         dialogProgressLabel.setText("");
         speakerLabel.setText("");
         hideChoices();
+    }
+
+    private void showRewardDialog(RewardDisplay display) {
+        rewardContainer.setVisible(true);
+        rewardTitleLabel.setText(display.title());
+        rewardGoldLabel.setText(display.money() > 0 ? "Money: " + display.money() : "");
+        rewardItems.clearChildren();
+        if (display.items() != null) {
+            for (String item : display.items()) {
+                TextraLabel itemLabel = new TextraLabel("Item: " + item, skin, "text_10");
+                itemLabel.setColor(skin.getColor("BLACK"));
+                rewardItems.addActor(itemLabel);
+            }
+        }
+        rewardHintLabel.setText("Continue with E");
+    }
+
+    private void hideRewardDialog() {
+        rewardContainer.setVisible(false);
+        rewardTitleLabel.setText("");
+        rewardGoldLabel.setText("");
+        rewardItems.clearChildren();
     }
 
     private void showChoices(DialogChoiceDisplay display) {

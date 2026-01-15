@@ -15,6 +15,7 @@ public class QuestLoader {
     public Quest loadQuest(QuestState state) {
         Quest quest = factory.create(state.getQuestId());
         quest.setCurrentStep(state.getCurrentStep());
+        quest.setRewardClaimed(state.isRewardClaimed());
 
         List<Object> data = state.getStepData();
         List<QuestStep> steps = quest.getSteps();

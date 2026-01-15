@@ -3,12 +3,7 @@ package com.github.tilcob.game.ai;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
-import com.github.tilcob.game.ai.state.ChaseState;
-import com.github.tilcob.game.ai.state.IdleState;
-import com.github.tilcob.game.ai.state.PatrolState;
-import com.github.tilcob.game.ai.state.ReturnState;
-import com.github.tilcob.game.ai.state.TalkingState;
-import com.github.tilcob.game.ai.state.WanderState;
+import com.github.tilcob.game.ai.state.*;
 
 public enum NpcState implements State<Entity> {
     IDLE(new IdleState()),

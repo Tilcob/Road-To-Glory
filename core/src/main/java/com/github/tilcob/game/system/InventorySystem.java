@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
+import com.badlogic.gdx.utils.ObjectIntMap;
 import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
@@ -11,7 +12,6 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemType;
-import com.badlogic.gdx.utils.ObjectIntMap;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;

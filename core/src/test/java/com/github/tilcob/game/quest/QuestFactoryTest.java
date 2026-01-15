@@ -5,9 +5,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 class QuestFactoryTest {
 
@@ -26,7 +24,7 @@ class QuestFactoryTest {
         Quest quest = factory.createQuestFromJson(questJson);
 
         assertNotNull(quest.getReward());
-        assertEquals(25, quest.getReward().gold());
+        assertEquals(25, quest.getReward().money());
         assertTrue(quest.getReward().items().isEmpty());
     }
 }

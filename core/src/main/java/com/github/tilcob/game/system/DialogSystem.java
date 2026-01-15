@@ -12,6 +12,7 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
 
 import java.util.Map;
@@ -74,6 +75,11 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestState questState = questLog.getQuestStateById(questId);
         if (questState == QuestState.NOT_STARTED) {
             eventBus.fire(new AddQuestEvent(player, questId));
+        }
+
+        Quest quest = questLog.getQuestById(questId);
+        if (quest != null && quest.isCompleted() && !quest.isRewardClaimed()) {
+            eventBus.fire(new QuestRewardEvent(player, questId));
         }
 
         Telegram telegram = new Telegram();

@@ -12,6 +12,7 @@ public class Quest {
     private final QuestReward reward;
     private final List<QuestStep> steps = new ArrayList<>();
     private int currentStep = 0;
+    private boolean rewardClaimed = false;
 
     public Quest(String questId, String title, String description) {
         this(questId, title, description, null);
@@ -58,5 +59,13 @@ public class Quest {
 
     public boolean isCompleted() {
         return currentStep == steps.size();
+    }
+
+    public boolean isRewardClaimed() {
+        return rewardClaimed;
+    }
+
+    public void setRewardClaimed(boolean rewardClaimed) {
+        this.rewardClaimed = rewardClaimed;
     }
 }

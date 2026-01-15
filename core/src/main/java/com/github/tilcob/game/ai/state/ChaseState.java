@@ -1,18 +1,13 @@
 package com.github.tilcob.game.ai.state;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
-import com.github.tilcob.game.component.AggroMemory;
-import com.github.tilcob.game.component.MoveIntent;
-import com.github.tilcob.game.component.NpcFsm;
-import com.github.tilcob.game.component.SpawnPoint;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.component.Attack;
-import com.badlogic.gdx.Gdx;
 
 public class ChaseState implements State<Entity> {
 
