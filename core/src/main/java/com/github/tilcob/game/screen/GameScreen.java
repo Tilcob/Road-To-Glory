@@ -3,6 +3,7 @@ package com.github.tilcob.game.screen;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -10,6 +11,7 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
@@ -63,6 +65,7 @@ public class GameScreen extends ScreenAdapter {
         this.services = services;
         this.uiViewport = uiViewport;
         this.gameUiGroup = new Group();
+        this.gameUiGroup.setSize(uiViewport.getWorldWidth(), uiViewport.getWorldHeight());
     }
 
     void initialize(GameScreenModule.Dependencies dependencies) {
@@ -90,6 +93,7 @@ public class GameScreen extends ScreenAdapter {
     public void resize(int width, int height) {
         super.resize(width, height);
         uiViewport.update(width, height, true);
+        gameUiGroup.setSize(uiViewport.getWorldWidth(), uiViewport.getWorldHeight());
     }
 
     @Override
@@ -105,7 +109,6 @@ public class GameScreen extends ScreenAdapter {
         pauseView.setVisible(false);
         stage.addActor(pauseView);
         paused = false;
-
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
