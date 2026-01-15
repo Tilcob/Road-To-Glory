@@ -1,11 +1,13 @@
 title: Start
 tags: root start
+position: 55,-25
 ---
 Welcome to my shop.
 ===
 
 title: Idle
 tags: idle
+position: 339,-28
 ---
 Take your time browsing.
 ===

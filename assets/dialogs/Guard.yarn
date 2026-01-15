@@ -1,5 +1,6 @@
 title: idle
 tags: idle
+position: -50,-138
 ---
 Good day my friend!
 Don't anger the guard!
@@ -7,6 +8,7 @@ Don't anger the guard!
 
 title: start
 tags: start, root
+position: -79,26
 ---
 -> In wont sir.
     Then have a great day!
@@ -21,16 +23,19 @@ tags: start, root
 
 title: flag_guard_angry
 tags: flag_guard_angry
+position: -23,188
 ---
 YOU again! Go away!.
 ===
 
 title: guard_polite
+position: 440,172
 ---
 Then have a great day!
 ===
 
 title: guard_threat
+position: 491,-126
 ---
 Don't make me Angry!
 I am gonna whoop your ass!
