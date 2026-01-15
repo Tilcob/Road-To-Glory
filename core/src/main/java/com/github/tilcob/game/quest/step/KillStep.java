@@ -19,7 +19,7 @@ public class KillStep implements QuestStep {
     }
 
     @Override
-    public boolean isCompleted() {
+    public boolean completed() {
         return completed;
     }
 

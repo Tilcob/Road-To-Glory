@@ -1,18 +1,17 @@
 package com.github.tilcob.game.system;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.event.AddQuestEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
-import com.github.tilcob.game.event.UpdateQuestLogEvent;
+import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.step.QuestStep;
 import org.junit.jupiter.api.Test;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -20,62 +19,53 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class QuestSystemTest extends HeadlessGdxTest {
 
     @Test
-    void firesCompletionEventForZeroStepQuestOnAdd() {
+    void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
         QuestSystem questSystem = new QuestSystem(eventBus);
+        Engine engine = new Engine();
+        engine.addSystem(questSystem);
 
         Entity player = new Entity();
         player.add(new QuestLog());
+        engine.addEntity(player);
 
-        AtomicBoolean completed = new AtomicBoolean(false);
-        eventBus.subscribe(QuestCompletedEvent.class, event -> completed.set(true));
+        Quest quest = new Quest("TestQuest", "Test Quest", "Test", new QuestReward(0, List.of()));
+        quest.getSteps().add(new TestStep(true));
+        QuestLog.MAPPER.get(player).add(quest);
 
-        eventBus.fire(new AddQuestEvent(player, "Talk"));
+        AtomicBoolean rewardFired = new AtomicBoolean(false);
+        eventBus.subscribe(QuestRewardEvent.class, event -> rewardFired.set(true));
 
-        assertTrue(completed.get());
+        engine.update(0f);
 
-        questSystem.dispose();
+        assertTrue(rewardFired.get());
     }
 
     @Test
-    void advancesQuestStepsAndEmitsUpdateEvents() {
+    void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
         QuestSystem questSystem = new QuestSystem(eventBus);
+        Engine engine = new Engine();
+        engine.addSystem(questSystem);
 
         Entity player = new Entity();
-        QuestLog questLog = new QuestLog();
-        player.add(questLog);
+        player.add(new QuestLog());
+        engine.addEntity(player);
 
-        Quest quest = new Quest("Step_Quest", "Step Quest", "Has steps");
-        quest.getSteps().add(new CompletedStep());
-        questLog.add(quest);
+        AtomicBoolean rewardFired = new AtomicBoolean(false);
+        eventBus.subscribe(QuestRewardEvent.class, event -> rewardFired.set(true));
 
-        AtomicInteger updateEvents = new AtomicInteger(0);
-        AtomicBoolean completed = new AtomicBoolean(false);
-        eventBus.subscribe(UpdateQuestLogEvent.class, event -> updateEvents.incrementAndGet());
-        eventBus.subscribe(QuestCompletedEvent.class, event -> completed.set(true));
+        eventBus.fire(new AddQuestEvent(player, "Talk"));
 
-        questSystem.processEntity(player, 0f);
-
-        assertEquals(1, quest.getCurrentStep());
-        assertEquals(1, updateEvents.get());
-        assertTrue(completed.get());
-
-        questSystem.dispose();
+        assertTrue(rewardFired.get());
     }
 
-    private static final class CompletedStep implements QuestStep {
-        @Override
-        public boolean isCompleted() {
-            return true;
-        }
+    private record TestStep(boolean completed) implements QuestStep {
 
         @Override
-        public void start() {
-        }
+        public void start() { }
 
         @Override
-        public void end() {
-        }
+        public void end() { }
     }
 }

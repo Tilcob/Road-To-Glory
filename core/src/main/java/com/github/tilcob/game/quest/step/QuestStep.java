@@ -2,7 +2,7 @@ package com.github.tilcob.game.quest.step;
 
 
 public interface QuestStep {
-    boolean isCompleted();
+    boolean completed();
     void start();
     void end();
 

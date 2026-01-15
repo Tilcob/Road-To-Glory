@@ -34,7 +34,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
     void loadAllReadsQuestAssetJson() {
         QuestFactory factory = new QuestFactory(new GameEventBus());
 
-        Quest quest = factory.loadAll(QuestAsset.Welcome_To_Town).get("Welcome_To_Town");
+        Quest quest = factory.loadAll(QuestAsset.welcome_to_town).get("welcome_to_town");
 
         assertNotNull(quest);
         assertEquals("Welcome_To_Town", quest.getQuestId());

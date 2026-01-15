@@ -9,6 +9,11 @@ public class DialogFlagDialog {
     public DialogFlagDialog() {
     }
 
+    public DialogFlagDialog(String flag, Array<String> lines) {
+        this.flag = flag;
+        this.lines = lines;
+    }
+
     public String flag() {
         return flag;
     }

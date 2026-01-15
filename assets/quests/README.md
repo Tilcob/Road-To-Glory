@@ -6,7 +6,7 @@ name) must equal the `questId`.
 ## Rewards
 
 Quests can optionally define a `rewards` object. Rewards are awarded when the quest is
-completed (via `QuestCompletedEvent`). Rewards belong to quests, not dialog effects.
+completed (via `QuestRewardEvent`). Rewards belong to quests, not dialog effects.
 
 Supported fields:
 

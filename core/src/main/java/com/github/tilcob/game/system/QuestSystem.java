@@ -5,10 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.event.AddQuestEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
-import com.github.tilcob.game.event.UpdateQuestLogEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.step.QuestStep;
@@ -39,7 +36,7 @@ public class QuestSystem extends IteratingSystem implements Disposable {
             int currentStep = quest.getCurrentStep();
             QuestStep step = quest.getSteps().get(currentStep);
 
-            if (step.isCompleted()) {
+            if (step.completed()) {
                 quest.incCurrentStep();
                 updated = true;
 

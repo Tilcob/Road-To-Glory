@@ -93,6 +93,55 @@ class YarnDialogLoaderTest {
         assertEquals("Npc-2", effects.get(2).target());
     }
 
+    @Test
+    void parsesQuestAndFlagDialogsFromTags() throws IOException {
+        String yarn = """
+            title: Idle
+            tags: idle
+            ---
+            Idle line.
+            ===
+
+            title: quest_Welcome_To_Town_notStarted
+            tags: quest_Welcome_To_Town, notstarted
+            ---
+            Welcome in our town!
+            ===
+
+            title: quest_Welcome_To_Town_inProgress
+            tags: quest_Welcome_To_Town, inprogress
+            ---
+            Are you new here?
+            ===
+
+            title: quest_Welcome_To_Town_completed
+            tags: quest_Welcome_To_Town, completed
+            ---
+            By my friend!
+            ===
+
+            title: flag_shop_seen
+            tags: flag_shop_seen
+            ---
+            Good to see you again.
+            ===
+            """;
+        FileHandle fileHandle = writeTempYarn("npc", yarn);
+        YarnDialogLoader loader = new YarnDialogLoader();
+
+        DialogData dialogData = loader.load(fileHandle);
+
+        assertNotNull(dialogData.questDialog());
+        assertEquals("Welcome_To_Town", dialogData.questDialog().questId());
+        assertEquals("Welcome in our town!", dialogData.questDialog().notStarted().first());
+        assertEquals("Are you new here?", dialogData.questDialog().inProgress().first());
+        assertEquals("By my friend!", dialogData.questDialog().completed().first());
+        assertNotNull(dialogData.flagDialogs());
+        assertEquals(1, dialogData.flagDialogs().size);
+        assertEquals("shop_seen", dialogData.flagDialogs().first().flag());
+        assertEquals("Good to see you again.", dialogData.flagDialogs().first().lines().first());
+    }
+
     private FileHandle writeTempYarn(String name, String content) throws IOException {
         Path file = tempDir.resolve(name + ".yarn");
         Files.writeString(file, content);

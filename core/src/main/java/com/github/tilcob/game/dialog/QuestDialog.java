@@ -17,6 +17,15 @@ public class QuestDialog {
         this.completed = completed;
     }
 
+    public QuestDialog(String questId, Array<String> notStarted, Array<String> inProgress, Array<String> completed,
+                       ObjectMap<String, Array<String>> stepDialogs) {
+        this.questId = questId;
+        this.notStarted = notStarted;
+        this.inProgress = inProgress;
+        this.completed = completed;
+        this.stepDialogs = stepDialogs;
+    }
+
     public QuestDialog() {}
 
     public String questId() {

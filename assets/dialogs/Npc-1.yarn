@@ -2,14 +2,12 @@ title: npc_1_start
 tags: root start
 position: -230,-225
 ---
--> Hallo!
-  <<add_quest Welcome_To_Town>>
-  <<jump quest_Welcome_To_Town_notStarted>>
+<<add_quest welcome_to_town>>
 ===
 
 title: npc_1_idle
 tags: idle
-position: 107,39
+position: 168,9
 ---
 Good day sir.
 Take care.
@@ -17,7 +15,7 @@ Take care.
 
 title: quest_Welcome_To_Town_notStarted
 tags: quest_Welcome_To_Town, notstarted
-position: 73,-130
+position: 184,-245
 ---
 Welcome in our town!
 ===

@@ -2,6 +2,7 @@ package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.event.QuestStepEvent;
 
 import java.util.*;
@@ -17,13 +18,53 @@ public class YarnDialogLoader {
         Array<String> idleLines = idleNode == null ? new Array<>() : toGdxArray(idleNode.lines);
         Array<DialogChoice> rootChoices = rootNode == null ? new Array<>() : toChoiceArray(rootNode.choices);
         Array<DialogNode> nodes = new Array<>();
+        Array<DialogFlagDialog> flagDialogs = new Array<>();
+        QuestDialog questDialog = null;
+        String questId = null;
+        Array<String> questNotStarted = null;
+        Array<String> questInProgress = null;
+        Array<String> questCompleted = null;
+        ObjectMap<String, Array<String>> stepDialogs = new ObjectMap<>();
+
         for (ParsedNode parsedNode : parsedNodes) {
             if (parsedNode == rootNode || parsedNode == idleNode) {
                 continue;
             }
+
+            String questTag = findQuestTag(parsedNode.tags);
+            if (questTag != null) {
+                questId = questTag;
+                Array<String> questLines = toGdxArray(parsedNode.lines);
+                if (parsedNode.tags.contains("notstarted")) {
+                    questNotStarted = questLines;
+                } else if (parsedNode.tags.contains("inprogress")) {
+                    questInProgress = questLines;
+                } else if (parsedNode.tags.contains("completed")) {
+                    questCompleted = questLines;
+                } else {
+                    String stepIndex = findStepIndex(parsedNode.tags);
+                    if (stepIndex != null) {
+                        stepDialogs.put(stepIndex, questLines);
+                    }
+                }
+                continue;
+            }
+            String flagTag = findFlagTag(parsedNode.tags);
+            if (flagTag != null) {
+                flagDialogs.add(new DialogFlagDialog(flagTag, toGdxArray(parsedNode.lines)));
+                continue;
+            }
+
             nodes.add(new DialogNode(parsedNode.id, toGdxArray(parsedNode.lines), toChoiceArray(parsedNode.choices)));
         }
-        return new DialogData(idleLines, rootChoices, null, null, nodes);
+
+        if (questId != null) {
+            ObjectMap<String, Array<String>> stepDialogMap = stepDialogs.size == 0 ? null : stepDialogs;
+            questDialog = new QuestDialog(questId, defaultLines(questNotStarted),
+                defaultLines(questInProgress), defaultLines(questCompleted), stepDialogMap);
+        }
+        Array<DialogFlagDialog> flagDialogArray = flagDialogs.size == 0 ? null : flagDialogs;
+        return new DialogData(idleLines, rootChoices, flagDialogArray, questDialog, nodes);
     }
 
     private static ParsedNode findTaggedNode(List<ParsedNode> parsedNodes, String... tags) {
@@ -221,6 +262,37 @@ public class YarnDialogLoader {
             array.add(line);
         }
         return array;
+    }
+
+    private static Array<String> defaultLines(Array<String> lines) {
+        return lines == null ? new Array<>() : lines;
+    }
+
+    private static String findQuestTag(Set<String> tags) {
+        for (String tag : tags) {
+            if (tag.startsWith("quest_") && tag.length() > "quest_".length()) {
+                return tag.substring("quest_".length());
+            }
+        }
+        return null;
+    }
+
+    private static String findFlagTag(Set<String> tags) {
+        for (String tag : tags) {
+            if (tag.startsWith("flag_") && tag.length() > "flag_".length()) {
+                return tag.substring("flag_".length());
+            }
+        }
+        return null;
+    }
+
+    private static String findStepIndex(Set<String> tags) {
+        for (String tag : tags) {
+            if (tag.startsWith("step_") && tag.length() > "step_".length()) {
+                return tag.substring("step_".length());
+            }
+        }
+        return null;
     }
 
     private static Array<DialogEffect> toGdxEffectArray(List<DialogEffect> effects) {

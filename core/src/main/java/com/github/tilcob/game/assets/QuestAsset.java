@@ -4,11 +4,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 
 public enum QuestAsset {
-    Welcome_To_Town,
-    Talk_To_Jakob,
-    Talk,;
+    welcome_to_town,
+    talk_to_jakob,
+    talk,;
 
     public FileHandle getFile() {
-        return Gdx.files.internal("quests/" + name() + ".json");
+        return Gdx.files.internal("quests/" + name().toLowerCase() + ".json");
     }
 }

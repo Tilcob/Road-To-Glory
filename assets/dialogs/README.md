@@ -24,6 +24,19 @@ Use tags to decide how nodes populate the top-level dialog fields:
 
 If no tagged root exists, the loader falls back to the node named `Start`.
 
+### Quest and flag dialogs
+
+Quest and flag dialog lines are derived from tags on nodes:
+
+- Quest tags use the pattern `quest_<QuestId>` plus a status tag:
+    - `notstarted` → `QuestDialog.notStarted`
+    - `inprogress` → `QuestDialog.inProgress`
+    - `completed` → `QuestDialog.completed`
+- Optional step-specific dialogs use `quest_<QuestId>` plus `step_<index>` (0-based index).
+- Flag dialogs use the pattern `flag_<flagName>` and populate `DialogData.flagDialogs`.
+
+Nodes with quest or flag tags are not added to `DialogData.nodes`.
+
 ### File name → NPC mapping
 
 Each `.yarn` file produces a single `DialogData` entry keyed by the file name (without extension). For example, `Shopkeeper.yarn` creates the dialog entry `Shopkeeper`.
@@ -126,5 +139,36 @@ tags: root
 ---
 -> I spoke with the shopkeeper.
     <<quest_step TALK Npc-2>>
+===
+```
+### Example: quest dialog tags
+
+```yarn
+title: quest_Welcome_To_Town_notStarted
+tags: quest_Welcome_To_Town, notstarted
+---
+Welcome in our town!
+===
+
+title: quest_Welcome_To_Town_inProgress
+tags: quest_Welcome_To_Town, inprogress
+---
+Are you new here?
+===
+
+title: quest_Welcome_To_Town_completed
+tags: quest_Welcome_To_Town, completed
+---
+By my friend!
+===
+```
+
+### Example: flag dialog tags
+
+```yarn
+title: flag_shop_seen
+tags: flag_shop_seen
+---
+Good to see you again.
 ===
 ```
