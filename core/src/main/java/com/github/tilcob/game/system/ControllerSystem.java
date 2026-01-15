@@ -15,12 +15,10 @@ import java.util.Iterator;
 import java.util.Map;
 
 public class ControllerSystem extends IteratingSystem {
-    private final ScreenNavigator screenNavigator;
     private final GameEventBus eventBus;
 
-    public ControllerSystem(ScreenNavigator screenNavigator, GameEventBus eventBus) {
+    public ControllerSystem(GameEventBus eventBus) {
         super(Family.all(Controller.class).get());
-        this.screenNavigator = screenNavigator;
         this.eventBus = eventBus;
     }
 
@@ -48,10 +46,7 @@ public class ControllerSystem extends IteratingSystem {
                     if (choosingDialog) eventBus.fire(new DialogChoiceNavigateEvent(entity, 1));
                 }
                 case SELECT -> startEntityAttack(entity);
-                case CANCEL -> {
-                    screenNavigator.setScreen(MenuScreen.class);
-                    eventBus.fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
-                }
+                case PAUSE -> eventBus.fire(new PauseEvent(PauseEvent.Action.TOGGLE));
                 case INTERACT -> interact(entity);
                 case INVENTORY -> showEntityInventory(entity);
                 default -> {
