@@ -1,5 +1,8 @@
 # Quest JSON conventions
 
+Each quest lives in its own JSON file. The filename (and matching `QuestAsset` enum
+name) must equal the `questId`.
+
 ## Rewards
 
 Quests can optionally define a `rewards` object. Rewards are awarded when the quest is
@@ -10,7 +13,7 @@ Supported fields:
 - `money` (integer): currency amount added to the player's wallet.
 - `items` (array of strings): item type names matching `ItemType` entries.
 
-### Example
+### Example (single quest)
 
 ```json
 {
