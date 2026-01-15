@@ -26,6 +26,30 @@ public class DialogEffect {
     public DialogEffect() {
     }
 
+    public static DialogEffect addQuest(String questId) {
+        DialogEffect effect = new DialogEffect();
+        effect.type = EffectType.ADD_QUEST;
+        effect.questId = questId;
+        return effect;
+    }
+
+    public static DialogEffect setFlag(String flag, Boolean value) {
+        DialogEffect effect = new DialogEffect();
+        effect.type = EffectType.SET_FLAG;
+        effect.flag = flag;
+        effect.value = value;
+        return effect;
+    }
+
+    public static DialogEffect questStep(QuestStepEvent.Type stepType, String target) {
+        DialogEffect effect = new DialogEffect();
+        effect.type = EffectType.QUEST_STEP;
+        effect.stepType = stepType;
+        effect.target = target;
+        return effect;
+    }
+
+
     public EffectType type() {
         return type;
     }

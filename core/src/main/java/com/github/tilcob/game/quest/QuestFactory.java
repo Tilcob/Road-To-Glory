@@ -1,6 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tilcob.game.assets.QuestAsset;
 import com.github.tilcob.game.event.GameEventBus;

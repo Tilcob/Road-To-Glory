@@ -2,12 +2,9 @@ package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
+import com.github.tilcob.game.event.QuestStepEvent;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
+import java.util.*;
 
 public class YarnDialogLoader {
     private static final String HEADER_SEPARATOR = "---";
@@ -128,6 +125,9 @@ public class YarnDialogLoader {
                 if (tryApplyJump(trimmed, currentChoice)) {
                     continue;
                 }
+                if (tryApplyEffect(trimmed, currentChoice)) {
+                    continue;
+                }
                 if (!isCommand(trimmed)) {
                     currentChoice.lines.add(trimmed);
                 }
@@ -163,6 +163,50 @@ public class YarnDialogLoader {
         return false;
     }
 
+    private static boolean tryApplyEffect(String line, ChoiceBuilder builder) {
+        if (!isCommand(line)) {
+            return false;
+        }
+        String inner = line.substring(2, line.length() - 2).trim();
+        if (inner.isEmpty()) {
+            return false;
+        }
+        String[] parts = inner.split("\\s+");
+        String command = parts[0].toLowerCase(Locale.ROOT);
+        switch (command) {
+            case "set_flag" -> {
+                if (parts.length < 3) {
+                    return false;
+                }
+                String flag = parts[1];
+                Boolean value = Boolean.parseBoolean(parts[2]);
+                builder.effects.add(DialogEffect.setFlag(flag, value));
+                return true;
+            }
+            case "add_quest" -> {
+                if (parts.length < 2) {
+                    return false;
+                }
+                builder.effects.add(DialogEffect.addQuest(parts[1]));
+                return true;
+            }
+            case "quest_step" -> {
+                if (parts.length < 3) {
+                    return false;
+                }
+                QuestStepEvent.Type stepType = parseQuestStepType(parts[1]);
+                if (stepType == null) {
+                    return false;
+                }
+                builder.effects.add(DialogEffect.questStep(stepType, parts[2]));
+                return true;
+            }
+            default -> {
+                return false;
+            }
+        }
+    }
+
     private static boolean isCommand(String line) {
         return line.startsWith("<<") && line.endsWith(">>");
     }
@@ -179,12 +223,29 @@ public class YarnDialogLoader {
         return array;
     }
 
+    private static Array<DialogEffect> toGdxEffectArray(List<DialogEffect> effects) {
+        Array<DialogEffect> array = new Array<>();
+        for (DialogEffect effect : effects) {
+            array.add(effect);
+        }
+        return array;
+    }
+
     private static Array<DialogChoice> toChoiceArray(List<ChoiceBuilder> choices) {
         Array<DialogChoice> array = new Array<>();
         for (ChoiceBuilder choice : choices) {
             array.add(choice.toDialogChoice());
         }
         return array;
+    }
+
+    private static QuestStepEvent.Type parseQuestStepType(String raw) {
+        for (QuestStepEvent.Type type : QuestStepEvent.Type.values()) {
+            if (type.name().equalsIgnoreCase(raw)) {
+                return type;
+            }
+        }
+        return null;
     }
 
     private static final class ParsedNode {
@@ -202,6 +263,7 @@ public class YarnDialogLoader {
     private static final class ChoiceBuilder {
         private final String text;
         private final List<String> lines = new ArrayList<>();
+        private final List<DialogEffect> effects = new ArrayList<>();
         private String next;
 
         private ChoiceBuilder(String text) {
@@ -209,7 +271,8 @@ public class YarnDialogLoader {
         }
 
         private DialogChoice toDialogChoice() {
-            return new DialogChoice(text, toGdxArray(lines), null, next);
+            Array<DialogEffect> effectArray = effects.isEmpty() ? null : toGdxEffectArray(effects);
+            return new DialogChoice(text, toGdxArray(lines), effectArray, next);
         }
     }
 }

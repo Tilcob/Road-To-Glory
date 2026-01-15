@@ -4,7 +4,6 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.dialog.DialogData;
-import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.quest.Quest;
