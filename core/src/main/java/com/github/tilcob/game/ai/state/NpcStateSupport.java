@@ -4,12 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorRegistry;
-import com.github.tilcob.game.component.AggroMemory;
-import com.github.tilcob.game.component.Facing;
-import com.github.tilcob.game.component.Npc;
-import com.github.tilcob.game.component.PlayerReference;
-import com.github.tilcob.game.component.Physic;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 
 public final class NpcStateSupport {

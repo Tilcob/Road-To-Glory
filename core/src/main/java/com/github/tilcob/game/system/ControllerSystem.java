@@ -8,8 +8,6 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
-import com.github.tilcob.game.screen.MenuScreen;
-import com.github.tilcob.game.screen.ScreenNavigator;
 
 import java.util.Iterator;
 import java.util.Map;
@@ -93,6 +91,7 @@ public class ControllerSystem extends IteratingSystem {
             }
             return;
         }
+        eventBus.fire(new DialogAdvanceEvent(player));
 
         if (OpenChestRequest.MAPPER.get(player) != null) {
             OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);

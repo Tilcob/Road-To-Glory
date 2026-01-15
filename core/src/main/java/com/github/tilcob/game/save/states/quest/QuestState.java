@@ -9,6 +9,7 @@ import java.util.List;
 public class QuestState {
     private String questId;
     private int currentStep;
+    private boolean rewardClaimed;
     private List<Object> stepData = new ArrayList<>();
 
     public QuestState() {}
@@ -43,5 +44,13 @@ public class QuestState {
 
     public void setStepData(List<Object> stepData) {
         this.stepData = stepData;
+    }
+
+    public boolean isRewardClaimed() {
+        return rewardClaimed;
+    }
+
+    public void setRewardClaimed(boolean rewardClaimed) {
+        this.rewardClaimed = rewardClaimed;
     }
 }

@@ -108,6 +108,8 @@ public class Constants {
     public static final String HIDE_DIALOG = "hideDialog";
     public static final String SHOW_DIALOG_CHOICES = "showDialogChoices";
     public static final String HIDE_DIALOG_CHOICES = "hideDialogChoices";
+    public static final String SHOW_REWARD_DIALOG = "showRewardDialog";
+    public static final String HIDE_REWARD_DIALOG = "hideRewardDialog";
 
     // Player properties
     public static final int PLAYER_ID = 4;

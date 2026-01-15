@@ -7,7 +7,7 @@ completed (via `QuestCompletedEvent`). Rewards belong to quests, not dialog effe
 
 Supported fields:
 
-- `gold` (integer): currency amount added to the player's wallet.
+- `money` (integer): currency amount added to the player's wallet.
 - `items` (array of strings): item type names matching `ItemType` entries.
 
 ### Example
@@ -24,7 +24,7 @@ Supported fields:
     }
   ],
   "rewards": {
-    "gold": 50,
+    "money": 50,
     "items": [
       "SWORD"
     ]
