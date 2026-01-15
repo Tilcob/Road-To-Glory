@@ -37,7 +37,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
         Quest quest = factory.loadAll(QuestAsset.welcome_to_town).get("welcome_to_town");
 
         assertNotNull(quest);
-        assertEquals("Welcome_To_Town", quest.getQuestId());
+        assertEquals("welcome_to_town", quest.getQuestId());
         assertEquals("Welcome to Town", quest.getTitle());
         assertEquals(1, quest.getSteps().size());
         assertNotNull(quest.getReward());

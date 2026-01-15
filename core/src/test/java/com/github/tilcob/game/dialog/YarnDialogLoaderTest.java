@@ -132,7 +132,7 @@ class YarnDialogLoaderTest {
         DialogData dialogData = loader.load(fileHandle);
 
         assertNotNull(dialogData.questDialog());
-        assertEquals("Welcome_To_Town", dialogData.questDialog().questId());
+        assertEquals("welcome_to_town", dialogData.questDialog().questId());
         assertEquals("Welcome in our town!", dialogData.questDialog().notStarted().first());
         assertEquals("Are you new here?", dialogData.questDialog().inProgress().first());
         assertEquals("By my friend!", dialogData.questDialog().completed().first());

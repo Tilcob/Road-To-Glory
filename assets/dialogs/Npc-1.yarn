@@ -1,13 +1,21 @@
 title: npc_1_start
 tags: root start
-position: -230,-225
+position: -333,-348
 ---
-<<add_quest welcome_to_town>>
+-> Hello.
+  <<jump npc_1_router>>
+===
+
+title: npc_1_router
+position: -42,-322
+---
+-> ...
+  <<jump quest_Welcome_To_Town_notStarted>>
 ===
 
 title: npc_1_idle
 tags: idle
-position: 168,9
+position: -336,-163
 ---
 Good day sir.
 Take care.
@@ -15,21 +23,39 @@ Take care.
 
 title: quest_Welcome_To_Town_notStarted
 tags: quest_Welcome_To_Town, notstarted
-position: 184,-245
+position: 306,-283
 ---
 Welcome in our town!
+-> Accept the quest.
+  <<add_quest Welcome_To_Town>>
+  <<quest_step START Welcome_To_Town>>
+  <<jump quest_Welcome_To_Town_inProgress>>
+-> Not now.
+  <<jump npc_1_idle_node>>
 ===
 
 title: quest_Welcome_To_Town_inProgress
 tags: quest_Welcome_To_Town, inprogress
-position: -196,-38
+position: -187,41
 ---
 Are you new here?
+-> I'm working on it.
+  <<jump npc_1_idle_node>>
 ===
 
 title: quest_Welcome_To_Town_completed
 tags: quest_Welcome_To_Town, completed
-position: 374,-96
+position: 587,-174
 ---
 By my friend!
+-> Bye!
+  <<set_flag welcome_to_town_completed_seen true>>
+  <<jump npc_1_idle_node>>
+===
+
+title: npc_1_idle_node
+position: 168,120
+---
+Good day sir.
+Take care.
 ===

@@ -15,10 +15,13 @@ public class YarnDialogLoader {
         List<ParsedNode> parsedNodes = parseNodes(fileHandle.readString("UTF-8"));
         ParsedNode rootNode = findTaggedNode(parsedNodes, "root", "start");
         ParsedNode idleNode = findTaggedNode(parsedNodes, "idle");
+
         Array<String> idleLines = idleNode == null ? new Array<>() : toGdxArray(idleNode.lines);
         Array<DialogChoice> rootChoices = rootNode == null ? new Array<>() : toChoiceArray(rootNode.choices);
+
         Array<DialogNode> nodes = new Array<>();
         Array<DialogFlagDialog> flagDialogs = new Array<>();
+
         QuestDialog questDialog = null;
         String questId = null;
         Array<String> questNotStarted = null;
@@ -31,10 +34,14 @@ public class YarnDialogLoader {
                 continue;
             }
 
+            // --- QUEST NODES: collect quest lines AND keep as normal nodes so <<jump quest_...>> works ---
             String questTag = findQuestTag(parsedNode.tags);
             if (questTag != null) {
+                // questId from tag "quest_<id>"
                 questId = questTag;
+
                 Array<String> questLines = toGdxArray(parsedNode.lines);
+
                 if (parsedNode.tags.contains("notstarted")) {
                     questNotStarted = questLines;
                 } else if (parsedNode.tags.contains("inprogress")) {
@@ -47,23 +54,36 @@ public class YarnDialogLoader {
                         stepDialogs.put(stepIndex, questLines);
                     }
                 }
+
+                // IMPORTANT: ALSO store it as a normal DialogNode so jump/goto can target it
+                nodes.add(new DialogNode(parsedNode.id, questLines, toChoiceArray(parsedNode.choices)));
                 continue;
             }
+
+            // --- FLAG DIALOGS ---
             String flagTag = findFlagTag(parsedNode.tags);
             if (flagTag != null) {
                 flagDialogs.add(new DialogFlagDialog(flagTag, toGdxArray(parsedNode.lines)));
                 continue;
             }
 
+            // --- NORMAL NODES ---
             nodes.add(new DialogNode(parsedNode.id, toGdxArray(parsedNode.lines), toChoiceArray(parsedNode.choices)));
         }
 
         if (questId != null) {
             ObjectMap<String, Array<String>> stepDialogMap = stepDialogs.size == 0 ? null : stepDialogs;
-            questDialog = new QuestDialog(questId, defaultLines(questNotStarted),
-                defaultLines(questInProgress), defaultLines(questCompleted), stepDialogMap);
+            questDialog = new QuestDialog(
+                questId,
+                defaultLines(questNotStarted),
+                defaultLines(questInProgress),
+                defaultLines(questCompleted),
+                stepDialogMap
+            );
         }
+
         Array<DialogFlagDialog> flagDialogArray = flagDialogs.size == 0 ? null : flagDialogs;
+
         return new DialogData(idleLines, rootChoices, flagDialogArray, questDialog, nodes);
     }
 
@@ -115,6 +135,7 @@ public class YarnDialogLoader {
                 }
             }
         }
+
         ParsedNode node = buildNode(headerLines, bodyLines);
         if (node != null) {
             nodes.add(node);
@@ -125,11 +146,14 @@ public class YarnDialogLoader {
     private static ParsedNode buildNode(List<String> headerLines, List<String> bodyLines) {
         String title = null;
         Set<String> tags = new HashSet<>();
+
         for (String headerLine : headerLines) {
             String trimmed = headerLine.trim();
-            if (trimmed.toLowerCase(Locale.ROOT).startsWith("title:")) {
+            String lower = trimmed.toLowerCase(Locale.ROOT);
+
+            if (lower.startsWith("title:")) {
                 title = trimmed.substring("title:".length()).trim();
-            } else if (trimmed.toLowerCase(Locale.ROOT).startsWith("tags:")) {
+            } else if (lower.startsWith("tags:")) {
                 String tagValue = trimmed.substring("tags:".length()).trim();
                 if (!tagValue.isEmpty()) {
                     for (String tag : tagValue.split("[,\\s]+")) {
@@ -140,9 +164,11 @@ public class YarnDialogLoader {
                 }
             }
         }
+
         if (title == null || title.isEmpty()) {
             return null;
         }
+
         ParsedNode parsedNode = new ParsedNode(title, tags);
         parseBody(bodyLines, parsedNode);
         return parsedNode;
@@ -150,11 +176,13 @@ public class YarnDialogLoader {
 
     private static void parseBody(List<String> bodyLines, ParsedNode parsedNode) {
         ChoiceBuilder currentChoice = null;
+
         for (String rawLine : bodyLines) {
             String trimmed = rawLine.trim();
             if (trimmed.isEmpty()) {
                 continue;
             }
+
             if (trimmed.startsWith("->")) {
                 if (currentChoice != null) {
                     parsedNode.choices.add(currentChoice);
@@ -162,6 +190,7 @@ public class YarnDialogLoader {
                 currentChoice = new ChoiceBuilder(trimmed.substring(2).trim());
                 continue;
             }
+
             if (currentChoice != null && isIndented(rawLine)) {
                 if (tryApplyJump(trimmed, currentChoice)) {
                     continue;
@@ -174,14 +203,17 @@ public class YarnDialogLoader {
                 }
                 continue;
             }
+
             if (currentChoice != null) {
                 parsedNode.choices.add(currentChoice);
                 currentChoice = null;
             }
+
             if (!isCommand(trimmed)) {
                 parsedNode.lines.add(trimmed);
             }
         }
+
         if (currentChoice != null) {
             parsedNode.choices.add(currentChoice);
         }
@@ -193,11 +225,13 @@ public class YarnDialogLoader {
             return false;
         }
         String inner = normalized.substring(2, normalized.length() - 2).trim();
-        if (inner.toLowerCase(Locale.ROOT).startsWith("jump ")) {
+        String lower = inner.toLowerCase(Locale.ROOT);
+
+        if (lower.startsWith("jump ")) {
             builder.next = inner.substring("jump ".length()).trim();
             return true;
         }
-        if (inner.toLowerCase(Locale.ROOT).startsWith("goto ")) {
+        if (lower.startsWith("goto ")) {
             builder.next = inner.substring("goto ".length()).trim();
             return true;
         }
@@ -208,19 +242,22 @@ public class YarnDialogLoader {
         if (!isCommand(line)) {
             return false;
         }
+
         String inner = line.substring(2, line.length() - 2).trim();
         if (inner.isEmpty()) {
             return false;
         }
+
         String[] parts = inner.split("\\s+");
         String command = parts[0].toLowerCase(Locale.ROOT);
+
         switch (command) {
             case "set_flag" -> {
                 if (parts.length < 3) {
                     return false;
                 }
                 String flag = parts[1];
-                Boolean value = Boolean.parseBoolean(parts[2]);
+                boolean value = Boolean.parseBoolean(parts[2]);
                 builder.effects.add(DialogEffect.setFlag(flag, value));
                 return true;
             }

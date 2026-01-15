@@ -34,7 +34,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestLog.MAPPER.get(player).add(quest);
 
         AtomicBoolean rewardFired = new AtomicBoolean(false);
-        eventBus.subscribe(QuestRewardEvent.class, event -> rewardFired.set(true));
+        eventBus.subscribe(QuestCompletedEvent.class, event -> rewardFired.set(true));
 
         engine.update(0f);
 
@@ -52,12 +52,12 @@ class QuestSystemTest extends HeadlessGdxTest {
         player.add(new QuestLog());
         engine.addEntity(player);
 
-        AtomicBoolean rewardFired = new AtomicBoolean(false);
-        eventBus.subscribe(QuestRewardEvent.class, event -> rewardFired.set(true));
+        AtomicBoolean completedFired = new AtomicBoolean(false);
+        eventBus.subscribe(QuestCompletedEvent.class, event -> completedFired.set(true));
 
-        eventBus.fire(new AddQuestEvent(player, "Talk"));
+        eventBus.fire(new AddQuestEvent(player, "talk"));
 
-        assertTrue(rewardFired.get());
+        assertTrue(completedFired.get());
     }
 
     private record TestStep(boolean completed) implements QuestStep {
