@@ -1,5 +1,6 @@
-title: idle
+title: npc_1_idle
 tags: idle
+position: 107,39
 ---
 Good day sir.
 Take care.
@@ -7,18 +8,21 @@ Take care.
 
 title: quest_Welcome_To_Town_notStarted
 tags: quest_Welcome_To_Town, notstarted
+position: 73,-130
 ---
 Welcome in our town!
 ===
 
 title: quest_Welcome_To_Town_inProgress
 tags: quest_Welcome_To_Town, inprogress
+position: -196,-38
 ---
 Are you new here?
 ===
 
 title: quest_Welcome_To_Town_completed
 tags: quest_Welcome_To_Town, completed
+position: 374,-96
 ---
 By my friend!
 ===

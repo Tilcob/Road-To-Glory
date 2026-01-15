@@ -1,4 +1,4 @@
-title: idle
+title: npc_2_idle
 tags: idle
 position: -176,59
 ---
@@ -6,7 +6,7 @@ Welcome in my shop!
 Would you like to see my wares?
 ===
 
-title: start
+title: npc_2_start
 tags: start, root
 position: -167,-94
 ---

@@ -1,4 +1,4 @@
-title: idle
+title: guard_idle
 tags: idle
 position: -50,-138
 ---
@@ -6,7 +6,7 @@ Good day my friend!
 Don't anger the guard!
 ===
 
-title: start
+title: guard_start
 tags: start, root
 position: -79,26
 ---
