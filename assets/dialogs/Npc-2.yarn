@@ -1,0 +1,41 @@
+title: idle
+tags: idle
+position: -176,59
+---
+Welcome in my shop!
+Would you like to see my wares?
+===
+
+title: start
+tags: start, root
+position: -167,-94
+---
+-> Show me your wares.
+    I'm still setting up. Come back soon!
+    <<set_flag shop_seen true>>
+    <<jump shop_wares>>
+
+-> Just browsing.
+    Take your time.
+    <<set_flag shop_seen true>>
+    <<jump shop_browsing>>
+===
+
+title: flag_shop_seen
+tags: flag_shop_seen
+position: 49,195
+---
+Good to see you again.
+===
+
+title: shop_wares
+position: 378,129
+---
+I'm still setting up. Come back soon!
+===
+
+title: shop_browsing
+position: 413,-27
+---
+Take your time.
+===

@@ -1,0 +1,24 @@
+title: idle
+tags: idle
+---
+Good day sir.
+Take care.
+===
+
+title: quest_Welcome_To_Town_notStarted
+tags: quest_Welcome_To_Town, notstarted
+---
+Welcome in our town!
+===
+
+title: quest_Welcome_To_Town_inProgress
+tags: quest_Welcome_To_Town, inprogress
+---
+Are you new here?
+===
+
+title: quest_Welcome_To_Town_completed
+tags: quest_Welcome_To_Town, completed
+---
+By my friend!
+===
