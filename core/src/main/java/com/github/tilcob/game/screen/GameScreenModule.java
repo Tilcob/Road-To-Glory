@@ -12,15 +12,13 @@ import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.input.ActiveEntityReference;
-import com.github.tilcob.game.input.GameControllerState;
-import com.github.tilcob.game.input.IdleControllerState;
-import com.github.tilcob.game.input.InputManager;
+import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
+import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class GameScreenModule {
     private final GameServices services;
@@ -67,14 +65,16 @@ public class GameScreenModule {
         IdleControllerState idleControllerState = new IdleControllerState();
         ActiveEntityReference activeEntityReference = new ActiveEntityReference();
         GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
+        UiControllerState uiControllerState = new UiControllerState(services.getEventBus());
         Stage stage = new Stage(uiViewport, batch);
         GameViewModel gameViewModel = new GameViewModel(services, viewport);
         InventoryViewModel inventoryViewModel = new InventoryViewModel(services);
+        PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
         Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
 
         // Input
         engine.addSystem(withPriority(
-            new ControllerSystem(screenNavigator, services.getEventBus()),
+            new ControllerSystem(services.getEventBus()),
             SystemOrder.INPUT
         ));
 
@@ -135,10 +135,12 @@ public class GameScreenModule {
             tiledAshleyConfigurator,
             idleControllerState,
             gameControllerState,
+            uiControllerState,
             physicWorld,
             stage,
             gameViewModel,
             inventoryViewModel,
+            pauseViewModel,
             skin,
             inputManager,
             services.getAudioManager(),
@@ -157,10 +159,12 @@ public class GameScreenModule {
         TiledAshleyConfigurator tiledAshleyConfigurator,
         IdleControllerState idleControllerState,
         GameControllerState gameControllerState,
+        UiControllerState uiControllerState,
         World physicWorld,
         Stage stage,
         GameViewModel gameViewModel,
         InventoryViewModel inventoryViewModel,
+        PauseViewModel pauseViewModel,
         Skin skin,
         InputManager inputManager,
         AudioManager audioManager,

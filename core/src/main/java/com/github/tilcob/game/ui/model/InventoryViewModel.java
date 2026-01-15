@@ -14,6 +14,7 @@ import com.github.tilcob.game.input.Command;
 public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();
     private boolean open = false;
+    private boolean paused = false;
 
     public InventoryViewModel(GameServices services) {
         super(services);
@@ -23,6 +24,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(UiEvent.class, this::onUiEvent);
         getEventBus().subscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
+        getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
     }
 
     private void onQuestLogEvent(UpdateQuestLogEvent event) {
@@ -48,6 +50,7 @@ public class InventoryViewModel extends ViewModel {
     private void onUiEvent(UiEvent event) {
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY) {
+            if (paused) return;
             boolean old = open;
             open = !open;
             this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
@@ -76,6 +79,28 @@ public class InventoryViewModel extends ViewModel {
 
     }
 
+    private void onPauseEvent(PauseEvent event) {
+        if (event == null) return;
+        switch (event.action()) {
+            case PAUSE -> {
+                paused = true;
+                closeInventory();
+            }
+            case RESUME -> paused = false;
+            case TOGGLE -> {
+                paused = !paused;
+                if (paused) closeInventory();
+            }
+        }
+    }
+
+    private void closeInventory() {
+        if (!open) return;
+        boolean old = true;
+        open = false;
+        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, false);
+    }
+
     @Override
     public void dispose() {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
@@ -83,5 +108,6 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().unsubscribe(UiEvent.class, this::onUiEvent);
         getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
+        getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
     }
 }

@@ -5,7 +5,7 @@
         "LEFT": "A",
         "RIGHT": "D",
         "SELECT": "SPACEBAR",
-        "CANCEL": "ESC",
+        "PAUSE": "ESC",
         "INTERACT": "E",
         "INVENTORY": "I"
     }
