@@ -19,10 +19,9 @@ import java.util.Map;
 
 public class DialogSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
-    private final Map<String, MapDialogData> allDialogs;
-    private String mapId;
+    private final Map<String, DialogData> allDialogs;
 
-    public DialogSystem(GameEventBus eventBus, Map<String, MapDialogData> allDialogs) {
+    public DialogSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs) {
         super(Family.all(Dialog.class).get());
         this.eventBus = eventBus;
         this.allDialogs = allDialogs;
@@ -31,7 +30,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         eventBus.subscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
         eventBus.subscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.subscribe(ExitTriggerEvent.class, this::onExitTrigger);
-        eventBus.subscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.subscribe(FinishedDialogEvent.class, this::onFinishedDialog);
     }
 
@@ -65,11 +63,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (npc == null) return;
         eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
 
-        if (mapId == null) return;
-        MapDialogData mapDialogData = allDialogs.get(mapId);
-        if (mapDialogData == null) return;
-
-        DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
+        DialogData dialogData = allDialogs.get(npc.getName());
         if (dialogData == null || dialogData.questDialog() == null) return;
         String questId = dialogData.questDialog().questId();
         QuestState questState = questLog.getQuestStateById(questId);
@@ -91,17 +85,13 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         Npc npc = Npc.MAPPER.get(npcEntity);
         PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
         Entity player = playerReference == null ? null : playerReference.getPlayer();
-        if (player == null || mapId == null) {
+        if (player == null) {
             dialog.setState(Dialog.State.IDLE);
             return;
         }
         if (DialogSession.MAPPER.get(player) != null) return;
-        MapDialogData mapDialogData = allDialogs.get(mapId);
-        if (mapDialogData == null) {
-            dialog.setState(Dialog.State.IDLE);
-            return;
-        }
-        DialogData dialogData = mapDialogData.getNpcs().get(npc.getName());
+
+        DialogData dialogData = allDialogs.get(npc.getName());
         if (dialogData == null) {
             dialog.setState(Dialog.State.IDLE);
             return;
@@ -125,10 +115,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
     private DialogLine toDialogLine(DialogSession session) {
         return new DialogLine(session.currentLine(), session.getIndex() + 1, session.getTotal());
-    }
-
-    private void onMapChange(MapChangeEvent event) {
-        this.mapId = event.mapId();
     }
 
     private void onFinishedDialog(FinishedDialogEvent event) {
@@ -232,7 +218,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         eventBus.unsubscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
         eventBus.unsubscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
-        eventBus.unsubscribe(MapChangeEvent.class, this::onMapChange);
         eventBus.unsubscribe(FinishedDialogEvent.class, this::onFinishedDialog);
     }
 }

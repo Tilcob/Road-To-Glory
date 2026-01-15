@@ -3,6 +3,7 @@ package com.github.tilcob.game;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.MapDialogData;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
@@ -25,7 +26,7 @@ public class GameServices {
     private final AssetManager assetManager;
     private final AudioManager audioManager;
     private final Map<String, Quest> allQuests;
-    private final Map<String, MapDialogData> allDialogs;
+    private final Map<String, DialogData> allDialogs;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -80,7 +81,7 @@ public class GameServices {
         return allQuests;
     }
 
-    public Map<String, MapDialogData> getAllDialogs() {
+    public Map<String, DialogData> getAllDialogs() {
         return allDialogs;
     }
 }

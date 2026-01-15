@@ -27,7 +27,7 @@ public class GameLoader {
             services.getAllQuests().putAll(questFactory.loadAll(questAsset));
         }
         for (DialogAsset dialogAsset : DialogAsset.values()) {
-            services.getAllDialogs().put(dialogAsset.name().toLowerCase(), dialogLoader.load(dialogAsset));
+            services.getAllDialogs().putAll(dialogLoader.load(dialogAsset));
         }
         services.getAssetManager().queue(SkinAsset.DEFAULT);
     }
