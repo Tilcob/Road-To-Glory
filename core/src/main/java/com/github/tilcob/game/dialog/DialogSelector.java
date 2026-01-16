@@ -12,7 +12,11 @@ public class DialogSelector {
                                          DialogFlags dialogFlags, String npcName) {
         String firstContactFlag = firstContactFlagKey(npcName);
         if (firstContactFlag != null && dialogFlags != null && !dialogFlags.get(firstContactFlag)) {
-            return new DialogSelection(dialogData.idle(), dialogData.choices());
+            Array<String> rootLines = dialogData.rootLines();
+            if (rootLines == null || rootLines.size == 0) {
+                rootLines = dialogData.idle();
+            }
+            return new DialogSelection(rootLines, dialogData.choices());
         }
 
         DialogFlagDialog flagDialog = selectFlagDialog(dialogData.flagDialogs(), dialogFlags);
