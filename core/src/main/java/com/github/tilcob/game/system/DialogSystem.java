@@ -46,51 +46,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
     private void finishDialog(Entity npcEntity, Dialog dialog) {
         dialog.setState(Dialog.State.IDLE);
-
-        setFirstContactFlag(npcEntity);
-        notifyQuestTalk(npcEntity);
-    }
-
-    private void setFirstContactFlag(Entity npcEntity) {
         PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
-        if (playerReference == null) return;
-        Entity player = playerReference.getPlayer();
-        if (player == null) return;
-
-        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
-        if (dialogFlags == null) return;
-
-        Npc npc = Npc.MAPPER.get(npcEntity);
-        if (npc == null) return;
-
-        String flagKey = DialogSelector.firstContactFlagKey(npc.getName());
-        if (flagKey == null) return;
-        dialogFlags.set(flagKey, true);
-    }
-
-    private void notifyQuestTalk(Entity npcEntity) {
-        PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
-        if (playerReference == null) return;
-        Entity player = playerReference.getPlayer();
-        if (player == null) return;
-
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        Npc npc = Npc.MAPPER.get(npcEntity);
-        if (npc == null) return;
-        eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
-
-        DialogData dialogData = allDialogs.get(npc.getName());
-        if (dialogData == null || dialogData.questDialog() == null) return;
-        String questId = dialogData.questDialog().questId();
-
-        Quest quest = questLog.getQuestById(questId);
-        if (quest != null && quest.isCompleted() && !quest.isRewardClaimed()) {
-            eventBus.fire(new QuestRewardEvent(player, questId));
-        }
-
-        Telegram telegram = new Telegram();
-        telegram.message = Messages.DIALOG_FINISHED;
-        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().handleMessage(telegram);
+        Entity player = playerReference == null ? null : playerReference.getPlayer();
+        if (player != null) eventBus.fire(new DialogFinishedEvent(npcEntity, player));
     }
 
     private void startDialog(Entity npcEntity, Dialog dialog) {
@@ -122,6 +80,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         dialog.setState(Dialog.State.ACTIVE);
         NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
         player.add(session);
+        eventBus.fire(new DialogStartedEvent(npcEntity, player));
         eventBus.fire(new DialogEvent(toDialogLine(session), npcEntity));
     }
 
