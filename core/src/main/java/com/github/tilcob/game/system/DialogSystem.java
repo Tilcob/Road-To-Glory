@@ -40,7 +40,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         switch (dialog.getState()) {
             case REQUEST -> startDialog(entity, dialog);
             case ACTIVE -> {
-
             }
             case FINISHED -> finishDialog(entity, dialog);
         }
@@ -95,9 +94,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(player);
         DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        Array<String> lines = DialogSelector.select(dialogData, questLog, dialogFlags);
+        DialogSelection selection = DialogSelector.select(dialogData, questLog, dialogFlags);
         boolean repeatChoices = dialogData.questDialog() == null;
-        DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices(),
+        DialogSession session = new DialogSession(npcEntity, selection.lines(), selection.choices(),
             repeatChoices, buildNodeMap(dialogData));
         if (!session.hasLines()) {
             dialog.setState(Dialog.State.IDLE);

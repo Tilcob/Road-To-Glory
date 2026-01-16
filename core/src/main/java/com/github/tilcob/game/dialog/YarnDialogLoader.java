@@ -27,7 +27,11 @@ public class YarnDialogLoader {
         Array<String> questNotStarted = null;
         Array<String> questInProgress = null;
         Array<String> questCompleted = null;
+        Array<DialogChoice> questNotStartedChoices = null;
+        Array<DialogChoice> questInProgressChoices = null;
+        Array<DialogChoice> questCompletedChoices = null;
         ObjectMap<String, Array<String>> stepDialogs = new ObjectMap<>();
+        ObjectMap<String, Array<DialogChoice>> stepChoices = new ObjectMap<>();
 
         for (ParsedNode parsedNode : parsedNodes) {
             if (parsedNode == rootNode || parsedNode == idleNode) {
@@ -41,17 +45,22 @@ public class YarnDialogLoader {
                 questId = questTag;
 
                 Array<String> questLines = toGdxArray(parsedNode.lines);
+                Array<DialogChoice> questChoices = toChoiceArray(parsedNode.choices);
 
                 if (parsedNode.tags.contains("notstarted")) {
                     questNotStarted = questLines;
+                    questNotStartedChoices = questChoices;
                 } else if (parsedNode.tags.contains("inprogress")) {
                     questInProgress = questLines;
+                    questInProgressChoices = questChoices;
                 } else if (parsedNode.tags.contains("completed")) {
                     questCompleted = questLines;
+                    questCompletedChoices = questChoices;
                 } else {
                     String stepIndex = findStepIndex(parsedNode.tags);
                     if (stepIndex != null) {
                         stepDialogs.put(stepIndex, questLines);
+                        stepChoices.put(stepIndex, questChoices);
                     }
                 }
 
@@ -73,12 +82,17 @@ public class YarnDialogLoader {
 
         if (questId != null) {
             ObjectMap<String, Array<String>> stepDialogMap = stepDialogs.size == 0 ? null : stepDialogs;
+            ObjectMap<String, Array<DialogChoice>> stepChoiceMap = stepChoices.size == 0 ? null : stepChoices;
             questDialog = new QuestDialog(
                 questId,
                 defaultLines(questNotStarted),
                 defaultLines(questInProgress),
                 defaultLines(questCompleted),
-                stepDialogMap
+                stepDialogMap,
+                defaultChoices(questNotStartedChoices),
+                defaultChoices(questInProgressChoices),
+                defaultChoices(questCompletedChoices),
+                stepChoiceMap
             );
         }
 
@@ -303,6 +317,10 @@ public class YarnDialogLoader {
 
     private static Array<String> defaultLines(Array<String> lines) {
         return lines == null ? new Array<>() : lines;
+    }
+
+    private static Array<DialogChoice> defaultChoices(Array<DialogChoice> choices) {
+        return choices == null ? new Array<>() : choices;
     }
 
     private static String findQuestTag(Set<String> tags) {
