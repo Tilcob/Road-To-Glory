@@ -19,6 +19,11 @@ public class DialogSelector {
     public static DialogSelection select(Array<String> idle, Array<DialogChoice> rootChoices,
                                          QuestDialog questDialog, QuestLog questLog) {
         if (questDialog != null) {
+            Quest quest = questLog.getQuestById(questDialog.questId());
+            if (quest == null) {
+                return new DialogSelection(idle, rootChoices);
+            }
+
             QuestState state = questLog.getQuestStateById(questDialog.questId());
 
             return switch (state) {
