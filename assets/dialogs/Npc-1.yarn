@@ -5,8 +5,7 @@ position: -193,-349
 Hello, would you like to do a quest?
 -> ... (Quest annehmen)
     <<add_quest welcome_to_town>>
-    <<quest_step START Welcome_To_Town>>
-    <<jump npc_1_idle_node>>
+    <<jump quest_Welcome_To_Town_notStarted>>
 -> ... (Noch nicht)
     <<jump npc_1_idle_node>>
 ===

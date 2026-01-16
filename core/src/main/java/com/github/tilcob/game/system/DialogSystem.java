@@ -13,7 +13,6 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestState;
 
 import java.util.Map;
 
@@ -112,7 +111,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(player);
         DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        DialogSelection selection = DialogSelector.select(dialogData, questLog, dialogFlags, npc.getName());
+        DialogSelection selection = DialogSelector.select(dialogData, questLog);
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity, selection.lines(), selection.choices(),
             repeatChoices, buildNodeMap(dialogData));

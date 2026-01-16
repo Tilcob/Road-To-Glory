@@ -1,26 +1,21 @@
 package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
-import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
 
 public class DialogSelector {
 
-    public static DialogSelection select(DialogData dialogData, QuestLog questLog,
-                                         DialogFlags dialogFlags, String npcName) {
+    public static DialogSelection select(DialogData dialogData, QuestLog questLog) {
         QuestDialog questDialog = dialogData.questDialog();
-        if (questDialog != null && questLog != null) {
-            Quest quest = questLog.getQuestById(questDialog.questId());
-            QuestState state = quest == null ? null : questLog.getQuestStateById(questDialog.questId());
-            if (quest != null && (state == QuestState.IN_PROGRESS || state == QuestState.COMPLETED)) {
-                return select(dialogData.rootLines(), dialogData.idle(), dialogData.choices(), questDialog, questLog);
-            }
-        }
-
         Array<String> rootLines = dialogData.rootLines();
         if (rootLines == null || rootLines.size == 0) rootLines = dialogData.idle();
+
+        if (questDialog != null && questLog != null) {
+            return select(rootLines, dialogData.idle(), dialogData.choices(), questDialog, questLog);
+        }
+
         return new DialogSelection(rootLines, dialogData.choices());
     }
 

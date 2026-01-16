@@ -22,6 +22,7 @@ class YarnDialogLoaderTest {
             title: Start
             tags: root
             ---
+            Welcome, traveler!
             -> Show me your wares.
                 <<jump shop_wares>>
                 I'm still setting up.
