@@ -8,7 +8,13 @@ import com.github.tilcob.game.quest.QuestState;
 
 public class DialogSelector {
 
-    public static DialogSelection select(DialogData dialogData, QuestLog questLog, DialogFlags dialogFlags) {
+    public static DialogSelection select(DialogData dialogData, QuestLog questLog,
+                                         DialogFlags dialogFlags, String npcName) {
+        String firstContactFlag = firstContactFlagKey(npcName);
+        if (firstContactFlag != null && dialogFlags != null && !dialogFlags.get(firstContactFlag)) {
+            return new DialogSelection(dialogData.idle(), dialogData.choices());
+        }
+
         DialogFlagDialog flagDialog = selectFlagDialog(dialogData.flagDialogs(), dialogFlags);
         if (flagDialog != null && flagDialog.lines() != null && flagDialog.lines().size > 0) {
             return new DialogSelection(flagDialog.lines(), new Array<>());
@@ -42,6 +48,14 @@ public class DialogSelector {
         DialogSelection stepDialog = selectStepDialog(questDialog, quest.getCurrentStep());
         if (stepDialog != null && stepDialog.lines() != null && stepDialog.lines().size > 0) return stepDialog;
         return new DialogSelection(questDialog.inProgress(), questDialog.inProgressChoices());
+    }
+
+    public static String firstContactFlagKey(String npcName) {
+        if (npcName == null || npcName.isBlank()) {
+            return null;
+        }
+        String normalizedName = npcName.trim().toLowerCase().replaceAll("\\s+", "_");
+        return "npc_" + normalizedName + "_root_shown";
     }
 
     private static DialogSelection selectStepDialog(QuestDialog questDialog, int stepIndex) {

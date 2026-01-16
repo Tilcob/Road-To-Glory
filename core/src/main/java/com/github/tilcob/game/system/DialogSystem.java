@@ -48,7 +48,25 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void finishDialog(Entity npcEntity, Dialog dialog) {
         dialog.setState(Dialog.State.IDLE);
 
+        setFirstContactFlag(npcEntity);
         notifyQuestTalk(npcEntity);
+    }
+
+    private void setFirstContactFlag(Entity npcEntity) {
+        PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
+        if (playerReference == null) return;
+        Entity player = playerReference.getPlayer();
+        if (player == null) return;
+
+        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
+        if (dialogFlags == null) return;
+
+        Npc npc = Npc.MAPPER.get(npcEntity);
+        if (npc == null) return;
+
+        String flagKey = DialogSelector.firstContactFlagKey(npc.getName());
+        if (flagKey == null) return;
+        dialogFlags.set(flagKey, true);
     }
 
     private void notifyQuestTalk(Entity npcEntity) {
@@ -94,7 +112,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         QuestLog questLog = QuestLog.MAPPER.get(player);
         DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        DialogSelection selection = DialogSelector.select(dialogData, questLog, dialogFlags);
+        DialogSelection selection = DialogSelector.select(dialogData, questLog, dialogFlags, npc.getName());
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity, selection.lines(), selection.choices(),
             repeatChoices, buildNodeMap(dialogData));

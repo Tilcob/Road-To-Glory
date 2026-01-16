@@ -1,7 +1,8 @@
 title: npc_1_start
-tags: root start
+tags: start, root
 position: -193,-349
 ---
+Hello, would you like to do a quest?
 -> ... (Quest annehmen)
     <<add_quest welcome_to_town>>
     <<quest_step START Welcome_To_Town>>
