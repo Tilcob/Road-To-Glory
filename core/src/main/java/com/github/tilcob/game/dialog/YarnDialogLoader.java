@@ -17,6 +17,7 @@ public class YarnDialogLoader {
         ParsedNode idleNode = findTaggedNode(parsedNodes, "idle");
 
         Array<String> idleLines = idleNode == null ? new Array<>() : toGdxArray(idleNode.lines);
+        Array<String> rootLines = rootNode == null ? new Array<>() : toGdxArray(rootNode.lines);
         Array<DialogChoice> rootChoices = rootNode == null ? new Array<>() : toChoiceArray(rootNode.choices);
 
         Array<DialogNode> nodes = new Array<>();
@@ -98,7 +99,7 @@ public class YarnDialogLoader {
 
         Array<DialogFlagDialog> flagDialogArray = flagDialogs.size == 0 ? null : flagDialogs;
 
-        return new DialogData(idleLines, rootChoices, flagDialogArray, questDialog, nodes);
+        return new DialogData(idleLines, rootLines, rootChoices, flagDialogArray, questDialog, nodes);
     }
 
     private static ParsedNode findTaggedNode(List<ParsedNode> parsedNodes, String... tags) {

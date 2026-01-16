@@ -4,15 +4,17 @@ import com.badlogic.gdx.utils.Array;
 
 public class DialogData {
     private Array<String> idle;
+    private Array<String> rootLines;
     private Array<DialogChoice> choices;
     private Array<DialogFlagDialog> flagDialogs;
     private QuestDialog questDialog;
     private Array<DialogNode> nodes;
 
-    public DialogData(Array<String> idle, Array<DialogChoice> choices, Array<DialogFlagDialog> flagDialogs,
-                      QuestDialog questDialog, Array<DialogNode> nodes) {
+    public DialogData(Array<String> idle, Array<String> rootLines, Array<DialogChoice> choices,
+                      Array<DialogFlagDialog> flagDialogs, QuestDialog questDialog, Array<DialogNode> nodes) {
         this.idle = idle;
         this.choices = choices;
+        this.rootLines = rootLines;
         this.flagDialogs = flagDialogs;
         this.questDialog = questDialog;
         this.nodes = nodes;
@@ -23,6 +25,10 @@ public class DialogData {
 
     public Array<String> idle() {
         return idle;
+    }
+
+    public Array<String> rootLines() {
+        return rootLines;
     }
 
     public Array<DialogChoice> choices() {

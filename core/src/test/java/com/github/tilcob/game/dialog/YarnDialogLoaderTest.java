@@ -46,6 +46,8 @@ class YarnDialogLoaderTest {
         assertNotNull(dialogData);
         assertEquals(1, dialogData.idle().size);
         assertEquals("Welcome in my shop!", dialogData.idle().first());
+        assertEquals(1, dialogData.rootLines().size);
+        assertEquals("Welcome, traveler!", dialogData.rootLines().first());
         assertEquals(1, dialogData.choices().size);
         DialogChoice choice = dialogData.choices().first();
         assertEquals("Show me your wares.", choice.text());
@@ -65,6 +67,7 @@ class YarnDialogLoaderTest {
             title: Start
             tags: root
             ---
+            Welcome, traveler!
             -> Any work for me?
                 <<set_flag shop_seen true>>
                 <<add_quest Welcome_To_Town>>
