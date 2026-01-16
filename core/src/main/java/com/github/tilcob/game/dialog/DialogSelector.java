@@ -10,29 +10,26 @@ public class DialogSelector {
 
     public static DialogSelection select(DialogData dialogData, QuestLog questLog,
                                          DialogFlags dialogFlags, String npcName) {
-        String firstContactFlag = firstContactFlagKey(npcName);
-        if (firstContactFlag != null && dialogFlags != null && !dialogFlags.get(firstContactFlag)) {
-            Array<String> rootLines = dialogData.rootLines();
-            if (rootLines == null || rootLines.size == 0) {
-                rootLines = dialogData.idle();
+        QuestDialog questDialog = dialogData.questDialog();
+        if (questDialog != null && questLog != null) {
+            Quest quest = questLog.getQuestById(questDialog.questId());
+            QuestState state = quest == null ? null : questLog.getQuestStateById(questDialog.questId());
+            if (quest != null && (state == QuestState.IN_PROGRESS || state == QuestState.COMPLETED)) {
+                return select(dialogData.rootLines(), dialogData.idle(), dialogData.choices(), questDialog, questLog);
             }
-            return new DialogSelection(rootLines, dialogData.choices());
         }
 
-        DialogFlagDialog flagDialog = selectFlagDialog(dialogData.flagDialogs(), dialogFlags);
-        if (flagDialog != null && flagDialog.lines() != null && flagDialog.lines().size > 0) {
-            return new DialogSelection(flagDialog.lines(), new Array<>());
-        }
-        return select(dialogData.idle(), dialogData.choices(), dialogData.questDialog(), questLog);
+        Array<String> rootLines = dialogData.rootLines();
+        if (rootLines == null || rootLines.size == 0) rootLines = dialogData.idle();
+        return new DialogSelection(rootLines, dialogData.choices());
     }
 
-    public static DialogSelection select(Array<String> idle, Array<DialogChoice> rootChoices,
+    public static DialogSelection select(Array<String> rootLines, Array<String> idle,
+                                         Array<DialogChoice> rootChoices,
                                          QuestDialog questDialog, QuestLog questLog) {
         if (questDialog != null) {
             Quest quest = questLog.getQuestById(questDialog.questId());
-            if (quest == null) {
-                return new DialogSelection(idle, rootChoices);
-            }
+            if (quest == null) return new DialogSelection(rootLines, rootChoices);
 
             QuestState state = questLog.getQuestStateById(questDialog.questId());
 
@@ -42,7 +39,7 @@ public class DialogSelector {
                 case COMPLETED -> new DialogSelection(questDialog.completed(), questDialog.completedChoices());
             };
         }
-        return new DialogSelection(idle, rootChoices);
+        return new DialogSelection(rootLines, rootChoices);
     }
 
     private static DialogSelection selectInProgress(QuestDialog questDialog, QuestLog questLog) {
@@ -72,19 +69,5 @@ public class DialogSelector {
 
         Array<DialogChoice> choices = questDialog.stepChoices() == null ? null : questDialog.stepChoices().get(key);
         return new DialogSelection(lines, choices);
-    }
-
-    private static DialogFlagDialog selectFlagDialog(Array<DialogFlagDialog> flagDialogs, DialogFlags dialogFlags) {
-        if (flagDialogs == null || dialogFlags == null) return null;
-        for (DialogFlagDialog flagDialog : flagDialogs) {
-            if (flagDialog == null) {
-                continue;
-            }
-            String flag = flagDialog.flag();
-            if (flag != null && dialogFlags.get(flag)) {
-                return flagDialog;
-            }
-        }
-        return null;
     }
 }
