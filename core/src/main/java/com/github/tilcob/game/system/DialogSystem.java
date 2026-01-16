@@ -3,7 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -12,19 +11,19 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestState;
 
 import java.util.Map;
 
 public class DialogSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final Map<String, DialogData> allDialogs;
+    private final ObjectMap<Entity, DialogNavigator> navigators;
 
     public DialogSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs) {
         super(Family.all(Dialog.class).get());
         this.eventBus = eventBus;
         this.allDialogs = allDialogs;
+        this.navigators = new ObjectMap<>();
 
         eventBus.subscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
         eventBus.subscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
@@ -40,7 +39,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         switch (dialog.getState()) {
             case REQUEST -> startDialog(entity, dialog);
             case ACTIVE -> {
-
             }
             case FINISHED -> finishDialog(entity, dialog);
         }
@@ -48,33 +46,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
     private void finishDialog(Entity npcEntity, Dialog dialog) {
         dialog.setState(Dialog.State.IDLE);
-
-        notifyQuestTalk(npcEntity);
-    }
-
-    private void notifyQuestTalk(Entity npcEntity) {
         PlayerReference playerReference = PlayerReference.MAPPER.get(npcEntity);
-        if (playerReference == null) return;
-        Entity player = playerReference.getPlayer();
-        if (player == null) return;
-
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        Npc npc = Npc.MAPPER.get(npcEntity);
-        if (npc == null) return;
-        eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
-
-        DialogData dialogData = allDialogs.get(npc.getName());
-        if (dialogData == null || dialogData.questDialog() == null) return;
-        String questId = dialogData.questDialog().questId();
-
-        Quest quest = questLog.getQuestById(questId);
-        if (quest != null && quest.isCompleted() && !quest.isRewardClaimed()) {
-            eventBus.fire(new QuestRewardEvent(player, questId));
-        }
-
-        Telegram telegram = new Telegram();
-        telegram.message = Messages.DIALOG_FINISHED;
-        NpcFsm.MAPPER.get(npcEntity).getNpcFsm().handleMessage(telegram);
+        Entity player = playerReference == null ? null : playerReference.getPlayer();
+        if (player != null) eventBus.fire(new DialogFinishedEvent(npcEntity, player));
     }
 
     private void startDialog(Entity npcEntity, Dialog dialog) {
@@ -93,24 +67,21 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             return;
         }
         QuestLog questLog = QuestLog.MAPPER.get(player);
-        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        Array<String> lines = DialogSelector.select(dialogData, questLog, dialogFlags);
+        DialogSelection selection = DialogSelector.select(dialogData, questLog);
         boolean repeatChoices = dialogData.questDialog() == null;
-        DialogSession session = new DialogSession(npcEntity, lines, dialogData.choices(),
-            repeatChoices, buildNodeMap(dialogData));
-        if (!session.hasLines()) {
+        DialogSession session = new DialogSession(npcEntity);
+        DialogNavigator navigator = new DialogNavigator(dialogData, session, selection, repeatChoices);
+        if (!navigator.hasLines()) {
             dialog.setState(Dialog.State.IDLE);
             return;
         }
         dialog.setState(Dialog.State.ACTIVE);
         NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
         player.add(session);
-        eventBus.fire(new DialogEvent(toDialogLine(session), npcEntity));
-    }
-
-    private DialogLine toDialogLine(DialogSession session) {
-        return new DialogLine(session.currentLine(), session.getIndex() + 1, session.getTotal());
+        navigators.put(player, navigator);
+        eventBus.fire(new DialogStartedEvent(npcEntity, player));
+        eventBus.fire(new DialogEvent(navigator.toDialogLine(), npcEntity));
     }
 
     private void onFinishedDialog(FinishedDialogEvent event) {
@@ -119,7 +90,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (playerReference != null) {
             Entity player = playerReference.getPlayer();
             if (player != null && DialogSession.MAPPER.get(player) != null) {
-                player.remove(DialogSession.class);
+                removeSession(player);
             }
         }
         Dialog dialog = Dialog.MAPPER.get(npc);
@@ -129,17 +100,17 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void onDialogAdvance(DialogAdvanceEvent event) {
         Entity player = event.player();
         DialogSession session = DialogSession.MAPPER.get(player);
-        if (session == null) {
-            return;
-        }
-        if (session.advance()) {
-            eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
+        DialogNavigator navigator = navigators.get(player);
+
+        if (session == null || navigator == null) return;
+        if (navigator.advance()) {
+            eventBus.fire(new DialogEvent(navigator.toDialogLine(), session.getNpc()));
         } else {
-            if (session.hasRemainingChoices() && !session.isAwaitingChoice()) {
-                session.beginChoice();
-                eventBus.fire(new DialogChoiceEvent(session.getChoices(), session.getChoiceIndex(), session.getNpc()));
+            if (navigator.hasRemainingChoices() && !session.isAwaitingChoice()) {
+                navigator.beginChoice();
+                eventBus.fire(new DialogChoiceEvent(navigator.getChoices(), session.getChoiceIndex(), session.getNpc()));
             } else {
-                player.remove(DialogSession.class);
+                removeSession(player);
                 eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
             }
         }
@@ -148,44 +119,31 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void onChoiceNavigate(DialogChoiceNavigateEvent event) {
         Entity player = event.player();
         DialogSession session = DialogSession.MAPPER.get(player);
-        if (session == null || !session.isAwaitingChoice()) {
-            return;
-        }
-        session.moveChoice(event.delta());
-        eventBus.fire(new DialogChoiceEvent(session.getChoices(), session.getChoiceIndex(), session.getNpc()));
+        DialogNavigator navigator = navigators.get(player);
+        if (session == null || navigator == null || !session.isAwaitingChoice()) return;
+        navigator.moveChoice(event.delta());
+        eventBus.fire(new DialogChoiceEvent(navigator.getChoices(), session.getChoiceIndex(), session.getNpc()));
     }
 
     private void onChoiceSelect(DialogChoiceSelectEvent event) {
         Entity player = event.player();
         DialogSession session = DialogSession.MAPPER.get(player);
-        if (session == null || !session.isAwaitingChoice()) return;
+        DialogNavigator navigator = navigators.get(player);
+        if (session == null || navigator == null || !session.isAwaitingChoice()) return;
 
-        DialogChoice choice = session.selectChoice();
+        DialogChoice choice = navigator.selectChoice();
         eventBus.fire(new DialogChoiceEvent(new Array<>(), 0, session.getNpc()));
         if (choice == null) return;
 
         eventBus.fire(new DialogChoiceResolvedEvent(player, session.getNpc(), choice));
-        boolean moveToNode = session.setNode(choice.next());
-        if (!moveToNode) session.setLines(choice.lines());
+        navigator.applyChoice(choice);
 
-        if (!session.hasLines()) {
-            player.remove(DialogSession.class);
+        if (!navigator.hasLines()) {
+            removeSession(player);
             eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
             return;
         }
-        eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
-    }
-
-    private ObjectMap<String, DialogNode> buildNodeMap(DialogData dialogData) {
-        ObjectMap<String, DialogNode> nodes = new ObjectMap<>();
-        if (dialogData == null || dialogData.getNodes() == null) {
-            return nodes;
-        }
-        for (DialogNode node : dialogData.getNodes()) {
-            if (node == null || node.id() == null) continue;
-            nodes.put(node.id(), node);
-        }
-        return nodes;
+        eventBus.fire(new DialogEvent(navigator.toDialogLine(), session.getNpc()));
     }
 
     private void onExitTrigger(ExitTriggerEvent event) {
@@ -196,7 +154,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         }
         Entity npcEntity = session.getNpc();
         if (npcEntity != null && npcEntity.equals(event.trigger())) {
-            player.remove(DialogSession.class);
+            removeSession(player);
             Dialog dialog = Dialog.MAPPER.get(npcEntity);
             if (dialog != null) {
                 dialog.setState(Dialog.State.IDLE);
@@ -206,6 +164,11 @@ public class DialogSystem extends IteratingSystem implements Disposable {
                 npcFsm.getNpcFsm().changeState(NpcState.IDLE);
             }
         }
+    }
+
+    private void removeSession(Entity player) {
+        player.remove(DialogSession.class);
+        navigators.remove(player);
     }
 
     @Override

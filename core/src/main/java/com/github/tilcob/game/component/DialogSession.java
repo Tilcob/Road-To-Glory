@@ -14,136 +14,62 @@ public class DialogSession implements Component {
     public static final ComponentMapper<DialogSession> MAPPER = ComponentMapper.getFor(DialogSession.class);
 
     private final Entity npc;
-    private Array<String> lines;
-    private Array<DialogChoice> choices;
-    private final ObjectMap<String, DialogNode> nodes;
-    private String currNodeId;
-    private int index;
+    private String currentNodeId;
+    private int lineIndex;
     private int choiceIndex;
     private boolean awaitingChoice;
-    private final boolean repeatableChoices;
     private boolean choiceConsumed;
 
-    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices,
-                         boolean repeatableChoices, ObjectMap<String, DialogNode> nodes) {
+    public DialogSession(Entity npc) {
         this.npc = npc;
-        this.lines = lines == null ? new Array<>() : lines;
-        this.choices = choices == null ? new Array<>() : new Array<>(choices);
-        this.nodes = nodes == null ? new ObjectMap<>() : nodes;
-        this.currNodeId = null;
-        this.index = 0;
+        this.currentNodeId = null;
+        this.lineIndex = 0;
         this.choiceIndex = 0;
         this.awaitingChoice = false;
-        this.repeatableChoices = repeatableChoices;
         this.choiceConsumed = false;
-    }
-
-    public DialogSession(Entity npc, Array<String> lines, Array<DialogChoice> choices, boolean repeatableChoices) {
-        this(npc, lines, choices, repeatableChoices, null);
     }
 
     public Entity getNpc() {
         return npc;
     }
 
-    public String currentLine() {
-        if (lines.isEmpty()) {
-            return "";
-        }
-        return lines.get(index);
-    }
-
     public String getCurrentNodeId() {
-        return currNodeId;
+        return currentNodeId;
     }
 
-    public boolean hasLines() {
-        return !lines.isEmpty();
+    public void setCurrentNodeId(String currentNodeId) {
+        this.currentNodeId = currentNodeId;
     }
 
-    public boolean advance() {
-        index++;
-        return index < lines.size;
+    public int getLineIndex() {
+        return lineIndex;
     }
 
-    public boolean hasChoices() {
-        return choices != null && choices.size > 0;
-    }
-
-    public boolean isAwaitingChoice() {
-        return awaitingChoice;
-    }
-
-    public void beginChoice() {
-        if (!hasChoices() || choiceConsumed) {
-            return;
-        }
-        awaitingChoice = true;
-        choiceIndex = 0;
-    }
-
-    public void moveChoice(int delta) {
-        if (!awaitingChoice || choices.isEmpty()) {
-            return;
-        }
-        choiceIndex = MathUtils.clamp(choiceIndex + delta, 0, choices.size - 1);
-    }
-
-    public DialogChoice selectChoice() {
-        if (!awaitingChoice || choices.isEmpty()) {
-            return null;
-        }
-        DialogChoice choice = choices.get(choiceIndex);
-        awaitingChoice = false;
-        choiceConsumed = true;
-        if (!repeatableChoices) choices.clear();
-        return choice;
-    }
-
-    public boolean hasRemainingChoices() {
-        return !choiceConsumed && hasChoices();
-    }
-
-    public Array<DialogChoice> getChoices() {
-        return choices;
+    public void setLineIndex(int lineIndex) {
+        this.lineIndex = lineIndex;
     }
 
     public int getChoiceIndex() {
         return choiceIndex;
     }
 
-    public int getIndex() {
-        return index;
+    public void setChoiceIndex(int choiceIndex) {
+        this.choiceIndex = choiceIndex;
     }
 
-    public int getTotal() {
-        return lines.size;
+    public boolean isAwaitingChoice() {
+        return awaitingChoice;
     }
 
-    public void setLines(Array<String> lines) {
-        this.lines = lines == null ? new Array<>() : lines;
-        this.index = 0;
-        this.currNodeId = null;
+    public void setAwaitingChoice(boolean awaitingChoice) {
+        this.awaitingChoice = awaitingChoice;
     }
 
-    public boolean setNode(String nodeId) {
-        if (nodeId == null || nodes == null || nodes.isEmpty()) {
-            return false;
-        }
-        DialogNode node = nodes.get(nodeId);
-        if (node == null) {
-            if (Gdx.app != null) {
-                Gdx.app.debug("DialogSession", "Dialog node not found: " + nodeId);
-            }
-            return false;
-        }
-        this.currNodeId = nodeId;
-        this.lines = node.lines() == null ? new Array<>() : node.lines();
-        this.choices = node.choices() == null ? new Array<>() : new Array<>(node.choices());
-        this.index = 0;
-        this.choiceIndex = 0;
-        this.awaitingChoice = false;
-        this.choiceConsumed = false;
-        return true;
+    public boolean isChoiceConsumed() {
+        return choiceConsumed;
+    }
+
+    public void setChoiceConsumed(boolean choiceConsumed) {
+        this.choiceConsumed = choiceConsumed;
     }
 }
