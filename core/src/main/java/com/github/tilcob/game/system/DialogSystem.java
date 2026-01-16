@@ -66,10 +66,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         DialogData dialogData = allDialogs.get(npc.getName());
         if (dialogData == null || dialogData.questDialog() == null) return;
         String questId = dialogData.questDialog().questId();
-        QuestState questState = questLog.getQuestStateById(questId);
-        if (questState == QuestState.NOT_STARTED) {
-            eventBus.fire(new AddQuestEvent(player, questId));
-        }
 
         Quest quest = questLog.getQuestById(questId);
         if (quest != null && quest.isCompleted() && !quest.isRewardClaimed()) {
