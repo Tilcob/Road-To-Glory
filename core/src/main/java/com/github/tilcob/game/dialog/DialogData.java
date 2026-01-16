@@ -1,6 +1,7 @@
 package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class DialogData {
     private Array<String> idle;
@@ -9,15 +10,18 @@ public class DialogData {
     private Array<DialogFlagDialog> flagDialogs;
     private QuestDialog questDialog;
     private Array<DialogNode> nodes;
+    private ObjectMap<String, DialogNode> nodesById;
 
     public DialogData(Array<String> idle, Array<String> rootLines, Array<DialogChoice> choices,
-                      Array<DialogFlagDialog> flagDialogs, QuestDialog questDialog, Array<DialogNode> nodes) {
+                      Array<DialogFlagDialog> flagDialogs, QuestDialog questDialog, Array<DialogNode> nodes,
+                      ObjectMap<String, DialogNode> nodesById) {
         this.idle = idle;
         this.choices = choices;
         this.rootLines = rootLines;
         this.flagDialogs = flagDialogs;
         this.questDialog = questDialog;
         this.nodes = nodes;
+        this.nodesById = nodesById;
     }
 
     public DialogData() {
@@ -45,5 +49,9 @@ public class DialogData {
 
     public Array<DialogNode> getNodes() {
         return nodes;
+    }
+
+    public ObjectMap<String, DialogNode> nodesById() {
+        return nodesById;
     }
 }

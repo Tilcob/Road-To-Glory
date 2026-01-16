@@ -98,8 +98,19 @@ public class YarnDialogLoader {
         }
 
         Array<DialogFlagDialog> flagDialogArray = flagDialogs.size == 0 ? null : flagDialogs;
+        ObjectMap<String, DialogNode> nodesById = buildNodeMap(nodes);
 
-        return new DialogData(idleLines, rootLines, rootChoices, flagDialogArray, questDialog, nodes);
+        return new DialogData(idleLines, rootLines, rootChoices, flagDialogArray, questDialog, nodes, nodesById);
+    }
+
+    private ObjectMap<String, DialogNode> buildNodeMap(Array<DialogNode> nodes) {
+        ObjectMap<String, DialogNode> nodesById = new ObjectMap<>();
+        if (nodes == null || nodes.isEmpty()) return nodesById;
+        for (DialogNode node : nodes) {
+            if (node == null || node.id() == null) continue;
+            nodesById.put(node.id(), node);
+        }
+        return nodesById;
     }
 
     private static ParsedNode findTaggedNode(List<ParsedNode> parsedNodes, String... tags) {

@@ -3,7 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.ai.msg.Telegram;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -12,7 +11,6 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.quest.Quest;
 
 import java.util.Map;
 
@@ -72,7 +70,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         DialogSelection selection = DialogSelector.select(dialogData, questLog);
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity, selection.lines(), selection.choices(),
-            repeatChoices, buildNodeMap(dialogData));
+            repeatChoices, dialogData.nodesById());
         if (!session.hasLines()) {
             dialog.setState(Dialog.State.IDLE);
             return;
@@ -149,18 +147,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             return;
         }
         eventBus.fire(new DialogEvent(toDialogLine(session), session.getNpc()));
-    }
-
-    private ObjectMap<String, DialogNode> buildNodeMap(DialogData dialogData) {
-        ObjectMap<String, DialogNode> nodes = new ObjectMap<>();
-        if (dialogData == null || dialogData.getNodes() == null) {
-            return nodes;
-        }
-        for (DialogNode node : dialogData.getNodes()) {
-            if (node == null || node.id() == null) continue;
-            nodes.put(node.id(), node);
-        }
-        return nodes;
     }
 
     private void onExitTrigger(ExitTriggerEvent event) {
