@@ -1,5 +1,30 @@
-- `core`: Main module with the application logic shared by all platforms.
-- `lwjgl3`: Primary desktop platform using LWJGL3; was called 'desktop' in older docs.
+# Road-To-Glory
+
+A LibGDX-based RPG project with a modular architecture split between shared core logic and the LWJGL3 desktop launcher.
+
+## Repository layout
+
+- `core`: Shared game logic, assets management, ECS components/systems, and UI.
+- `lwjgl3`: Desktop launcher and platform-specific configuration.
+- `assets`: Runtime assets bundled with the game.
+- `assets_raw`: Source assets before processing/export.
+- `utils`: Utility scripts and tooling.
+
+## Codebase documentation
+
+The core module follows a layered architecture on top of Ashley ECS. The most important packages are documented via
+`package-info.java` so that IDEs show clear package-level overviews. The highlights are:
+
+- `com.github.tilcob.game.system`: ECS systems for gameplay, AI, rendering, dialog, and inventory.
+- `com.github.tilcob.game.component`: Data-only ECS components for entity state.
+- `com.github.tilcob.game.ai`: NPC state/behavior configuration and AI state machines.
+- `com.github.tilcob.game.dialog`: Dialog data, selection logic, and Yarn loader integration.
+- `com.github.tilcob.game.quest`: Quest definitions, steps, and rewards.
+- `com.github.tilcob.game.save`: Save service, registry, and migration helpers.
+- `com.github.tilcob.game.ui`: Scene2D UI views, models, and inventory widgets.
+
+When introducing new packages or major gameplay features, follow the same pattern by adding or extending
+`package-info.java` descriptions so the high-level intent stays discoverable.
 
 ## Gradle
 
