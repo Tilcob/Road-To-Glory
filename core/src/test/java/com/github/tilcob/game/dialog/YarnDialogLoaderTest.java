@@ -10,7 +10,8 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class YarnDialogLoaderTest {
     @TempDir
@@ -55,11 +56,11 @@ class YarnDialogLoaderTest {
         assertEquals("shop_wares", choice.next());
         assertEquals(1, choice.lines().size);
         assertEquals("I'm still setting up.", choice.lines().first());
-        assertEquals(1, dialogData.getNodes().size);
+        assertEquals(2, dialogData.getNodes().size);
         DialogNode node = dialogData.getNodes().first();
-        assertEquals("shop_wares", node.id());
+        assertEquals("Idle", node.id());
         assertEquals(1, node.lines().size);
-        assertEquals("Come back soon!", node.lines().first());
+        assertEquals("Welcome in my shop!", node.lines().first());
     }
 
     @Test
@@ -106,19 +107,19 @@ class YarnDialogLoaderTest {
             Idle line.
             ===
 
-            title: quest_Welcome_To_Town_notStarted
+            title: quest_notStarted
             tags: quest_Welcome_To_Town, notstarted
             ---
             Welcome in our town!
             ===
 
-            title: quest_Welcome_To_Town_inProgress
+            title: quest_inProgress
             tags: quest_Welcome_To_Town, inprogress
             ---
             Are you new here?
             ===
 
-            title: quest_Welcome_To_Town_completed
+            title: quest_completed
             tags: quest_Welcome_To_Town, completed
             ---
             By my friend!

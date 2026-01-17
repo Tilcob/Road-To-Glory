@@ -3,12 +3,6 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
-import com.github.tilcob.game.dialog.DialogChoice;
-import com.github.tilcob.game.dialog.DialogNode;
 
 public class DialogSession implements Component {
     public static final ComponentMapper<DialogSession> MAPPER = ComponentMapper.getFor(DialogSession.class);

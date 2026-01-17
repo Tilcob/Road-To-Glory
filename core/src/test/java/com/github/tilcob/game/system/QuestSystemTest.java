@@ -3,17 +3,18 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.quest.QuestReward;
-import com.github.tilcob.game.test.HeadlessGdxTest;
+import com.github.tilcob.game.event.AddQuestEvent;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.step.QuestStep;
+import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuestSystemTest extends HeadlessGdxTest {

@@ -49,7 +49,7 @@ public class YarnDialogLoader {
                 if (parsedNode.tags.contains("notstarted")) {
                     questNotStarted = questLines;
                     questNotStartedChoices = questChoices;
-                } else if (parsedNode.tags.contains("inProgress")) {
+                } else if (parsedNode.tags.contains("inprogress")) {
                     questInProgress = questLines;
                     questInProgressChoices = questChoices;
                 } else if (parsedNode.tags.contains("completed")) {
