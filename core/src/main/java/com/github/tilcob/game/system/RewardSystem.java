@@ -11,15 +11,16 @@ import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.QuestReward;
 
 public class RewardSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestFactory questFactory;
 
-    public RewardSystem(GameEventBus eventBus) {
+    public RewardSystem(GameEventBus eventBus, QuestRepository questRepository) {
         this.eventBus = eventBus;
-        this.questFactory = new QuestFactory(eventBus);
+        this.questFactory = new QuestFactory(eventBus, questRepository);
         eventBus.subscribe(QuestRewardEvent.class, this::onQuestReward);
     }
 

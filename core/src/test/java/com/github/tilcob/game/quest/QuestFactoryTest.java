@@ -1,6 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.assets.QuestAsset;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
@@ -13,9 +12,11 @@ class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
     void createQuestFromJsonAllowsNullRewardItems() {
-        QuestFactory factory = new QuestFactory(new GameEventBus());
-        QuestFactory.RewardJson rewardJson = new QuestFactory.RewardJson(25, null);
-        QuestFactory.QuestJson questJson = new QuestFactory.QuestJson(
+        GameEventBus eventBus = new GameEventBus();
+        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestFactory factory = new QuestFactory(eventBus, repository);
+        QuestJson.RewardJson rewardJson = new QuestJson.RewardJson(25, null);
+        QuestJson questJson = new QuestJson(
             "Reward_Quest",
             "Reward Quest",
             "Reward test",
@@ -31,10 +32,13 @@ class QuestFactoryTest extends HeadlessGdxTest {
     }
 
     @Test
-    void loadAllReadsQuestAssetJson() {
-        QuestFactory factory = new QuestFactory(new GameEventBus());
+    void createUsesRepositoryDefinitions() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestFactory factory = new QuestFactory(eventBus, repository);
+        repository.loadAll();
 
-        Quest quest = factory.loadAll(QuestAsset.welcome_to_town).get("welcome_to_town");
+        Quest quest = factory.create("welcome_to_town");
 
         assertNotNull(quest);
         assertEquals("welcome_to_town", quest.getQuestId());

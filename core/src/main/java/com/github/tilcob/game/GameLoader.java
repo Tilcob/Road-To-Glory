@@ -1,8 +1,12 @@
 package com.github.tilcob.game;
 
-import com.github.tilcob.game.assets.*;
+import com.github.tilcob.game.assets.AtlasAsset;
+import com.github.tilcob.game.assets.DialogAsset;
+import com.github.tilcob.game.assets.SkinAsset;
+import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestJson;
 
 public class GameLoader {
     private final GameServices services;
@@ -11,7 +15,7 @@ public class GameLoader {
 
     public GameLoader(GameServices services) {
         this.services = services;
-        this.questFactory = new QuestFactory(services.getEventBus());
+        this.questFactory = new QuestFactory(services.getEventBus(), services.getQuestRepository());
         this.dialogLoader = new YarnDialogLoader();
     }
 
@@ -22,8 +26,8 @@ public class GameLoader {
         for (SoundAsset soundAsset : SoundAsset.values()) {
             services.getAssetManager().queue(soundAsset);
         }
-        for (QuestAsset questAsset : QuestAsset.values()) {
-            services.getAllQuests().putAll(questFactory.loadAll(questAsset));
+        for (QuestJson questJson : services.getQuestRepository().loadAll().values()) {
+            services.getAllQuests().put(questJson.questId(), questFactory.createQuestFromJson(questJson));
         }
         for (DialogAsset dialogAsset : DialogAsset.values()) {
             services.getAllDialogs().put(dialogAsset.getNpcName(),

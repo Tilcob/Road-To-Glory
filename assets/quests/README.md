@@ -1,7 +1,8 @@
 # Quest JSON conventions
 
-Each quest lives in its own JSON file. The filename (and matching `QuestAsset` enum
-name) must equal the `questId`.
+Each quest lives in its own JSON file. The filename should match the `questId`, and
+quests are loaded either by manifest (`quests/index.json`) or by listing the `quests/`
+directory at runtime.
 
 ## Rewards
 

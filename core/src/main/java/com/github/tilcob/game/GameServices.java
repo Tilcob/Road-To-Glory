@@ -7,6 +7,7 @@ import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
@@ -26,6 +27,7 @@ public class GameServices {
     private final AudioManager audioManager;
     private final Map<String, Quest> allQuests;
     private final Map<String, DialogData> allDialogs;
+    private final QuestRepository questRepository;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -38,6 +40,8 @@ public class GameServices {
         this.audioManager = new AudioManager(assetManager);
         this.allQuests = new HashMap<>();
         this.allDialogs = new HashMap<>();
+        this.questRepository = new QuestRepository(eventBus, false, "quests/index.json",
+            "quests");
     }
 
     public void loadGame() {
@@ -82,5 +86,9 @@ public class GameServices {
 
     public Map<String, DialogData> getAllDialogs() {
         return allDialogs;
+    }
+
+    public QuestRepository getQuestRepository() {
+        return questRepository;
     }
 }

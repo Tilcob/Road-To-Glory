@@ -11,16 +11,17 @@ import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.step.QuestStep;
 
 public class QuestSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestFactory factory;
 
-    public QuestSystem(GameEventBus eventBus) {
+    public QuestSystem(GameEventBus eventBus, QuestRepository questRepository) {
         super(Family.all(QuestLog.class).get());
         this.eventBus = eventBus;
-        this.factory = new QuestFactory(eventBus);
+        this.factory = new QuestFactory(eventBus, questRepository);
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
     }
