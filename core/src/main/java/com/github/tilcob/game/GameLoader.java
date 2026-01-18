@@ -1,6 +1,5 @@
-package com.github.tilcob.game.screen;
+package com.github.tilcob.game;
 
-import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.*;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.quest.QuestFactory;

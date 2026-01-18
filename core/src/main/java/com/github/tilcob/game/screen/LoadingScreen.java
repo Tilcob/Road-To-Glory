@@ -2,6 +2,7 @@ package com.github.tilcob.game.screen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
+import com.github.tilcob.game.GameLoader;
 import com.github.tilcob.game.GameServices;
 
 import java.util.function.Consumer;

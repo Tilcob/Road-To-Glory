@@ -21,7 +21,7 @@ class SaveManagerTest extends HeadlessGdxTest {
 
     @Test
     void saveAndLoadRoundTripRebuildsState() throws Exception {
-        FileHandle saveFile = Gdx.files.local("build/test-saves/savegame.json");
+        FileHandle saveFile = Gdx.files.local("tests/build/test-saves/savegame.json");
         saveFile.file().getParentFile().mkdirs();
         saveFile.delete();
 
@@ -57,7 +57,7 @@ class SaveManagerTest extends HeadlessGdxTest {
 
     @Test
     void saveThrowsWhenRequiredFieldsAreMissing() {
-        SaveManager saveManager = new SaveManager("build/test-saves/invalid-save.json");
+        SaveManager saveManager = new SaveManager("tests/build/test-saves/invalid-save.json");
 
         GameState state = new GameState();
         PlayerState playerState = new PlayerState();
@@ -70,7 +70,7 @@ class SaveManagerTest extends HeadlessGdxTest {
 
     @Test
     void loadThrowsWhenSaveFileIsMissing() {
-        FileHandle saveFile = Gdx.files.local("build/test-saves/missing-save.json");
+        FileHandle saveFile = Gdx.files.local("tests/build/test-saves/missing-save.json");
         saveFile.delete();
 
         SaveManager saveManager = new SaveManager(saveFile.path());
