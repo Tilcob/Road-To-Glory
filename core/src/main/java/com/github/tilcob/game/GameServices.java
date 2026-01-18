@@ -40,7 +40,7 @@ public class GameServices {
         this.audioManager = new AudioManager(assetManager);
         this.allQuests = new HashMap<>();
         this.allDialogs = new HashMap<>();
-        this.questRepository = new QuestRepository(eventBus, false, "quests/index.json",
+        this.questRepository = new QuestRepository(eventBus, true, "quests/index.json",
             "quests");
     }
 

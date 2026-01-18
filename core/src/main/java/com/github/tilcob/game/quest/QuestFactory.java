@@ -30,9 +30,7 @@ public class QuestFactory {
     }
 
     private QuestReward createReward(QuestJson.RewardJson rewardJson) {
-        if (rewardJson == null) {
-            return null;
-        }
+        if (rewardJson == null) return null;
         List<ItemType> items = new ArrayList<>();
         if (rewardJson.items() != null) rewardJson.items().forEach(item -> items.add(ItemType.valueOf(item)));
         return new QuestReward(rewardJson.money(), items);
@@ -48,12 +46,9 @@ public class QuestFactory {
     }
 
     public Quest create(String questId) {
-        if (questRepository.isEmpty()) {
-            questRepository.loadAll();
-        }
+        if (questRepository.isEmpty()) questRepository.loadAll();
         QuestJson definition = questRepository.getQuestDefinition(questId);
         if (definition != null) return createQuestFromJson(definition);
-
         throw new IllegalArgumentException("Quest not found: " + questId);
     }
 }

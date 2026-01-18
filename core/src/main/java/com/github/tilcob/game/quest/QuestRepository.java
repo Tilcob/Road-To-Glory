@@ -52,7 +52,12 @@ public class QuestRepository {
             String[] entries = mapper.readValue(manifest.readString(), String[].class);
             List<FileHandle> files = new ArrayList<>();
             for (String entry : entries) {
-                files.add(resolveQuestFile(entry));
+                FileHandle questFile = resolveQuestFile(entry);
+                if (!questFile.exists()) {
+                    Gdx.app.error(TAG, "Quest file from index not found: " + questFile.path());
+                    continue;
+                }
+                files.add(questFile);
             }
             return files;
         } catch (IOException e) {

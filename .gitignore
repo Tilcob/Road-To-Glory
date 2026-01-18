@@ -165,3 +165,6 @@ Thumbs.db
 
 # Project exclude paths
 /utils/build/
+
+# Generated asset indexes
+assets/**/index.json
