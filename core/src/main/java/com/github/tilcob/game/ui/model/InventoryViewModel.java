@@ -11,6 +11,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 
 public class InventoryViewModel extends ViewModel {
@@ -65,7 +66,7 @@ public class InventoryViewModel extends ViewModel {
             Id idComp = Id.MAPPER.get(itemEntity);
             if (idComp == null) return;
 
-            ItemDefinition definition = ItemDefinitions.get(item.getItemId());
+            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
             ItemModel model = new ItemModel(
                 idComp.getId(),
                 definition.category(),

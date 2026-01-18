@@ -3,6 +3,7 @@ package com.github.tilcob.game.save.states.chest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
@@ -40,8 +41,8 @@ public class ChestState {
     public void rebuildContentsFromName() {
         contents.clear();
         for (String name : contentsByName) {
-            String resolved = ItemDefinitions.resolveId(name);
-            if (!ItemDefinitions.isKnownId(resolved)) {
+            String resolved = ItemDefinitionRegistry.resolveId(name);
+            if (!ItemDefinitionRegistry.isKnownId(resolved)) {
                 Gdx.app.error("ChestState", "Unknown item id: " + name);
                 continue;
             }

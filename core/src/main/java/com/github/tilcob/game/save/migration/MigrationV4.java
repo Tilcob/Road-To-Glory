@@ -1,5 +1,6 @@
 package com.github.tilcob.game.save.migration;
 
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
@@ -17,7 +18,7 @@ public class MigrationV4 implements Migration {
         PlayerState playerState = state.getPlayerState();
         if (playerState != null && playerState.getItemsByName().isEmpty()) {
             for (var item : playerState.getItems()) {
-                playerState.getItemsByName().add(ItemDefinitions.resolveId(item));
+                playerState.getItemsByName().add(ItemDefinitionRegistry.resolveId(item));
             }
         }
 
@@ -27,7 +28,7 @@ public class MigrationV4 implements Migration {
                 for (var chest : chestMap.values()) {
                     if (chest.getContentsByName().isEmpty()) {
                         for (var item : chest.getContents()) {
-                            chest.getContentsByName().add(ItemDefinitions.resolveId(item));
+                            chest.getContentsByName().add(ItemDefinitionRegistry.resolveId(item));
                         }
                     }
                 }

@@ -27,6 +27,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.loot.LootTableType;
@@ -152,7 +153,7 @@ public class TiledAshleyConfigurator {
         String[] itemTypes = lootStr.split(",");
 
         for (String itemType : itemTypes) {
-            loot.add(ItemDefinitions.resolveId(itemType.trim()));
+            loot.add(ItemDefinitionRegistry.resolveId(itemType.trim()));
         }
         return loot;
     }

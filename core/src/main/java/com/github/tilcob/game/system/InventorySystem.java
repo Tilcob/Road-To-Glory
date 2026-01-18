@@ -13,6 +13,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
@@ -40,7 +41,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         ObjectIntMap<String> addedCounts = new ObjectIntMap<>();
 
         for (String itemId : inventory.getItemsToAdd()) {
-            String resolvedId = ItemDefinitions.resolveId(itemId);
+            String resolvedId = ItemDefinitionRegistry.resolveId(itemId);
             if (inventoryFull) {
                 remaining.add(resolvedId);
                 continue;
@@ -140,7 +141,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         Item to = Item.MAPPER.get(toEntity);
 
         if (!from.getItemId().equals(to.getItemId())) return false;
-        ItemDefinition definition = ItemDefinitions.get(from.getItemId());
+        ItemDefinition definition = ItemDefinitionRegistry.get(from.getItemId());
         if (!definition.isStackable()) return false;
 
         int space = definition.maxStack() - to.getCount();
@@ -168,7 +169,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     }
 
     private Entity findStackableItem(Inventory inventory, String itemId) {
-        ItemDefinition definition = ItemDefinitions.get(itemId);
+        ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
         for (Entity e : inventory.getItems()) {
             Item item = Item.MAPPER.get(e);
             if (item.getItemId().equals(itemId) && definition.isStackable() && item.getCount() < definition.maxStack()) {

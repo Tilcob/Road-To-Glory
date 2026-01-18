@@ -6,7 +6,7 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.item.ItemRegistry;
+import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.save.SaveManager;
@@ -20,7 +20,7 @@ import java.util.Map;
 
 public class GameServices {
     private final GameEventBus eventBus;
-    private final ItemRegistry itemRegistry;
+    private final ItemEntityRegistry itemEntityRegistry;
     private final ChestRegistry chestRegistry;
     private final StateManager stateManager;
     private final SaveService saveService;
@@ -33,7 +33,7 @@ public class GameServices {
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
-        this.itemRegistry = new ItemRegistry(eventBus);
+        this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
         SaveManager saveManager = new SaveManager(savePath);
@@ -60,8 +60,8 @@ public class GameServices {
         return eventBus;
     }
 
-    public ItemRegistry getItemRegistry() {
-        return itemRegistry;
+    public ItemEntityRegistry getItemRegistry() {
+        return itemEntityRegistry;
     }
 
     public ChestRegistry getChestRegistry() {

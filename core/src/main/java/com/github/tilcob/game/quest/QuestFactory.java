@@ -1,6 +1,7 @@
 package com.github.tilcob.game.quest;
 
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.quest.step.CollectItemStep;
 import com.github.tilcob.game.quest.step.KillStep;
@@ -33,7 +34,7 @@ public class QuestFactory {
         if (rewardJson == null) return null;
         List<String> items = new ArrayList<>();
         if (rewardJson.items() != null) rewardJson.items().forEach(
-            item -> items.add(ItemDefinitions.resolveId(item)));
+            item -> items.add(ItemDefinitionRegistry.resolveId(item)));
         return new QuestReward(rewardJson.money(), items);
     }
 

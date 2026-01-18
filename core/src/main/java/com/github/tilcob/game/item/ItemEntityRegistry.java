@@ -6,10 +6,10 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.ItemCreatedEvent;
 import com.github.tilcob.game.event.ItemRemovedEvent;
 
-public class ItemRegistry {
+public class ItemEntityRegistry {
     private final IntMap<Entity> itemsById = new IntMap<>();
 
-    public ItemRegistry(GameEventBus eventBus) {
+    public ItemEntityRegistry(GameEventBus eventBus) {
         eventBus.subscribe(ItemCreatedEvent.class, this::register);
         eventBus.subscribe(ItemRemovedEvent.class, this::unregister);
     }

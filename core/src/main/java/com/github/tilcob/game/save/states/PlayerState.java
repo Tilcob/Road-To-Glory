@@ -3,6 +3,7 @@ package com.github.tilcob.game.save.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
@@ -49,8 +50,8 @@ public class PlayerState {
     public void rebuildItemsByName() {
         items.clear();
         for (String name : itemsByName) {
-            String resolved = ItemDefinitions.resolveId(name);
-            if (!ItemDefinitions.isKnownId(resolved)) {
+            String resolved = ItemDefinitionRegistry.resolveId(name);
+            if (!ItemDefinitionRegistry.isKnownId(resolved)) {
                 Gdx.app.error("PlayerState", "Unknown item id: " + name);
                 continue;
             }

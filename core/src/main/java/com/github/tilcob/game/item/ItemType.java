@@ -2,7 +2,7 @@ package com.github.tilcob.game.item;
 
 @Deprecated(forRemoval = false)
 public enum ItemType {
-    UNDEFINED(ItemCategory.UNDEFINED, "", 1, ItemDefinitions.UNDEFINED_ID),
+    UNDEFINED(ItemCategory.UNDEFINED, "", 1, ItemDefinitionRegistry.UNDEFINED_ID),
     HELMET(ItemCategory.HELMET, "helmet", 1, "helmet"),
     SWORD(ItemCategory.WEAPON, "sword", 1, "sword"),
     BOOTS(ItemCategory.BOOTS, "boots", 2, "boots"),

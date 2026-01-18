@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.OpenChestRequest;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
@@ -55,7 +56,7 @@ public class ChestSystem extends IteratingSystem {
 
         for (var entity : inventory.getItems()) {
             Item item = Item.MAPPER.get(entity);
-            ItemDefinition definition = ItemDefinitions.get(item.getItemId());
+            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
             if (!definition.isStackable()) continue;
             int space = definition.maxStack() - item.getCount();
             if (space > 0) {
@@ -67,7 +68,7 @@ public class ChestSystem extends IteratingSystem {
         List<String> transferred = new ArrayList<>();
 
         for (String itemId : chest.getContents()) {
-            ItemDefinition definition = ItemDefinitions.get(itemId);
+            ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
             if (definition.isStackable() && stackSpace.getOrDefault(itemId, 0) > 0) {
                 stackSpace.put(itemId, stackSpace.get(itemId) - 1);
                 transferred.add(itemId);
