@@ -1,0 +1,7 @@
+{
+    "id": "necklace",
+    "name": "Necklace",
+    "category": "NECKLACE",
+    "maxStack": 1,
+    "icon": "necklace"
+}

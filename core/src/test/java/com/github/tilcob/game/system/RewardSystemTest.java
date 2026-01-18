@@ -7,7 +7,6 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.QuestReward;
@@ -30,7 +29,7 @@ class RewardSystemTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(15, List.of(ItemType.SWORD));
+        QuestReward reward = new QuestReward(15, List.of("sword"));
         Quest quest = new Quest("Reward_Quest", "Reward Quest", "Reward test", reward);
         questLog.add(quest);
 
@@ -43,7 +42,7 @@ class RewardSystemTest {
 
         Inventory inventory = Inventory.MAPPER.get(player);
         assertNotNull(inventory);
-        assertTrue(inventory.getItemsToAdd().contains(ItemType.SWORD, true));
+        assertTrue(inventory.getItemsToAdd().contains("sword", true));
         assertTrue(quest.isRewardClaimed());
 
         rewardSystem.dispose();
@@ -59,7 +58,7 @@ class RewardSystemTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(10, List.of(ItemType.BOOTS));
+        QuestReward reward = new QuestReward(10, List.of("boots"));
         Quest quest = new Quest("Incomplete_Quest", "Incomplete Quest", "Not done", reward);
         quest.getSteps().add(new TestStep(false));
         questLog.add(quest);

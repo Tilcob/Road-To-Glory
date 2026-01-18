@@ -14,7 +14,6 @@ import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogChoice;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.item.ItemType;
 
 import java.util.Map;
 
@@ -96,8 +95,8 @@ public class GameViewModel extends ViewModel {
 
     private void onRewardGranted(RewardGrantedEvent event) {
         Array<String> items = new Array<>();
-        for (ItemType itemType : event.reward().items()) {
-            items.add(itemType.name());
+        for (String itemId : event.reward().items()) {
+            items.add(itemId);
         }
         String title = event.questTitle() == null || event.questTitle().isBlank()
             ? event.questId().replace("_", " ")

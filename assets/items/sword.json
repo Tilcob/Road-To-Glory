@@ -1,0 +1,7 @@
+{
+    "id": "sword",
+    "name": "Iron Sword",
+    "category": "WEAPON",
+    "maxStack": 1,
+    "icon": "sword"
+}

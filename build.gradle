@@ -111,10 +111,34 @@ tasks.register("genDialogIndex") {
   }
 }
 
+tasks.register("genItemIndex") {
+  group = "assets"
+  description = "Generates assets/items/index.json from *.json (excluding index.json)."
+  doLast {
+    def dir = file("$rootDir/assets/items")
+    if (!dir.exists()) {
+      println "Items directory not found, skipping: $dir"
+      return
+    }
+
+    def outFile = file("$rootDir/assets/items/index.json")
+
+    def names = dir.listFiles()
+      .findAll { it.isFile() }
+      .collect { it.name }
+      .findAll { it.toLowerCase().endsWith(".json") }
+      .findAll { it != "index.json" }
+      .sort()
+
+    outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(names)) + "\n"
+    println "Generated $outFile (${names.size()} entries)"
+  }
+}
+
 tasks.register("genAssetIndexes") {
   group = "assets"
   description = "Generates quest + dialog index files."
-  dependsOn("genQuestIndex", "genDialogIndex")
+  dependsOn("genQuestIndex", "genDialogIndex", "genItemIndex")
 }
 
 // Automatically run before processResources in all subprojects (core/lwjgl3/etc.)

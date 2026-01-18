@@ -27,7 +27,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.loot.LootTableType;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.save.registry.ChestRegistry;
@@ -133,10 +133,10 @@ public class TiledAshleyConfigurator {
         boolean hasInventory = object.getProperties().get(Constants.HAS_INVENTORY, false, Boolean.class);
         if (!hasInventory) return;
         String lootStr = object.getProperties().get(Constants.LOOT, "", String.class);
-        Array<ItemType> loot;
+        Array<String> loot;
         ChestState state;
         if (!lootStr.isBlank()) {
-            loot = getItemType(lootStr);
+            loot = getItemIds(lootStr);
             state = chestRegistry.getOrCreate(map, id, loot);
         } else {
             loot = LootTableType.BASIC_CHEST.getLootTable().roll();
@@ -146,12 +146,12 @@ public class TiledAshleyConfigurator {
         entity.add(new Chest(state));
     }
 
-    private Array<ItemType> getItemType(String lootStr) {
-        Array<ItemType> loot = new Array<>();
+    private Array<String> getItemIds(String lootStr) {
+        Array<String> loot = new Array<>();
         String[] itemTypes = lootStr.split(",");
 
         for (String itemType : itemTypes) {
-            loot.add(ItemType.valueOf(itemType));
+            loot.add(ItemDefinitionRegistry.resolveId(itemType.trim()));
         }
         return loot;
     }

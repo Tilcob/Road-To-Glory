@@ -3,20 +3,20 @@ package com.github.tilcob.game.save.states.chest;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class ChestState {
     @JsonIgnore
-    private final List<ItemType> contents = new ArrayList<>();
+    private final List<String> contents = new ArrayList<>();
     private List<String> contentsByName = new ArrayList<>();
     private boolean opened;
 
     public ChestState() {}
 
-    public ChestState(Array<ItemType> initialLoot) {
+    public ChestState(Array<String> initialLoot) {
         addItems(initialLoot);
     }
 
@@ -33,35 +33,39 @@ public class ChestState {
     }
 
     @JsonIgnore
-    public List<ItemType> getContents() { return contents; }
+    public List<String> getContents() { return contents; }
 
     @JsonIgnore
     public void rebuildContentsFromName() {
         contents.clear();
+        List<String> normalized = new ArrayList<>();
         for (String name : contentsByName) {
-            try {
-                contents.add(ItemType.valueOf(name));
-            } catch (IllegalArgumentException e) {
-                Gdx.app.error("ChestState", e.getMessage());
+            String resolved = ItemDefinitionRegistry.resolveId(name);
+            if (!ItemDefinitionRegistry.isKnownId(resolved)) {
+                Gdx.app.error("ChestState", "Unknown item id: " + name);
+                continue;
             }
+            contents.add(resolved);
+            normalized.add(resolved);
         }
+        contentsByName = normalized;
         opened = false;
     }
 
     @JsonIgnore
-    public Array<ItemType> getContentsForGame() {
-        Array<ItemType> newArray = new Array<>();
-        for (ItemType item : contents) {
+    public Array<String> getContentsForGame() {
+        Array<String> newArray = new Array<>();
+        for (String item : contents) {
             newArray.add(item);
         }
         return newArray;
     }
 
     @JsonIgnore
-    private void addItems(Array<ItemType> contents) {
-        for (ItemType item : contents) {
+    private void addItems(Array<String> contents) {
+        for (String item : contents) {
             this.contents.add(item);
-            contentsByName.add(item.name());
+            contentsByName.add(item);
         }
     }
 
@@ -78,12 +82,12 @@ public class ChestState {
     }
 
     @JsonIgnore
-    public void setContents(List<ItemType> newContents) {
+    public void setContents(List<String> newContents) {
         contents.clear();
         contentsByName.clear();
-        for (ItemType item : newContents) {
+        for (String item : newContents) {
             contents.add(item);
-            contentsByName.add(item.name());
+            contentsByName.add(item);
         }
     }
 }

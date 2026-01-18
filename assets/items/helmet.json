@@ -1,0 +1,7 @@
+{
+    "id": "helmet",
+    "name": "Helmet",
+    "category": "HELMET",
+    "maxStack": 1,
+    "icon": "helmet"
+}

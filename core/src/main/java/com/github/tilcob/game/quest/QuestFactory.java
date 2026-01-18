@@ -1,7 +1,7 @@
 package com.github.tilcob.game.quest;
 
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.step.CollectItemStep;
 import com.github.tilcob.game.quest.step.KillStep;
 import com.github.tilcob.game.quest.step.QuestStep;
@@ -31,15 +31,16 @@ public class QuestFactory {
 
     private QuestReward createReward(QuestJson.RewardJson rewardJson) {
         if (rewardJson == null) return null;
-        List<ItemType> items = new ArrayList<>();
-        if (rewardJson.items() != null) rewardJson.items().forEach(item -> items.add(ItemType.valueOf(item)));
+        List<String> items = new ArrayList<>();
+        if (rewardJson.items() != null) rewardJson.items().forEach(
+            item -> items.add(ItemDefinitionRegistry.resolveId(item)));
         return new QuestReward(rewardJson.money(), items);
     }
 
     public QuestStep createStep(QuestJson.StepJson step) {
         return switch (step.type()) {
             case "talk"  -> new TalkStep(step.npc(), eventBus);
-            case "collect" -> new CollectItemStep(ItemType.valueOf(step.item()), step.amount(), eventBus);
+            case "collect" -> new CollectItemStep(ItemDefinitionRegistry.resolveId(step.itemId()), step.amount(), eventBus);
             case "kill" -> new KillStep(step.enemy(), step.amount(), eventBus);
             default -> throw new IllegalArgumentException("Unknown step type: " + step.type());
         };

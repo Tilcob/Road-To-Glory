@@ -2,7 +2,6 @@ package com.github.tilcob.game.save.registry;
 
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.assets.MapAsset;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.chest.ChestRegistryState;
 import com.github.tilcob.game.save.states.chest.ChestState;
 
@@ -12,7 +11,7 @@ import java.util.Map;
 public class ChestRegistry {
     private final Map<MapAsset, Map<Integer, ChestState>> chests = new HashMap<>();
 
-    public ChestState getOrCreate(MapAsset map, int id, Array<ItemType> loot) {
+    public ChestState getOrCreate(MapAsset map, int id, Array<String> loot) {
         return chests
             .computeIfAbsent(map, m -> new HashMap<>())
             .computeIfAbsent(id, i -> new ChestState(loot));

@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.QuestRepository;
@@ -30,7 +31,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
         if (quest == null || quest.isRewardClaimed() || !quest.isCompleted()) return;
         quest.setRewardClaimed(true);
         QuestReward reward = quest.getReward();
-        applyGold(player, reward);
+        applyMoney(player, reward);
         applyItems(player, reward);
         if (reward.money() > 0 || !reward.items().isEmpty()) {
             eventBus.fire(new RewardGrantedEvent(player, quest.getQuestId(), quest.getTitle(), reward));
@@ -46,7 +47,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
         return questFactory.create(event.questId());
     }
 
-    private void applyGold(Entity player, QuestReward reward) {
+    private void applyMoney(Entity player, QuestReward reward) {
         if (reward.money() <= 0) return;
         Wallet wallet = Wallet.MAPPER.get(player);
         if (wallet == null) {
@@ -63,8 +64,8 @@ public class RewardSystem extends EntitySystem implements Disposable {
             inventory = new Inventory();
             player.add(inventory);
         }
-        for (var itemType : reward.items()) {
-            inventory.getItemsToAdd().add(itemType);
+        for (var itemId : reward.items()) {
+            inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(itemId));
         }
     }
 

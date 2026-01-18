@@ -1,0 +1,7 @@
+{
+    "id": "bracelet",
+    "name": "Bracelet",
+    "category": "BRACELET",
+    "maxStack": 1,
+    "icon": "bracelet"
+}

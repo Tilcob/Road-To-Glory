@@ -3,7 +3,6 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.utils.Array;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.chest.ChestState;
 
 import java.util.List;
@@ -29,7 +28,7 @@ public class Chest implements Component {
         return state.isOpened();
     }
 
-    public Array<ItemType> getContents() {
+    public Array<String> getContents() {
         return state.getContentsForGame();
     }
 
@@ -38,7 +37,7 @@ public class Chest implements Component {
         state.clearContents();
     }
 
-    public void setContents(List<ItemType> items) {
+    public void setContents(List<String> items) {
         state.setContents(items);
     }
 }

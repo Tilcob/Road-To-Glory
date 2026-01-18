@@ -10,6 +10,8 @@ import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();
@@ -63,10 +65,11 @@ public class InventoryViewModel extends ViewModel {
             Id idComp = Id.MAPPER.get(itemEntity);
             if (idComp == null) return;
 
+            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
             ItemModel model = new ItemModel(
                 idComp.getId(),
-                item.getItemType().getCategory(),
-                item.getItemType().getDrawableName(),
+                definition.category(),
+                definition.icon(),
                 item.getSlotIndex(),
                 item.isEquipped(),
                 item.getCount()

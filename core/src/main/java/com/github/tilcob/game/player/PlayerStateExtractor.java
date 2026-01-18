@@ -23,7 +23,7 @@ public class PlayerStateExtractor {
             Item item = Item.MAPPER.get(itemEntity);
             if (item == null) continue;
             for (int i = 0; i < item.getCount(); i++) {
-                state.getItemsByName().add(item.getItemType().name());
+                state.getItemsByName().add(item.getItemId());
             }
         }
         return state;

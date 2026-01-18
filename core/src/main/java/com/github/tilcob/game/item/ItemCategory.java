@@ -7,6 +7,7 @@ public enum ItemCategory {
     WEAPON,
     BOOTS,
     CONSUMABLE,
+    MATERIAL,
     NECKLACE,
     BRACELET,
     SHIELD,

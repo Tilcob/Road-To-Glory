@@ -7,6 +7,9 @@ import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
+import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.item.ItemLoader;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.QuestJson;
 import com.github.tilcob.game.quest.QuestRepository;
@@ -36,6 +39,9 @@ public class GameLoader {
         }
         for (SoundAsset soundAsset : SoundAsset.values()) {
             services.getAssetManager().queue(soundAsset);
+        }
+        for (ItemDefinition definition : ItemLoader.loadAll()) {
+            ItemDefinitionRegistry.register(definition);
         }
         Map<String, QuestJson> questDefinitions = questRepository.loadAll();
         if (questDefinitions.isEmpty()) Gdx.app.error(TAG, "No quest definitions loaded from repository.");

@@ -8,7 +8,8 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.OpenChestRequest;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.item.ItemType;
+import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -47,41 +48,43 @@ public class ChestSystem extends IteratingSystem {
     }
 
     private void transferContents(Chest chest, Inventory inventory) {
-        Map<ItemType, Integer> stackSpace = new HashMap<>();
+        Map<String, Integer> stackSpace = new HashMap<>();
         int usedSlots = inventory.getItems().size;
         int emptySlots = Constants.INVENTORY_CAPACITY - usedSlots;
 
         for (var entity : inventory.getItems()) {
             Item item = Item.MAPPER.get(entity);
-            if (!item.getItemType().isStackable()) continue;
-            int space = item.getItemType().getMaxStack() - item.getCount();
+            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
+            if (!definition.isStackable()) continue;
+            int space = definition.maxStack() - item.getCount();
             if (space > 0) {
-                stackSpace.merge(item.getItemType(), space, Integer::sum);
+                stackSpace.merge(item.getItemId(), space, Integer::sum);
             }
         }
 
-        List<ItemType> remaining = new ArrayList<>();
-        List<ItemType> transferred = new ArrayList<>();
+        List<String> remaining = new ArrayList<>();
+        List<String> transferred = new ArrayList<>();
 
-        for (ItemType item : chest.getContents()) {
-            if (item.isStackable() && stackSpace.getOrDefault(item, 0) > 0) {
-                stackSpace.put(item, stackSpace.get(item) - 1);
-                transferred.add(item);
+        for (String itemId : chest.getContents()) {
+            ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
+            if (definition.isStackable() && stackSpace.getOrDefault(itemId, 0) > 0) {
+                stackSpace.put(itemId, stackSpace.get(itemId) - 1);
+                transferred.add(itemId);
                 continue;
             }
 
             if (emptySlots > 0) {
                 emptySlots--;
-                transferred.add(item);
+                transferred.add(itemId);
                 continue;
             }
 
-            remaining.add(item);
+            remaining.add(itemId);
         }
 
         if (!transferred.isEmpty()) {
-            for (ItemType item : transferred) {
-                inventory.getItemsToAdd().add(item);
+            for (String itemId : transferred) {
+                inventory.getItemsToAdd().add(itemId);
             }
         }
         chest.setContents(remaining);

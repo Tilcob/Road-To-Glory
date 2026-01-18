@@ -3,7 +3,6 @@ package com.github.tilcob.game.save;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.github.tilcob.game.assets.MapAsset;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.save.states.chest.ChestRegistryState;
@@ -31,12 +30,12 @@ class SaveManagerTest extends HeadlessGdxTest {
         PlayerState playerState = new PlayerState();
         playerState.setPosX(10f);
         playerState.setPosY(20f);
-        playerState.setItemsByName(List.of(ItemType.SWORD.name(), ItemType.BOOTS.name()));
+        playerState.setItemsByName(List.of("sword", "boots"));
         state.setPlayerState(playerState);
 
         ChestRegistryState chestRegistryState = new ChestRegistryState();
         ChestState chestState = new ChestState();
-        chestState.setContentsByName(List.of(ItemType.ARMOR.name()));
+        chestState.setContentsByName(List.of("armor"));
 
         Map<String, Map<Integer, ChestState>> chestsByName = new HashMap<>();
         Map<Integer, ChestState> chestMap = new HashMap<>();
@@ -49,10 +48,10 @@ class SaveManagerTest extends HeadlessGdxTest {
         GameState loaded = saveManager.load();
 
         assertEquals(10f, loaded.getPlayerState().getPosX());
-        assertTrue(loaded.getPlayerState().getItems().contains(ItemType.SWORD));
+        assertTrue(loaded.getPlayerState().getItems().contains("sword"));
         assertTrue(loaded.getChestRegistryState().getChests().containsKey(MapAsset.MAIN));
         assertTrue(loaded.getChestRegistryState().getChests().get(MapAsset.MAIN).get(1)
-            .getContents().contains(ItemType.ARMOR));
+            .getContents().contains("armor"));
     }
 
     @Test

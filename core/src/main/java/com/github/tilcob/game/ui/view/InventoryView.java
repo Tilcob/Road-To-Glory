@@ -99,7 +99,7 @@ public class InventoryView extends View<InventoryViewModel> {
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 InventorySlot slot = slots[i][j];
-                Actor actor = slot.findActor("item");
+                Actor actor = slot.findActor("itemId");
                 if (actor != null) actor.remove();
                 slot.setCount(0);
             }
@@ -112,7 +112,7 @@ public class InventoryView extends View<InventoryViewModel> {
 
             InventorySlot slot = slots[row][col];
             Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
-            itemImage.setName("item");
+            itemImage.setName("itemId");
             itemImage.setScaling(Scaling.fit);
 
             slot.add(itemImage);

@@ -1,0 +1,7 @@
+{
+    "id": "shield",
+    "name": "Wooden Shield",
+    "category": "SHIELD",
+    "maxStack": 1,
+    "icon": "shield"
+}

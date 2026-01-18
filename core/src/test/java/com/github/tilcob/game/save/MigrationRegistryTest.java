@@ -1,7 +1,6 @@
 package com.github.tilcob.game.save;
 
 import com.github.tilcob.game.assets.MapAsset;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.registry.MigrationRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
@@ -24,12 +23,12 @@ class MigrationRegistryTest extends HeadlessGdxTest {
         state.setSaveVersion(1);
 
         PlayerState playerState = new PlayerState();
-        playerState.getItems().add(ItemType.SWORD);
+        playerState.getItems().add("sword");
         state.setPlayerState(playerState);
 
         ChestRegistryState chestRegistryState = new ChestRegistryState();
         ChestState chestState = new ChestState();
-        chestState.getContents().add(ItemType.ARMOR);
+        chestState.getContents().add("armor");
         Map<Integer, ChestState> chestMap = new HashMap<>();
         chestMap.put(1, chestState);
         chestRegistryState.getChests().put(MapAsset.MAIN, chestMap);
@@ -38,7 +37,7 @@ class MigrationRegistryTest extends HeadlessGdxTest {
         new MigrationRegistry().migrate(state);
 
         assertEquals(4, state.getSaveVersion());
-        assertTrue(state.getPlayerState().getItemsByName().contains(ItemType.SWORD.name()));
+        assertTrue(state.getPlayerState().getItemsByName().contains("sword"));
         assertTrue(state.getChestRegistryState().getChestsByName().containsKey(MapAsset.MAIN.name()));
     }
 }

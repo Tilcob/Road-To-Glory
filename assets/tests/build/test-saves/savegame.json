@@ -4,13 +4,13 @@
     "posX" : 10.0,
     "posY" : 20.0,
     "life" : 0.0,
-    "itemsByName" : [ "SWORD", "BOOTS" ]
+    "itemsByName" : [ "sword", "boots" ]
   },
   "chestRegistryState" : {
     "chestsByName" : {
       "MAIN" : {
         "1" : {
-          "contentsByName" : [ "ARMOR" ],
+          "contentsByName" : [ "armor" ],
           "opened" : false
         }
       }

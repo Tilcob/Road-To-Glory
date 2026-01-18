@@ -122,7 +122,7 @@ public class MenuView extends View<MenuViewModel> {
     }
 
     /**
-     * Moves selection to the next menu item.
+     * Moves selection to the next menu itemId.
      */
     public void onDown(Object o) {
         Group menuContentTable = this.selectedItem.getParent();
@@ -139,7 +139,7 @@ public class MenuView extends View<MenuViewModel> {
     }
 
     /**
-     * Moves selection to the previous menu item.
+     * Moves selection to the previous menu itemId.
      */
     public void onUp(Object o) {
         Group menuContentTable = this.selectedItem.getParent();
