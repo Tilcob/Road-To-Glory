@@ -14,16 +14,6 @@ public final class ItemDefinitionRegistry {
     private static final Map<String, String> LEGACY_ITEM_ID_MIGRATION;
 
     static {
-        register(new ItemDefinition(UNDEFINED_ID, "Undefined", ItemCategory.UNDEFINED, 1, ""));
-        register(new ItemDefinition("helmet", "Helmet", ItemCategory.HELMET, 1, "helmet"));
-        register(new ItemDefinition("sword", "Sword", ItemCategory.WEAPON, 1, "sword"));
-        register(new ItemDefinition("boots", "Boots", ItemCategory.BOOTS, 2, "boots"));
-        register(new ItemDefinition("armor", "Armor", ItemCategory.ARMOR, 1, "armor"));
-        register(new ItemDefinition("shield", "Shield", ItemCategory.SHIELD, 1, "shield"));
-        register(new ItemDefinition("ring", "Ring", ItemCategory.RING, 1, "ring"));
-        register(new ItemDefinition("bracelet", "Bracelet", ItemCategory.BRACELET, 1, "bracelet"));
-        register(new ItemDefinition("necklace", "Necklace", ItemCategory.NECKLACE, 1, "necklace"));
-
         Map<String, String> legacyMap = new HashMap<>();
         legacyMap.put("UNDEFINED", UNDEFINED_ID);
         legacyMap.put("HELMET", "helmet");
