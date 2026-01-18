@@ -5,14 +5,14 @@ import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemType;
 
 public class CollectItemStep implements QuestStep {
-    private final ItemType item;
+    private final String itemId;
     private final int amount;
     private final GameEventBus eventBus;
     private int collected;
     private boolean completed;
 
-    public CollectItemStep(ItemType item, int amount, GameEventBus eventBus) {
-        this.item = item;
+    public CollectItemStep(String itemId, int amount, GameEventBus eventBus) {
+        this.itemId = itemId;
         this.amount = amount;
         this.eventBus = eventBus;
         this.collected = 0;
@@ -30,7 +30,7 @@ public class CollectItemStep implements QuestStep {
     }
 
     private void onEvent(CollectItemEvent event) {
-        if (completed || event.item() != item) {
+        if (completed || event.itemId().equals(itemId)) {
             return;
         }
         collected += event.count();

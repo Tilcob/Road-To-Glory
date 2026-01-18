@@ -3,6 +3,7 @@ package com.github.tilcob.game.save.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
 import java.util.ArrayList;
@@ -13,7 +14,7 @@ public class PlayerState {
     private float posY;
     private float life;
     @JsonIgnore
-    private List<ItemType> items = new ArrayList<>();
+    private List<String> items = new ArrayList<>();
     private List<String> itemsByName = new ArrayList<>();
 
     public PlayerState() { }
@@ -36,11 +37,11 @@ public class PlayerState {
     }
 
     @JsonIgnore
-    public List<ItemType> getItems() {
+    public List<String> getItems() {
         return items;
     }
     @JsonIgnore
-    public void setItems(List<ItemType> items) {
+    public void setItems(List<String> items) {
         this.items = items;
     }
 
@@ -48,11 +49,12 @@ public class PlayerState {
     public void rebuildItemsByName() {
         items.clear();
         for (String name : itemsByName) {
-            try {
-                items.add(ItemType.valueOf(name));
-            } catch (IllegalArgumentException e) {
-                Gdx.app.error("PlayerState", e.getMessage());
+            String resolved = ItemDefinitions.resolveId(name);
+            if (!ItemDefinitions.isKnownId(resolved)) {
+                Gdx.app.error("PlayerState", "Unknown item id: " + name);
+                continue;
             }
+            items.add(resolved);
         }
     }
 

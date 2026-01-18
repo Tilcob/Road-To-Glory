@@ -29,7 +29,7 @@ public class Chest implements Component {
         return state.isOpened();
     }
 
-    public Array<ItemType> getContents() {
+    public Array<String> getContents() {
         return state.getContentsForGame();
     }
 
@@ -38,7 +38,7 @@ public class Chest implements Component {
         state.clearContents();
     }
 
-    public void setContents(List<ItemType> items) {
+    public void setContents(List<String> items) {
         state.setContents(items);
     }
 }

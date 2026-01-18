@@ -6,6 +6,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Life;
 import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.PlayerState;
 
@@ -24,7 +25,7 @@ public class PlayerStateApplier {
         life.setLife(state.getLife());
         inventory.getItems().clear();
         for (var item : state.getItemsByName()) {
-            inventory.getItemsToAdd().add(ItemType.valueOf(item));
+            inventory.getItemsToAdd().add(ItemDefinitions.resolveId(item));
         }
     }
 }

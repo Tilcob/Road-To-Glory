@@ -10,14 +10,14 @@ public class Inventory implements Component {
     public static final ComponentMapper<Inventory> MAPPER = ComponentMapper.getFor(Inventory.class);
 
     private final Array<Entity> entities = new Array<>();
-    private final Array<ItemType> itemsToAdd = new Array<>();
+    private final Array<String> itemsToAdd = new Array<>();
     private int nextItemId = 0;
 
     public Array<Entity> getItems() {
         return entities;
     }
 
-    public Array<ItemType> getItemsToAdd() {
+    public Array<String> getItemsToAdd() {
         return itemsToAdd;
     }
 

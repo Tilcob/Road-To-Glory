@@ -7,20 +7,20 @@ import com.github.tilcob.game.item.ItemType;
 public class Item implements Component {
     public static final ComponentMapper<Item> MAPPER = ComponentMapper.getFor(Item.class);
 
-    private final ItemType itemType;
+    private final String itemId;
     private int slotIndex;
     private boolean equipped;
     private int count;
 
-    public Item(ItemType itemType, int slotIndex, int count) {
-        this.itemType = itemType;
+    public Item(String itemId, int slotIndex, int count) {
+        this.itemId = itemId;
         this.slotIndex = slotIndex;
         this.equipped = false;
         this.count = count;
     }
 
-    public ItemType getItemType() {
-        return itemType;
+    public String getItemId() {
+        return itemId;
     }
 
     public int getSlotIndex() {

@@ -3,6 +3,7 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.github.tilcob.game.component.Id;
@@ -11,6 +12,8 @@ import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
+import com.github.tilcob.game.item.ItemDefinition;
+import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
@@ -33,49 +36,50 @@ public class InventorySystem extends IteratingSystem implements Disposable {
 
         boolean inventoryFull = false;
         boolean addedAny = false;
-        var remaining = new com.badlogic.gdx.utils.Array<ItemType>();
-        ObjectIntMap<ItemType> addedCounts = new ObjectIntMap<>();
+        var remaining = new Array<String>();
+        ObjectIntMap<String> addedCounts = new ObjectIntMap<>();
 
-        for (ItemType itemType : inventory.getItemsToAdd()) {
+        for (String itemId : inventory.getItemsToAdd()) {
+            String resolvedId = ItemDefinitions.resolveId(itemId);
             if (inventoryFull) {
-                remaining.add(itemType);
+                remaining.add(resolvedId);
                 continue;
             }
 
             int slotIndex = emptySlotIndex(inventory);
             if (slotIndex == -1) {
                 inventoryFull = true;
-                remaining.add(itemType);
+                remaining.add(resolvedId);
                 continue;
             }
-            addItem(inventory, itemType, slotIndex);
+            addItem(inventory, resolvedId, slotIndex);
             addedAny = true;
-            addedCounts.getAndIncrement(itemType, 0, 1);
+            addedCounts.getAndIncrement(resolvedId, 0, 1);
         }
         inventory.getItemsToAdd().clear();
         inventory.getItemsToAdd().addAll(remaining);
         if (inventoryFull) eventBus.fire(new InventoryFullEvent());
         if (addedAny) {
             eventBus.fire(new EntityAddItemEvent(player));
-            for (ObjectIntMap.Entry<ItemType> entry : addedCounts) {
+            for (var entry : addedCounts) {
                 eventBus.fire(new CollectItemEvent(entry.key, entry.value));
             }
         }
     }
 
-    private void addItem(Inventory inventory, ItemType itemType, int slotIndex) {
-        Entity stackEntity = findStackableItem(inventory, itemType);
+    private void addItem(Inventory inventory, String itemId, int slotIndex) {
+        Entity stackEntity = findStackableItem(inventory, itemId);
         if (stackEntity != null) {
             Item stack = Item.MAPPER.get(stackEntity);
             stack.add(1);
             return;
         }
-        inventory.add(spawnItem(itemType, slotIndex, inventory.nextId()));
+        inventory.add(spawnItem(itemId, slotIndex, inventory.nextId()));
     }
 
-    private Entity spawnItem(ItemType itemType, int slotIndex, int id) {
+    private Entity spawnItem(String itemId, int slotIndex, int id) {
         Entity entity = getEngine().createEntity();
-        entity.add(new Item(itemType, slotIndex, 1));
+        entity.add(new Item(itemId, slotIndex, 1));
         entity.add(new Id(id));
         getEngine().addEntity(entity);
 
@@ -135,9 +139,11 @@ public class InventorySystem extends IteratingSystem implements Disposable {
 
         Item to = Item.MAPPER.get(toEntity);
 
-        if (from.getItemType() != to.getItemType() || !from.getItemType().isStackable()) return false;
+        if (!from.getItemId().equals(to.getItemId())) return false;
+        ItemDefinition definition = ItemDefinitions.get(from.getItemId());
+        if (!definition.isStackable()) return false;
 
-        int space = from.getItemType().getMaxStack() - to.getCount();
+        int space = definition.maxStack() - to.getCount();
         if (space <= 0) return false;
 
         int transfer = Math.min(space, from.getCount());
@@ -161,10 +167,11 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         return null;
     }
 
-    private Entity findStackableItem(Inventory inventory, ItemType type) {
+    private Entity findStackableItem(Inventory inventory, String itemId) {
+        ItemDefinition definition = ItemDefinitions.get(itemId);
         for (Entity e : inventory.getItems()) {
             Item item = Item.MAPPER.get(e);
-            if (item.getItemType() == type && type.isStackable() && item.getCount() < type.getMaxStack()) {
+            if (item.getItemId().equals(itemId) && definition.isStackable() && item.getCount() < definition.maxStack()) {
                 return e;
             }
         }
@@ -185,7 +192,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         int emptySlot = emptySlotIndex(inventory);
         if (emptySlot == -1) return;
 
-        Entity newItemEntity = spawnItem(item.getItemType(), emptySlot, inventory.nextId());
+        Entity newItemEntity = spawnItem(item.getItemId(), emptySlot, inventory.nextId());
         Item newItem = Item.MAPPER.get(newItemEntity);
         newItem.add(half - 1);
         newItem.setSlotIndex(emptySlot);

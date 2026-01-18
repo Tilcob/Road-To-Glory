@@ -12,7 +12,7 @@ import java.util.Map;
 public class ChestRegistry {
     private final Map<MapAsset, Map<Integer, ChestState>> chests = new HashMap<>();
 
-    public ChestState getOrCreate(MapAsset map, int id, Array<ItemType> loot) {
+    public ChestState getOrCreate(MapAsset map, int id, Array<String> loot) {
         return chests
             .computeIfAbsent(map, m -> new HashMap<>())
             .computeIfAbsent(id, i -> new ChestState(loot));
