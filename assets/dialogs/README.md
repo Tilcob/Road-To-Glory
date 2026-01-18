@@ -41,6 +41,38 @@ Nodes with quest or flag tags are not added to `DialogData.nodes`.
 
 Each `.yarn` file produces a single `DialogData` entry keyed by the file name (without extension). For example, `Shopkeeper.yarn` creates the dialog entry `Shopkeeper`.
 
+NPC ids follow the same convention as file names. An NPC id like `Npc-2` resolves to
+`dialogs/Npc-2.yarn` when using the directory listing or default file resolution.
+
+If you need a different file name, supply an alias map when constructing the dialog
+repository so `npcId` can point to a different `*.yarn` file.
+
+### Dialog discovery
+
+Dialogs can be loaded by listing the `dialogs/` directory or by using a manifest file at
+`dialogs/index.json`.
+
+#### Manifest (`dialogs/index.json`)
+
+The manifest supports two formats:
+
+- Array: a list of file names or paths. NPC ids are inferred from the file name.
+- Object: explicit NPC id → file name/path mapping (useful for aliases).
+
+```json
+[
+  "Npc-2.yarn",
+  "vendors/Shopkeeper.yarn"
+]
+```
+
+```json
+{
+  "Npc-2": "Npc-2.yarn",
+  "Mayor": "town/MayorDialog.yarn"
+}
+```
+
 ### Example: idle + root
 
 ```yarn
