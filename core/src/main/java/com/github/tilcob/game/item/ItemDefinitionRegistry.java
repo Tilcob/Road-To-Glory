@@ -41,6 +41,9 @@ public final class ItemDefinitionRegistry {
     }
 
     public static void register(ItemDefinition definition) {
+        if (DEFINITIONS.containsKey(definition.id())) {
+            throw new IllegalArgumentException("Item definition already registered: " + definition.id());
+        }
         DEFINITIONS.put(definition.id(), definition);
     }
 
