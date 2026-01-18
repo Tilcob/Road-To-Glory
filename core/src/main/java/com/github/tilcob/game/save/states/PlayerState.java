@@ -47,6 +47,7 @@ public class PlayerState {
     @JsonIgnore
     public void rebuildItemsByName() {
         items.clear();
+        List<String> normalized = new ArrayList<>();
         for (String name : itemsByName) {
             String resolved = ItemDefinitionRegistry.resolveId(name);
             if (!ItemDefinitionRegistry.isKnownId(resolved)) {
@@ -54,7 +55,9 @@ public class PlayerState {
                 continue;
             }
             items.add(resolved);
+            normalized.add(resolved);
         }
+        itemsByName = normalized;
     }
 
     @JsonIgnore

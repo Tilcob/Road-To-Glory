@@ -40,7 +40,7 @@ public class QuestFactory {
     public QuestStep createStep(QuestJson.StepJson step) {
         return switch (step.type()) {
             case "talk"  -> new TalkStep(step.npc(), eventBus);
-            case "collect" -> new CollectItemStep(step.itemId(), step.amount(), eventBus);
+            case "collect" -> new CollectItemStep(ItemDefinitionRegistry.resolveId(step.itemId()), step.amount(), eventBus);
             case "kill" -> new KillStep(step.enemy(), step.amount(), eventBus);
             default -> throw new IllegalArgumentException("Unknown step type: " + step.type());
         };

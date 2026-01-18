@@ -38,6 +38,7 @@ public class ChestState {
     @JsonIgnore
     public void rebuildContentsFromName() {
         contents.clear();
+        List<String> normalized = new ArrayList<>();
         for (String name : contentsByName) {
             String resolved = ItemDefinitionRegistry.resolveId(name);
             if (!ItemDefinitionRegistry.isKnownId(resolved)) {
@@ -45,7 +46,9 @@ public class ChestState {
                 continue;
             }
             contents.add(resolved);
+            normalized.add(resolved);
         }
+        contentsByName = normalized;
         opened = false;
     }
 

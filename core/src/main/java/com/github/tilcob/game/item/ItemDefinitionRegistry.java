@@ -11,7 +11,7 @@ import java.util.Map;
 public final class ItemDefinitionRegistry {
     public static final String UNDEFINED_ID = "undefined";
     private static final Map<String, ItemDefinition> DEFINITIONS = new HashMap<>();
-    private static final Map<String, String> LEGACY_NAME_TO_ID;
+    private static final Map<String, String> LEGACY_ITEM_ID_MIGRATION;
 
     static {
         register(new ItemDefinition(UNDEFINED_ID, "Undefined", ItemCategory.UNDEFINED, 1, ""));
@@ -34,7 +34,7 @@ public final class ItemDefinitionRegistry {
         legacyMap.put("RING", "ring");
         legacyMap.put("BRACELET", "bracelet");
         legacyMap.put("NECKLACE", "necklace");
-        LEGACY_NAME_TO_ID = Map.copyOf(legacyMap);
+        LEGACY_ITEM_ID_MIGRATION = Map.copyOf(legacyMap);
     }
 
     private ItemDefinitionRegistry() {
@@ -75,11 +75,11 @@ public final class ItemDefinitionRegistry {
         if (DEFINITIONS.containsKey(rawId)) {
             return rawId;
         }
-        String legacy = LEGACY_NAME_TO_ID.get(rawId);
+        String legacy = LEGACY_ITEM_ID_MIGRATION.get(rawId);
         if (legacy != null) {
             return legacy;
         }
-        legacy = LEGACY_NAME_TO_ID.get(rawId.toUpperCase());
+        legacy = LEGACY_ITEM_ID_MIGRATION.get(rawId.toUpperCase());
         if (legacy != null) {
             return legacy;
         }

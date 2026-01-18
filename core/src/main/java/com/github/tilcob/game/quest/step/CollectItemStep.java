@@ -2,6 +2,7 @@ package com.github.tilcob.game.quest.step;
 
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 public class CollectItemStep implements QuestStep {
     private final String itemId;
@@ -11,7 +12,7 @@ public class CollectItemStep implements QuestStep {
     private boolean completed;
 
     public CollectItemStep(String itemId, int amount, GameEventBus eventBus) {
-        this.itemId = itemId;
+        this.itemId = ItemDefinitionRegistry.resolveId(itemId);
         this.amount = amount;
         this.eventBus = eventBus;
         this.collected = 0;

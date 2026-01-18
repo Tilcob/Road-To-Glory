@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.QuestRepository;
@@ -64,7 +65,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
             player.add(inventory);
         }
         for (var itemId : reward.items()) {
-            inventory.getItemsToAdd().add(itemId);
+            inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(itemId));
         }
     }
 

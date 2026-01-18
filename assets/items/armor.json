@@ -1,0 +1,7 @@
+{
+    "id": "armor",
+    "name": "Armor",
+    "category": "ARMOR",
+    "maxStack": 1,
+    "icon": "armor"
+}

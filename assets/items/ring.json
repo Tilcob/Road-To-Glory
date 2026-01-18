@@ -1,0 +1,7 @@
+{
+    "id": "ring",
+    "name": "Ring",
+    "category": "RING",
+    "maxStack": 1,
+    "icon": "ring"
+}
