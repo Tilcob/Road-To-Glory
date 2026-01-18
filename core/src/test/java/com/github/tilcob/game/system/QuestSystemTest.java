@@ -23,7 +23,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         QuestSystem questSystem = new QuestSystem(eventBus, repository);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
@@ -47,7 +47,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         QuestSystem questSystem = new QuestSystem(eventBus, repository);
         Engine engine = new Engine();
         engine.addSystem(questSystem);

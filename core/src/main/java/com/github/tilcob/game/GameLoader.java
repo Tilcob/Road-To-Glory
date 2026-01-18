@@ -1,7 +1,6 @@
 package com.github.tilcob.game;
 
 import com.github.tilcob.game.assets.AtlasAsset;
-import com.github.tilcob.game.assets.DialogAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
@@ -29,9 +28,8 @@ public class GameLoader {
         for (QuestJson questJson : services.getQuestRepository().loadAll().values()) {
             services.getAllQuests().put(questJson.questId(), questFactory.createQuestFromJson(questJson));
         }
-        for (DialogAsset dialogAsset : DialogAsset.values()) {
-            services.getAllDialogs().put(dialogAsset.getNpcName(),
-                dialogLoader.load(dialogAsset.getFileHandle()));
+        for (var entry : services.getDialogRepository().loadAll().entrySet()) {
+            services.getAllDialogs().put(entry.getKey(), dialogLoader.load(entry.getValue()));
         }
         services.getAssetManager().queue(SkinAsset.DEFAULT);
     }

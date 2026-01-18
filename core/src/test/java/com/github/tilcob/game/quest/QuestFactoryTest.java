@@ -13,7 +13,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
     @Test
     void createQuestFromJsonAllowsNullRewardItems() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         QuestFactory factory = new QuestFactory(eventBus, repository);
         QuestJson.RewardJson rewardJson = new QuestJson.RewardJson(25, null);
         QuestJson questJson = new QuestJson(
@@ -34,7 +34,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
     @Test
     void createUsesRepositoryDefinitions() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         QuestFactory factory = new QuestFactory(eventBus, repository);
         repository.loadAll();
 

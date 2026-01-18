@@ -4,6 +4,7 @@ import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemRegistry;
 import com.github.tilcob.game.quest.Quest;
@@ -28,6 +29,7 @@ public class GameServices {
     private final Map<String, Quest> allQuests;
     private final Map<String, DialogData> allDialogs;
     private final QuestRepository questRepository;
+    private final DialogRepository dialogRepository;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -42,6 +44,8 @@ public class GameServices {
         this.allDialogs = new HashMap<>();
         this.questRepository = new QuestRepository(eventBus, true, "quests/index.json",
             "quests");
+        this.dialogRepository = new DialogRepository(true, "dialogs",
+            Map.of("Shopkeeper", "shopkeeper"));
     }
 
     public void loadGame() {
@@ -90,5 +94,9 @@ public class GameServices {
 
     public QuestRepository getQuestRepository() {
         return questRepository;
+    }
+
+    public DialogRepository getDialogRepository() {
+        return dialogRepository;
     }
 }

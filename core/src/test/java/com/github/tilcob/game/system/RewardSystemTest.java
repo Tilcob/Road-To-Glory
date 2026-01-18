@@ -23,7 +23,7 @@ class RewardSystemTest {
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
@@ -52,7 +52,7 @@ class RewardSystemTest {
     @Test
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
@@ -76,7 +76,7 @@ class RewardSystemTest {
     @Test
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, false, "quests/index.json", "quests");
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
         RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
