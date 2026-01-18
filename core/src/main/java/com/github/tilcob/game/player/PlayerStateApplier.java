@@ -7,8 +7,6 @@ import com.github.tilcob.game.component.Life;
 import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.PlayerState;
 
 public class PlayerStateApplier {

@@ -1,7 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.item.ItemType;
-
 import java.util.List;
 
 public record QuestReward(int money, List<String> items) {

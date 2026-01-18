@@ -10,8 +10,6 @@ import com.github.tilcob.game.component.OpenChestRequest;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 
 import java.util.ArrayList;
 import java.util.HashMap;

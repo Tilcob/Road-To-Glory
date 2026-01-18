@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 
 import java.util.ArrayList;
 import java.util.List;

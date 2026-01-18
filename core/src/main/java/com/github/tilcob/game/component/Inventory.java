@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
-import com.github.tilcob.game.item.ItemType;
 
 public class Inventory implements Component {
     public static final ComponentMapper<Inventory> MAPPER = ComponentMapper.getFor(Inventory.class);

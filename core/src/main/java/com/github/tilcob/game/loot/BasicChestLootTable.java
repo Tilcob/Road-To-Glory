@@ -2,7 +2,6 @@ package com.github.tilcob.game.loot;
 
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.github.tilcob.game.item.ItemType;
 
 public class BasicChestLootTable implements LootTable {
 

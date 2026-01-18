@@ -2,7 +2,6 @@ package com.github.tilcob.game.quest;
 
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.quest.step.CollectItemStep;
 import com.github.tilcob.game.quest.step.KillStep;
 import com.github.tilcob.game.quest.step.QuestStep;

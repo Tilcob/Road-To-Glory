@@ -3,7 +3,6 @@ package com.github.tilcob.game.component;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.utils.Array;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.save.states.chest.ChestState;
 
 import java.util.List;

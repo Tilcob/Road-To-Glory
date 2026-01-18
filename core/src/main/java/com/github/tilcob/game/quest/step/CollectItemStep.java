@@ -2,7 +2,6 @@ package com.github.tilcob.game.quest.step;
 
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
-import com.github.tilcob.game.item.ItemType;
 
 public class CollectItemStep implements QuestStep {
     private final String itemId;

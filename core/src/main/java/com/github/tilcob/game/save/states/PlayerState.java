@@ -4,8 +4,6 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,7 +1,6 @@
 package com.github.tilcob.game.save.migration;
 
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.save.states.chest.ChestRegistryState;

@@ -14,8 +14,6 @@ import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;

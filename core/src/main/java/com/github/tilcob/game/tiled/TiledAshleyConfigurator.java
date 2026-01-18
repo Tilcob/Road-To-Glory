@@ -28,8 +28,6 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.item.ItemDefinitions;
-import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.loot.LootTableType;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.save.registry.ChestRegistry;

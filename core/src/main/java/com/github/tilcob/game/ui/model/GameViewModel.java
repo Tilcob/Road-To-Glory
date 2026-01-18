@@ -14,7 +14,6 @@ import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogChoice;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.item.ItemType;
 
 import java.util.Map;
 
