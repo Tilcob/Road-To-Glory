@@ -9,7 +9,7 @@
         }
     ],
     "rewards": {
-        "gold": 50,
+        "money": 50,
         "items": [
             "SWORD"
         ]

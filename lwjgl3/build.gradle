@@ -125,6 +125,17 @@ construo {
     // human-readable name, used for example in the `.app` name for macOS
     humanName.set(appName)
 
+    jlink {
+      guessModulesFromJar.set(false)
+      modules.addAll(
+        "java.base",
+        "java.desktop",
+        "java.logging",
+        "jdk.crypto.ec",
+        "jdk.unsupported"
+      )
+    }
+
     targets.configure {
       register("linuxX64", Target.Linux) {
         architecture.set(Target.Architecture.X86_64)

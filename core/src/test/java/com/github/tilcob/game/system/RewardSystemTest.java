@@ -9,6 +9,7 @@ import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.item.ItemType;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.QuestReward;
 import org.junit.jupiter.api.Test;
 
@@ -22,7 +23,8 @@ class RewardSystemTest {
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
-        RewardSystem rewardSystem = new RewardSystem(eventBus);
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -50,7 +52,8 @@ class RewardSystemTest {
     @Test
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
-        RewardSystem rewardSystem = new RewardSystem(eventBus);
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -73,7 +76,8 @@ class RewardSystemTest {
     @Test
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
-        RewardSystem rewardSystem = new RewardSystem(eventBus);
+        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();

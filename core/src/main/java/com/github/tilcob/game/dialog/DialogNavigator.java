@@ -82,15 +82,16 @@ public class DialogNavigator {
         return choices;
     }
 
-    public boolean applyChoice(DialogChoice choice) {
+    public void applyChoice(DialogChoice choice) {
         if (choice == null) {
-            return false;
+            return;
         }
         if (switchToNode(choice.next())) {
-            return hasLines();
+            hasLines();
+            return;
         }
         setLines(choice.lines());
-        return hasLines();
+        hasLines();
     }
 
     private boolean switchToNode(String nodeId) {

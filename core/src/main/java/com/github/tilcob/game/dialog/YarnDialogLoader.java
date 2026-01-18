@@ -35,9 +35,7 @@ public class YarnDialogLoader {
         ObjectMap<String, Array<DialogChoice>> stepChoices = new ObjectMap<>();
 
         for (ParsedNode parsedNode : parsedNodes) {
-            if (parsedNode == rootNode || parsedNode == idleNode) {
-                continue;
-            }
+            if (parsedNode == rootNode) continue;
 
             // --- QUEST NODES: collect quest lines AND keep as normal nodes so <<jump quest_...>> works ---
             String questTag = findQuestTag(parsedNode.tags);
@@ -224,7 +222,7 @@ public class YarnDialogLoader {
                 if (tryApplyEffect(trimmed, currentChoice)) {
                     continue;
                 }
-                if (!isCommand(trimmed)) {
+                if (isCommand(trimmed)) {
                     currentChoice.lines.add(trimmed);
                 }
                 continue;
@@ -235,7 +233,7 @@ public class YarnDialogLoader {
                 currentChoice = null;
             }
 
-            if (!isCommand(trimmed)) {
+            if (isCommand(trimmed)) {
                 parsedNode.lines.add(trimmed);
             }
         }
@@ -265,7 +263,7 @@ public class YarnDialogLoader {
     }
 
     private static boolean tryApplyEffect(String line, ChoiceBuilder builder) {
-        if (!isCommand(line)) {
+        if (isCommand(line)) {
             return false;
         }
 
@@ -312,7 +310,7 @@ public class YarnDialogLoader {
     }
 
     private static boolean isCommand(String line) {
-        return line.startsWith("<<") && line.endsWith(">>");
+        return !line.startsWith("<<") || !line.endsWith(">>");
     }
 
     private static boolean isIndented(String line) {
