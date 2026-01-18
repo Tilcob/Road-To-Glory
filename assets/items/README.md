@@ -10,6 +10,9 @@ reason about.
 Items are loaded by listing the `items/` directory at runtime. The loader is
 **non-recursive** and ignores `index.json`, so place item files directly in this folder.
 
+Keep an `undefined.json` entry in this directory because the runtime resolves missing/null
+item references to the `undefined` id.
+
 ## Required fields
 
 - `id` (string): stable item id (example: `iron_sword`).
