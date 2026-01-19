@@ -11,17 +11,19 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.quest.QuestManager;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
+    private final QuestManager questManager;
     private Entity player;
 
-    public InventorySystem(GameEventBus eventBus) {
+    public InventorySystem(GameEventBus eventBus, QuestManager questManager) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
+        this.questManager = questManager;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
@@ -61,7 +63,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         if (addedAny) {
             eventBus.fire(new EntityAddItemEvent(player));
             for (var entry : addedCounts) {
-                eventBus.fire(new CollectItemEvent(entry.key, entry.value));
+                questManager.signal(player, "collect", entry.key, entry.value);
             }
         }
     }

@@ -2,15 +2,11 @@ package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.github.tilcob.game.component.Counters;
-import com.github.tilcob.game.component.DialogFlags;
-import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
-import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.component.Wallet;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
@@ -87,9 +83,10 @@ public class QuestYarnBridge {
             return;
         }
         quest.setCurrentStep(Math.min(stage, quest.getSteps().size()));
-        if (quest.getCurrentStep() < quest.getSteps().size()) {
-            quest.getSteps().get(quest.getCurrentStep()).start();
+        if (quest.isCompleted()) {
+            eventBus.fire(new QuestCompletedEvent(player, questId));
         }
+        eventBus.fire(new UpdateQuestLogEvent(player));
     }
 
     private void giveGold(Entity player, String[] args) {

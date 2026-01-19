@@ -3,6 +3,10 @@ package com.github.tilcob.game.quest.step;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.quest.KillEvent;
 
+/**
+ * @deprecated Quest steps are superseded by quest Yarn signals.
+ */
+@Deprecated(forRemoval = false)
 public class KillStep implements QuestStep {
     private final String enemy;
     private final int amount;

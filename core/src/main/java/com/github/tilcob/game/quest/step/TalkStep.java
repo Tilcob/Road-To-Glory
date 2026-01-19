@@ -3,6 +3,10 @@ package com.github.tilcob.game.quest.step;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestStepEvent;
 
+/**
+ * @deprecated Quest steps are superseded by quest Yarn signals.
+ */
+@Deprecated(forRemoval = false)
 public class TalkStep implements QuestStep {
     private final String npc;
     private final GameEventBus eventBus;

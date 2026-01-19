@@ -10,48 +10,44 @@ import com.github.tilcob.game.dialog.DialogEffect;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.DialogChoiceResolvedEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestStepEvent;
+import com.github.tilcob.game.quest.QuestManager;
+
+import java.util.Locale;
 
 public class DialogConsequenceSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
+    private final QuestManager questManager;
 
-    public DialogConsequenceSystem(GameEventBus eventBus) {
+    public DialogConsequenceSystem(GameEventBus eventBus, QuestManager questManager) {
         this.eventBus = eventBus;
+        this.questManager = questManager;
         eventBus.subscribe(DialogChoiceResolvedEvent.class, this::onChoiceResolved);
     }
 
     private void onChoiceResolved(DialogChoiceResolvedEvent event) {
         DialogChoice choice = event.choice();
-        if (choice == null) {
-            return;
-        }
+        if (choice == null) return;
         Array<DialogEffect> effects = choice.effects();
         if (effects == null || effects.isEmpty()) {
             return;
         }
         for (DialogEffect effect : effects) {
-            if (effect == null || effect.type() == null) {
-                continue;
-            }
+            if (effect == null || effect.type() == null) continue;
             switch (effect.type()) {
                 case ADD_QUEST -> applyAddQuest(event.player(), effect);
                 case SET_FLAG -> applyFlag(event.player(), effect);
-                case QUEST_STEP -> applyQuestStep(effect);
+                case QUEST_STEP -> applyQuestStep(event.player(), effect);
             }
         }
     }
 
     private void applyAddQuest(Entity player, DialogEffect effect) {
-        if (effect.questId() == null) {
-            return;
-        }
+        if (effect.questId() == null) return;
         eventBus.fire(new AddQuestEvent(player, effect.questId()));
     }
 
     private void applyFlag(Entity player, DialogEffect effect) {
-        if (effect.flag() == null) {
-            return;
-        }
+        if (effect.flag() == null) return;
         DialogFlags flags = DialogFlags.MAPPER.get(player);
         if (flags == null) {
             flags = new DialogFlags();
@@ -61,11 +57,10 @@ public class DialogConsequenceSystem extends EntitySystem implements Disposable 
         flags.set(effect.flag(), value);
     }
 
-    private void applyQuestStep(DialogEffect effect) {
-        if (effect.stepType() == null || effect.target() == null) {
-            return;
-        }
-        eventBus.fire(new QuestStepEvent(effect.stepType(), effect.target()));
+    private void applyQuestStep(Entity player, DialogEffect effect) {
+        if (effect.stepType() == null) return;
+        String eventType = effect.stepType().name().toLowerCase(Locale.ROOT);
+        questManager.signal(player, eventType, effect.target(), 1);
     }
 
     @Override

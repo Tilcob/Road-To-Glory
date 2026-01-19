@@ -4,6 +4,10 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.quest.CollectItemEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
+/**
+ * @deprecated Quest steps are superseded by quest Yarn signals.
+ */
+@Deprecated(forRemoval = false)
 public class CollectItemStep implements QuestStep {
     private final String itemId;
     private final int amount;

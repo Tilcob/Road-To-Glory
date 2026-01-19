@@ -8,6 +8,7 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
@@ -36,6 +37,7 @@ public class GameServices {
     private final QuestYarnBridge questYarnBridge;
     private final DialogYarnRuntime dialogYarnRuntime;
     private final QuestYarnRuntime questYarnRuntime;
+    private final QuestManager questManager;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -54,6 +56,7 @@ public class GameServices {
         this.questYarnBridge = new QuestYarnBridge(eventBus);
         this.dialogYarnRuntime = new DialogYarnRuntime(questYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge);
+        this.questManager = new QuestManager(questYarnRuntime, allDialogs);
     }
 
     public void loadGame() {
@@ -114,5 +117,9 @@ public class GameServices {
 
     public QuestYarnRuntime getQuestYarnRuntime() {
         return questYarnRuntime;
+    }
+
+    public QuestManager getQuestManager() {
+        return questManager;
     }
 }

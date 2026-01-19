@@ -14,18 +14,21 @@ import com.github.tilcob.game.dialog.DialogSelector;
 import com.github.tilcob.game.event.DialogFinishedEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
-import com.github.tilcob.game.event.QuestStepEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestManager;
 
 import java.util.Map;
 
 public class DialogQuestBridgeSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
     private final Map<String, DialogData> allDialogs;
+    private final QuestManager questManager;
 
-    public DialogQuestBridgeSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs) {
+    public DialogQuestBridgeSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs,
+                                   QuestManager questManager) {
         this.eventBus = eventBus;
         this.allDialogs = allDialogs;
+        this.questManager = questManager;
 
         eventBus.subscribe(DialogFinishedEvent.class, this::onDialogFinished);
     }
@@ -56,7 +59,7 @@ public class DialogQuestBridgeSystem extends EntitySystem implements Disposable 
         QuestLog questLog = QuestLog.MAPPER.get(player);
         Npc npc = Npc.MAPPER.get(npcEntity);
         if (npc == null) return;
-        eventBus.fire(new QuestStepEvent(QuestStepEvent.Type.TALK, npc.getName()));
+        questManager.signal(player, "talk", npc.getName(), 1);
 
         DialogData dialogData = allDialogs.get(npc.getName());
         if (dialogData == null || dialogData.questDialog() == null) return;

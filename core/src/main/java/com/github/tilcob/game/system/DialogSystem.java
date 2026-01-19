@@ -12,7 +12,6 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
-import com.github.tilcob.game.yarn.YarnRuntime;
 
 import java.util.Map;
 
