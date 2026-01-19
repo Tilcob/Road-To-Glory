@@ -7,6 +7,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
@@ -22,6 +23,8 @@ public class RewardSystem extends EntitySystem implements Disposable {
     public RewardSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry) {
         this.eventBus = eventBus;
         this.questFactory = new QuestFactory(questYarnRegistry);
+
+        eventBus.subscribe(QuestCompletedEvent.class, this::onQuestCompleted);
         eventBus.subscribe(QuestRewardEvent.class, this::onQuestReward);
     }
 
@@ -38,13 +41,23 @@ public class RewardSystem extends EntitySystem implements Disposable {
         }
     }
 
-    private Quest questFor(QuestRewardEvent event) {
-        QuestLog questLog = QuestLog.MAPPER.get(event.player());
+    private void onQuestCompleted(QuestCompletedEvent event) {
+        Quest quest = questFor(event.player(), event.questId());
+        if (quest == null || quest.isRewardClaimed() || !quest.isCompleted()) return;
+        eventBus.fire(new QuestRewardEvent(event.player(), event.questId()));
+    }
+
+    private Quest questFor(Entity player, String questId) {
+        QuestLog questLog = QuestLog.MAPPER.get(player);
         if (questLog != null) {
-            Quest quest = questLog.getQuestById(event.questId());
+            Quest quest = questLog.getQuestById(questId);
             if (quest != null) return quest;
         }
-        return questFactory.create(event.questId());
+        return questFactory.create(questId);
+    }
+
+    private Quest questFor(QuestRewardEvent event) {
+        return questFor(event.player(), event.questId());
     }
 
     private void applyMoney(Entity player, QuestReward reward) {
@@ -72,5 +85,6 @@ public class RewardSystem extends EntitySystem implements Disposable {
     @Override
     public void dispose() {
         eventBus.unsubscribe(QuestRewardEvent.class, this::onQuestReward);
+        eventBus.unsubscribe(QuestCompletedEvent.class, this::onQuestCompleted);
     }
 }

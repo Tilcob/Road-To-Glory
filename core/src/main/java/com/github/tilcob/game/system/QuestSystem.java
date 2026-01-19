@@ -26,7 +26,6 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         this.questYarnRuntime = questYarnRuntime;
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
-        eventBus.subscribe(QuestCompletedEvent.class, this::onQuestCompleted);
     }
 
     @Override
@@ -65,13 +64,8 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         eventBus.fire(new UpdateQuestLogEvent(event.player()));
     }
 
-    private void onQuestCompleted(QuestCompletedEvent event) {
-        eventBus.fire(new QuestRewardEvent(event.player(), event.questId()));
-    }
-
     @Override
     public void dispose() {
         eventBus.unsubscribe(AddQuestEvent.class, this::addQuest);
-        eventBus.unsubscribe(QuestCompletedEvent.class, this::onQuestCompleted);
     }
 }

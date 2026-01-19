@@ -5,6 +5,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.quest.Quest;
@@ -14,6 +15,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -96,6 +98,36 @@ class RewardSystemTest {
         assertNull(Inventory.MAPPER.get(player));
         assertTrue(quest.isRewardClaimed());
         assertFalse(rewardGranted.get());
+
+        rewardSystem.dispose();
+    }
+
+    @Test
+    void grantsRewardOnceOnQuestCompletedEvent() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        QuestReward reward = new QuestReward(20, List.of("shield"));
+        Quest quest = new Quest("Completion_Quest", "Completion Quest", "Complete me", reward, 1);
+        quest.setCurrentStep(1);
+        questLog.add(quest);
+
+        AtomicInteger grants = new AtomicInteger(0);
+        eventBus.subscribe(RewardGrantedEvent.class, event -> grants.incrementAndGet());
+
+        eventBus.fire(new QuestCompletedEvent(player, "Completion_Quest"));
+        eventBus.fire(new QuestCompletedEvent(player, "Completion_Quest"));
+
+        Wallet wallet = Wallet.MAPPER.get(player);
+        assertNotNull(wallet);
+        assertEquals(20, wallet.getMoney());
+        assertTrue(quest.isRewardClaimed());
+        assertEquals(1, grants.get());
 
         rewardSystem.dispose();
     }
