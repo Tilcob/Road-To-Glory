@@ -64,6 +64,7 @@ public class QuestYarnBridge {
             Quest quest = questLog.getQuestById(questId);
             if (quest != null) {
                 if (!quest.isCompleted()) quest.setCurrentStep(quest.getTotalStages());
+                eventBus.fire(new UpdateQuestLogEvent(player));
                 quest.setCompletionNotified(true);
             }
         }
