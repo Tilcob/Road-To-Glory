@@ -13,16 +13,18 @@ public class QuestLoader {
     }
 
     public Quest loadQuest(QuestState state) {
+        if (state == null || state.getQuestId() == null || state.getQuestId().isBlank()) return null;
+        if (!state.isActive() && !state.isCompleted()) return null;
         Quest quest = factory.create(state.getQuestId());
-        quest.setCurrentStep(state.getCurrentStep());
-        quest.setRewardClaimed(state.isRewardClaimed());
 
-        List<Object> data = state.getStepData();
-        List<QuestStep> steps = quest.getSteps();
-
-        for (int i = 0; i < data.size(); i++) {
-            steps.get(i).loadData(data.get(i));
+        int maxStage = quest.getSteps().size();
+        int stage = Math.max(0, state.getStage());
+        if (state.isCompleted()) {
+            quest.setCurrentStep(maxStage);
+        } else {
+            quest.setCurrentStep(Math.min(stage, maxStage));
         }
+        quest.setRewardClaimed(state.isRewardClaimed());
         return quest;
     }
 

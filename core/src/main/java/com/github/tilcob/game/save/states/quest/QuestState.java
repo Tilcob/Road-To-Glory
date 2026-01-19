@@ -4,22 +4,27 @@ import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.step.QuestStep;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class QuestState {
     private String questId;
-    private int currentStep;
+    private boolean active;
+    private boolean completed;
+    private int stage;
     private boolean rewardClaimed;
-    private List<Object> stepData = new ArrayList<>();
+    private Map<String, Boolean> flags = new HashMap<>();
+    private Map<String, Integer> counters = new HashMap<>();
 
     public QuestState() {}
 
     public QuestState(Quest quest) {
         this.questId = quest.getQuestId();
-        this.currentStep = quest.getCurrentStep();
-        for (QuestStep questStep : quest.getSteps()) {
-            stepData.add(questStep.saveData());
-        }
+        this.active = true;
+        this.completed = quest.isCompleted();
+        this.stage = quest.getCurrentStep();
+        this.rewardClaimed = quest.isRewardClaimed();
     }
 
     public String getQuestId() {
@@ -30,20 +35,28 @@ public class QuestState {
         this.questId = questId;
     }
 
-    public int getCurrentStep() {
-        return currentStep;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setCurrentStep(int currentStep) {
-        this.currentStep = currentStep;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public List<Object> getStepData() {
-        return stepData;
+    public boolean isCompleted() {
+        return completed;
     }
 
-    public void setStepData(List<Object> stepData) {
-        this.stepData = stepData;
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public int getStage() {
+        return stage;
+    }
+
+    public void setStage(int stage) {
+        this.stage = stage;
     }
 
     public boolean isRewardClaimed() {
@@ -52,5 +65,21 @@ public class QuestState {
 
     public void setRewardClaimed(boolean rewardClaimed) {
         this.rewardClaimed = rewardClaimed;
+    }
+
+    public Map<String, Boolean> getFlags() {
+        return flags;
+    }
+
+    public void setFlags(Map<String, Boolean> flags) {
+        this.flags = flags == null ? new HashMap<>() : flags;
+    }
+
+    public Map<String, Integer> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(Map<String, Integer> counters) {
+        this.counters = counters == null ? new HashMap<>() : counters;
     }
 }
