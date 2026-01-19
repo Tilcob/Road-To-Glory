@@ -33,7 +33,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestSystem questSystem = new QuestSystem(
             eventBus,
             registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), Map.of())
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of())
         );
         Engine engine = new Engine();
         engine.addSystem(questSystem);
@@ -61,7 +61,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestSystem questSystem = new QuestSystem(
             eventBus,
             registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), Map.of())
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of())
         );
         Engine engine = new Engine();
         engine.addSystem(questSystem);
@@ -88,7 +88,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestSystem questSystem = new QuestSystem(
             eventBus,
             registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), questDialogs)
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), questDialogs)
         );
         Engine engine = new Engine();
         engine.addSystem(questSystem);

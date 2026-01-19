@@ -119,6 +119,14 @@ These commands are only recognized when they appear inside an indented choice bo
 - `<<add_quest <questId>>>`: Add a quest to the player's quest log.
 - `<<quest_step <type> <target>>>`: Trigger a quest step event.
 
+### Dialog runtime commands (command lines inside dialog nodes)
+
+Direct reward commands are only supported in dialog yarn nodes (never in quest yarn).
+
+- `<<give_money <amount>>>`: Grant currency to the player.
+- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
+
+
 ### Example: choices + node jumps
 
 ```yarn

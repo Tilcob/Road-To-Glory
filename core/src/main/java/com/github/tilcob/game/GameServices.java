@@ -15,6 +15,7 @@ import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.yarn.DialogYarnBridge;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 import com.github.tilcob.game.yarn.QuestYarnBridge;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
@@ -55,8 +56,8 @@ public class GameServices {
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
-        QuestYarnBridge dialogYarnBridge = new QuestYarnBridge(eventBus, true);
-        this.questYarnBridge = new QuestYarnBridge(eventBus, false);
+        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        this.questYarnBridge = new QuestYarnBridge(eventBus);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questManager = new QuestManager(questYarnRuntime);

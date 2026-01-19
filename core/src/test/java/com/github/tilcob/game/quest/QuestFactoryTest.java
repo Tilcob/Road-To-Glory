@@ -20,7 +20,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
             "Reward test",
             "reward_start",
             List.of(),
-            QuestDefinition.RewardTiming.GIVER,
+            RewardTiming.GIVER,
             rewardDefinition
         );
 

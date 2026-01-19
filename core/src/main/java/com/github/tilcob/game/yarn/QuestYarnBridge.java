@@ -13,11 +13,9 @@ import com.github.tilcob.game.quest.QuestState;
 
 public class QuestYarnBridge {
     private final GameEventBus eventBus;
-    private final boolean allowRewards;
 
-    public QuestYarnBridge(GameEventBus eventBus, boolean allowRewards) {
+    public QuestYarnBridge(GameEventBus eventBus) {
         this.eventBus = eventBus;
-        this.allowRewards = allowRewards;
     }
 
     public void registerAll(YarnRuntime runtime) {
@@ -29,10 +27,6 @@ public class QuestYarnBridge {
         registry.register("quest_start", this::startQuest);
         registry.register("quest_complete", this::completeQuest);
         registry.register("quest_stage", this::setQuestStage);
-        if (allowRewards) {
-            registry.register("give_money", this::giveMoney);
-            registry.register("give_item", this::giveItem);
-        }
         registry.register("set_flag", this::setFlag);
         registry.register("inc_counter", this::incrementCounter);
     }
@@ -87,32 +81,6 @@ public class QuestYarnBridge {
             eventBus.fire(new QuestCompletedEvent(player, questId));
         }
         eventBus.fire(new UpdateQuestLogEvent(player));
-    }
-
-    private void giveMoney(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) return;
-        int amount = parseInt(args[0], 0);
-        if (amount <= 0) return;
-        Wallet wallet = Wallet.MAPPER.get(player);
-        if (wallet == null) {
-            wallet = new Wallet();
-            player.add(wallet);
-        }
-        wallet.earn(amount);
-    }
-
-    private void giveItem(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) return;
-        String itemId = args[0];
-        int count = args.length > 1 ? parseInt(args[1], 1) : 1;
-        if (itemId == null || itemId.isBlank() || count <= 0) return;
-        Inventory inventory = Inventory.MAPPER.get(player);
-        if (inventory == null) {
-            inventory = new Inventory();
-            player.add(inventory);
-        }
-        String resolved = ItemDefinitionRegistry.resolveId(itemId);
-        for (int i = 0; i < count; i++) inventory.getItemsToAdd().add(resolved);
     }
 
     private void setFlag(Entity player, String[] args) {

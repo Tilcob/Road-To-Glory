@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Entity;
 public class DialogYarnRuntime {
     private final YarnRuntime runtime;
 
-    public DialogYarnRuntime(QuestYarnBridge bridge) {
+    public DialogYarnRuntime(DialogYarnBridge bridge) {
         this.runtime = new YarnRuntime();
         bridge.registerAll(runtime);
     }

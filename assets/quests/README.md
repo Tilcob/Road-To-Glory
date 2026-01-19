@@ -41,11 +41,11 @@ Supported fields:
 These commands are executed when quest nodes are processed (for example `q_<questId>_start` or
 `q_<questId>_on_<event>`).
 
+Quest nodes should only drive quest state and flags; rewards belong in the header fields above.
+
 - `<<quest_start <questId>>>`: Mark a quest as started (adds it to the quest log).
 - `<<quest_stage <questId> <stage>>>`: Set the quest stage (0-based).
 - `<<quest_complete <questId>>>`: Mark the quest as completed and emit completion events.
-- `<<give_money <amount>>>`: Grant currency to the player.
-- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
 - `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
 - `<<inc_counter <counter> <amount>>>`: Increment a named counter (amount defaults to `1`).
 
