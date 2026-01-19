@@ -1,17 +1,18 @@
 # Quest Yarn conventions
 
 Quest data is registered via Yarn headers inside each quest file referenced by the
-`quests/index.json` manifest.
+`quests/index.json` manifest (generated from `.yarn` files only).
 
 ### Manifest (`quests/index.json`)
 
-The manifest is a JSON array of file names or relative paths. Entries without a `/` are
-resolved relative to the `quests/` directory.
+The manifest is a JSON array of `.yarn` file names or relative paths. Entries without a
+`/` are resolved relative to the `quests/` directory.
 
 ## Quest discovery
 
 The quest registry is loaded from `quests/index.json` at runtime. JSON manifests
-and directory listing are no longer used.
+and directory listing are no longer used. Do not add metadata files like
+`quests_index.yarn`; only `.yarn` quest scripts belong here.
 
 ## Registry format
 

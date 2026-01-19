@@ -80,10 +80,8 @@ tasks.register("genQuestIndex") {
     def outFile = file("$rootDir/assets/quests/index.json")
 
     def names = dir.listFiles()
-      .findAll { it.isFile() }
+      .findAll { it.isFile() && it.name.toLowerCase().endsWith("yarn") }
       .collect { it.name }
-      .findAll { it.toLowerCase().endsWith(".yarn") }
-      .findAll { it != "index.json" }
       .sort()
 
     outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(names)) + "\n"
