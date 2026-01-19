@@ -5,7 +5,6 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.quest.Quest;
@@ -16,7 +15,6 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -104,61 +102,6 @@ class RewardSystemTest extends HeadlessGdxTest {
     }
 
     @Test
-    void grantsRewardOnceOnQuestCompletedEvent() {
-        GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
-
-        Entity player = new Entity();
-        QuestLog questLog = new QuestLog();
-        player.add(questLog);
-
-        QuestReward reward = new QuestReward(20, List.of("shield"));
-        Quest quest = new Quest("completion_reward_test", "Completion Quest", "Complete me", reward, 1);
-        quest.setCurrentStep(1);
-        questLog.add(quest);
-
-        AtomicInteger grants = new AtomicInteger(0);
-        eventBus.subscribe(RewardGrantedEvent.class, event -> grants.incrementAndGet());
-
-        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
-        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
-
-        Wallet wallet = Wallet.MAPPER.get(player);
-        assertNotNull(wallet);
-        assertEquals(20, wallet.getMoney());
-        assertTrue(quest.isRewardClaimed());
-        assertEquals(1, grants.get());
-
-        rewardSystem.dispose();
-    }
-
-    @Test
-    void grantsRewardsForCompletionTimingOnQuestCompletedEvent() {
-        GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
-
-        Entity player = new Entity();
-        QuestLog questLog = new QuestLog();
-        player.add(questLog);
-
-        QuestReward reward = new QuestReward(30, List.of("amulet"));
-        Quest quest = new Quest("completion_reward_test", "Completion Quest", "Complete me", reward, 1);
-        quest.setCurrentStep(1);
-        questLog.add(quest);
-
-        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
-
-        Wallet wallet = Wallet.MAPPER.get(player);
-        assertNotNull(wallet);
-        assertEquals(30, wallet.getMoney());
-        assertTrue(quest.isRewardClaimed());
-
-        rewardSystem.dispose();
-    }
-
-    @Test
     void giverTimingRewardsOnlyOnQuestRewardEvent() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
@@ -173,41 +116,11 @@ class RewardSystemTest extends HeadlessGdxTest {
         quest.setCurrentStep(1);
         questLog.add(quest);
 
-        eventBus.fire(new QuestCompletedEvent(player, "giver_reward_test"));
-
-        assertNull(Wallet.MAPPER.get(player));
-        assertFalse(quest.isRewardClaimed());
-
         eventBus.fire(new QuestRewardEvent(player, "giver_reward_test"));
 
         Wallet wallet = Wallet.MAPPER.get(player);
         assertNotNull(wallet);
         assertEquals(12, wallet.getMoney());
-        assertTrue(quest.isRewardClaimed());
-
-        rewardSystem.dispose();
-    }
-
-    @Test
-    void autoTimingRewardsOnCompletionWithoutDialog() {
-        GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
-
-        Entity player = new Entity();
-        QuestLog questLog = new QuestLog();
-        player.add(questLog);
-
-        QuestReward reward = new QuestReward(25, List.of("cloak"));
-        Quest quest = new Quest("auto_reward_test", "Auto Quest", "Auto reward", reward, 1);
-        quest.setCurrentStep(1);
-        questLog.add(quest);
-
-        eventBus.fire(new QuestCompletedEvent(player, "auto_reward_test"));
-
-        Wallet wallet = Wallet.MAPPER.get(player);
-        assertNotNull(wallet);
-        assertEquals(25, wallet.getMoney());
         assertTrue(quest.isRewardClaimed());
 
         rewardSystem.dispose();

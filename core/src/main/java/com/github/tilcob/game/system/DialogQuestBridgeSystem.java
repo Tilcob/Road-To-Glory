@@ -8,17 +8,10 @@ import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.NpcFsm;
-import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogSelector;
-import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.event.DialogFinishedEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestRewardEvent;
-import com.github.tilcob.game.quest.QuestDefinition;
 import com.github.tilcob.game.quest.QuestManager;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
-
-import java.util.Map;
 
 public class DialogQuestBridgeSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;

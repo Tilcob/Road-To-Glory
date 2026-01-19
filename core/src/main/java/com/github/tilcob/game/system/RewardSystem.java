@@ -7,11 +7,13 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.quest.*;
+import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestFactory;
+import com.github.tilcob.game.quest.QuestReward;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 
 public class RewardSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
