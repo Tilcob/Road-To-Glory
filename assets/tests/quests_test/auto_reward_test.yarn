@@ -1,0 +1,12 @@
+questId: auto_reward_test
+displayName: Auto Reward Test
+journalText: Reward should be granted automatically on completion.
+startNode: q_auto_reward_test_start
+reward_money: 25
+reward_timing: auto
+title: q_auto_reward_test_start
+position: 0,0
+---
+<<quest_start auto_reward_test>>
+<<quest_complete auto_reward_test>>
+===

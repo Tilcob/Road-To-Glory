@@ -132,4 +132,84 @@ class RewardSystemTest extends HeadlessGdxTest {
 
         rewardSystem.dispose();
     }
+
+    @Test
+    void grantsRewardsForCompletionTimingOnQuestCompletedEvent() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        QuestReward reward = new QuestReward(30, List.of("amulet"));
+        Quest quest = new Quest("completion_reward_test", "Completion Quest", "Complete me", reward, 1);
+        quest.setCurrentStep(1);
+        questLog.add(quest);
+
+        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
+
+        Wallet wallet = Wallet.MAPPER.get(player);
+        assertNotNull(wallet);
+        assertEquals(30, wallet.getMoney());
+        assertTrue(quest.isRewardClaimed());
+
+        rewardSystem.dispose();
+    }
+
+    @Test
+    void giverTimingRewardsOnlyOnQuestRewardEvent() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        QuestReward reward = new QuestReward(12, List.of("ring"));
+        Quest quest = new Quest("giver_reward_test", "Giver Quest", "Talk to the giver", reward, 1);
+        quest.setCurrentStep(1);
+        questLog.add(quest);
+
+        eventBus.fire(new QuestCompletedEvent(player, "giver_reward_test"));
+
+        assertNull(Wallet.MAPPER.get(player));
+        assertFalse(quest.isRewardClaimed());
+
+        eventBus.fire(new QuestRewardEvent(player, "giver_reward_test"));
+
+        Wallet wallet = Wallet.MAPPER.get(player);
+        assertNotNull(wallet);
+        assertEquals(12, wallet.getMoney());
+        assertTrue(quest.isRewardClaimed());
+
+        rewardSystem.dispose();
+    }
+
+    @Test
+    void autoTimingRewardsOnCompletionWithoutDialog() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        QuestReward reward = new QuestReward(25, List.of("cloak"));
+        Quest quest = new Quest("auto_reward_test", "Auto Quest", "Auto reward", reward, 1);
+        quest.setCurrentStep(1);
+        questLog.add(quest);
+
+        eventBus.fire(new QuestCompletedEvent(player, "auto_reward_test"));
+
+        Wallet wallet = Wallet.MAPPER.get(player);
+        assertNotNull(wallet);
+        assertEquals(25, wallet.getMoney());
+        assertTrue(quest.isRewardClaimed());
+
+        rewardSystem.dispose();
+    }
 }
