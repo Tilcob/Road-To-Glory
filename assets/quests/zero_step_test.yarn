@@ -1,0 +1,11 @@
+questId: zero_step_test
+displayName: Zero Step Test
+journalText: Autocomplete quest for tests.
+startNode: q_zero_step_start
+reward_money: 0
+title: q_zero_step_start
+position: 0,0
+---
+<<quest_start zero_step_test>>
+<<quest_complete zero_step_test>>
+===

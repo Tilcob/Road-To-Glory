@@ -61,7 +61,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         AtomicBoolean completedFired = new AtomicBoolean(false);
         eventBus.subscribe(QuestCompletedEvent.class, event -> completedFired.set(true));
 
-        eventBus.fire(new AddQuestEvent(player, "welcome_to_town"));
+        eventBus.fire(new AddQuestEvent(player, "zero_step_test"));
 
         assertTrue(completedFired.get());
     }
