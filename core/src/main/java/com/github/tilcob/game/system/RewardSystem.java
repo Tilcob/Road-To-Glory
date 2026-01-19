@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestFactory;
@@ -37,6 +38,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
         if (reward.money() > 0 || !reward.items().isEmpty()) {
             eventBus.fire(new RewardGrantedEvent(player, quest.getQuestId(), quest.getTitle(), reward));
         }
+        eventBus.fire(new UpdateQuestLogEvent(player));
     }
 
     private Quest questFor(Entity player, String questId) {

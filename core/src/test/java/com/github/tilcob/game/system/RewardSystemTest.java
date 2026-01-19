@@ -7,6 +7,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 
 import java.util.List;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -97,6 +99,32 @@ class RewardSystemTest extends HeadlessGdxTest {
         assertNull(Inventory.MAPPER.get(player));
         assertTrue(quest.isRewardClaimed());
         assertFalse(rewardGranted.get());
+
+        rewardSystem.dispose();
+    }
+
+    @Test
+    void firesUpdateQuestLogEventOnRewardClaim() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        QuestReward reward = new QuestReward(0, List.of());
+        Quest quest = new Quest("claim_update_test", "Claim Quest", "Claim", reward, 1);
+        quest.setCurrentStep(quest.getTotalStages());
+        questLog.add(quest);
+
+        AtomicInteger updateCount = new AtomicInteger();
+        eventBus.subscribe(UpdateQuestLogEvent.class, event -> updateCount.incrementAndGet());
+
+        eventBus.fire(new QuestRewardEvent(player, "claim_update_test"));
+
+        assertTrue(quest.isRewardClaimed());
+        assertEquals(1, updateCount.get());
 
         rewardSystem.dispose();
     }

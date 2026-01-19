@@ -10,6 +10,7 @@ import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
@@ -21,7 +22,9 @@ import org.junit.jupiter.api.Test;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class QuestSystemTest extends HeadlessGdxTest {
@@ -101,5 +104,51 @@ class QuestSystemTest extends HeadlessGdxTest {
 
         DialogFlags flags = DialogFlags.MAPPER.get(player);
         assertTrue(flags != null && flags.get("start_node_flag_test"));
+    }
+
+    @Test
+    void firesUpdateQuestLogEventOnStageChange() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of());
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        Quest quest = new Quest("stage_test", "Stage Quest", "Stage", new QuestReward(0, List.of()), 2);
+        questLog.add(quest);
+
+        AtomicInteger updateCount = new AtomicInteger();
+        eventBus.subscribe(UpdateQuestLogEvent.class, event -> updateCount.incrementAndGet());
+
+        runtime.executeCommandLine(player, "<<quest_stage stage_test 1>>");
+
+        assertEquals(1, quest.getCurrentStep());
+        assertEquals(1, updateCount.get());
+    }
+
+    @Test
+    void firesUpdateQuestLogEventOnCompletion() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of());
+
+        Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+
+        Quest quest = new Quest("complete_test", "Complete Quest", "Complete", new QuestReward(0, List.of()), 1);
+        questLog.add(quest);
+
+        AtomicInteger updateCount = new AtomicInteger();
+        AtomicBoolean completed = new AtomicBoolean(false);
+        eventBus.subscribe(UpdateQuestLogEvent.class, event -> updateCount.incrementAndGet());
+        eventBus.subscribe(QuestCompletedEvent.class, event -> completed.set(true));
+
+        runtime.executeCommandLine(player, "<<quest_complete complete_test>>");
+
+        assertTrue(quest.isCompleted());
+        assertTrue(quest.isCompletionNotified());
+        assertTrue(completed.get());
+        assertEquals(1, updateCount.get());
     }
 }
