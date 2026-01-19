@@ -23,15 +23,9 @@ import java.util.Map;
 public class DialogQuestBridgeSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestManager questManager;
-    private final QuestYarnRegistry questYarnRegistry;
-    private final Map<String, DialogData> allDialogs;
-
-    public DialogQuestBridgeSystem(GameEventBus eventBus, QuestManager questManager,
-                                   QuestYarnRegistry questYarnRegistry, Map<String, DialogData> allDialogs) {
+    public DialogQuestBridgeSystem(GameEventBus eventBus, QuestManager questManager) {
         this.eventBus = eventBus;
         this.questManager = questManager;
-        this.questYarnRegistry = questYarnRegistry;
-        this.allDialogs = allDialogs;
 
         eventBus.subscribe(DialogFinishedEvent.class, this::onDialogFinished);
     }
@@ -43,7 +37,6 @@ public class DialogQuestBridgeSystem extends EntitySystem implements Disposable 
 
         setFirstContactFlag(npcEntity, player);
         notifyQuestTalk(npcEntity, player);
-        maybeNotifyQuestReward(player, npcEntity);
         notifyNpcDialogFinished(npcEntity);
     }
 
@@ -72,26 +65,6 @@ public class DialogQuestBridgeSystem extends EntitySystem implements Disposable 
         telegram.message = Messages.DIALOG_FINISHED;
         npcFsm.getNpcFsm().handleMessage(telegram);
     }
-
-    private void maybeNotifyQuestReward(Entity player, Entity npcEntity) {
-        Npc npc = Npc.MAPPER.get(npcEntity);
-        if (npc == null) return;
-        DialogData dialogData = allDialogs.get(npc.getName());
-        if (dialogData == null) return;
-        QuestDialog questDialog = dialogData.questDialog();
-        if (questDialog == null || questDialog.questId() == null) return;
-        QuestDefinition definition = questDefinitionFor(questDialog.questId());
-        if (definition == null || definition.rewardTiming() != QuestDefinition.RewardTiming.GIVER) return;
-        eventBus.fire(new QuestRewardEvent(player, questDialog.questId()));
-    }
-
-    private QuestDefinition questDefinitionFor(String questId) {
-        if (questYarnRegistry.isEmpty()) {
-            questYarnRegistry.loadAll();
-        }
-        return questYarnRegistry.getQuestDefinition(questId);
-    }
-
 
     @Override
     public void dispose() {

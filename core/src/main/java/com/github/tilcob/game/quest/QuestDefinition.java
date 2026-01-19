@@ -16,10 +16,4 @@ public record QuestDefinition(
 
     public record RewardDefinition(int money, List<String> items) {
     }
-
-    public enum RewardTiming {
-        GIVER,
-        COMPLETION,
-        AUTO
-    }
 }
