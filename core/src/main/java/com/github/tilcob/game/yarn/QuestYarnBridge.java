@@ -13,9 +13,11 @@ import com.github.tilcob.game.quest.QuestState;
 
 public class QuestYarnBridge {
     private final GameEventBus eventBus;
+    private final boolean allowRewards;
 
-    public QuestYarnBridge(GameEventBus eventBus) {
+    public QuestYarnBridge(GameEventBus eventBus, boolean allowRewards) {
         this.eventBus = eventBus;
+        this.allowRewards = allowRewards;
     }
 
     public void registerAll(YarnRuntime runtime) {
@@ -27,8 +29,10 @@ public class QuestYarnBridge {
         registry.register("quest_start", this::startQuest);
         registry.register("quest_complete", this::completeQuest);
         registry.register("quest_stage", this::setQuestStage);
-        registry.register("give_money", this::giveMoney);
-        registry.register("give_item", this::giveItem);
+        if (allowRewards) {
+            registry.register("give_money", this::giveMoney);
+            registry.register("give_item", this::giveItem);
+        }
         registry.register("set_flag", this::setFlag);
         registry.register("inc_counter", this::incrementCounter);
     }

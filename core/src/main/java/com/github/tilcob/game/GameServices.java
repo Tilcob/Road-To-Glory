@@ -55,8 +55,9 @@ public class GameServices {
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
-        this.questYarnBridge = new QuestYarnBridge(eventBus);
-        this.dialogYarnRuntime = new DialogYarnRuntime(questYarnBridge);
+        QuestYarnBridge dialogYarnBridge = new QuestYarnBridge(eventBus, true);
+        this.questYarnBridge = new QuestYarnBridge(eventBus, false);
+        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge);
         this.questManager = new QuestManager(questYarnRuntime, allDialogs, allQuestDialogs);
     }

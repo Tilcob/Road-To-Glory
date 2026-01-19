@@ -5,10 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.event.AddQuestEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
-import com.github.tilcob.game.event.UpdateQuestLogEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestDefinition;
 import com.github.tilcob.game.quest.QuestFactory;
@@ -29,6 +26,7 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         this.questYarnRuntime = questYarnRuntime;
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
+        eventBus.subscribe(QuestCompletedEvent.class, this::onQuestCompleted);
     }
 
     @Override
@@ -67,8 +65,13 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         eventBus.fire(new UpdateQuestLogEvent(event.player()));
     }
 
+    private void onQuestCompleted(QuestCompletedEvent event) {
+        eventBus.fire(new QuestRewardEvent(event.player(), event.questId()));
+    }
+
     @Override
     public void dispose() {
         eventBus.unsubscribe(AddQuestEvent.class, this::addQuest);
+        eventBus.unsubscribe(QuestCompletedEvent.class, this::onQuestCompleted);
     }
 }

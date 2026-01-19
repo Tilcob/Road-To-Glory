@@ -18,7 +18,5 @@ position: -178,-155
 <<if $eventTarget == "Npc-2">>
 <<quest_stage welcome_to_town 1>>
 <<quest_complete welcome_to_town>>
-<<give_money 50>>
-<<give_item "SWORD" 1>>
 <<endif>>
 ===
