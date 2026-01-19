@@ -11,8 +11,6 @@ public class QuestState {
     private boolean completed;
     private int stage;
     private boolean rewardClaimed;
-    private Map<String, Boolean> flags = new HashMap<>();
-    private Map<String, Integer> counters = new HashMap<>();
 
     public QuestState() {}
 
@@ -62,21 +60,5 @@ public class QuestState {
 
     public void setRewardClaimed(boolean rewardClaimed) {
         this.rewardClaimed = rewardClaimed;
-    }
-
-    public Map<String, Boolean> getFlags() {
-        return flags;
-    }
-
-    public void setFlags(Map<String, Boolean> flags) {
-        this.flags = flags == null ? new HashMap<>() : flags;
-    }
-
-    public Map<String, Integer> getCounters() {
-        return counters;
-    }
-
-    public void setCounters(Map<String, Integer> counters) {
-        this.counters = counters == null ? new HashMap<>() : counters;
     }
 }
