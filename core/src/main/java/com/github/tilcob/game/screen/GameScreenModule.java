@@ -124,7 +124,12 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new DialogConsequenceSystem(services.getEventBus(), services.getQuestManager()),
             SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
-            new DialogQuestBridgeSystem(services.getEventBus(), services.getQuestManager()),
+            new DialogQuestBridgeSystem(
+                services.getEventBus(),
+                services.getQuestManager(),
+                services.getQuestYarnRegistry(),
+                services.getAllDialogs()
+            ),
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(
