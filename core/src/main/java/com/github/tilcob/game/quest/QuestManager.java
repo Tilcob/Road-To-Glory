@@ -1,15 +1,9 @@
 package com.github.tilcob.game.quest;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.dialog.DialogData;
-import com.github.tilcob.game.dialog.DialogNode;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
-
-import java.util.Map;
 
 public class QuestManager {
     private static final String TAG = QuestManager.class.getSimpleName();

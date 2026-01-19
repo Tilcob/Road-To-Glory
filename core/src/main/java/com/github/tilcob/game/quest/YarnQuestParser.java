@@ -45,6 +45,7 @@ public class YarnQuestParser {
 
         int rewardMoney = parseRewardMoney(headers, questFile);
         List<String> rewardItems = parseRewardItems(headers);
+        QuestDefinition.RewardTiming rewardTiming = parseRewardTiming(headers, questFile);
         QuestDefinition.RewardDefinition reward = new QuestDefinition.RewardDefinition(
             rewardMoney,
             List.copyOf(rewardItems)
@@ -56,6 +57,7 @@ public class YarnQuestParser {
             journalText,
             startNode,
             List.copyOf(steps),
+            rewardTiming,
             reward
         );
     }
@@ -159,6 +161,20 @@ public class YarnQuestParser {
             .map(this::normalizeHeaderValue)
             .filter(value -> !value.isBlank())
             .toList();
+    }
+
+    private QuestDefinition.RewardTiming parseRewardTiming(Map<String, List<String>> headers, FileHandle questFile) {
+        String value = getFirst(headers, "reward_timing");
+        if (value == null || value.isBlank()) {
+            return QuestDefinition.RewardTiming.GIVER;
+        }
+        String normalized = normalizeHeaderValue(value).toUpperCase(Locale.ROOT);
+        try {
+            return QuestDefinition.RewardTiming.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            Gdx.app.error(TAG, "Invalid reward_timing in quest file: " + questFile.path() + " (" + value + ")");
+            return QuestDefinition.RewardTiming.GIVER;
+        }
     }
 
     private int parseInt(String value, FileHandle questFile) {

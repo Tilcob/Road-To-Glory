@@ -8,11 +8,18 @@ public record QuestDefinition(
     String journalText,
     String startNode,
     List<StepDefinition> steps,
+    RewardTiming rewardTiming,
     RewardDefinition reward
 ) {
     public record StepDefinition(String type, String npc, String itemId, int amount, String enemy) {
     }
 
     public record RewardDefinition(int money, List<String> items) {
+    }
+
+    public enum RewardTiming {
+        GIVER,
+        COMPLETION,
+        AUTO
     }
 }

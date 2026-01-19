@@ -23,6 +23,7 @@ class YarnQuestParserTest extends HeadlessGdxTest {
             reward_money: 25
             reward_item: sword
             reward_items: shield, potion
+            reward_timing: giver
             title: q_reward_headers_start
             ---
             <<quest_start reward_headers>>
@@ -38,6 +39,7 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         assertNotNull(definition);
         assertEquals("reward_headers", definition.questId());
         assertEquals(25, definition.reward().money());
+        assertEquals(QuestDefinition.RewardTiming.GIVER, definition.rewardTiming());
         assertTrue(definition.reward().items().contains("sword"));
         assertTrue(definition.reward().items().contains("shield"));
         assertTrue(definition.reward().items().contains("potion"));

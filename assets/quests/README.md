@@ -22,6 +22,7 @@ Inside the quest file headers (before the first `---`):
 - Steps are expressed as `step:` lines using `talk`, `collect`, or `kill`.
 - Rewards are optional and use `reward_money:` / `reward_item:`.
 - You may also use `reward_items:` with a comma-separated list.
+- Reward timing is optional and uses `reward_timing:` (`giver`, `completion`, or `auto`).
 
 ## Rewards
 
@@ -32,7 +33,8 @@ Supported fields:
 
 - `reward_money`: currency amount added to the player's wallet.
 - `reward_item`: item definition IDs (for example, `sword`). Repeat the line per item.
-- `reward.items`: comma-separated item definition IDs.
+- `reward_items`: comma-separated item definition IDs.
+- `reward_timing`: when rewards are delivered. Use `giver`, `completion`, or `auto` (defaults to `giver`).
 
 ### Quest Yarn runtime commands (executed from quest nodes)
 
@@ -57,6 +59,7 @@ journalText: Get to know the locals and settle in.
 startNode: q_welcome_to_town_start
 reward_money: 50
 reward_item: sword
+reward_timing: giver
 step: talk Npc-2
 title: q_welcome_to_town_start
 position: -178,-155
