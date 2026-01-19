@@ -16,6 +16,7 @@ public class QuestYarnRegistry {
 
     private final String indexPath;
     private final Map<String, QuestDefinition> definitions = new HashMap<>();
+    private final Map<String, FileHandle> questFiles = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
     private final YarnQuestParser questParser = new YarnQuestParser();
 
@@ -25,6 +26,7 @@ public class QuestYarnRegistry {
 
     public Map<String, QuestDefinition> loadAll() {
         definitions.clear();
+        questFiles.clear();
         FileHandle indexFile = Gdx.files.internal(indexPath);
         if (!indexFile.exists()) {
             Gdx.app.error(TAG, "Quest index not found: " + indexPath);
@@ -54,6 +56,10 @@ public class QuestYarnRegistry {
         return definitions.get(questId);
     }
 
+    public Map<String, FileHandle> getQuestFiles() {
+        return Collections.unmodifiableMap(questFiles);
+    }
+
     public boolean isEmpty() {
         return definitions.isEmpty();
     }
@@ -70,6 +76,7 @@ public class QuestYarnRegistry {
             return;
         }
         definitions.put(quest.questId(), quest);
+        questFiles.put(quest.questId(), questFile);
     }
 
     private FileHandle resolveQuestFileFromEntry(String entry) {

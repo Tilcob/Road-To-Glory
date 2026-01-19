@@ -27,7 +27,7 @@ public class QuestYarnBridge {
         registry.register("quest_start", this::startQuest);
         registry.register("quest_complete", this::completeQuest);
         registry.register("quest_stage", this::setQuestStage);
-        registry.register("give_gold", this::giveGold);
+        registry.register("give_money", this::giveMoney);
         registry.register("give_item", this::giveItem);
         registry.register("set_flag", this::setFlag);
         registry.register("inc_counter", this::incrementCounter);
@@ -84,7 +84,7 @@ public class QuestYarnBridge {
         eventBus.fire(new UpdateQuestLogEvent(player));
     }
 
-    private void giveGold(Entity player, String[] args) {
+    private void giveMoney(Entity player, String[] args) {
         if (player == null || args == null || args.length == 0) {
             return;
         }

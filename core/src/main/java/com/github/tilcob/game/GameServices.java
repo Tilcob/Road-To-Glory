@@ -31,6 +31,7 @@ public class GameServices {
     private final AssetManager assetManager;
     private final AudioManager audioManager;
     private final Map<String, Quest> allQuests;
+    private final Map<String, DialogData> allQuestDialogs;
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
@@ -49,6 +50,7 @@ public class GameServices {
         this.assetManager = new AssetManager(resolver);
         this.audioManager = new AudioManager(assetManager);
         this.allQuests = new HashMap<>();
+        this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.dialogRepository = new DialogRepository(true, "dialogs",
@@ -56,7 +58,7 @@ public class GameServices {
         this.questYarnBridge = new QuestYarnBridge(eventBus);
         this.dialogYarnRuntime = new DialogYarnRuntime(questYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge);
-        this.questManager = new QuestManager(questYarnRuntime, allDialogs);
+        this.questManager = new QuestManager(questYarnRuntime, allDialogs, allQuestDialogs);
     }
 
     public void loadGame() {
@@ -97,6 +99,10 @@ public class GameServices {
 
     public Map<String, Quest> getAllQuests() {
         return allQuests;
+    }
+
+    public Map<String, DialogData> getAllQuestDialogs() {
+        return allQuestDialogs;
     }
 
     public Map<String, DialogData> getAllDialogs() {

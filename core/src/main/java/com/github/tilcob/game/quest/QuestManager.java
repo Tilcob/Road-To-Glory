@@ -16,10 +16,14 @@ public class QuestManager {
 
     private final QuestYarnRuntime questYarnRuntime;
     private final Map<String, DialogData> allDialogs;
+    private final Map<String, DialogData> allQuestDialogs;
 
-    public QuestManager(QuestYarnRuntime questYarnRuntime, Map<String, DialogData> allDialogs) {
+    public QuestManager(QuestYarnRuntime questYarnRuntime,
+                        Map<String, DialogData> allDialogs,
+                        Map<String, DialogData> allQuestDialogs) {
         this.questYarnRuntime = questYarnRuntime;
         this.allDialogs = allDialogs;
+        this.allQuestDialogs = allQuestDialogs;
     }
 
     public void signal(String eventType, String target, int amount) {
@@ -102,14 +106,22 @@ public class QuestManager {
 
     private DialogNode findNode(String nodeId) {
         if (nodeId == null || nodeId.isBlank()) return null;
-        for (DialogData dialogData : allDialogs.values()) {
+        DialogNode node1 = getDialogNode(allDialogs, nodeId);
+        if (node1 != null) return node1;
+        DialogNode node = getDialogNode(allQuestDialogs, nodeId);
+        if (node != null) return node;
+        if (Gdx.app != null) Gdx.app.debug(TAG, "Quest Yarn node not found: " + nodeId);
+        return null;
+    }
+
+    private DialogNode getDialogNode(Map<String, DialogData> allQuestDialogs, String nodeId) {
+        for (DialogData dialogData : allQuestDialogs.values()) {
             if (dialogData == null) continue;
             ObjectMap<String, DialogNode> nodes = dialogData.nodesById();
             if (nodes == null || nodes.isEmpty()) continue;
             DialogNode node = nodes.get(nodeId);
             if (node != null) return node;
         }
-        if (Gdx.app != null) Gdx.app.debug(TAG, "Quest Yarn node not found: " + nodeId);
         return null;
     }
 }

@@ -53,6 +53,24 @@ public class GameLoader {
             }
             services.getAllQuests().put(questDefinition.questId(), questFactory.createQuest(questDefinition));
         }
+        Map<String, FileHandle> questFiles = questRegistry.getQuestFiles();
+        if (questFiles.isEmpty()) {
+            Gdx.app.error(TAG, "No quest yarn files loaded from repository.");
+        }
+        for (var entry : questFiles.entrySet()) {
+            String questId = entry.getKey();
+            FileHandle questFile = entry.getValue();
+            if (questId == null || questId.isBlank()) {
+                Gdx.app.error(TAG, "Encountered quest file entry without a questId.");
+                continue;
+            }
+            if (questFile == null) {
+                Gdx.app.error(TAG, "Quest file missing for questId: " + questId);
+                continue;
+            }
+            services.getAllQuestDialogs().put(questId, dialogLoader.load(questFile));
+        }
+
         Map<String, FileHandle> dialogFiles = dialogRepository.loadAll();
         if (dialogFiles.isEmpty()) {
             Gdx.app.error(TAG, "No dialog files loaded from repository.");
