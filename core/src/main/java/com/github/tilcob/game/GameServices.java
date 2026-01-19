@@ -7,10 +7,7 @@ import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemEntityRegistry;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestLifecycleService;
-import com.github.tilcob.game.quest.QuestManager;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
+import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
@@ -41,6 +38,7 @@ public class GameServices {
     private final QuestYarnRuntime questYarnRuntime;
     private final QuestManager questManager;
     private final QuestLifecycleService questLifecycleService;
+    private final QuestRewardService questRewardService;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -56,6 +54,7 @@ public class GameServices {
         this.allDialogs = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allQuestDialogs);
+        this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
@@ -64,7 +63,6 @@ public class GameServices {
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
-
     }
 
     public void loadGame() {
@@ -137,5 +135,9 @@ public class GameServices {
 
     public QuestLifecycleService getQuestLifecycleService() {
         return questLifecycleService;
+    }
+
+    public QuestRewardService getQuestRewardService() {
+        return questRewardService;
     }
 }

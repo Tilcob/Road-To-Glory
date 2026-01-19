@@ -7,10 +7,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestLifecycleService;
-import com.github.tilcob.game.quest.QuestReward;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
+import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
@@ -114,7 +111,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         dialogs.put("QuestGiver", new DialogData(null, null, null, null, questDialog, null, null));
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, dialogs);
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
+        QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
 
         Entity npc = new Entity();
         npc.add(new Npc(null, "QuestGiver"));
@@ -157,7 +155,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
+        QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -193,7 +192,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
+        QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
