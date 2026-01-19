@@ -85,7 +85,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Map<String, DialogData> dialogs = new HashMap<>();
         QuestDialog questDialog = new QuestDialog("giver_reward_test", null, null, null);
         dialogs.put("QuestGiver", new DialogData(null, null, null, null, questDialog, null, null));
-        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, dialogs);
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
 
         Entity npc = new Entity();

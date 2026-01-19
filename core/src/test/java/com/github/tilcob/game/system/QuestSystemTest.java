@@ -87,7 +87,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         YarnDialogLoader dialogLoader = new YarnDialogLoader();
         DialogData dialogData = dialogLoader.load(Gdx.files.internal("tests/quests_test/start_node_flag_test.yarn"));
         Map<String, DialogData> questDialogs = Map.of("start_node_flag_test", dialogData);
-        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, questDialogs);
         QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
         questLifecycleService.setQuestYarnRuntime(runtime);
         QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
