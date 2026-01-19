@@ -11,6 +11,7 @@ import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
+import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -19,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-class RewardSystemTest {
+class RewardSystemTest extends HeadlessGdxTest {
 
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
@@ -113,15 +114,15 @@ class RewardSystemTest {
         player.add(questLog);
 
         QuestReward reward = new QuestReward(20, List.of("shield"));
-        Quest quest = new Quest("Completion_Quest", "Completion Quest", "Complete me", reward, 1);
+        Quest quest = new Quest("completion_reward_test", "Completion Quest", "Complete me", reward, 1);
         quest.setCurrentStep(1);
         questLog.add(quest);
 
         AtomicInteger grants = new AtomicInteger(0);
         eventBus.subscribe(RewardGrantedEvent.class, event -> grants.incrementAndGet());
 
-        eventBus.fire(new QuestCompletedEvent(player, "Completion_Quest"));
-        eventBus.fire(new QuestCompletedEvent(player, "Completion_Quest"));
+        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
+        eventBus.fire(new QuestCompletedEvent(player, "completion_reward_test"));
 
         Wallet wallet = Wallet.MAPPER.get(player);
         assertNotNull(wallet);

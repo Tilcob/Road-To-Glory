@@ -11,18 +11,17 @@ import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestReward;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
+import com.github.tilcob.game.quest.*;
 
 public class RewardSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestFactory questFactory;
+    private final QuestYarnRegistry questYarnRegistry;
 
     public RewardSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry) {
         this.eventBus = eventBus;
         this.questFactory = new QuestFactory(questYarnRegistry);
+        this.questYarnRegistry = questYarnRegistry;
 
         eventBus.subscribe(QuestCompletedEvent.class, this::onQuestCompleted);
         eventBus.subscribe(QuestRewardEvent.class, this::onQuestReward);
@@ -44,6 +43,13 @@ public class RewardSystem extends EntitySystem implements Disposable {
     private void onQuestCompleted(QuestCompletedEvent event) {
         Quest quest = questFor(event.player(), event.questId());
         if (quest == null || quest.isRewardClaimed() || !quest.isCompleted()) return;
+        QuestDefinition definition = questDefinitionFor(event.questId());
+        if (definition == null) return;
+        QuestDefinition.RewardTiming timing = definition.rewardTiming();
+        if (timing != QuestDefinition.RewardTiming.COMPLETION
+            && timing != QuestDefinition.RewardTiming.AUTO) {
+            return;
+        }
         eventBus.fire(new QuestRewardEvent(event.player(), event.questId()));
     }
 
@@ -54,6 +60,13 @@ public class RewardSystem extends EntitySystem implements Disposable {
             if (quest != null) return quest;
         }
         return questFactory.create(questId);
+    }
+
+    private QuestDefinition questDefinitionFor(String questId) {
+        if (questYarnRegistry.isEmpty()) {
+            questYarnRegistry.loadAll();
+        }
+        return questYarnRegistry.getQuestDefinition(questId);
     }
 
     private Quest questFor(QuestRewardEvent event) {
