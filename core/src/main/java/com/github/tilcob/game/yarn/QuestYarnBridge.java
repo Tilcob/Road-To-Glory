@@ -90,13 +90,9 @@ public class QuestYarnBridge {
     }
 
     private void giveMoney(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) {
-            return;
-        }
+        if (player == null || args == null || args.length == 0) return;
         int amount = parseInt(args[0], 0);
-        if (amount <= 0) {
-            return;
-        }
+        if (amount <= 0) return;
         Wallet wallet = Wallet.MAPPER.get(player);
         if (wallet == null) {
             wallet = new Wallet();
@@ -106,23 +102,17 @@ public class QuestYarnBridge {
     }
 
     private void giveItem(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) {
-            return;
-        }
+        if (player == null || args == null || args.length == 0) return;
         String itemId = args[0];
         int count = args.length > 1 ? parseInt(args[1], 1) : 1;
-        if (itemId == null || itemId.isBlank() || count <= 0) {
-            return;
-        }
+        if (itemId == null || itemId.isBlank() || count <= 0) return;
         Inventory inventory = Inventory.MAPPER.get(player);
         if (inventory == null) {
             inventory = new Inventory();
             player.add(inventory);
         }
         String resolved = ItemDefinitionRegistry.resolveId(itemId);
-        for (int i = 0; i < count; i++) {
-            inventory.getItemsToAdd().add(resolved);
-        }
+        for (int i = 0; i < count; i++) inventory.getItemsToAdd().add(resolved);
     }
 
     private void setFlag(Entity player, String[] args) {

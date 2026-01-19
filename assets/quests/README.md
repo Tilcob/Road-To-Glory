@@ -42,7 +42,7 @@ These commands are executed when quest nodes are processed (for example `q_<ques
 - `<<quest_start <questId>>>`: Mark a quest as started (adds it to the quest log).
 - `<<quest_stage <questId> <stage>>>`: Set the quest stage (0-based).
 - `<<quest_complete <questId>>>`: Mark the quest as completed and emit completion events.
-- `<<give_gold <amount>>>`: Grant currency to the player.
+- `<<give_money <amount>>>`: Grant currency to the player.
 - `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
 - `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
 - `<<inc_counter <counter> <amount>>>`: Increment a named counter (amount defaults to `1`).
@@ -71,8 +71,6 @@ position: -178,-155
 <<if $eventTarget == "Npc-2">>
 <<quest_stage welcome_to_town 1>>
 <<quest_complete welcome_to_town>>
-<<give_money 50>>
-<<give_item "SWORD" 1>>
 <<endif>>
 ===
 
