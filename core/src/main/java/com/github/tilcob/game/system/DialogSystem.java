@@ -11,6 +11,7 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.yarn.DialogYarnRuntime;
 
 import java.util.Map;
 
@@ -18,12 +19,14 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final Map<String, DialogData> allDialogs;
     private final ObjectMap<Entity, DialogNavigator> navigators;
+    private final DialogYarnRuntime dialogYarnRuntime;
 
-    public DialogSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs) {
+    public DialogSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs, DialogYarnRuntime dialogYarnRuntime) {
         super(Family.all(Dialog.class).get());
         this.eventBus = eventBus;
         this.allDialogs = allDialogs;
         this.navigators = new ObjectMap<>();
+        this.dialogYarnRuntime = dialogYarnRuntime;
 
         eventBus.subscribe(DialogAdvanceEvent.class, this::onDialogAdvance);
         eventBus.subscribe(DialogChoiceNavigateEvent.class, this::onChoiceNavigate);
@@ -81,7 +84,14 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         player.add(session);
         navigators.put(player, navigator);
         eventBus.fire(new DialogStartedEvent(npcEntity, player));
-        eventBus.fire(new DialogEvent(navigator.toDialogLine(), npcEntity));
+        if (!dispatchNextLine(player, navigator, npcEntity)) {
+            removeSession(player);
+            dialog.setState(Dialog.State.IDLE);
+            NpcFsm npcFsm = NpcFsm.MAPPER.get(npcEntity);
+            if (npcFsm != null) {
+                npcFsm.getNpcFsm().changeState(NpcState.IDLE);
+            }
+        }
     }
 
     private void onFinishedDialog(FinishedDialogEvent event) {
@@ -103,16 +113,13 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         DialogNavigator navigator = navigators.get(player);
 
         if (session == null || navigator == null) return;
-        if (navigator.advance()) {
-            eventBus.fire(new DialogEvent(navigator.toDialogLine(), session.getNpc()));
-        } else {
-            if (navigator.hasRemainingChoices() && !session.isAwaitingChoice()) {
-                navigator.beginChoice();
-                eventBus.fire(new DialogChoiceEvent(navigator.getChoices(), session.getChoiceIndex(), session.getNpc()));
-            } else {
-                removeSession(player);
-                eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
-            }
+        if (navigator.advance() && dispatchNextLine(player, navigator, session.getNpc())) return;
+        if (navigator.hasRemainingChoices() && !session.isAwaitingChoice()) {
+            navigator.beginChoice();
+            eventBus.fire(new DialogChoiceEvent(navigator.getChoices(), session.getChoiceIndex(), session.getNpc()));
+        }  else {
+            removeSession(player);
+            eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
         }
     }
 
@@ -143,7 +150,10 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
             return;
         }
-        eventBus.fire(new DialogEvent(navigator.toDialogLine(), session.getNpc()));
+        if (!dispatchNextLine(player, navigator, session.getNpc())) {
+            removeSession(player);
+            eventBus.fire(new FinishedDialogEvent(Messages.DIALOG_FINISHED, session.getNpc()));
+        }
     }
 
     private void onExitTrigger(ExitTriggerEvent event) {
@@ -169,6 +179,21 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void removeSession(Entity player) {
         player.remove(DialogSession.class);
         navigators.remove(player);
+    }
+
+    private boolean dispatchNextLine(Entity player, DialogNavigator navigator, Entity npcEntity) {
+        DialogSession session = DialogSession.MAPPER.get(player);
+        if (session == null) return false;
+        while (navigator.hasLines()) {
+            String line = navigator.currentLine();
+            if (dialogYarnRuntime.executeCommandLine(player, line)) {
+                if (!navigator.advance()) return false;
+                continue;
+            }
+            eventBus.fire(new DialogEvent(navigator.toDialogLine(), npcEntity));
+            return true;
+        }
+        return false;
     }
 
     @Override

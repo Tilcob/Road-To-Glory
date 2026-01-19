@@ -3,20 +3,20 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.*;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.quest.KillEvent;
 import com.github.tilcob.game.npc.NpcType;
+import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
 
 public class DamageSystem extends IteratingSystem {
     private final GameViewModel viewModel;
-    private final GameEventBus eventBus;
+    private final QuestManager questManager;
 
-    public DamageSystem(GameViewModel viewModel, GameEventBus eventBus) {
+    public DamageSystem(GameViewModel viewModel, QuestManager questManager) {
         super(Family.all(Damaged.class).get());
         this.viewModel = viewModel;
-        this.eventBus = eventBus;
+        this.questManager = questManager;
     }
 
     @Override
@@ -32,7 +32,7 @@ public class DamageSystem extends IteratingSystem {
             if (life.getLife() <= 0 && Player.MAPPER.get(entity) == null) {
                 Npc npc = Npc.MAPPER.get(entity);
                 if (npc != null && npc.getType() == NpcType.ENEMY) {
-                    eventBus.fire(new KillEvent(npc.getName(), 1));
+                    questManager.signal(resolvePlayer(), "kill", npc.getName(), 1);
                 }
                 getEngine().removeEntity(entity);
                 return;
@@ -45,5 +45,11 @@ public class DamageSystem extends IteratingSystem {
             float y = transform.getPosition().y;
             viewModel.playerDamage((int) dealtDamage, x, y);
         }
+    }
+
+    private Entity resolvePlayer() {
+        ImmutableArray<Entity> players = getEngine().getEntitiesFor(Family.all(Player.class).get());
+        if (players == null || players.size() == 0) return null;
+        return players.first();
     }
 }

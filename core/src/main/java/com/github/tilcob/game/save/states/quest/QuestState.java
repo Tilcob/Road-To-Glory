@@ -1,25 +1,22 @@
 package com.github.tilcob.game.save.states.quest;
 
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.step.QuestStep;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class QuestState {
     private String questId;
-    private int currentStep;
+    private boolean active;
+    private boolean completed;
+    private int stage;
     private boolean rewardClaimed;
-    private List<Object> stepData = new ArrayList<>();
 
     public QuestState() {}
 
     public QuestState(Quest quest) {
         this.questId = quest.getQuestId();
-        this.currentStep = quest.getCurrentStep();
-        for (QuestStep questStep : quest.getSteps()) {
-            stepData.add(questStep.saveData());
-        }
+        this.active = true;
+        this.completed = quest.isCompleted();
+        this.stage = quest.getCurrentStep();
+        this.rewardClaimed = quest.isRewardClaimed();
     }
 
     public String getQuestId() {
@@ -30,20 +27,28 @@ public class QuestState {
         this.questId = questId;
     }
 
-    public int getCurrentStep() {
-        return currentStep;
+    public boolean isActive() {
+        return active;
     }
 
-    public void setCurrentStep(int currentStep) {
-        this.currentStep = currentStep;
+    public void setActive(boolean active) {
+        this.active = active;
     }
 
-    public List<Object> getStepData() {
-        return stepData;
+    public boolean isCompleted() {
+        return completed;
     }
 
-    public void setStepData(List<Object> stepData) {
-        this.stepData = stepData;
+    public void setCompleted(boolean completed) {
+        this.completed = completed;
+    }
+
+    public int getStage() {
+        return stage;
+    }
+
+    public void setStage(int stage) {
+        this.stage = stage;
     }
 
     public boolean isRewardClaimed() {

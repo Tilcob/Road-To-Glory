@@ -1,0 +1,12 @@
+questId: completion_reward_test
+displayName: Completion Reward Test
+journalText: Verify completion rewards trigger automatically.
+startNode: q_completion_reward_test_start
+reward_money: 0
+reward_timing: completion
+title: q_completion_reward_test_start
+position: 0,0
+---
+<<quest_start completion_reward_test>>
+<<quest_complete completion_reward_test>>
+===

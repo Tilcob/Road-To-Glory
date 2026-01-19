@@ -1,0 +1,12 @@
+questId: giver_reward_test
+displayName: Giver Reward Test
+journalText: Reward should be granted by quest giver dialog.
+startNode: q_giver_reward_test_start
+reward_money: 12
+reward_timing: giver
+title: q_giver_reward_test_start
+position: 0,0
+---
+<<quest_start giver_reward_test>>
+<<quest_complete giver_reward_test>>
+===

@@ -222,9 +222,7 @@ public class YarnDialogLoader {
                 if (tryApplyEffect(trimmed, currentChoice)) {
                     continue;
                 }
-                if (isCommand(trimmed)) {
-                    currentChoice.lines.add(trimmed);
-                }
+                currentChoice.lines.add(trimmed);
                 continue;
             }
 
@@ -232,10 +230,7 @@ public class YarnDialogLoader {
                 parsedNode.choices.add(currentChoice);
                 currentChoice = null;
             }
-
-            if (isCommand(trimmed)) {
-                parsedNode.lines.add(trimmed);
-            }
+            parsedNode.lines.add(trimmed);
         }
 
         if (currentChoice != null) {
@@ -263,7 +258,7 @@ public class YarnDialogLoader {
     }
 
     private static boolean tryApplyEffect(String line, ChoiceBuilder builder) {
-        if (isCommand(line)) {
+        if (!isCommand(line)) {
             return false;
         }
 
@@ -310,7 +305,7 @@ public class YarnDialogLoader {
     }
 
     private static boolean isCommand(String line) {
-        return !line.startsWith("<<") || !line.endsWith(">>");
+        return line.startsWith("<<") || line.endsWith(">>");
     }
 
     private static boolean isIndented(String line) {

@@ -10,6 +10,12 @@ A LibGDX-based RPG project with a modular architecture split between shared core
 - `assets_raw`: Source assets before processing/export.
 - `utils`: Utility scripts and tooling.
 
+### Quest data
+
+Quest definitions live in `assets/quests/index.json`, which is generated from the
+`.yarn` quest files in `assets/quests` and loaded from Yarn headers inside each quest
+file.
+
 ## Codebase documentation
 
 The core module follows a layered architecture on top of Ashley ECS. The most important packages are documented via

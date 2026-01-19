@@ -52,7 +52,7 @@ public class StateManager {
         questLog.getQuests().clear();
         for (QuestState state : gameState.getQuests()) {
             Quest quest = loader.loadQuest(state);
-            questLog.add(quest);
+            if (quest != null) questLog.add(quest);
         }
     }
 

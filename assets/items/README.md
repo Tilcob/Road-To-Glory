@@ -7,8 +7,8 @@ reason about.
 
 ## Directory layout
 
-Items are loaded by listing the `items/` directory at runtime. The loader is
-**non-recursive** and ignores `index.json`, so place item files directly in this folder.
+Items are loaded by the manifest at `items/index.json`, similar to dialogs and quests.
+Keep the manifest updated with every item file you want to ship.
 
 Keep an `undefined.json` entry in this directory because the runtime resolves missing/null
 item references to the `undefined` id.

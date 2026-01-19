@@ -1,6 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
@@ -11,20 +10,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
-    void createQuestFromJsonAllowsNullRewardItems() {
-        GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestFactory factory = new QuestFactory(eventBus, repository);
-        QuestJson.RewardJson rewardJson = new QuestJson.RewardJson(25, null);
-        QuestJson questJson = new QuestJson(
+    void createQuestAllowsNullRewardItems() {
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json");
+        QuestFactory factory = new QuestFactory(registry);
+        QuestDefinition.RewardDefinition rewardDefinition = new QuestDefinition.RewardDefinition(25, null);
+        QuestDefinition questDefinition = new QuestDefinition(
             "Reward_Quest",
             "Reward Quest",
             "Reward test",
+            "reward_start",
             List.of(),
-            rewardJson
+            RewardTiming.GIVER,
+            rewardDefinition
         );
 
-        Quest quest = factory.createQuestFromJson(questJson);
+        Quest quest = factory.createQuest(questDefinition);
 
         assertNotNull(quest.getReward());
         assertEquals(25, quest.getReward().money());
@@ -32,20 +32,19 @@ class QuestFactoryTest extends HeadlessGdxTest {
     }
 
     @Test
-    void createUsesRepositoryDefinitions() {
-        GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestFactory factory = new QuestFactory(eventBus, repository);
-        repository.loadAll();
+    void createUsesRegistryDefinitions() {
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestFactory factory = new QuestFactory(registry);
+        registry.loadAll();
 
-        QuestJson definition = repository.getQuestDefinition("welcome_to_town");
+        QuestDefinition definition = registry.getQuestDefinition("welcome_to_town");
         assertNotNull(definition);
-        Quest quest = factory.createQuestFromJson(definition);
+        Quest quest = factory.createQuest(definition);
 
         assertNotNull(quest);
         assertEquals("welcome_to_town", quest.getQuestId());
         assertEquals("Welcome to Town", quest.getTitle());
-        assertEquals(1, quest.getSteps().size());
+        assertEquals(1, quest.getTotalStages());
         assertNotNull(quest.getReward());
         assertEquals(50, quest.getReward().money());
         assertEquals(1, quest.getReward().items().size());

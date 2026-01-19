@@ -106,6 +106,27 @@ Dialog effects are intentionally limited to quest and flag state changes. Effect
 
 Rewards (currency, items, experience, etc.) **must not** be applied through dialog effects. If dialog-triggered rewards become necessary in the future, add a **dedicated dialog event type** that is handled by a reward-specific system instead of mutating economy state directly from dialog processing.
 
+## Custom Yarn commands
+
+The project defines additional Yarn commands that are interpreted by the dialog loader (effects)
+or by the quest Yarn runtime (command lines in quest nodes). Use the exact casing shown below.
+
+### Dialog choice effects (parsed by the dialog loader)
+
+These commands are only recognized when they appear inside an indented choice body.
+
+- `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
+- `<<add_quest <questId>>>`: Add a quest to the player's quest log.
+- `<<quest_step <type> <target>>>`: Trigger a quest step event.
+
+### Dialog runtime commands (command lines inside dialog nodes)
+
+Direct reward commands are only supported in dialog yarn nodes (never in quest yarn).
+
+- `<<give_money <amount>>>`: Grant currency to the player.
+- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
+
+
 ### Example: choices + node jumps
 
 ```yarn

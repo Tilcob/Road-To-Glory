@@ -96,7 +96,10 @@ public class GameScreenModule {
             new AttackSystem(physicWorld, services.getAudioManager()),
             SystemOrder.COMBAT
         ));
-        engine.addSystem(withPriority(new DamageSystem(gameViewModel, services.getEventBus()), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(
+            new DamageSystem(gameViewModel, services.getQuestManager()),
+            SystemOrder.COMBAT
+        ));
         engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
         engine.addSystem(withPriority(
             new TriggerSystem(services.getAudioManager(), services.getEventBus()),
@@ -108,19 +111,38 @@ public class GameScreenModule {
             new MapChangeSystem(tiledManager, services.getEventBus(), services.getStateManager()),
             SystemOrder.GAMEPLAY
         ));
-        engine.addSystem(withPriority(new InventorySystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new QuestSystem(services.getEventBus(), services.getQuestRepository()),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestRepository()),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new DialogConsequenceSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
-            new DialogQuestBridgeSystem(services.getEventBus(), services.getAllDialogs()),
+            new InventorySystem(services.getEventBus(), services.getQuestManager()),
+            SystemOrder.GAMEPLAY
+        ));
+        engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new QuestSystem(
+            services.getEventBus(), services.getQuestLifecycleService()),
+            SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestLifecycleService()),
+            SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(
+            new QuestRewardSchedulerSystem(
+                services.getEventBus(),
+                services.getQuestLifecycleService()
+            ),
+            SystemOrder.GAMEPLAY
+        ));
+        engine.addSystem(withPriority(new DialogConsequenceSystem(
+                services.getEventBus(),
+                services.getQuestManager(),
+                services.getQuestLifecycleService()
+            ),
+            SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(
+            new DialogQuestBridgeSystem(
+                services.getEventBus(),
+                services.getQuestManager()
+            ),
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(
-            new DialogSystem(services.getEventBus(), services.getAllDialogs()),
+            new DialogSystem(services.getEventBus(), services.getAllDialogs(), services.getDialogYarnRuntime()),
             SystemOrder.GAMEPLAY
         ));
 

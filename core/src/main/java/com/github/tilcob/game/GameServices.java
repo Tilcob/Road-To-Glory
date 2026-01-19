@@ -8,12 +8,18 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestRepository;
+import com.github.tilcob.game.quest.QuestLifecycleService;
+import com.github.tilcob.game.quest.QuestManager;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.yarn.DialogYarnBridge;
+import com.github.tilcob.game.yarn.DialogYarnRuntime;
+import com.github.tilcob.game.yarn.QuestYarnBridge;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -27,9 +33,14 @@ public class GameServices {
     private final AssetManager assetManager;
     private final AudioManager audioManager;
     private final Map<String, Quest> allQuests;
+    private final Map<String, DialogData> allQuestDialogs;
     private final Map<String, DialogData> allDialogs;
-    private final QuestRepository questRepository;
+    private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
+    private final DialogYarnRuntime dialogYarnRuntime;
+    private final QuestYarnRuntime questYarnRuntime;
+    private final QuestManager questManager;
+    private final QuestLifecycleService questLifecycleService;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -41,11 +52,19 @@ public class GameServices {
         this.assetManager = new AssetManager(resolver);
         this.audioManager = new AudioManager(assetManager);
         this.allQuests = new HashMap<>();
+        this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
-        this.questRepository = new QuestRepository(eventBus, true, "quests/index.json",
-            "quests");
+        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
+        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allQuestDialogs);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
+        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
+        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
+        this.questManager = new QuestManager(questYarnRuntime);
+
     }
 
     public void loadGame() {
@@ -88,15 +107,35 @@ public class GameServices {
         return allQuests;
     }
 
+    public Map<String, DialogData> getAllQuestDialogs() {
+        return allQuestDialogs;
+    }
+
     public Map<String, DialogData> getAllDialogs() {
         return allDialogs;
     }
 
-    public QuestRepository getQuestRepository() {
-        return questRepository;
+    public QuestYarnRegistry getQuestYarnRegistry() {
+        return questYarnRegistry;
     }
 
     public DialogRepository getDialogRepository() {
         return dialogRepository;
+    }
+
+    public DialogYarnRuntime getDialogYarnRuntime() {
+        return dialogYarnRuntime;
+    }
+
+    public QuestYarnRuntime getQuestYarnRuntime() {
+        return questYarnRuntime;
+    }
+
+    public QuestManager getQuestManager() {
+        return questManager;
+    }
+
+    public QuestLifecycleService getQuestLifecycleService() {
+        return questLifecycleService;
     }
 }

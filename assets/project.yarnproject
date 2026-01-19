@@ -1,5 +1,5 @@
 {
   "projectFileVersion": 3,
   "sourceFiles": ["*.yarn"],
-  "definitions": "dialog.commands.ysls.json"
+  "definitions": "definitions.commands.ysls.json"
 }

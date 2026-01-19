@@ -10,9 +10,9 @@ import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemLoader;
+import com.github.tilcob.game.quest.QuestDefinition;
 import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestJson;
-import com.github.tilcob.game.quest.QuestRepository;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 
 import java.util.Map;
 
@@ -22,14 +22,14 @@ public class GameLoader {
     private final GameServices services;
     private final QuestFactory questFactory;
     private final YarnDialogLoader dialogLoader;
-    private final QuestRepository questRepository;
+    private final QuestYarnRegistry questRegistry;
     private final DialogRepository dialogRepository;
 
     public GameLoader(GameServices services) {
         this.services = services;
-        this.questFactory = new QuestFactory(services.getEventBus(), services.getQuestRepository());
+        this.questFactory = new QuestFactory(services.getQuestYarnRegistry());
         this.dialogLoader = new YarnDialogLoader();
-        this.questRepository = services.getQuestRepository();
+        this.questRegistry = services.getQuestYarnRegistry();
         this.dialogRepository = services.getDialogRepository();
     }
 
@@ -43,16 +43,34 @@ public class GameLoader {
         for (ItemDefinition definition : ItemLoader.loadAll()) {
             ItemDefinitionRegistry.register(definition);
         }
-        Map<String, QuestJson> questDefinitions = questRepository.loadAll();
+        Map<String, QuestDefinition> questDefinitions = questRegistry.loadAll();
         if (questDefinitions.isEmpty()) Gdx.app.error(TAG, "No quest definitions loaded from repository.");
 
-        for (QuestJson questJson : questDefinitions.values()) {
-            if (questJson == null || questJson.questId() == null || questJson.questId().isBlank()) {
+        for (QuestDefinition questDefinition : questDefinitions.values()) {
+            if (questDefinition == null || questDefinition.questId() == null || questDefinition.questId().isBlank()) {
                 Gdx.app.error(TAG, "Encountered quest definition without a valid questId.");
                 continue;
             }
-            services.getAllQuests().put(questJson.questId(), questFactory.createQuestFromJson(questJson));
+            services.getAllQuests().put(questDefinition.questId(), questFactory.createQuest(questDefinition));
         }
+        Map<String, FileHandle> questFiles = questRegistry.getQuestFiles();
+        if (questFiles.isEmpty()) {
+            Gdx.app.error(TAG, "No quest yarn files loaded from repository.");
+        }
+        for (var entry : questFiles.entrySet()) {
+            String questId = entry.getKey();
+            FileHandle questFile = entry.getValue();
+            if (questId == null || questId.isBlank()) {
+                Gdx.app.error(TAG, "Encountered quest file entry without a questId.");
+                continue;
+            }
+            if (questFile == null) {
+                Gdx.app.error(TAG, "Quest file missing for questId: " + questId);
+                continue;
+            }
+            services.getAllQuestDialogs().put(questId, dialogLoader.load(questFile));
+        }
+
         Map<String, FileHandle> dialogFiles = dialogRepository.loadAll();
         if (dialogFiles.isEmpty()) {
             Gdx.app.error(TAG, "No dialog files loaded from repository.");

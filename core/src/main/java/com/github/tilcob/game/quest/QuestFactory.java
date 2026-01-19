@@ -1,55 +1,35 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.quest.step.CollectItemStep;
-import com.github.tilcob.game.quest.step.KillStep;
-import com.github.tilcob.game.quest.step.QuestStep;
-import com.github.tilcob.game.quest.step.TalkStep;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class QuestFactory {
-    private final GameEventBus eventBus;
-    private final QuestRepository questRepository;
+    private final QuestYarnRegistry questRegistry;
 
-    public QuestFactory(GameEventBus eventBus, QuestRepository questRepository) {
-        this.eventBus = eventBus;
-        this.questRepository = questRepository;
+    public QuestFactory(QuestYarnRegistry questRegistry) {
+        this.questRegistry = questRegistry;
     }
 
-    public Quest createQuestFromJson(QuestJson json) {
-        QuestReward reward = createReward(json.rewards());
-        Quest quest = new Quest(json.questId(), json.title(), json.description(), reward);
-
-        for (QuestJson.StepJson step : json.steps()) {
-            quest.getSteps().add(createStep(step));
-        }
-        return quest;
+    public Quest createQuest(QuestDefinition definition) {
+        QuestReward reward = createReward(definition.reward());
+        int stageCount = definition.steps() == null ? 0 : definition.steps().size();
+        return new Quest(definition.questId(), definition.displayName(), definition.journalText(), reward, stageCount);
     }
 
-    private QuestReward createReward(QuestJson.RewardJson rewardJson) {
-        if (rewardJson == null) return null;
+    private QuestReward createReward(QuestDefinition.RewardDefinition reward) {
+        if (reward == null) return null;
         List<String> items = new ArrayList<>();
-        if (rewardJson.items() != null) rewardJson.items().forEach(
+        if (reward.items() != null) reward.items().forEach(
             item -> items.add(ItemDefinitionRegistry.resolveId(item)));
-        return new QuestReward(rewardJson.money(), items);
-    }
-
-    public QuestStep createStep(QuestJson.StepJson step) {
-        return switch (step.type()) {
-            case "talk"  -> new TalkStep(step.npc(), eventBus);
-            case "collect" -> new CollectItemStep(ItemDefinitionRegistry.resolveId(step.itemId()), step.amount(), eventBus);
-            case "kill" -> new KillStep(step.enemy(), step.amount(), eventBus);
-            default -> throw new IllegalArgumentException("Unknown step type: " + step.type());
-        };
+        return new QuestReward(reward.money(), items);
     }
 
     public Quest create(String questId) {
-        if (questRepository.isEmpty()) questRepository.loadAll();
-        QuestJson definition = questRepository.getQuestDefinition(questId);
-        if (definition != null) return createQuestFromJson(definition);
+        if (questRegistry.isEmpty()) questRegistry.loadAll();
+        QuestDefinition definition = questRegistry.getQuestDefinition(questId);
+        if (definition != null) return createQuest(definition);
         throw new IllegalArgumentException("Quest not found: " + questId);
     }
 }
