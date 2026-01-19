@@ -39,7 +39,7 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         assertNotNull(definition);
         assertEquals("reward_headers", definition.questId());
         assertEquals(25, definition.reward().money());
-        assertEquals(QuestDefinition.RewardTiming.GIVER, definition.rewardTiming());
+        assertEquals(RewardTiming.GIVER, definition.rewardTiming());
         assertTrue(definition.reward().items().contains("sword"));
         assertTrue(definition.reward().items().contains("shield"));
         assertTrue(definition.reward().items().contains("potion"));
@@ -66,6 +66,6 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         QuestDefinition definition = new YarnQuestParser().parse(handle);
 
         assertNotNull(definition);
-        assertEquals(QuestDefinition.RewardTiming.GIVER, definition.rewardTiming());
+        assertEquals(RewardTiming.GIVER, definition.rewardTiming());
     }
 }
