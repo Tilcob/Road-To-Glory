@@ -106,6 +106,10 @@ public class QuestLifecycleService {
         if (dialogData == null) return;
         QuestDialog questDialog = dialogData.questDialog();
         if (questDialog == null || questDialog.questId() == null) return;
+        QuestLog questLog = QuestLog.MAPPER.get(player);
+        if (questLog == null) return;
+        Quest quest = questLog.getQuestById(questDialog.questId());
+        if (quest == null || !quest.isCompleted() || quest.isRewardClaimed()) return;
         QuestDefinition definition = questDefinitionFor(questDialog.questId());
         if (definition == null || definition.rewardTiming() != RewardTiming.GIVER) return;
         eventBus.fire(new QuestRewardEvent(player, questDialog.questId()));
