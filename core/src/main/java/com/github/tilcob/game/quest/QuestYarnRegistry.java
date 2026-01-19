@@ -2,17 +2,19 @@ package com.github.tilcob.game.quest;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
+import java.io.IOException;
 import java.util.*;
 
 public class QuestYarnRegistry {
     private static final String TAG = QuestYarnRegistry.class.getSimpleName();
-    private static final String NODE_SEPARATOR = "===";
-    private static final String HEADER_SEPARATOR = "---";
-    private static final String INDEX_NODE_TITLE = "quests_index";
+    private static final String QUESTS_DIR = "quests";
 
     private final String indexPath;
     private final Map<String, QuestDefinition> definitions = new HashMap<>();
+    private final ObjectMapper mapper = new ObjectMapper();
 
     public QuestYarnRegistry(String indexPath) {
         this.indexPath = indexPath;
@@ -25,12 +27,23 @@ public class QuestYarnRegistry {
             Gdx.app.error(TAG, "Quest index not found: " + indexPath);
             return Collections.unmodifiableMap(definitions);
         }
-        ParsedNode indexNode = findNode(indexFile.readString("UTF-8"), INDEX_NODE_TITLE);
-        if (indexNode == null) {
-            Gdx.app.error(TAG, "Missing quests_index node in: " + indexPath);
-            return Collections.unmodifiableMap(definitions);
+
+        try {
+            JsonNode root = mapper.readTree(indexFile.readString());
+            if (!root.isArray()) {
+                Gdx.app.error(TAG, "Quest index must be a JSON array: " + indexFile.path());
+                return Collections.unmodifiableMap(definitions);
+            }
+            for (JsonNode entry : root) {
+                if (!entry.isTextual()) {
+                    Gdx.app.error(TAG, "Invalid quest index entry: " + entry.toString());
+                    continue;
+                }
+                loadQuestDefinition(resolveQuestFileFromEntry(entry.asText()));
+            }
+        } catch (IOException e) {
+            Gdx.app.error(TAG, "Failed to read quest index: " + indexFile.path(), e);
         }
-        parseIndexNode(indexNode.bodyLines);
         return Collections.unmodifiableMap(definitions);
     }
 
@@ -42,216 +55,149 @@ public class QuestYarnRegistry {
         return definitions.isEmpty();
     }
 
-    private void parseIndexNode(List<String> bodyLines) {
-        QuestDefinitionBuilder current = null;
-
-        for (String rawLine : bodyLines) {
-            String trimmed = rawLine.trim();
-            if (trimmed.isEmpty() || trimmed.startsWith("#") || trimmed.startsWith("//")) {
-                if (trimmed.isEmpty()) {
-                    current = finalizeQuest(current);
-                }
-                continue;
-            }
-
-            if (trimmed.startsWith("questId:")) {
-                current = finalizeQuest(current);
-                current = new QuestDefinitionBuilder();
-                current.questId = trimmed.substring("questId:".length()).trim();
-                continue;
-            }
-
-            if (current == null) {
-                Gdx.app.error(TAG, "Encountered quest metadata before questId: " + trimmed);
-                continue;
-            }
-
-            if (trimmed.startsWith("displayName:")) {
-                current.title = trimmed.substring("displayName:".length()).trim();
-                continue;
-            }
-            if (trimmed.startsWith("journalText:")) {
-                current.description = trimmed.substring("journalText:".length()).trim();
-                continue;
-            }
-            if (trimmed.startsWith("startNode:")) {
-                current.startNode = trimmed.substring("startNode:".length()).trim();
-                continue;
-            }
-            if (trimmed.startsWith("step:")) {
-                parseStep(trimmed.substring("step:".length()).trim(), current);
-                continue;
-            }
-            if (trimmed.startsWith("reward.money:")) {
-                current.rewardMoney = parseInt(trimmed.substring("reward.money:".length()).trim());
-                continue;
-            }
-            if (trimmed.startsWith("reward.item:")) {
-                String itemId = trimmed.substring("reward.item:".length()).trim();
-                if (!itemId.isEmpty()) {
-                    current.rewardItems.add(itemId);
-                }
-                continue;
-            }
-
-            Gdx.app.error(TAG, "Unrecognized quest index line: " + trimmed);
-        }
-
-        finalizeQuest(current);
-    }
-
-    private QuestDefinitionBuilder finalizeQuest(QuestDefinitionBuilder builder) {
-        if (builder == null) {
-            return null;
-        }
-        if (builder.questId == null || builder.questId.isBlank()) {
-            Gdx.app.error(TAG, "Quest entry missing questId.");
-            return null;
-        }
-        if (definitions.containsKey(builder.questId)) {
-            Gdx.app.error(TAG, "Duplicate questId detected: " + builder.questId);
-            return null;
-        }
-        if (builder.title == null || builder.title.isBlank()) {
-            Gdx.app.error(TAG, "Missing displayName for quest: " + builder.questId);
-        }
-        if (builder.description == null || builder.description.isBlank()) {
-            Gdx.app.error(TAG, "Missing journalText for quest: " + builder.questId);
-        }
-        if (builder.startNode == null || builder.startNode.isBlank()) {
-            Gdx.app.error(TAG, "Missing startNode for quest: " + builder.questId);
-        }
-
-        QuestDefinition.RewardDefinition reward = new QuestDefinition.RewardDefinition(
-            builder.rewardMoney,
-            List.copyOf(builder.rewardItems)
-        );
-        QuestDefinition quest = new QuestDefinition(
-            builder.questId,
-            builder.title,
-            builder.description,
-            builder.startNode,
-            List.copyOf(builder.steps),
-            reward
-        );
-        definitions.put(quest.questId(), quest);
-        return null;
-    }
-
-    private void parseStep(String payload, QuestDefinitionBuilder builder) {
-        if (payload.isEmpty()) {
-            Gdx.app.error(TAG, "Empty step definition.");
+    private void loadQuestDefinition(FileHandle questFile) {
+        if (!questFile.exists()) {
+            Gdx.app.error(TAG, "Quest file not found: " + questFile.path());
             return;
         }
-        String[] parts = payload.split("\\s+");
-        String type = parts[0].toLowerCase(Locale.ROOT);
-
-        switch (type) {
-            case "talk" -> {
-                if (parts.length < 2) {
-                    Gdx.app.error(TAG, "Talk step missing npc: " + payload);
-                    return;
-                }
-                builder.steps.add(new QuestDefinition.StepDefinition("talk", parts[1], null, 0, null));
-            }
-            case "collect" -> {
-                if (parts.length < 3) {
-                    Gdx.app.error(TAG, "Collect step missing item/amount: " + payload);
-                    return;
-                }
-                int amount = parseInt(parts[2]);
-                builder.steps.add(new QuestDefinition.StepDefinition("collect", null, parts[1], amount, null));
-            }
-            case "kill" -> {
-                if (parts.length < 3) {
-                    Gdx.app.error(TAG, "Kill step missing enemy/amount: " + payload);
-                    return;
-                }
-                int amount = parseInt(parts[2]);
-                builder.steps.add(new QuestDefinition.StepDefinition("kill", null, null, amount, parts[1]));
-            }
-            default -> Gdx.app.error(TAG, "Unknown step type: " + payload);
-        }
-    }
-
-    private int parseInt(String raw) {
         try {
-            return Integer.parseInt(raw);
-        } catch (NumberFormatException ex) {
-            Gdx.app.error(TAG, "Failed to parse integer: " + raw, ex);
-            return 0;
+            JsonNode root = mapper.readTree(questFile.readString());
+            if (!root.isObject()) {
+                Gdx.app.error(TAG, "Quest definition must be a JSON object: " + questFile.path());
+                return;
+            }
+            String questId = getText(root, "questId");
+            if (questId == null || questId.isBlank()) {
+                Gdx.app.error(TAG, "Quest entry missing questId: " + questFile.path());
+                return;
+            }
+            if (definitions.containsKey(questId)) {
+                Gdx.app.error(TAG, "Duplicate questId detected: " + questId);
+                return;
+            }
+            String title = getText(root, "title");
+            if (title == null || title.isBlank()) {
+                Gdx.app.error(TAG, "Missing title for quest: " + questId);
+                return;
+            }
+            String description = getText(root, "description");
+            if (description == null || description.isBlank()) {
+                Gdx.app.error(TAG, "Missing description for quest: " + questId);
+                return;
+            }
+            String startNode = getText(root, "startNode");
+
+            List<QuestDefinition.StepDefinition> steps = parseSteps(root.get("steps"));
+            QuestDefinition.RewardDefinition reward = parseRewards(root.get("rewards"));
+
+            QuestDefinition quest = new QuestDefinition(
+                questId,
+                title,
+                description,
+                startNode,
+                List.copyOf(steps),
+                reward
+            );
+            definitions.put(quest.questId(), quest);
+        } catch (IOException e) {
+            Gdx.app.error(TAG, "Failed to read quest definition: " + questFile.path(), e);
         }
     }
 
-    private ParsedNode findNode(String content, String nodeTitle) {
-        String[] lines = content.split("\\R", -1);
-        List<String> headerLines = new ArrayList<>();
-        List<String> bodyLines = new ArrayList<>();
-        boolean inBody = false;
+    private List<QuestDefinition.StepDefinition> parseSteps(JsonNode stepsNode) {
+        if (stepsNode == null || !stepsNode.isArray()) return List.of();
 
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (NODE_SEPARATOR.equals(trimmed)) {
-                ParsedNode node = buildNode(headerLines, bodyLines);
-                if (node != null && nodeTitle.equalsIgnoreCase(node.title)) {
-                    return node;
+        List<QuestDefinition.StepDefinition> steps = new ArrayList<>();
+        for (JsonNode stepNode : stepsNode) {
+            if (!stepNode.isObject()) {
+                Gdx.app.error(TAG, "Invalid quest step entry: " + stepNode.toString());
+                continue;
+            }
+            String type = getText(stepNode, "type");
+            if (type == null || type.isBlank()) {
+                Gdx.app.error(TAG, "Quest step missing type: " + stepNode.toString());
+                continue;
+            }
+            String normalizedType = type.toLowerCase(Locale.ROOT);
+            switch (normalizedType) {
+                case "talk" -> {
+                    String npc = getText(stepNode, "npc");
+                    if (npc == null || npc.isBlank()) {
+                        Gdx.app.error(TAG, "Talk step missing npc: " + stepNode.toString());
+                        continue;
+                    }
+                    steps.add(new QuestDefinition.StepDefinition("talk", npc, null, 0, null));
                 }
-                headerLines.clear();
-                bodyLines.clear();
-                inBody = false;
-                continue;
-            }
-            if (!inBody && HEADER_SEPARATOR.equals(trimmed)) {
-                inBody = true;
-                continue;
-            }
-            if (inBody) {
-                bodyLines.add(line);
-            } else if (!trimmed.isEmpty()) {
-                headerLines.add(line);
+                case "collect" -> {
+                    String itemId = getText(stepNode, "itemId");
+                    int amount = getInt(stepNode, "amount");
+                    if (itemId == null || itemId.isBlank()) {
+                        Gdx.app.error(TAG, "Collect step missing itemId: " + stepNode.toString());
+                        continue;
+                    }
+                    steps.add(new QuestDefinition.StepDefinition("collect", null, itemId, amount, null));
+                }
+                case "kill" -> {
+                    String enemy = getText(stepNode, "enemy");
+                    int amount = getInt(stepNode, "amount");
+                    if (enemy == null || enemy.isBlank()) {
+                        Gdx.app.error(TAG, "Kill step missing enemy: " + stepNode.toString());
+                        continue;
+                    }
+                    steps.add(new QuestDefinition.StepDefinition("kill", null, null, amount, enemy));
+                }
+                default -> Gdx.app.error(TAG, "Unknown step type: " + type);
             }
         }
 
-        ParsedNode node = buildNode(headerLines, bodyLines);
-        if (node != null && nodeTitle.equalsIgnoreCase(node.title)) {
-            return node;
+        return steps;
+    }
+
+    private QuestDefinition.RewardDefinition parseRewards(JsonNode rewardsNode) {
+        if (rewardsNode == null || !rewardsNode.isObject()) {
+            return new QuestDefinition.RewardDefinition(0, List.of());
         }
+        int money = getInt(rewardsNode, "money");
+        List<String> items = new ArrayList<>();
+        JsonNode itemsNode = rewardsNode.get("items");
+
+        if (itemsNode != null && itemsNode.isArray()) {
+            for (JsonNode itemNode : itemsNode) {
+                if (!itemNode.isTextual()) {
+                    Gdx.app.error(TAG, "Invalid reward item entry: " + itemNode.toString());
+                    continue;
+                }
+                items.add(itemNode.asText());
+            }
+        }
+
+        return new QuestDefinition.RewardDefinition(money, items);
+    }
+
+    private String getText(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        if (field != null && field.isTextual()) return field.asText();
         return null;
     }
 
-    private ParsedNode buildNode(List<String> headerLines, List<String> bodyLines) {
-        String title = null;
-        for (String headerLine : headerLines) {
-            String trimmed = headerLine.trim();
-            String lower = trimmed.toLowerCase(Locale.ROOT);
-            if (lower.startsWith("title:")) {
-                title = trimmed.substring("title:".length()).trim();
-                break;
-            }
-        }
-        if (title == null || title.isBlank()) {
-            return null;
-        }
-        return new ParsedNode(title, List.copyOf(bodyLines));
+    private int getInt(JsonNode node, String fieldName) {
+        JsonNode field = node.get(fieldName);
+        if (field != null && field.canConvertToInt()) return field.asInt();
+        return 0;
     }
 
-    private static final class ParsedNode {
-        private final String title;
-        private final List<String> bodyLines;
-
-        private ParsedNode(String title, List<String> bodyLines) {
-            this.title = title;
-            this.bodyLines = bodyLines;
+    private FileHandle resolveQuestFileFromEntry(String entry) {
+        String fileName = ensureJsonExtension(entry);
+        if (fileName.contains("/")) {
+            return Gdx.files.internal(fileName);
         }
+        return Gdx.files.internal(QUESTS_DIR + "/" + fileName);
     }
 
-    private static final class QuestDefinitionBuilder {
-        private String questId;
-        private String title;
-        private String description;
-        private String startNode;
-        private int rewardMoney = 0;
-        private final List<String> rewardItems = new ArrayList<>();
-        private final List<QuestDefinition.StepDefinition> steps = new ArrayList<>();
+    private String ensureJsonExtension(String entry) {
+        if (entry.toLowerCase().endsWith(".json")) {
+            return entry;
+        }
+        return entry + ".json";
     }
 }
