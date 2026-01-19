@@ -18,9 +18,10 @@ and directory listing are no longer used. Do not add metadata files like
 
 Inside the quest file headers (before the first `---`):
 - Each quest starts with a `questId:` line.
-- Optional fields: `displayName:`, `journalText:`, and `startNode:`.
+- Required fields: `displayName:`, `journalText:`, and `startNode:`.
 - Steps are expressed as `step:` lines using `talk`, `collect`, or `kill`.
-- Rewards are optional and use `reward.money:` and `reward.item:`.
+- Rewards are optional and use `reward_money:` / `reward_item:`.
+- You may also use `reward_items:` with a comma-separated list.
 
 ## Rewards
 
@@ -29,8 +30,9 @@ to quests, not dialog effects.
 
 Supported fields:
 
-- `reward.money`: currency amount added to the player's wallet.
-- `reward.item`: item definition IDs (for example, `sword`). Repeat the line per item.
+- `reward_money`: currency amount added to the player's wallet.
+- `reward_item`: item definition IDs (for example, `sword`). Repeat the line per item.
+- `reward.items`: comma-separated item definition IDs.
 
 ### Quest Yarn runtime commands (executed from quest nodes)
 

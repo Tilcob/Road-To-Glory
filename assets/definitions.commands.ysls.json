@@ -1,73 +1,73 @@
 {
-  "Commands": [
-    {
-      "YarnName": "set_flag",
-      "Documentation": "Setzt ein boolean Flag im Game-State (LibGDX Loader).",
-      "Parameters": [
-        { "Name": "flag", "Type": "string" },
-        { "Name": "value", "Type": "bool" }
-      ]
-    },
-    {
-      "YarnName": "add_quest",
-      "Documentation": "Fügt eine Quest hinzu.",
-      "Parameters": [
-        { "Name": "questId", "Type": "string" }
-      ]
-    },
-    {
-      "YarnName": "quest_step",
-      "Documentation": "Triggert einen Quest-Step (Type + questId).",
-      "Parameters": [
-        { "Name": "type", "Type": "string" },
-        { "Name": "questId", "Type": "string" }
-      ]
-    },
-    {
-      "YarnName": "quest_start",
-      "Documentation": "Startet eine Quest (QuestLog).",
-      "Parameters": [
-        { "Name": "questId", "Type": "string" }
-      ]
-    },
-    {
-      "YarnName": "quest_stage",
-      "Documentation": "Setzt die Quest-Stage (0-basiert).",
-      "Parameters": [
-        { "Name": "questId", "Type": "string" },
-        { "Name": "stage", "Type": "number" }
-      ]
-    },
-    {
-      "YarnName": "quest_complete",
-      "Documentation": "Markiert eine Quest als abgeschlossen.",
-      "Parameters": [
-        { "Name": "questId", "Type": "string" }
-      ]
-    },
-    {
-      "YarnName": "give_money",
-      "Documentation": "Vergibt Geld an den Spieler.",
-      "Parameters": [
-        { "Name": "amount", "Type": "number" }
-      ]
-    },
-    {
-      "YarnName": "give_item",
-      "Documentation": "Vergibt Items an den Spieler.",
-      "Parameters": [
-        { "Name": "itemId", "Type": "string" },
-        { "Name": "amount", "Type": "number" }
-      ]
-    },
-    {
-      "YarnName": "inc_counter",
-      "Documentation": "Erhöht einen Counter im Spielzustand.",
-      "Parameters": [
-        { "Name": "counter", "Type": "string" },
-        { "Name": "amount", "Type": "number" }
-      ]
-    }
-  ],
-  "Functions": []
+    "Commands": [
+        {
+            "YarnName": "set_flag",
+            "Documentation": "Sets a boolean flag in the game state.",
+            "Parameters": [
+                { "Name": "flag", "Type": "string" },
+                { "Name": "value", "Type": "bool" }
+            ]
+        },
+        {
+            "YarnName": "add_quest",
+            "Documentation": "Adds a quest to the quest log.",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "quest_step",
+            "Documentation": "Triggers a quest step (type + questId).",
+            "Parameters": [
+                { "Name": "type", "Type": "string" },
+                { "Name": "questId", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "quest_start",
+            "Documentation": "Starts a quest and registers it in the quest log.",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "quest_stage",
+            "Documentation": "Sets the current quest stage (zero-based).",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" },
+                { "Name": "stage", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "quest_complete",
+            "Documentation": "Marks a quest as completed.",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "give_money",
+            "Documentation": "Gives money to the player.",
+            "Parameters": [
+                { "Name": "amount", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "give_item",
+            "Documentation": "Gives an item to the player.",
+            "Parameters": [
+                { "Name": "itemId", "Type": "string" },
+                { "Name": "amount", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "inc_counter",
+            "Documentation": "Increases a counter in the game state.",
+            "Parameters": [
+                { "Name": "counter", "Type": "string" },
+                { "Name": "amount", "Type": "number" }
+            ]
+        }
+    ],
+    "Functions": []
 }

@@ -69,7 +69,7 @@ public class YarnQuestParser {
             }
             String key = matcher.group(1);
             String value = normalizeHeaderValue(matcher.group(2));
-            if (key.equals("reward.items")) {
+            if (key.equals("reward_items")) {
                 addRewardItems(headers, value);
             } else if (!value.isBlank()) {
                 headers.computeIfAbsent(key, ignored -> new ArrayList<>()).add(value);
@@ -191,5 +191,9 @@ public class YarnQuestParser {
             return trimmed.substring(1, trimmed.length() - 1).trim();
         }
         return trimmed;
+    }
+
+    private String normalizeHeaderKey(String key) {
+        return key.trim().replace('.', '_');
     }
 }

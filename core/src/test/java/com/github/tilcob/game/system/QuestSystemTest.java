@@ -11,6 +11,8 @@ import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.test.HeadlessGdxTest;
+import com.github.tilcob.game.yarn.QuestYarnBridge;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -24,7 +26,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestSystem questSystem = new QuestSystem(eventBus, registry);
+        QuestSystem questSystem = new QuestSystem(eventBus, registry, new QuestYarnRuntime(new QuestYarnBridge(eventBus)));
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -48,7 +50,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestSystem questSystem = new QuestSystem(eventBus, registry);
+        QuestSystem questSystem = new QuestSystem(eventBus, registry, new QuestYarnRuntime(new QuestYarnBridge(eventBus)));
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -59,7 +61,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         AtomicBoolean completedFired = new AtomicBoolean(false);
         eventBus.subscribe(QuestCompletedEvent.class, event -> completedFired.set(true));
 
-        eventBus.fire(new AddQuestEvent(player, "talk"));
+        eventBus.fire(new AddQuestEvent(player, "welcome_to_town"));
 
         assertTrue(completedFired.get());
     }
