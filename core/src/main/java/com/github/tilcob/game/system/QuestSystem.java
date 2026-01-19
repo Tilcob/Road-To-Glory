@@ -7,26 +7,17 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
-import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestDefinition;
-import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
-import com.github.tilcob.game.yarn.QuestYarnRuntime;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 
 public class QuestSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
-    private final QuestFactory factory;
-    private final QuestYarnRegistry questYarnRegistry;
-    private final QuestYarnRuntime questYarnRuntime;
+    private final QuestLifecycleService questLifecycleService;
 
-    public QuestSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry, QuestYarnRuntime questYarnRuntime) {
+    public QuestSystem(GameEventBus eventBus, QuestLifecycleService questLifecycleService) {
         super(Family.all(QuestLog.class).get());
         this.eventBus = eventBus;
-        this.questYarnRegistry = questYarnRegistry;
-        this.factory = new QuestFactory(questYarnRegistry);
-        this.questYarnRuntime = questYarnRuntime;
+        this.questLifecycleService = questLifecycleService;
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
     }
@@ -34,37 +25,16 @@ public class QuestSystem extends IteratingSystem implements Disposable {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         QuestLog questLog = QuestLog.MAPPER.get(entity);
-        boolean updated = false;
-
         var quests = questLog.getQuests();
 
         for (int i = 0; i < quests.size; i++) {
             Quest quest = quests.get(i);
-            if (!quest.isCompleted() || quest.isCompletionNotified()) continue;
-            quest.setCompletionNotified(true);
-            updated = true;
-            eventBus.fire(new QuestCompletedEvent(entity, quest.getQuestId()));
+            questLifecycleService.notifyQuestCompletion(entity, quest);
         }
-
-        if (updated) eventBus.fire(new UpdateQuestLogEvent(entity));
     }
 
     private void addQuest(AddQuestEvent event) {
-        QuestLog questLog = QuestLog.MAPPER.get(event.player());
-        for (Quest quest : questLog.getQuests()) {
-            if (quest.getQuestId().equals(event.questId())) return;
-        }
-        Quest quest = factory.create(event.questId());
-        questLog.add(quest);
-        if (quest.getTotalStages() == 0) {
-            quest.setCompletionNotified(true);
-            eventBus.fire(new QuestCompletedEvent(event.player(), event.questId()));
-        }
-        QuestDefinition definition = questYarnRegistry.getQuestDefinition(event.questId());
-        if (definition != null) {
-            questYarnRuntime.executeStartNode(event.player(), definition.startNode());
-        }
-        eventBus.fire(new UpdateQuestLogEvent(event.player()));
+        questLifecycleService.startQuest(event.player(), event.questId());
     }
 
     @Override

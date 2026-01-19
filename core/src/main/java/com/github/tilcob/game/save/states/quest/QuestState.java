@@ -2,9 +2,6 @@ package com.github.tilcob.game.save.states.quest;
 
 import com.github.tilcob.game.quest.Quest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class QuestState {
     private String questId;
     private boolean active;

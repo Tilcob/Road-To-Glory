@@ -7,9 +7,9 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.dialog.DialogChoice;
 import com.github.tilcob.game.dialog.DialogEffect;
-import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.DialogChoiceResolvedEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestManager;
 
 import java.util.Locale;
@@ -17,10 +17,15 @@ import java.util.Locale;
 public class DialogConsequenceSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestManager questManager;
+    private final QuestLifecycleService questLifecycleService;
 
-    public DialogConsequenceSystem(GameEventBus eventBus, QuestManager questManager) {
+    public DialogConsequenceSystem(GameEventBus eventBus,
+                                   QuestManager questManager,
+                                   QuestLifecycleService questLifecycleService) {
         this.eventBus = eventBus;
         this.questManager = questManager;
+        this.questLifecycleService = questLifecycleService;
+
         eventBus.subscribe(DialogChoiceResolvedEvent.class, this::onChoiceResolved);
     }
 
@@ -43,7 +48,7 @@ public class DialogConsequenceSystem extends EntitySystem implements Disposable 
 
     private void applyAddQuest(Entity player, DialogEffect effect) {
         if (effect.questId() == null) return;
-        eventBus.fire(new AddQuestEvent(player, effect.questId()));
+        questLifecycleService.startQuest(player, effect.questId());
     }
 
     private void applyFlag(Entity player, DialogEffect effect) {

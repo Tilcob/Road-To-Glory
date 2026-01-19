@@ -12,6 +12,7 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.test.HeadlessGdxTest;
@@ -33,11 +34,10 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        QuestSystem questSystem = new QuestSystem(
-            eventBus,
-            registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of())
-        );
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
+        questLifecycleService.setQuestYarnRuntime(runtime);
+        QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -61,11 +61,10 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        QuestSystem questSystem = new QuestSystem(
-            eventBus,
-            registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of())
-        );
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
+        questLifecycleService.setQuestYarnRuntime(runtime);
+        QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -88,11 +87,10 @@ class QuestSystemTest extends HeadlessGdxTest {
         YarnDialogLoader dialogLoader = new YarnDialogLoader();
         DialogData dialogData = dialogLoader.load(Gdx.files.internal("tests/quests_test/start_node_flag_test.yarn"));
         Map<String, DialogData> questDialogs = Map.of("start_node_flag_test", dialogData);
-        QuestSystem questSystem = new QuestSystem(
-            eventBus,
-            registry,
-            new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), questDialogs)
-        );
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
+        questLifecycleService.setQuestYarnRuntime(runtime);
+        QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -109,7 +107,10 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesUpdateQuestLogEventOnStageChange() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of());
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
+        questLifecycleService.setQuestYarnRuntime(runtime);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -130,7 +131,10 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesUpdateQuestLogEventOnCompletion() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(eventBus), Map.of(), Map.of());
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestYarnRuntime runtime = new QuestYarnRuntime(new QuestYarnBridge(questLifecycleService), Map.of(), Map.of());
+        questLifecycleService.setQuestYarnRuntime(runtime);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();

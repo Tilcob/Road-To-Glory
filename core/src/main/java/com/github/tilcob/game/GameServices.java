@@ -8,6 +8,7 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.SaveManager;
@@ -36,10 +37,10 @@ public class GameServices {
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
-    private final QuestYarnBridge questYarnBridge;
     private final DialogYarnRuntime dialogYarnRuntime;
     private final QuestYarnRuntime questYarnRuntime;
     private final QuestManager questManager;
+    private final QuestLifecycleService questLifecycleService;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -54,13 +55,16 @@ public class GameServices {
         this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
+        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allQuestDialogs);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        this.questYarnBridge = new QuestYarnBridge(eventBus);
+        QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
+
     }
 
     public void loadGame() {
@@ -129,5 +133,9 @@ public class GameServices {
 
     public QuestManager getQuestManager() {
         return questManager;
+    }
+
+    public QuestLifecycleService getQuestLifecycleService() {
+        return questLifecycleService;
     }
 }

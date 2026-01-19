@@ -9,12 +9,14 @@ import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -26,7 +28,8 @@ class RewardSystemTest extends HeadlessGdxTest {
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -55,7 +58,8 @@ class RewardSystemTest extends HeadlessGdxTest {
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -78,7 +82,8 @@ class RewardSystemTest extends HeadlessGdxTest {
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -107,7 +112,8 @@ class RewardSystemTest extends HeadlessGdxTest {
     void firesUpdateQuestLogEventOnRewardClaim() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -133,7 +139,8 @@ class RewardSystemTest extends HeadlessGdxTest {
     void giverTimingRewardsOnlyOnQuestRewardEvent() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        RewardSystem rewardSystem = new RewardSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();

@@ -3,19 +3,16 @@ package com.github.tilcob.game.yarn;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.ObjectIntMap;
 import com.github.tilcob.game.component.*;
-import com.github.tilcob.game.event.AddQuestEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
-import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestState;
 
 public class QuestYarnBridge {
-    private final GameEventBus eventBus;
+    private final QuestLifecycleService questLifecycleService;
 
-    public QuestYarnBridge(GameEventBus eventBus) {
-        this.eventBus = eventBus;
+    public QuestYarnBridge(QuestLifecycleService questLifecycleService) {
+        this.questLifecycleService = questLifecycleService;
     }
 
     public void registerAll(YarnRuntime runtime) {
@@ -45,7 +42,7 @@ public class QuestYarnBridge {
         if (player == null || questId == null) {
             return;
         }
-        eventBus.fire(new AddQuestEvent(player, questId));
+        questLifecycleService.startQuest(player, questId);
     }
 
     private void completeQuest(Entity player, String[] args) {
@@ -53,16 +50,7 @@ public class QuestYarnBridge {
         if (player == null || questId == null) {
             return;
         }
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog != null) {
-            Quest quest = questLog.getQuestById(questId);
-            if (quest != null) {
-                if (!quest.isCompleted()) quest.setCurrentStep(quest.getTotalStages());
-                quest.setCompletionNotified(true);
-                eventBus.fire(new UpdateQuestLogEvent(player));
-            }
-        }
-        eventBus.fire(new QuestCompletedEvent(player, questId));
+        questLifecycleService.completeQuest(player, questId);
     }
 
     private void setQuestStage(Entity player, String[] args) {
@@ -70,17 +58,7 @@ public class QuestYarnBridge {
         String questId = args[0];
         int stage = parseInt(args[1], -1);
         if (questId == null || stage < 0) return;
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog == null) return;
-        Quest quest = questLog.getQuestById(questId);
-        if (quest == null) return;
-
-        quest.setCurrentStep(Math.min(stage, quest.getTotalStages()));
-        if (quest.isCompleted()) {
-            quest.setCompletionNotified(true);
-            eventBus.fire(new QuestCompletedEvent(player, questId));
-        }
-        eventBus.fire(new UpdateQuestLogEvent(player));
+        questLifecycleService.setQuestStage(player, questId, stage);
     }
 
     private void setFlag(Entity player, String[] args) {

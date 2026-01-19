@@ -8,6 +8,7 @@ import com.github.tilcob.game.event.DialogFinishedEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
+import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
@@ -24,7 +25,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
     void firesRewardForCompletionTimingOnQuestCompletedEvent() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, registry, Map.of());
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         AtomicReference<QuestRewardEvent> rewardEvent = new AtomicReference<>();
@@ -43,7 +45,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
     void firesRewardForAutoTimingOnQuestCompletedEvent() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, registry, Map.of());
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         AtomicReference<QuestRewardEvent> rewardEvent = new AtomicReference<>();
@@ -61,7 +64,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
     void doesNotFireRewardForGiverTimingOnQuestCompletedEvent() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
-        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, registry, Map.of());
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
 
         Entity player = new Entity();
         AtomicReference<QuestRewardEvent> rewardEvent = new AtomicReference<>();
@@ -81,7 +85,8 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Map<String, DialogData> dialogs = new HashMap<>();
         QuestDialog questDialog = new QuestDialog("giver_reward_test", null, null, null);
         dialogs.put("QuestGiver", new DialogData(null, null, null, null, questDialog, null, null));
-        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, registry, dialogs);
+        QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
+        QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
 
         Entity npc = new Entity();
         npc.add(new Npc(null, "QuestGiver"));

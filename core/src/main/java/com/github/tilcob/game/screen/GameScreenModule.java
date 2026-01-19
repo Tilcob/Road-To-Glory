@@ -117,19 +117,22 @@ public class GameScreenModule {
         ));
         engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new QuestSystem(
-            services.getEventBus(), services.getQuestYarnRegistry(), services.getQuestYarnRuntime()),
+            services.getEventBus(), services.getQuestLifecycleService()),
             SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestYarnRegistry()),
+        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestLifecycleService()),
             SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
             new QuestRewardSchedulerSystem(
                 services.getEventBus(),
-                services.getQuestYarnRegistry(),
-                services.getAllDialogs()
+                services.getQuestLifecycleService()
             ),
             SystemOrder.GAMEPLAY
         ));
-        engine.addSystem(withPriority(new DialogConsequenceSystem(services.getEventBus(), services.getQuestManager()),
+        engine.addSystem(withPriority(new DialogConsequenceSystem(
+                services.getEventBus(),
+                services.getQuestManager(),
+                services.getQuestLifecycleService()
+            ),
             SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
             new DialogQuestBridgeSystem(
