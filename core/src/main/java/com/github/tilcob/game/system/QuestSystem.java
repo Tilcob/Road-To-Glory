@@ -13,7 +13,6 @@ import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestDefinition;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
-import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
 public class QuestSystem extends IteratingSystem implements Disposable {
@@ -26,7 +25,7 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         super(Family.all(QuestLog.class).get());
         this.eventBus = eventBus;
         this.questYarnRegistry = questYarnRegistry;
-        this.factory = new QuestFactory(eventBus, questYarnRegistry);
+        this.factory = new QuestFactory(questYarnRegistry);
         this.questYarnRuntime = questYarnRuntime;
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
@@ -41,23 +40,10 @@ public class QuestSystem extends IteratingSystem implements Disposable {
 
         for (int i = 0; i < quests.size; i++) {
             Quest quest = quests.get(i);
-            if (quest.isCompleted()) continue;
-
-            int currentStep = quest.getCurrentStep();
-            QuestStep step = quest.getSteps().get(currentStep);
-
-            if (step.completed()) {
-                quest.incCurrentStep();
-                updated = true;
-
-                if (quest.getCurrentStep() == quest.getSteps().size()) {
-                    eventBus.fire(new QuestCompletedEvent(entity, quest.getQuestId()));
-                } else {
-                    quest.getSteps()
-                        .get(quest.getCurrentStep())
-                        .start();
-                }
-            }
+            if (!quest.isCompleted() || quest.isCompletionNotified()) continue;
+            quest.setCompletionNotified(true);
+            updated = true;
+            eventBus.fire(new QuestCompletedEvent(entity, quest.getQuestId()));
         }
 
         if (updated) eventBus.fire(new UpdateQuestLogEvent(entity));
@@ -70,7 +56,10 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         }
         Quest quest = factory.create(event.questId());
         questLog.add(quest);
-        if (quest.getSteps().isEmpty()) eventBus.fire(new QuestCompletedEvent(event.player(), event.questId()));
+        if (quest.getTotalStages() == 0) {
+            quest.setCompletionNotified(true);
+            eventBus.fire(new QuestCompletedEvent(event.player(), event.questId()));
+        }
         QuestDefinition definition = questYarnRegistry.getQuestDefinition(event.questId());
         if (definition != null) {
             questYarnRuntime.executeStartNode(event.player(), definition.startNode());

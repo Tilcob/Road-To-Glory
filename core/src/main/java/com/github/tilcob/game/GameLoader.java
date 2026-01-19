@@ -27,7 +27,7 @@ public class GameLoader {
 
     public GameLoader(GameServices services) {
         this.services = services;
-        this.questFactory = new QuestFactory(services.getEventBus(), services.getQuestYarnRegistry());
+        this.questFactory = new QuestFactory(services.getQuestYarnRegistry());
         this.dialogLoader = new YarnDialogLoader();
         this.questRegistry = services.getQuestYarnRegistry();
         this.dialogRepository = services.getDialogRepository();

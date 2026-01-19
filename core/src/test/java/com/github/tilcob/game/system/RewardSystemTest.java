@@ -30,10 +30,10 @@ class RewardSystemTest {
         player.add(questLog);
 
         QuestReward reward = new QuestReward(15, List.of("sword"));
-        Quest quest = new Quest("Reward_Quest", "Reward Quest", "Reward test", reward);
+        Quest quest = new Quest("Reward_Quest", "Reward Quest", "Reward test", reward, 1);
         questLog.add(quest);
 
-        quest.setCurrentStep(quest.getSteps().size());
+        quest.setCurrentStep(quest.getTotalStages());
         eventBus.fire(new QuestRewardEvent(player, "Reward_Quest"));
 
         Wallet wallet = Wallet.MAPPER.get(player);
@@ -59,8 +59,7 @@ class RewardSystemTest {
         player.add(questLog);
 
         QuestReward reward = new QuestReward(10, List.of("boots"));
-        Quest quest = new Quest("Incomplete_Quest", "Incomplete Quest", "Not done", reward);
-        quest.getSteps().add(new TestStep(false));
+        Quest quest = new Quest("Incomplete_Quest", "Incomplete Quest", "Not done", reward, 1);
         questLog.add(quest);
 
         eventBus.fire(new QuestRewardEvent(player, "Incomplete_Quest"));
@@ -84,7 +83,7 @@ class RewardSystemTest {
 
         QuestReward reward = new QuestReward(0, List.of());
         Quest quest = new Quest("Empty_Quest", "Empty Quest", "Nothing", reward);
-        quest.setCurrentStep(quest.getSteps().size());
+        quest.setCurrentStep(quest.getTotalStages());
         quest.setRewardClaimed(true);
         questLog.add(quest);
 
@@ -99,26 +98,5 @@ class RewardSystemTest {
         assertFalse(rewardGranted.get());
 
         rewardSystem.dispose();
-    }
-
-    private static final class TestStep implements com.github.tilcob.game.quest.step.QuestStep {
-        private final boolean completed;
-
-        private TestStep(boolean completed) {
-            this.completed = completed;
-        }
-
-        @Override
-        public boolean completed() {
-            return completed;
-        }
-
-        @Override
-        public void start() {
-        }
-
-        @Override
-        public void end() {
-        }
     }
 }

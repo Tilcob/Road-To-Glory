@@ -58,32 +58,27 @@ public class QuestYarnBridge {
         QuestLog questLog = QuestLog.MAPPER.get(player);
         if (questLog != null) {
             Quest quest = questLog.getQuestById(questId);
-            if (quest != null && !quest.isCompleted()) {
-                quest.setCurrentStep(quest.getSteps().size());
+            if (quest != null) {
+                if (!quest.isCompleted()) quest.setCurrentStep(quest.getTotalStages());
+                quest.setCompletionNotified(true);
             }
         }
         eventBus.fire(new QuestCompletedEvent(player, questId));
     }
 
     private void setQuestStage(Entity player, String[] args) {
-        if (player == null || args == null || args.length < 2) {
-            return;
-        }
+        if (player == null || args == null || args.length < 2) return;
         String questId = args[0];
         int stage = parseInt(args[1], -1);
-        if (questId == null || stage < 0) {
-            return;
-        }
+        if (questId == null || stage < 0) return;
         QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog == null) {
-            return;
-        }
+        if (questLog == null) return;
         Quest quest = questLog.getQuestById(questId);
-        if (quest == null) {
-            return;
-        }
-        quest.setCurrentStep(Math.min(stage, quest.getSteps().size()));
+        if (quest == null) return;
+
+        quest.setCurrentStep(Math.min(stage, quest.getTotalStages()));
         if (quest.isCompleted()) {
+            quest.setCompletionNotified(true);
             eventBus.fire(new QuestCompletedEvent(player, questId));
         }
         eventBus.fire(new UpdateQuestLogEvent(player));

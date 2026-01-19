@@ -9,7 +9,6 @@ import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestReward;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
-import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import com.github.tilcob.game.yarn.QuestYarnBridge;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
@@ -34,8 +33,8 @@ class QuestSystemTest extends HeadlessGdxTest {
         player.add(new QuestLog());
         engine.addEntity(player);
 
-        Quest quest = new Quest("TestQuest", "Test Quest", "Test", new QuestReward(0, List.of()));
-        quest.getSteps().add(new TestStep(true));
+        Quest quest = new Quest("TestQuest", "Test Quest", "Test", new QuestReward(0, List.of()), 1);
+        quest.setCurrentStep(1);
         QuestLog.MAPPER.get(player).add(quest);
 
         AtomicBoolean rewardFired = new AtomicBoolean(false);
@@ -64,14 +63,5 @@ class QuestSystemTest extends HeadlessGdxTest {
         eventBus.fire(new AddQuestEvent(player, "zero_step_test"));
 
         assertTrue(completedFired.get());
-    }
-
-    private record TestStep(boolean completed) implements QuestStep {
-
-        @Override
-        public void start() { }
-
-        @Override
-        public void end() { }
     }
 }

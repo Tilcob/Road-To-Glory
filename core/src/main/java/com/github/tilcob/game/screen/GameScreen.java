@@ -125,7 +125,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void loadQuest() {
-        QuestLoader loader = new QuestLoader(new QuestFactory(services.getEventBus(), services.getQuestYarnRegistry()));
+        QuestLoader loader = new QuestLoader(new QuestFactory(services.getQuestYarnRegistry()));
         QuestLog questLog = QuestLog.MAPPER.get(player);
         services.getStateManager().loadQuests(questLog, loader);
     }

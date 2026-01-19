@@ -1,6 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
@@ -12,9 +11,8 @@ class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
     void createQuestAllowsNullRewardItems() {
-        GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestFactory factory = new QuestFactory(eventBus, registry);
+        QuestFactory factory = new QuestFactory(registry);
         QuestDefinition.RewardDefinition rewardDefinition = new QuestDefinition.RewardDefinition(25, null);
         QuestDefinition questDefinition = new QuestDefinition(
             "Reward_Quest",
@@ -34,9 +32,8 @@ class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
     void createUsesRegistryDefinitions() {
-        GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestFactory factory = new QuestFactory(eventBus, registry);
+        QuestFactory factory = new QuestFactory(registry);
         registry.loadAll();
 
         QuestDefinition definition = registry.getQuestDefinition("welcome_to_town");
@@ -46,7 +43,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
         assertNotNull(quest);
         assertEquals("welcome_to_town", quest.getQuestId());
         assertEquals("Welcome to Town", quest.getTitle());
-        assertEquals(1, quest.getSteps().size());
+        assertEquals(1, quest.getTotalStages());
         assertNotNull(quest.getReward());
         assertEquals(50, quest.getReward().money());
         assertEquals(1, quest.getReward().items().size());

@@ -14,10 +14,11 @@ public class QuestLoader {
         if (!state.isActive() && !state.isCompleted()) return null;
         Quest quest = factory.create(state.getQuestId());
 
-        int maxStage = quest.getSteps().size();
+        int maxStage = quest.getTotalStages();
         int stage = Math.max(0, state.getStage());
         if (state.isCompleted()) {
             quest.setCurrentStep(maxStage);
+            quest.setCompletionNotified(true);
         } else {
             quest.setCurrentStep(Math.min(stage, maxStage));
         }

@@ -1,28 +1,25 @@
 package com.github.tilcob.game.quest;
 
-import com.github.tilcob.game.quest.step.QuestStep;
-
-import java.util.ArrayList;
-import java.util.List;
-
 public class Quest {
     private final String questId;
     private final String title;
     private final String description;
     private final QuestReward reward;
-    private final List<QuestStep> steps = new ArrayList<>();
+    private final int totalStages;
     private int currentStep = 0;
     private boolean rewardClaimed = false;
-
-    public Quest(String questId, String title, String description) {
-        this(questId, title, description, null);
-    }
+    private boolean completionNotified = false;
 
     public Quest(String questId, String title, String description, QuestReward reward) {
+        this(questId, title, description, reward, 0);
+    }
+
+    public Quest(String questId, String title, String description, QuestReward reward, int totalStages) {
         this.questId = questId;
         this.title = title;
         this.description = description;
         this.reward = reward;
+        this.totalStages = totalStages;
     }
 
     public String getQuestId() {
@@ -41,8 +38,8 @@ public class Quest {
         return reward;
     }
 
-    public List<QuestStep> getSteps() {
-        return steps;
+    public int getTotalStages() {
+        return totalStages;
     }
 
     public int getCurrentStep() {
@@ -58,7 +55,15 @@ public class Quest {
     }
 
     public boolean isCompleted() {
-        return currentStep == steps.size();
+        return currentStep >= totalStages;
+    }
+
+    public boolean isCompletionNotified() {
+        return completionNotified;
+    }
+
+    public void setCompletionNotified(boolean completionNotified) {
+        this.completionNotified = completionNotified;
     }
 
     public boolean isRewardClaimed() {

@@ -15,7 +15,6 @@ position: -178,-155
 title: q_welcome_to_town_on_talk
 position: -178,-155
 ---
-<<declare $eventTarget = "" as string>>
 <<if $eventTarget == "Npc-2">>
 <<quest_stage welcome_to_town 1>>
 <<quest_complete welcome_to_town>>

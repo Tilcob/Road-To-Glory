@@ -21,7 +21,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
 
     public RewardSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry) {
         this.eventBus = eventBus;
-        this.questFactory = new QuestFactory(eventBus, questYarnRegistry);
+        this.questFactory = new QuestFactory(questYarnRegistry);
         eventBus.subscribe(QuestRewardEvent.class, this::onQuestReward);
     }
 
