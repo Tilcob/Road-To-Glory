@@ -86,7 +86,7 @@ public class YarnQuestParser {
         for (String part : parts) {
             String trimmed = normalizeHeaderValue(part);
             if (!trimmed.isBlank()) {
-                headers.computeIfAbsent("reward.item", ignored -> new ArrayList<>()).add(trimmed);
+                headers.computeIfAbsent("reward_item", ignored -> new ArrayList<>()).add(trimmed);
             }
         }
     }
@@ -146,7 +146,7 @@ public class YarnQuestParser {
     }
 
     private int parseRewardMoney(Map<String, List<String>> headers, FileHandle questFile) {
-        String value = getFirst(headers, "reward.money");
+        String value = getFirst(headers, "reward_money");
         if (value == null || value.isBlank()) {
             return 0;
         }
@@ -154,7 +154,7 @@ public class YarnQuestParser {
     }
 
     private List<String> parseRewardItems(Map<String, List<String>> headers) {
-        List<String> values = headers.getOrDefault("reward.item", List.of());
+        List<String> values = headers.getOrDefault("reward_item", List.of());
         return values.stream()
             .map(this::normalizeHeaderValue)
             .filter(value -> !value.isBlank())

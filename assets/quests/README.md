@@ -49,14 +49,24 @@ These commands are executed when quest nodes are processed (for example `q_<ques
 ### Example (single quest)
 
 ```yarn
+questId: welcome_to_town
+displayName: Welcome to Town
+journalText: Get to know the locals and settle in.
+startNode: q_welcome_to_town_start
+reward_money: 50
+reward_item: sword
+step: talk Npc-2
 title: q_welcome_to_town_start
+position: -178,-155
 ---
 <<quest_start welcome_to_town>>
 <<quest_stage welcome_to_town 0>>
 ===
 
 title: q_welcome_to_town_on_talk
+position: -178,-155
 ---
+<<declare $eventTarget = "" as string>>
 <<if $eventTarget == "Npc-2">>
 <<quest_stage welcome_to_town 1>>
 <<quest_complete welcome_to_town>>
@@ -64,4 +74,5 @@ title: q_welcome_to_town_on_talk
 <<give_item "SWORD" 1>>
 <<endif>>
 ===
+
 ```
