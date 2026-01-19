@@ -29,7 +29,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestSystem questSystem = new QuestSystem(
             eventBus,
             registry,
@@ -57,7 +57,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestSystem questSystem = new QuestSystem(
             eventBus,
             registry,
@@ -81,9 +81,9 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void executesStartNodeCommandsOnAdd() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         YarnDialogLoader dialogLoader = new YarnDialogLoader();
-        DialogData dialogData = dialogLoader.load(Gdx.files.internal("quests/start_node_flag_test.yarn"));
+        DialogData dialogData = dialogLoader.load(Gdx.files.internal("tests/quests_test/start_node_flag_test.yarn"));
         Map<String, DialogData> questDialogs = Map.of("start_node_flag_test", dialogData);
         QuestSystem questSystem = new QuestSystem(
             eventBus,

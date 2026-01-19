@@ -25,7 +25,7 @@ class RewardSystemTest extends HeadlessGdxTest {
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
@@ -54,7 +54,7 @@ class RewardSystemTest extends HeadlessGdxTest {
     @Test
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
@@ -77,7 +77,7 @@ class RewardSystemTest extends HeadlessGdxTest {
     @Test
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
@@ -106,7 +106,7 @@ class RewardSystemTest extends HeadlessGdxTest {
     @Test
     void grantsRewardOnceOnQuestCompletedEvent() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();

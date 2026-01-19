@@ -44,4 +44,28 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         assertTrue(definition.reward().items().contains("shield"));
         assertTrue(definition.reward().items().contains("potion"));
     }
+
+    @Test
+    void defaultsRewardTimingToGiverWhenMissing() throws IOException {
+        String content = """
+            questId: default_reward_timing
+            displayName: Default Reward Timing
+            journalText: Missing reward timing should default.
+            startNode: q_default_reward_timing_start
+            reward_money: 10
+            title: q_default_reward_timing_start
+            ---
+            <<quest_start default_reward_timing>>
+            ===
+            """;
+
+        Path tempFile = Files.createTempFile("quest-default-reward", ".yarn");
+        Files.writeString(tempFile, content);
+
+        FileHandle handle = Gdx.files.absolute(tempFile.toAbsolutePath().toString());
+        QuestDefinition definition = new YarnQuestParser().parse(handle);
+
+        assertNotNull(definition);
+        assertEquals(QuestDefinition.RewardTiming.GIVER, definition.rewardTiming());
+    }
 }

@@ -11,7 +11,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
     void createQuestAllowsNullRewardItems() {
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json");
         QuestFactory factory = new QuestFactory(registry);
         QuestDefinition.RewardDefinition rewardDefinition = new QuestDefinition.RewardDefinition(25, null);
         QuestDefinition questDefinition = new QuestDefinition(

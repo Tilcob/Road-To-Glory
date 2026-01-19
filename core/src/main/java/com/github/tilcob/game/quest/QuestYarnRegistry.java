@@ -15,13 +15,19 @@ public class QuestYarnRegistry {
     private static final String QUESTS_DIR = "quests";
 
     private final String indexPath;
+    private final String indexDir;
     private final Map<String, QuestDefinition> definitions = new HashMap<>();
     private final Map<String, FileHandle> questFiles = new HashMap<>();
     private final ObjectMapper mapper = new ObjectMapper();
     private final YarnQuestParser questParser = new YarnQuestParser();
 
     public QuestYarnRegistry(String indexPath) {
+        this(indexPath, QUESTS_DIR);
+    }
+
+    public QuestYarnRegistry(String indexPath, String indexDir) {
         this.indexPath = indexPath;
+        this.indexDir = indexDir;
     }
 
     public Map<String, QuestDefinition> loadAll() {
@@ -82,7 +88,7 @@ public class QuestYarnRegistry {
     private FileHandle resolveQuestFileFromEntry(String entry) {
         String fileName = ensureYarnExtension(entry);
         if (fileName.contains("/")) return Gdx.files.internal(fileName);
-        return Gdx.files.internal(QUESTS_DIR + "/" + fileName);
+        return Gdx.files.internal(indexDir + "/" + fileName);
     }
 
     private String ensureYarnExtension(String entry) {
