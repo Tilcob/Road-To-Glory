@@ -22,7 +22,7 @@ class RewardSystemTest {
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
@@ -51,7 +51,7 @@ class RewardSystemTest {
     @Test
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
@@ -75,7 +75,7 @@ class RewardSystemTest {
     @Test
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();

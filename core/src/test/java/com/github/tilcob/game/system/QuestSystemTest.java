@@ -23,7 +23,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         QuestSystem questSystem = new QuestSystem(eventBus, registry);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
@@ -47,7 +47,7 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         QuestSystem questSystem = new QuestSystem(eventBus, registry);
         Engine engine = new Engine();
         engine.addSystem(questSystem);

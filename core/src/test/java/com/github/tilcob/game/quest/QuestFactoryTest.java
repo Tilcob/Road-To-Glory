@@ -13,7 +13,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
     @Test
     void createQuestAllowsNullRewardItems() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         QuestFactory factory = new QuestFactory(eventBus, registry);
         QuestDefinition.RewardDefinition rewardDefinition = new QuestDefinition.RewardDefinition(25, null);
         QuestDefinition questDefinition = new QuestDefinition(
@@ -35,7 +35,7 @@ class QuestFactoryTest extends HeadlessGdxTest {
     @Test
     void createUsesRegistryDefinitions() {
         GameEventBus eventBus = new GameEventBus();
-        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
         QuestFactory factory = new QuestFactory(eventBus, registry);
         registry.loadAll();
 
