@@ -4,8 +4,8 @@ import java.util.List;
 
 public record QuestDefinition(
     String questId,
-    String title,
-    String description,
+    String displayName,
+    String journalText,
     String startNode,
     List<StepDefinition> steps,
     RewardDefinition reward

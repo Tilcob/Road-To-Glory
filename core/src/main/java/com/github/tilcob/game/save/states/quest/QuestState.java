@@ -1,11 +1,8 @@
 package com.github.tilcob.game.save.states.quest;
 
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.step.QuestStep;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 public class QuestState {

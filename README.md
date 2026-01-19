@@ -12,9 +12,8 @@ A LibGDX-based RPG project with a modular architecture split between shared core
 
 ### Quest data
 
-Quest definitions live in `assets/quests/index.json` and are loaded from the Yarn
-node `quests_index`.
-
+Quest definitions live in `assets/quests/index.json` and are loaded from Yarn
+headers inside each quest file.
 
 ## Codebase documentation
 

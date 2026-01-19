@@ -21,7 +21,7 @@ public class QuestFactory {
 
     public Quest createQuest(QuestDefinition definition) {
         QuestReward reward = createReward(definition.reward());
-        Quest quest = new Quest(definition.questId(), definition.title(), definition.description(), reward);
+        Quest quest = new Quest(definition.questId(), definition.displayName(), definition.journalText(), reward);
 
         for (var step : definition.steps()) {
             quest.getSteps().add(createStep(step));

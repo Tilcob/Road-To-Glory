@@ -1,7 +1,7 @@
 # Quest Yarn conventions
 
-Quest data is registered via the Yarn file `quests/quests_index.yarn`. The registry is a
-single Yarn node named `quests_index` that lists quest metadata, steps, and rewards.
+Quest data is registered via Yarn headers inside each quest file referenced by the
+`quests/index.json` manifest.
 
 ### Manifest (`quests/index.json`)
 
@@ -15,7 +15,7 @@ and directory listing are no longer used.
 
 ## Registry format
 
-Inside the `quests_index` node body:
+Inside the quest file headers (before the first `---`):
 - Each quest starts with a `questId:` line.
 - Optional fields: `displayName:`, `journalText:`, and `startNode:`.
 - Steps are expressed as `step:` lines using `talk`, `collect`, or `kill`.
