@@ -68,4 +68,33 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         assertNotNull(definition);
         assertEquals(RewardTiming.GIVER, definition.rewardTiming());
     }
+
+    @Test
+    void parsesStepJournalEntries() throws IOException {
+        String content = """
+            questId: step_journal_test
+            displayName: Step Journals
+            journalText: Quest journal text.
+            startNode: q_step_journal_test_start
+            step: talk Npc-1
+            step: collect potion 2
+            step_journal: Talk to the villager.
+            step_journal: Gather two potions.
+            title: q_step_journal_test_start
+            ---
+            <<quest_start step_journal_test>>
+            ===
+            """;
+
+        Path tempFile = Files.createTempFile("quest-step-journal", ".yarn");
+        Files.writeString(tempFile, content);
+
+        FileHandle handle = Gdx.files.absolute(tempFile.toAbsolutePath().toString());
+        QuestDefinition definition = new YarnQuestParser().parse(handle);
+
+        assertNotNull(definition);
+        assertEquals(2, definition.steps().size());
+        assertEquals("Talk to the villager.", definition.steps().get(0).journalText());
+        assertEquals("Gather two potions.", definition.steps().get(1).journalText());
+    }
 }

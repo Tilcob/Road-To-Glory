@@ -20,6 +20,7 @@ Inside the quest file headers (before the first `---`):
 - Each quest starts with a `questId:` line.
 - Required fields: `displayName:`, `journalText:`, and `startNode:`.
 - Steps are expressed as `step:` lines using `talk`, `collect`, or `kill`.
+- Optional step journal text can be provided with `step_journal:` lines (one per step, in order).
 - Rewards are optional and use `reward_money:` / `reward_item:`.
 - You may also use `reward_items:` with a comma-separated list.
 - Reward timing is optional and uses `reward_timing:` (`giver`, `completion`, or `auto`).
@@ -61,6 +62,7 @@ reward_money: 50
 reward_item: sword
 reward_timing: giver
 step: talk Npc-2
+step_journal: Talk to Npc-2 about the town.
 title: q_welcome_to_town_start
 position: -178,-155
 ---
@@ -77,4 +79,53 @@ position: -178,-155
 <<endif>>
 ===
 
+```
+
+### Example (multiple steps with journals)
+
+```yarn
+questId: gather_supplies
+displayName: Gather Supplies
+journalText: Stock up before the next journey.
+startNode: q_gather_supplies_start
+reward_money: 30
+reward_item: bread
+reward_timing: completion
+step: talk Shopkeeper
+step: collect potion 2
+step: kill Rat 3
+step_journal: Speak with the shopkeeper about supplies.
+step_journal: Collect two potions from the shelves.
+step_journal: Clear the cellar of three rats.
+title: q_gather_supplies_start
+position: -120,-110
+---
+<<quest_start gather_supplies>>
+<<quest_stage gather_supplies 0>>
+===
+
+title: q_gather_supplies_on_talk
+position: -120,-90
+---
+<<if $eventTarget == "Shopkeeper">>
+<<quest_stage gather_supplies 1>>
+<<endif>>
+===
+
+title: q_gather_supplies_on_collect
+position: -120,-70
+---
+<<if $eventTarget == "potion">>
+<<quest_stage gather_supplies 2>>
+<<endif>>
+===
+
+title: q_gather_supplies_on_kill
+position: -120,-50
+---
+<<if $eventTarget == "Rat">>
+<<quest_stage gather_supplies 3>>
+<<quest_complete gather_supplies>>
+<<endif>>
+===
 ```

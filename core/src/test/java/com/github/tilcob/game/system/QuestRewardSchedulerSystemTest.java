@@ -91,6 +91,12 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Entity npc = new Entity();
         npc.add(new Npc(null, "QuestGiver"));
         Entity player = new Entity();
+        QuestLog questLog = new QuestLog();
+        player.add(questLog);
+        QuestReward reward = new QuestReward(0, List.of());
+        Quest quest = new Quest("giver_reward_test", "Giver Reward", "Reward after dialog", reward, 1);
+        quest.setCurrentStep(quest.getTotalStages());
+        questLog.add(quest);
         AtomicReference<QuestRewardEvent> rewardEvent = new AtomicReference<>();
         eventBus.subscribe(QuestRewardEvent.class, rewardEvent::set);
 
