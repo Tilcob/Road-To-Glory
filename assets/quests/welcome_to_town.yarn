@@ -1,0 +1,17 @@
+title: q_welcome_to_town_start
+position: 0,0
+---
+<<quest_start welcome_to_town>>
+<<quest_stage welcome_to_town 0>>
+===
+
+title: q_welcome_to_town_on_talk
+position: -178,-155
+---
+<<if $eventTarget == "Npc-2">>
+<<quest_stage welcome_to_town 1>>
+<<quest_complete welcome_to_town>>
+<<give_money 50>>
+<<give_item "SWORD" 1>>
+<<endif>>
+===

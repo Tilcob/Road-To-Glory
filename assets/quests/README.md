@@ -31,17 +31,36 @@ Supported fields:
 - `reward.money`: currency amount added to the player's wallet.
 - `reward.item`: item definition IDs (for example, `sword`). Repeat the line per item.
 
+### Quest Yarn runtime commands (executed from quest nodes)
+
+These commands are executed when quest nodes are processed (for example `q_<questId>_start` or
+`q_<questId>_on_<event>`).
+
+- `<<quest_start <questId>>>`: Mark a quest as started (adds it to the quest log).
+- `<<quest_stage <questId> <stage>>>`: Set the quest stage (0-based).
+- `<<quest_complete <questId>>>`: Mark the quest as completed and emit completion events.
+- `<<give_gold <amount>>>`: Grant currency to the player.
+- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
+- `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
+- `<<inc_counter <counter> <amount>>>`: Increment a named counter (amount defaults to `1`).
+
+
 ### Example (single quest)
 
 ```yarn
-title: quests_index
+title: q_welcome_to_town_start
 ---
-questId: welcome_to_town
-displayName: Welcome to Town
-journalText: Get to know the locals and settle in.
-startNode: quest_notStarted
-step: talk Npc-2
-reward.money: 50
-reward.item: sword
+<<quest_start welcome_to_town>>
+<<quest_stage welcome_to_town 0>>
+===
+
+title: q_welcome_to_town_on_talk
+---
+<<if $eventTarget == "Npc-2">>
+<<quest_stage welcome_to_town 1>>
+<<quest_complete welcome_to_town>>
+<<give_money 50>>
+<<give_item "SWORD" 1>>
+<<endif>>
 ===
 ```
