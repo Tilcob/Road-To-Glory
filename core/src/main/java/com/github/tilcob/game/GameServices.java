@@ -14,6 +14,9 @@ import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.yarn.DialogYarnRuntime;
+import com.github.tilcob.game.yarn.QuestYarnBridge;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +33,9 @@ public class GameServices {
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
+    private final QuestYarnBridge questYarnBridge;
+    private final DialogYarnRuntime dialogYarnRuntime;
+    private final QuestYarnRuntime questYarnRuntime;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -45,6 +51,9 @@ public class GameServices {
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
+        this.questYarnBridge = new QuestYarnBridge(eventBus);
+        this.dialogYarnRuntime = new DialogYarnRuntime(questYarnBridge);
+        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge);
     }
 
     public void loadGame() {
@@ -97,5 +106,13 @@ public class GameServices {
 
     public DialogRepository getDialogRepository() {
         return dialogRepository;
+    }
+
+    public DialogYarnRuntime getDialogYarnRuntime() {
+        return dialogYarnRuntime;
+    }
+
+    public QuestYarnRuntime getQuestYarnRuntime() {
+        return questYarnRuntime;
     }
 }

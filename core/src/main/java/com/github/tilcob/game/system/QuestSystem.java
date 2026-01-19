@@ -10,18 +10,24 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestDefinition;
 import com.github.tilcob.game.quest.QuestFactory;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.quest.step.QuestStep;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
 public class QuestSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestFactory factory;
+    private final QuestYarnRegistry questYarnRegistry;
+    private final QuestYarnRuntime questYarnRuntime;
 
-    public QuestSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry) {
+    public QuestSystem(GameEventBus eventBus, QuestYarnRegistry questYarnRegistry, QuestYarnRuntime questYarnRuntime) {
         super(Family.all(QuestLog.class).get());
         this.eventBus = eventBus;
+        this.questYarnRegistry = questYarnRegistry;
         this.factory = new QuestFactory(eventBus, questYarnRegistry);
+        this.questYarnRuntime = questYarnRuntime;
 
         eventBus.subscribe(AddQuestEvent.class, this::addQuest);
     }
@@ -65,6 +71,10 @@ public class QuestSystem extends IteratingSystem implements Disposable {
         Quest quest = factory.create(event.questId());
         questLog.add(quest);
         if (quest.getSteps().isEmpty()) eventBus.fire(new QuestCompletedEvent(event.player(), event.questId()));
+        QuestDefinition definition = questYarnRegistry.getQuestDefinition(event.questId());
+        if (definition != null) {
+            questYarnRuntime.executeStartNode(event.player(), definition.startNode());
+        }
         eventBus.fire(new UpdateQuestLogEvent(event.player()));
     }
 

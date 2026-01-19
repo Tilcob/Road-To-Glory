@@ -10,10 +10,10 @@ A LibGDX-based RPG project with a modular architecture split between shared core
 - `assets_raw`: Source assets before processing/export.
 - `utils`: Utility scripts and tooling.
 
-### Quest data (Yarn-only)
+### Quest data
 
-Quest definitions live in `assets/quests/quests_index.yarn` and are loaded from the Yarn
-node `quests_index`. JSON quest manifests and per-quest JSON files are no longer used.
+Quest definitions live in `assets/quests/index.json` and are loaded from the Yarn
+node `quests_index`.
 
 
 ## Codebase documentation
