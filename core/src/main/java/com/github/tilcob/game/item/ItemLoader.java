@@ -18,17 +18,23 @@ public final class ItemLoader {
         if (!itemsDirectory.exists()) {
             throw new IllegalStateException("Items directory not found: " + itemsDirectory.path());
         }
+        FileHandle indexFile = itemsDirectory.child("index.json");
+        if (!indexFile.exists()) {
+            throw new IllegalStateException("Items index not found: " + indexFile.path());
+        }
         Map<String, ItemDefinition> definitions = new HashMap<>();
         JsonReader reader = new JsonReader();
+        JsonValue index = reader.parse(indexFile);
+        if (!index.isArray()) {
+            throw new IllegalArgumentException("Item index must be a JSON array: " + indexFile.path());
+        }
 
-        // list() is intentionally non-recursive; items are expected directly under /assets/items.
-        for (FileHandle file : itemsDirectory.list()) {
-            if (!file.extension().equalsIgnoreCase("json")) {
-                continue;
+        for (JsonValue entry = index.child; entry != null; entry = entry.next) {
+            if (entry.isNull() || entry.asString().isBlank()) {
+                throw new IllegalArgumentException("Item index entry must be a non-empty string: " + indexFile.path());
             }
-            if (file.name().equalsIgnoreCase("index.json")) {
-                continue;
-            }
+            FileHandle file = itemsDirectory.child(entry.asString());
+            if (!file.exists()) throw new IllegalArgumentException("Item file missing: " + file.path());
 
             JsonValue root = reader.parse(file);
             String id = requireString(root, "id", file);
