@@ -108,52 +108,13 @@ public class QuestLifecycleService {
         if (questDialog == null || questDialog.questId() == null) return;
         QuestDefinition definition = questDefinitionFor(questDialog.questId());
         if (definition == null || definition.rewardTiming() != RewardTiming.GIVER) return;
-        eventBus.fire(new QuestRewardEvent(player, questDialog.questId()));
-    }
 
-    public void claimReward(Entity player, String questId) {
-        if (player == null || questId == null || questId.isBlank()) return;
-        Quest quest = questFor(player, questId);
-        if (quest == null || quest.isRewardClaimed() || !quest.isCompleted()) return;
-        quest.setRewardClaimed(true);
-        QuestReward reward = quest.getReward();
-        applyMoney(player, reward);
-        applyItems(player, reward);
-        if (reward.money() > 0 || !reward.items().isEmpty()) {
-            eventBus.fire(new RewardGrantedEvent(player, quest.getQuestId(), quest.getTitle(), reward));
-        }
-        eventBus.fire(new UpdateQuestLogEvent(player));
-    }
-
-    private Quest questFor(Entity player, String questId) {
         QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog != null) {
-            Quest quest = questLog.getQuestById(questId);
-            if (quest != null) return quest;
-        }
-        return questFactory.create(questId);
-    }
+        if (questLog == null) return;
+        Quest quest = questLog.getQuestById(questDialog.questId());
+        if (quest == null || !quest.isCompleted() || quest.isRewardClaimed()) return;
 
-    private void applyMoney(Entity player, QuestReward reward) {
-        if (reward.money() <= 0) return;
-        Wallet wallet = Wallet.MAPPER.get(player);
-        if (wallet == null) {
-            wallet = new Wallet();
-            player.add(wallet);
-        }
-        wallet.earn(reward.money());
-    }
-
-    private void applyItems(Entity player, QuestReward reward) {
-        if (reward.items().isEmpty()) return;
-        Inventory inventory = Inventory.MAPPER.get(player);
-        if (inventory == null) {
-            inventory = new Inventory();
-            player.add(inventory);
-        }
-        for (var itemId : reward.items()) {
-            inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(itemId));
-        }
+        eventBus.fire(new QuestRewardEvent(player, questDialog.questId()));
     }
 
     private QuestDefinition questDefinitionFor(String questId) {

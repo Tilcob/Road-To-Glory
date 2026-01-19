@@ -24,7 +24,12 @@ public class YarnQuestParser {
         String displayName = getFirst(headers, "displayName");
         String journalText = getFirst(headers, "journalText");
         String startNode = getFirst(headers, "startNode");
-        List<QuestDefinition.StepDefinition> steps = parseSteps(headers.getOrDefault("step", List.of()), questFile);
+        List<String> stepJournals = headers.getOrDefault("step_journal", List.of());
+        List<QuestDefinition.StepDefinition> steps = parseSteps(
+            headers.getOrDefault("step", List.of()),
+            stepJournals,
+            questFile
+        );
 
         if (questId == null || questId.isBlank()) {
             Gdx.app.error(TAG, "Quest entry missing questId: " + questFile.path());
@@ -101,10 +106,17 @@ public class YarnQuestParser {
         return values.get(0);
     }
 
-    private List<QuestDefinition.StepDefinition> parseSteps(List<String> stepValues, FileHandle questFile) {
+    private List<QuestDefinition.StepDefinition> parseSteps(List<String> stepValues,
+                                                            List<String> stepJournals,
+                                                            FileHandle questFile) {
         List<QuestDefinition.StepDefinition> steps = new ArrayList<>();
-        for (String value : stepValues) {
-            QuestDefinition.StepDefinition parsed = parseStepDefinition(value, questFile);
+        for (int index = 0; index < stepValues.size(); index++) {
+            String value = stepValues.get(index);
+            String journal = null;
+            if (stepJournals != null && index < stepJournals.size()) {
+                journal = normalizeHeaderValue(stepJournals.get(index));
+            }
+            QuestDefinition.StepDefinition parsed = parseStepDefinition(value, journal, questFile);
             if (parsed != null) {
                 steps.add(parsed);
             }
@@ -112,7 +124,7 @@ public class YarnQuestParser {
         return steps;
     }
 
-    private QuestDefinition.StepDefinition parseStepDefinition(String value, FileHandle questFile) {
+    private QuestDefinition.StepDefinition parseStepDefinition(String value, String journalText, FileHandle questFile) {
         String[] parts = value.trim().split("\\s+");
         if (parts.length == 0) {
             return null;
@@ -124,21 +136,35 @@ public class YarnQuestParser {
                     Gdx.app.error(TAG, "Talk step missing npc: " + questFile.path());
                     yield null;
                 }
-                yield new QuestDefinition.StepDefinition("talk", parts[1], null, 0, null);
+                yield new QuestDefinition.StepDefinition("talk", parts[1], null, 0, null, journalText);
             }
             case "collect" -> {
                 if (parts.length < 3) {
                     Gdx.app.error(TAG, "Collect step missing args: " + questFile.path());
                     yield null;
                 }
-                yield new QuestDefinition.StepDefinition("collect", null, parts[1], parseInt(parts[2], questFile), null);
+                yield new QuestDefinition.StepDefinition(
+                    "collect",
+                    null,
+                    parts[1],
+                    parseInt(parts[2], questFile),
+                    null,
+                    journalText
+                );
             }
             case "kill" -> {
                 if (parts.length < 3) {
                     Gdx.app.error(TAG, "Kill step missing args: " + questFile.path());
                     yield null;
                 }
-                yield new QuestDefinition.StepDefinition("kill", null, null, parseInt(parts[2], questFile), parts[1]);
+                yield new QuestDefinition.StepDefinition(
+                    "collect",
+                    null,
+                    parts[1],
+                    parseInt(parts[2], questFile),
+                    null,
+                    journalText
+                );
             }
             default -> {
                 Gdx.app.error(TAG, "Unknown step type: " + parts[0]);

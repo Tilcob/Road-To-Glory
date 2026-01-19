@@ -15,7 +15,19 @@ public class QuestFactory {
     public Quest createQuest(QuestDefinition definition) {
         QuestReward reward = createReward(definition.reward());
         int stageCount = definition.steps() == null ? 0 : definition.steps().size();
-        return new Quest(definition.questId(), definition.displayName(), definition.journalText(), reward, stageCount);
+        List<String> stepJournals = definition.steps() == null
+            ? List.of()
+            : definition.steps().stream()
+            .map(QuestDefinition.StepDefinition::journalText)
+            .toList();
+        return new Quest(
+            definition.questId(),
+            definition.displayName(),
+            definition.journalText(),
+            reward,
+            stageCount,
+            stepJournals
+        );
     }
 
     private QuestReward createReward(QuestDefinition.RewardDefinition reward) {

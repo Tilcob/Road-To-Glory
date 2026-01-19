@@ -119,7 +119,7 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new QuestSystem(
             services.getEventBus(), services.getQuestLifecycleService()),
             SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestLifecycleService()),
+        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestRewardService()),
             SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(
             new QuestRewardSchedulerSystem(

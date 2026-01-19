@@ -22,9 +22,9 @@ public class QuestManager {
         if (eventType == null || eventType.isBlank()) {
             return;
         }
-        questYarnRuntime.setVariable("$eventType", eventType);
-        questYarnRuntime.setVariable("$eventTarget", target);
-        questYarnRuntime.setVariable("$eventAmount", amount);
+        questYarnRuntime.setVariable(player, "$eventType", eventType);
+        questYarnRuntime.setVariable(player, "$eventTarget", target);
+        questYarnRuntime.setVariable(player, "$eventAmount", amount);
 
         boolean handled = false;
         if (player != null) {
