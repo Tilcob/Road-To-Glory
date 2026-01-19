@@ -2,7 +2,11 @@ package com.github.tilcob.game.system;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
+import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
@@ -15,6 +19,7 @@ import com.github.tilcob.game.yarn.QuestYarnRuntime;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -25,7 +30,11 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestSystem questSystem = new QuestSystem(eventBus, registry, new QuestYarnRuntime(new QuestYarnBridge(eventBus)));
+        QuestSystem questSystem = new QuestSystem(
+            eventBus,
+            registry,
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), Map.of())
+        );
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -49,7 +58,11 @@ class QuestSystemTest extends HeadlessGdxTest {
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
-        QuestSystem questSystem = new QuestSystem(eventBus, registry, new QuestYarnRuntime(new QuestYarnBridge(eventBus)));
+        QuestSystem questSystem = new QuestSystem(
+            eventBus,
+            registry,
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), Map.of())
+        );
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -63,5 +76,30 @@ class QuestSystemTest extends HeadlessGdxTest {
         eventBus.fire(new AddQuestEvent(player, "zero_step_test"));
 
         assertTrue(completedFired.get());
+    }
+
+    @Test
+    void executesStartNodeCommandsOnAdd() {
+        GameEventBus eventBus = new GameEventBus();
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/index.json");
+        YarnDialogLoader dialogLoader = new YarnDialogLoader();
+        DialogData dialogData = dialogLoader.load(Gdx.files.internal("quests/start_node_flag_test.yarn"));
+        Map<String, DialogData> questDialogs = Map.of("start_node_flag_test", dialogData);
+        QuestSystem questSystem = new QuestSystem(
+            eventBus,
+            registry,
+            new QuestYarnRuntime(new QuestYarnBridge(eventBus, true), Map.of(), questDialogs)
+        );
+        Engine engine = new Engine();
+        engine.addSystem(questSystem);
+
+        Entity player = new Entity();
+        player.add(new QuestLog());
+        engine.addEntity(player);
+
+        eventBus.fire(new AddQuestEvent(player, "start_node_flag_test"));
+
+        DialogFlags flags = DialogFlags.MAPPER.get(player);
+        assertTrue(flags != null && flags.get("start_node_flag_test"));
     }
 }

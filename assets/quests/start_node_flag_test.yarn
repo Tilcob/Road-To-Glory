@@ -1,0 +1,11 @@
+questId: start_node_flag_test
+displayName: Start Node Flag Test
+journalText: Verify quest start nodes execute Yarn commands.
+startNode: q_start_node_flag_test_start
+reward_money: 0
+step: talk Npc-1
+title: q_start_node_flag_test_start
+position: 0,0
+---
+<<set_flag start_node_flag_test>>
+===

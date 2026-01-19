@@ -1,17 +1,35 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.DialogNode;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 public class QuestYarnRuntime {
+    private static final String TAG = QuestYarnRuntime.class.getSimpleName();
+
     private final YarnRuntime runtime;
     private final Map<String, Object> variables;
+    private final Map<String, DialogData> allDialogs;
+    private final Map<String, DialogData> allQuestDialogs;
 
     public QuestYarnRuntime(QuestYarnBridge bridge) {
+        this(bridge, Collections.emptyMap(), Collections.emptyMap());
+    }
+
+    public QuestYarnRuntime(QuestYarnBridge bridge,
+                            Map<String, DialogData> allDialogs,
+                            Map<String, DialogData> allQuestDialogs) {
         this.runtime = new YarnRuntime();
         this.variables = new HashMap<>();
+        this.allDialogs = allDialogs == null ? Collections.emptyMap() : allDialogs;
+        this.allQuestDialogs = allQuestDialogs == null ? Collections.emptyMap() : allQuestDialogs;
         bridge.registerAll(runtime);
     }
 
@@ -23,7 +41,29 @@ public class QuestYarnRuntime {
             runtime.executeCommandLine(player, startNode);
             return;
         }
-        // TODO: Execute quest yarn nodes via the Yarn Spinner runtime once node lookup is wired in.
+        executeNode(player, startNode);
+    }
+
+    public boolean executeNode(Entity player, String nodeId) {
+        DialogNode node = findNode(nodeId);
+        if (node == null) return false;
+        Array<String> lines = node.lines();
+        if (lines == null) return false;
+        boolean shouldExecute = true;
+        for (String line : lines) {
+            String trimmed = line == null ? "" : line.trim();
+            if (isIfLine(trimmed)) {
+                shouldExecute = evaluateCondition(trimmed);
+                continue;
+            }
+            if (isEndIfLine(trimmed)) {
+                shouldExecute = true;
+                continue;
+            }
+            if (!shouldExecute) continue;
+            runtime.executeCommandLine(player, line);
+        }
+        return true;
     }
 
     public boolean executeCommandLine(Entity player, String line) {
@@ -39,5 +79,48 @@ public class QuestYarnRuntime {
 
     public Object getVariable(String name) {
         return variables.get(name);
+    }
+
+    private boolean isIfLine(String line) {
+        return line.startsWith("<<if ") && line.endsWith(">>");
+    }
+
+    private boolean isEndIfLine(String line) {
+        return line.equals("<<endif>>");
+    }
+
+    private boolean evaluateCondition(String line) {
+        String inner = line.substring(2, line.length() - 2).trim();
+        String condition = inner.substring("if ".length()).trim();
+        String[] parts = condition.split("==", 2);
+        if (parts.length != 2) return false;
+        String left = parts[0].trim();
+        String right = parts[1].trim();
+        if (right.startsWith("\"") && right.endsWith("\"") && right.length() >= 2) {
+            right = right.substring(1, right.length() - 1);
+        }
+        Object value = getVariable(left);
+        return value != null && right.equals(String.valueOf(value));
+    }
+
+    private DialogNode findNode(String nodeId) {
+        if (nodeId == null || nodeId.isBlank()) return null;
+        DialogNode node = getDialogNode(allDialogs, nodeId);
+        if (node != null) return node;
+        node = getDialogNode(allQuestDialogs, nodeId);
+        if (node != null) return node;
+        if (Gdx.app != null) Gdx.app.debug(TAG, "Quest Yarn node not found: " + nodeId);
+        return null;
+    }
+
+    private DialogNode getDialogNode(Map<String, DialogData> dialogDataMap, String nodeId) {
+        for (DialogData dialogData : dialogDataMap.values()) {
+            if (dialogData == null) continue;
+            ObjectMap<String, DialogNode> nodes = dialogData.nodesById();
+            if (nodes == null || nodes.isEmpty()) continue;
+            DialogNode node = nodes.get(nodeId);
+            if (node != null) return node;
+        }
+        return null;
     }
 }

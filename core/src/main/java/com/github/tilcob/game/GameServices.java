@@ -58,8 +58,8 @@ public class GameServices {
         QuestYarnBridge dialogYarnBridge = new QuestYarnBridge(eventBus, true);
         this.questYarnBridge = new QuestYarnBridge(eventBus, false);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
-        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge);
-        this.questManager = new QuestManager(questYarnRuntime, allDialogs, allQuestDialogs);
+        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.questManager = new QuestManager(questYarnRuntime);
     }
 
     public void loadGame() {
