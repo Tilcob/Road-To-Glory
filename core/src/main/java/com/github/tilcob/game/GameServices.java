@@ -8,7 +8,7 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestRepository;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.registry.ChestRegistry;
@@ -28,7 +28,7 @@ public class GameServices {
     private final AudioManager audioManager;
     private final Map<String, Quest> allQuests;
     private final Map<String, DialogData> allDialogs;
-    private final QuestRepository questRepository;
+    private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
@@ -42,8 +42,7 @@ public class GameServices {
         this.audioManager = new AudioManager(assetManager);
         this.allQuests = new HashMap<>();
         this.allDialogs = new HashMap<>();
-        this.questRepository = new QuestRepository(eventBus, true, "quests/index.json",
-            "quests");
+        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
     }
@@ -92,8 +91,8 @@ public class GameServices {
         return allDialogs;
     }
 
-    public QuestRepository getQuestRepository() {
-        return questRepository;
+    public QuestYarnRegistry getQuestYarnRegistry() {
+        return questYarnRegistry;
     }
 
     public DialogRepository getDialogRepository() {

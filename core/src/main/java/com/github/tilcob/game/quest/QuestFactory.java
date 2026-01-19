@@ -12,32 +12,32 @@ import java.util.List;
 
 public class QuestFactory {
     private final GameEventBus eventBus;
-    private final QuestRepository questRepository;
+    private final QuestYarnRegistry questRegistry;
 
-    public QuestFactory(GameEventBus eventBus, QuestRepository questRepository) {
+    public QuestFactory(GameEventBus eventBus, QuestYarnRegistry questRegistry) {
         this.eventBus = eventBus;
-        this.questRepository = questRepository;
+        this.questRegistry = questRegistry;
     }
 
-    public Quest createQuestFromJson(QuestJson json) {
-        QuestReward reward = createReward(json.rewards());
-        Quest quest = new Quest(json.questId(), json.title(), json.description(), reward);
+    public Quest createQuest(QuestDefinition definition) {
+        QuestReward reward = createReward(definition.reward());
+        Quest quest = new Quest(definition.questId(), definition.title(), definition.description(), reward);
 
-        for (QuestJson.StepJson step : json.steps()) {
+        for (var step : definition.steps()) {
             quest.getSteps().add(createStep(step));
         }
         return quest;
     }
 
-    private QuestReward createReward(QuestJson.RewardJson rewardJson) {
-        if (rewardJson == null) return null;
+    private QuestReward createReward(QuestDefinition.RewardDefinition reward) {
+        if (reward == null) return null;
         List<String> items = new ArrayList<>();
-        if (rewardJson.items() != null) rewardJson.items().forEach(
+        if (reward.items() != null) reward.items().forEach(
             item -> items.add(ItemDefinitionRegistry.resolveId(item)));
-        return new QuestReward(rewardJson.money(), items);
+        return new QuestReward(reward.money(), items);
     }
 
-    public QuestStep createStep(QuestJson.StepJson step) {
+    public QuestStep createStep(QuestDefinition.StepDefinition step) {
         return switch (step.type()) {
             case "talk"  -> new TalkStep(step.npc(), eventBus);
             case "collect" -> new CollectItemStep(ItemDefinitionRegistry.resolveId(step.itemId()), step.amount(), eventBus);
@@ -47,9 +47,9 @@ public class QuestFactory {
     }
 
     public Quest create(String questId) {
-        if (questRepository.isEmpty()) questRepository.loadAll();
-        QuestJson definition = questRepository.getQuestDefinition(questId);
-        if (definition != null) return createQuestFromJson(definition);
+        if (questRegistry.isEmpty()) questRegistry.loadAll();
+        QuestDefinition definition = questRegistry.getQuestDefinition(questId);
+        if (definition != null) return createQuest(definition);
         throw new IllegalArgumentException("Quest not found: " + questId);
     }
 }

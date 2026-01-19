@@ -11,20 +11,21 @@ import static org.junit.jupiter.api.Assertions.*;
 class QuestFactoryTest extends HeadlessGdxTest {
 
     @Test
-    void createQuestFromJsonAllowsNullRewardItems() {
+    void createQuestAllowsNullRewardItems() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestFactory factory = new QuestFactory(eventBus, repository);
-        QuestJson.RewardJson rewardJson = new QuestJson.RewardJson(25, null);
-        QuestJson questJson = new QuestJson(
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestFactory factory = new QuestFactory(eventBus, registry);
+        QuestDefinition.RewardDefinition rewardDefinition = new QuestDefinition.RewardDefinition(25, null);
+        QuestDefinition questDefinition = new QuestDefinition(
             "Reward_Quest",
             "Reward Quest",
             "Reward test",
+            "reward_start",
             List.of(),
-            rewardJson
+            rewardDefinition
         );
 
-        Quest quest = factory.createQuestFromJson(questJson);
+        Quest quest = factory.createQuest(questDefinition);
 
         assertNotNull(quest.getReward());
         assertEquals(25, quest.getReward().money());
@@ -32,15 +33,15 @@ class QuestFactoryTest extends HeadlessGdxTest {
     }
 
     @Test
-    void createUsesRepositoryDefinitions() {
+    void createUsesRegistryDefinitions() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestFactory factory = new QuestFactory(eventBus, repository);
-        repository.loadAll();
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestFactory factory = new QuestFactory(eventBus, registry);
+        registry.loadAll();
 
-        QuestJson definition = repository.getQuestDefinition("welcome_to_town");
+        QuestDefinition definition = registry.getQuestDefinition("welcome_to_town");
         assertNotNull(definition);
-        Quest quest = factory.createQuestFromJson(definition);
+        Quest quest = factory.createQuest(definition);
 
         assertNotNull(quest);
         assertEquals("welcome_to_town", quest.getQuestId());

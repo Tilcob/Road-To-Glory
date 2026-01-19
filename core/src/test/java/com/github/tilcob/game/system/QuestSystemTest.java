@@ -7,8 +7,8 @@ import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.QuestReward;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.quest.step.QuestStep;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventWhenQuestCompletes() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestSystem questSystem = new QuestSystem(eventBus, repository);
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestSystem questSystem = new QuestSystem(eventBus, registry);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 
@@ -47,8 +47,8 @@ class QuestSystemTest extends HeadlessGdxTest {
     @Test
     void firesRewardEventForZeroStepQuestOnAdd() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        QuestSystem questSystem = new QuestSystem(eventBus, repository);
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        QuestSystem questSystem = new QuestSystem(eventBus, registry);
         Engine engine = new Engine();
         engine.addSystem(questSystem);
 

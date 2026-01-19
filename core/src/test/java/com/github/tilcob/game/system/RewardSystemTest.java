@@ -8,8 +8,8 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestRepository;
 import com.github.tilcob.game.quest.QuestReward;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -22,8 +22,8 @@ class RewardSystemTest {
     @Test
     void grantsRewardsAndCreatesInventoryIfMissing() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -51,8 +51,8 @@ class RewardSystemTest {
     @Test
     void doesNotGrantRewardsWhenQuestIsIncomplete() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -75,8 +75,8 @@ class RewardSystemTest {
     @Test
     void skipsRewardGrantWhenAlreadyClaimedOrEmpty() {
         GameEventBus eventBus = new GameEventBus();
-        QuestRepository repository = new QuestRepository(eventBus, true, "quests/index.json", "quests");
-        RewardSystem rewardSystem = new RewardSystem(eventBus, repository);
+        QuestYarnRegistry registry = new QuestYarnRegistry("quests/quests_index.yarn");
+        RewardSystem rewardSystem = new RewardSystem(eventBus, registry);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();

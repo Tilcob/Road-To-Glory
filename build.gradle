@@ -72,7 +72,7 @@ configure(subprojects) {
 
 tasks.register("genQuestIndex") {
   group = "assets"
-  description = "Generates assets/quests/index.json from *.json (excluding index.json)."
+  description = "Generates assets/quests/index.json from *.yarn."
   doLast {
     def dir = file("$rootDir/assets/quests")
     if (!dir.exists()) throw new GradleException("Directory not found: $dir")
@@ -82,7 +82,7 @@ tasks.register("genQuestIndex") {
     def names = dir.listFiles()
       .findAll { it.isFile() }
       .collect { it.name }
-      .findAll { it.toLowerCase().endsWith(".json") }
+      .findAll { it.toLowerCase().endsWith(".yarn") }
       .findAll { it != "index.json" }
       .sort()
 
@@ -137,7 +137,7 @@ tasks.register("genItemIndex") {
 
 tasks.register("genAssetIndexes") {
   group = "assets"
-  description = "Generates quest + dialog index files."
+  description = "Generates quest + dialog + items index files."
   dependsOn("genQuestIndex", "genDialogIndex", "genItemIndex")
 }
 
