@@ -2,6 +2,7 @@ package com.github.tilcob.game.ai.state;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorRegistry;
 import com.github.tilcob.game.component.*;
@@ -15,6 +16,8 @@ public final class NpcStateSupport {
     }
 
     public static void lookAtPlayer(Entity player, Entity entity) {
+        if (Physic.MAPPER.get(entity).getBody().getType() == BodyDef.BodyType.StaticBody) return;
+
         Facing facingEntity = Facing.MAPPER.get(entity);
         Facing facingPlayer = Facing.MAPPER.get(player);
 

@@ -37,6 +37,10 @@ Quest and flag dialog lines are derived from tags on nodes:
 
 Nodes with quest or flag tags are not added to `DialogData.nodes`.
 
+To show a quest `completed` dialog only once, set the dialog flag
+`quest_<questId>_completed_seen` (for example, via `<<set_flag quest_<questId>_completed_seen true>>`).
+When the flag is set, completed dialogs fall back to idle/root lines.
+
 ### File name → NPC mapping
 
 Each `.yarn` file produces a single `DialogData` entry keyed by the file name (without extension). For example, `Shopkeeper.yarn` creates the dialog entry `Shopkeeper`.

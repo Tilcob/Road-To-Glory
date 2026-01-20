@@ -70,8 +70,9 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             return;
         }
         QuestLog questLog = QuestLog.MAPPER.get(player);
+        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
 
-        DialogSelection selection = DialogSelector.select(dialogData, questLog);
+        DialogSelection selection = DialogSelector.select(dialogData, questLog, dialogFlags);
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity);
         DialogNavigator navigator = new DialogNavigator(dialogData, session, selection, repeatChoices);

@@ -37,4 +37,5 @@ tags: quest_welcome_to_town, completed
 position: 11,-23
 ---
 By my friend!
+<<set_flag quest_welcome_to_town_completed_seen true>>
 ===
