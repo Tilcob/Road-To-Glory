@@ -119,7 +119,7 @@ public class InventoryView extends View<InventoryViewModel> {
             slot.setCount(item.getCount());
             slot.getCountTable().toFront();
 
-            dragAndDrop.addSource(new InventoryItemSource(itemImage, item.getSlotIdx()));
+            dragAndDrop.addSource(new InventoryItemSource(itemImage, item.getSlotIdx(), viewModel.getEventBus()));
         }
     }
 

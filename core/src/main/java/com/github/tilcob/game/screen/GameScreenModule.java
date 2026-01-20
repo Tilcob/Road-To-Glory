@@ -112,7 +112,7 @@ public class GameScreenModule {
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(
-            new InventorySystem(services.getEventBus(), services.getQuestManager()),
+            new InventorySystem(services.getEventBus(), services.getQuestManager(), skin),
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));

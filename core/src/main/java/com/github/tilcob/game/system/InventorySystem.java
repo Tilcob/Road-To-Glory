@@ -3,12 +3,14 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.github.tilcob.game.component.Id;
-import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.item.ItemDefinition;
@@ -18,14 +20,17 @@ import com.github.tilcob.game.quest.QuestManager;
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestManager questManager;
+    private final Skin skin;
     private Entity player;
 
-    public InventorySystem(GameEventBus eventBus, QuestManager questManager) {
+    public InventorySystem(GameEventBus eventBus, QuestManager questManager, Skin skin) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
         this.questManager = questManager;
+        this.skin = skin;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.subscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
     }
 
@@ -105,6 +110,63 @@ public class InventorySystem extends IteratingSystem implements Disposable {
             return i;
         }
         return -1;
+    }
+
+    private void onDropItem(InventoryDropEvent event) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        if (inventory == null) return;
+
+        Entity itemEntity = findItemAtSlot(inventory, event.slotIndex());
+        if (itemEntity == null) return;
+
+        Item item = Item.MAPPER.get(itemEntity);
+        String itemId = item.getItemId();
+        int count = item.getCount();
+
+        inventory.remove(itemEntity);
+        removeItem(itemEntity);
+
+        Entity droppedEntity = getEngine().createEntity();
+        droppedEntity.add(new Item(itemId, -1, count));
+        droppedEntity.add(new MapEntity());
+
+        TextureRegion region = skin.getRegion(ItemDefinitionRegistry.get(itemId).icon());
+        droppedEntity.add(new Graphic(Color.WHITE.cpy(), region));
+        droppedEntity.add(createDropTransform(region));
+
+        getEngine().addEntity(droppedEntity);
+        eventBus.fire(new UpdateInventoryEvent(player));
+    }
+
+    private Transform createDropTransform(TextureRegion region) {
+        Transform playerTransform = Transform.MAPPER.get(player);
+        Vector2 dropPosition = playerTransform == null
+            ? new Vector2()
+            : playerTransform.getPosition().cpy().add(getFacingOffset());
+
+        Vector2 size = region == null
+            ? new Vector2(0f, 0f)
+            : new Vector2(region.getRegionWidth(), region.getRegionHeight()).scl(Constants.UNIT_SCALE);
+
+        return new Transform(
+            dropPosition,
+            1,
+            size,
+            new Vector2(1f, 1f),
+            0f
+        );
+    }
+
+    private Vector2 getFacingOffset() {
+        Facing facing = Facing.MAPPER.get(player);
+        if (facing == null) return new Vector2(0f, -1f);
+
+        return switch (facing.getDirection()) {
+            case LEFT -> new Vector2(-1f, 0f);
+            case RIGHT -> new Vector2(1f, 0f);
+            case UP -> new Vector2(0f, 1f);
+            case DOWN -> new Vector2(0f, -1f);
+        };
     }
 
     private void onMoveEntity(DragAndDropEvent event) {
@@ -206,6 +268,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     @Override
     public void dispose() {
         eventBus.unsubscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.unsubscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.unsubscribe(SplitStackEvent.class, this::onSplitStack);
     }
 }
