@@ -10,6 +10,7 @@ public class Equipment implements Component {
     public static final ComponentMapper<Equipment> MAPPER = ComponentMapper.getFor(Equipment.class);
 
     private final ObjectMap<ItemCategory, Entity> equippedSlots = new ObjectMap<>();
+    private boolean dirty = true;
 
     public ObjectMap<ItemCategory, Entity> getEquippedSlots() {
         return equippedSlots;
@@ -25,11 +26,13 @@ public class Equipment implements Component {
             setEquippedState(previous, false);
         }
         if (itemEntity == null) {
+            dirty = true;
             equippedSlots.remove(slot);
             return previous;
         }
         equippedSlots.put(slot, itemEntity);
         setEquippedState(itemEntity, true);
+        dirty = true;
         return previous;
     }
 
@@ -38,6 +41,7 @@ public class Equipment implements Component {
         if (previous != null) {
             setEquippedState(previous, false);
         }
+        dirty = true;
         return previous;
     }
 
@@ -46,5 +50,11 @@ public class Equipment implements Component {
         if (item != null) {
             item.setEquipped(equipped);
         }
+    }
+
+    public boolean consumeDirty() {
+        if (!dirty) return false;
+        dirty = false;
+        return true;
     }
 }

@@ -7,6 +7,8 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.component.Equipment;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.StatModifierComponent;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.StatRecalcEvent;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemCategory;
@@ -22,8 +24,11 @@ public class EquipmentStatModifierSystem extends IteratingSystem {
     private static final String ITEM_SOURCE_PREFIX = "item:";
     private static final Map<String, StatType> STAT_TYPE_LOOKUP = buildStatTypeLookup();
 
-    public EquipmentStatModifierSystem() {
+    private final GameEventBus eventBus;
+
+    public EquipmentStatModifierSystem(GameEventBus eventBus) {
         super(Family.all(Equipment.class, StatModifierComponent.class).get());
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -31,6 +36,7 @@ public class EquipmentStatModifierSystem extends IteratingSystem {
         Equipment equipment = Equipment.MAPPER.get(entity);
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
         if (equipment == null || modifiers == null) return;
+        if (!equipment.consumeDirty()) return;
 
         modifiers.removeModifiersBySourcePrefix(ITEM_SOURCE_PREFIX);
 
@@ -58,6 +64,7 @@ public class EquipmentStatModifierSystem extends IteratingSystem {
                 ));
             }
         }
+        eventBus.fire(new StatRecalcEvent(entity));
     }
 
     private static Map<String, StatType> buildStatTypeLookup() {
