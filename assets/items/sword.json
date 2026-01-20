@@ -3,5 +3,11 @@
     "name": "Iron Sword",
     "category": "WEAPON",
     "maxStack": 1,
-    "icon": "sword"
+    "icon": "sword",
+    "statModifiers": [
+        {
+            "stat": "attack",
+            "additive": 5
+        }
+    ]
 }

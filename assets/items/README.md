@@ -25,6 +25,8 @@ item references to the `undefined` id.
 
 - `stats` (object): map of stat name → float value (example: `{"attack": 6}`). Stat names must exist in
   `assets/stats/index.json` to keep stat keys centralized.
+- `statModifiers` (array): list of stat modifier objects. Each entry must include a `stat` key plus at
+  least one of `additive` or `multiplier`. Stat names must exist in `assets/stats/index.json`.
 
 ## Example: stackable material
 
@@ -52,6 +54,30 @@ item references to the `undefined` id.
   "icon": "sword",
   "stats": {
     "attack": 6
-  }
+  },
+  "statModifiers": [
+    {
+      "stat": "attack",
+      "additive": 5
+    }
+  ]
+}
+```
+
+## Example: multiplier modifier
+
+```json
+{
+  "id": "stamina_necklace",
+  "name": "Stamina Necklace",
+  "category": "NECKLACE",
+  "maxStack": 1,
+  "icon": "necklace",
+  "statModifiers": [
+    {
+      "stat": "stamina",
+      "multiplier": 1.1
+    }
+  ]
 }
 ```

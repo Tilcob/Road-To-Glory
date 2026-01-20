@@ -3,5 +3,6 @@
     "burn_time",
     "damage",
     "life_regeneration",
-    "max_life"
+    "max_life",
+    "stamina"
 ]

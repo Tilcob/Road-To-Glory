@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.github.tilcob.game.stat.StatCatalog;
 import com.github.tilcob.game.stat.StatKey;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -53,8 +54,9 @@ public final class ItemLoader {
             }
             String icon = requireString(root, "icon", file);
             Map<StatKey, Float> stats = parseStats(root.get("stats"), file);
+            List<ItemStatModifier> statModifiers = parseStatModifiers(root.get("statModifiers"), file);
 
-            definitions.put(id, new ItemDefinition(id, name, category, maxStack, icon, stats));
+            definitions.put(id, new ItemDefinition(id, name, category, maxStack, icon, stats, statModifiers));
         }
 
         return List.copyOf(definitions.values());
@@ -97,5 +99,34 @@ public final class ItemLoader {
             stats.put(key, stat.asFloat());
         }
         return stats;
+    }
+
+    private static List<ItemStatModifier> parseStatModifiers(JsonValue modifiersValue, FileHandle file) {
+        if (modifiersValue == null || modifiersValue.isNull()) {
+            return List.of();
+        }
+        if (!modifiersValue.isArray()) {
+            throw new IllegalArgumentException("Item statModifiers must be a JSON array in " + file.path());
+        }
+        List<ItemStatModifier> modifiers = new ArrayList<>();
+        for (JsonValue entry = modifiersValue.child; entry != null; entry = entry.next) {
+            if (!entry.isObject()) {
+                throw new IllegalArgumentException("Item statModifiers entry must be an object in " + file.path());
+            }
+            String statId = entry.getString("stat", "").trim();
+            if (statId.isBlank()) {
+                throw new IllegalArgumentException("Item statModifiers entry missing 'stat' in " + file.path());
+            }
+            boolean hasAdditive = entry.has("additive");
+            boolean hasMultiplier = entry.has("multiplier");
+            if (!hasAdditive && !hasMultiplier) {
+                throw new IllegalArgumentException("Item statModifiers entry must include additive or multiplier in " + file.path());
+            }
+            float additive = hasAdditive ? entry.getFloat("additive") : 0f;
+            float multiplier = hasMultiplier ? entry.getFloat("multiplier") : 1f;
+            StatKey key = StatCatalog.require(statId, file);
+            modifiers.add(new ItemStatModifier(key, additive, multiplier));
+        }
+        return List.copyOf(modifiers);
     }
 }
