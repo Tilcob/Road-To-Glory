@@ -15,9 +15,12 @@ import com.github.tilcob.game.ui.inventory.InventorySlotTarget;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.ItemModel;
 
+import java.util.EnumMap;
+
 public class InventoryView extends View<InventoryViewModel> {
     private Table inventoryRoot;
     private InventorySlot[][] slots;
+    private EnumMap<ItemCategory, InventorySlot> equipmentSlots;
     private Table questLog;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
@@ -27,6 +30,7 @@ public class InventoryView extends View<InventoryViewModel> {
     @Override
     protected void setupUI() {
         slots = new InventorySlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
+        equipmentSlots = new EnumMap<>(ItemCategory.class);
         dragAndDrop = new InventoryDragAndDrop();
 
         inventoryRoot = new Table();
@@ -72,7 +76,9 @@ public class InventoryView extends View<InventoryViewModel> {
         int columns = 4;
         for (int i = 0; i < equipmentCategories.length; i++) {
             ItemCategory category = equipmentCategories[i];
-            equipmentGrid.add(buildEquipmentSlot(category)).size(35, 35).pad(2.0f);
+            InventorySlot equipmentSlot = new InventorySlot(-1, skin, viewModel.getEventBus());
+            equipmentSlots.put(category, equipmentSlot);
+            equipmentGrid.add(buildEquipmentSlot(category, equipmentSlot)).size(35, 35).pad(2.0f);
             if ((i + 1) % columns == 0) {
                 equipmentGrid.row();
             }
@@ -126,26 +132,29 @@ public class InventoryView extends View<InventoryViewModel> {
     private void updatePlayerItems(Array<ItemModel> array) {
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
-                InventorySlot slot = slots[i][j];
-                Actor actor = slot.findActor("itemId");
-                if (actor != null) actor.remove();
-                slot.setCount(0);
+                clearSlot(slots[i][j]);
             }
         }
 
+        for (InventorySlot equipmentSlot : equipmentSlots.values()) {
+            clearSlot(equipmentSlot);
+        }
+
         for (ItemModel item : array) {
+            if (item.isEquipped()) {
+                InventorySlot equipmentSlot = equipmentSlots.get(item.getCategory());
+                if (equipmentSlot == null) continue;
+                renderItemInSlot(item, equipmentSlot);
+                continue;
+            }
+
             int idx = item.getSlotIdx();
             int row = idx / Constants.INVENTORY_COLUMNS;
             int col = idx % Constants.INVENTORY_COLUMNS;
+            if (row < 0 || row >= Constants.INVENTORY_ROWS || col < 0) continue;
 
             InventorySlot slot = slots[row][col];
-            Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
-            itemImage.setName("itemId");
-            itemImage.setScaling(Scaling.fit);
-
-            slot.add(itemImage);
-            slot.setCount(item.getCount());
-            slot.getCountTable().toFront();
+            Image itemImage = renderItemInSlot(item, slot);
 
             dragAndDrop.addSource(new InventoryItemSource(itemImage, item.getSlotIdx(), viewModel.getEventBus()));
         }
@@ -155,10 +164,9 @@ public class InventoryView extends View<InventoryViewModel> {
         inventoryRoot.setVisible(isVisible);
     }
 
-    private Stack buildEquipmentSlot(ItemCategory category) {
+    private Stack buildEquipmentSlot(ItemCategory category, InventorySlot slot) {
         Stack stack = new Stack();
-        Image image = new Image(skin.getDrawable("Other_panel_border_brown_detail"));
-        stack.add(image);
+        stack.add(slot);
 
         Label label = new Label(category.name(), skin, "text_08");
         label.setColor(skin.getColor("BLACK"));
@@ -168,5 +176,22 @@ public class InventoryView extends View<InventoryViewModel> {
         stack.add(labelTable);
 
         return stack;
+    }
+
+    private void clearSlot(InventorySlot slot) {
+        Actor actor = slot.findActor("itemId");
+        if (actor != null) actor.remove();
+        slot.setCount(0);
+    }
+
+    private Image renderItemInSlot(ItemModel item, InventorySlot slot) {
+        Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
+        itemImage.setName("itemId");
+        itemImage.setScaling(Scaling.fit);
+
+        slot.add(itemImage);
+        slot.setCount(item.getCount());
+        slot.getCountTable().toFront();
+        return itemImage;
     }
 }
