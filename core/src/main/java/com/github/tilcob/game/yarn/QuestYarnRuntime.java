@@ -47,7 +47,7 @@ public class QuestYarnRuntime {
     }
 
     public boolean executeNode(Entity player, String nodeId) {
-        DialogNode node = findNode(nodeId);
+        DialogNode node = findNode(nodeId, true);
         if (node == null) return false;
         Array<String> lines = node.lines();
         if (lines == null) return false;
@@ -87,6 +87,10 @@ public class QuestYarnRuntime {
         return scoped == null ? null : scoped.get(name);
     }
 
+    public boolean hasNode(String nodeId) {
+        return findNode(nodeId, false) != null;
+    }
+
     private boolean isIfLine(String line) {
         return line.startsWith("<<if ") && line.endsWith(">>");
     }
@@ -121,13 +125,15 @@ public class QuestYarnRuntime {
         return scoped;
     }
 
-    private DialogNode findNode(String nodeId) {
+    private DialogNode findNode(String nodeId, boolean logMissing) {
         if (nodeId == null || nodeId.isBlank()) return null;
         DialogNode node = getDialogNode(allDialogs, nodeId);
         if (node != null) return node;
         node = getDialogNode(allQuestDialogs, nodeId);
         if (node != null) return node;
-        if (Gdx.app != null) Gdx.app.debug(TAG, "Quest Yarn node not found: " + nodeId);
+        if (logMissing && Gdx.app != null) {
+            Gdx.app.debug(TAG, "Quest Yarn node not found: " + nodeId);
+        }
         return null;
     }
 
