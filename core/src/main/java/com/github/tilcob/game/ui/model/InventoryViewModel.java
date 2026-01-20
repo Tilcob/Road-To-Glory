@@ -22,6 +22,7 @@ public class InventoryViewModel extends ViewModel {
         super(services);
 
         getEventBus().subscribe(UpdateInventoryEvent.class, this::updateInventory);
+        getEventBus().subscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().subscribe(UiEvent.class, this::onUiEvent);
         getEventBus().subscribe(InventoryFullEvent.class, this::onFullInventory);
@@ -35,11 +36,11 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void updateInventory(UpdateInventoryEvent updateInventoryEvent) {
-        Inventory inventory = Inventory.MAPPER.get(updateInventoryEvent.player());
-        if (inventory == null) return;
-        items.clear();
-        onAddItem(inventory.getItems());
-        propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
+        rebuildInventory(updateInventoryEvent.player());
+    }
+
+    private void updateEquipment(UpdateEquipmentEvent updateEquipmentEvent) {
+        rebuildInventory(updateEquipmentEvent.player());
     }
 
     private void onEntityAddItemEvent(EntityAddItemEvent event) {
@@ -78,6 +79,14 @@ public class InventoryViewModel extends ViewModel {
         }
     }
 
+    private void rebuildInventory(Entity player) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        if (inventory == null) return;
+        items.clear();
+        onAddItem(inventory.getItems());
+        propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
+    }
+
     private void onFullInventory(InventoryFullEvent inventoryFullEvent) {
 
     }
@@ -107,6 +116,7 @@ public class InventoryViewModel extends ViewModel {
     @Override
     public void dispose() {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
+        getEventBus().unsubscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().unsubscribe(UiEvent.class, this::onUiEvent);
         getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);

@@ -10,6 +10,7 @@ import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.UpdateEquipmentEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;
@@ -57,6 +58,7 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
             }
         }
         eventBus.fire(new UpdateInventoryEvent(player));
+        eventBus.fire(new UpdateEquipmentEvent(player));
     }
 
     private void handleUnequip(ItemCategory category, Inventory inventory, Equipment equipment) {
@@ -71,6 +73,7 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
             item.setSlotIndex(emptySlot);
         }
         eventBus.fire(new UpdateInventoryEvent(player));
+        eventBus.fire(new UpdateEquipmentEvent(player));
     }
 
     private int emptySlotIndex(Inventory inventory) {
