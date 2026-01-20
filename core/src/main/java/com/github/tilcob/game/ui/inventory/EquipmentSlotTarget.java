@@ -1,7 +1,7 @@
 package com.github.tilcob.game.ui.inventory;
 
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.github.tilcob.game.event.EquipmentDropEvent;
+import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemCategory;
 
@@ -24,6 +24,6 @@ public class EquipmentSlotTarget extends DragAndDrop.Target {
     public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
         InventoryItemSource itemSource = (InventoryItemSource) payload.getObject();
         int fromIdx = itemSource.getFromIdx();
-        eventBus.fire(new EquipmentDropEvent(category, fromIdx));
+        eventBus.fire(new EquipItemEvent(category, fromIdx));
     }
 }

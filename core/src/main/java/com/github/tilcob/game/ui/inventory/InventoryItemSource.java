@@ -4,7 +4,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.InventoryDropEvent;
 
 
 public class InventoryItemSource extends DragAndDrop.Source {
@@ -27,11 +26,11 @@ public class InventoryItemSource extends DragAndDrop.Source {
         return payload;
     }
 
-    @Override
-    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-        if (target != null) return;
-        eventBus.fire(new InventoryDropEvent(fromIdx));
-    }
+//    @Override
+//    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
+//        if (target != null) return;
+//        eventBus.fire(new InventoryDropEvent(fromIdx));
+//    }
 
     public Image getImage() {
         return image;

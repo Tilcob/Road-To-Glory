@@ -115,6 +115,7 @@ public class GameScreenModule {
             new InventorySystem(services.getEventBus(), services.getQuestManager(), skin),
             SystemOrder.GAMEPLAY
         ));
+        engine.addSystem(withPriority(new EquipmentSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new EquipmentStatModifierSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new StatModifierDurationSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new LevelUpSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
