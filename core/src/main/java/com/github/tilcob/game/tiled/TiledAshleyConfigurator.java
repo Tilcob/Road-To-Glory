@@ -96,6 +96,7 @@ public class TiledAshleyConfigurator {
         entity.add(new WanderTimer());
         entity.add(new AggroMemory());
         entity.add(new Equipment());
+        entity.add(new StatModifierComponent());
         Transform transform = Transform.MAPPER.get(entity);
         if (transform != null) {
             entity.add(new SpawnPoint(transform.getPosition()));

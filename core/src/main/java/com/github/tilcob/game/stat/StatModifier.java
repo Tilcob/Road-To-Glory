@@ -4,11 +4,11 @@ public class StatModifier {
     private StatType statType;
     private float additive;
     private float multiplier;
-    private StatModifierSource source;
+    private String source;
     private Float durationSeconds;
     private Long expireTimeEpochMs;
 
-    public StatModifier(StatType statType, float additive, float multiplier, StatModifierSource source) {
+    public StatModifier(StatType statType, float additive, float multiplier, String source) {
         this.statType = statType;
         this.additive = additive;
         this.multiplier = multiplier;
@@ -19,7 +19,7 @@ public class StatModifier {
         StatType statType,
         float additive,
         float multiplier,
-        StatModifierSource source,
+        String source,
         Float durationSeconds,
         Long expireTimeEpochMs
     ) {
@@ -55,11 +55,11 @@ public class StatModifier {
         this.multiplier = multiplier;
     }
 
-    public StatModifierSource getSource() {
+    public String getSource() {
         return source;
     }
 
-    public void setSource(StatModifierSource source) {
+    public void setSource(String source) {
         this.source = source;
     }
 
