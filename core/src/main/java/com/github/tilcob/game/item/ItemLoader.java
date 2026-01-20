@@ -4,6 +4,8 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
+import com.github.tilcob.game.stat.StatCatalog;
+import com.github.tilcob.game.stat.StatKey;
 
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,7 @@ public final class ItemLoader {
                 throw new IllegalArgumentException("Item maxStack must be >= 1 in " + file.path());
             }
             String icon = requireString(root, "icon", file);
-            Map<String, Float> stats = parseStats(root.get("stats"), file);
+            Map<StatKey, Float> stats = parseStats(root.get("stats"), file);
 
             definitions.put(id, new ItemDefinition(id, name, category, maxStack, icon, stats));
         }
@@ -82,16 +84,17 @@ public final class ItemLoader {
         }
     }
 
-    private static Map<String, Float> parseStats(JsonValue statsValue, FileHandle file) {
+    private static Map<StatKey, Float> parseStats(JsonValue statsValue, FileHandle file) {
         if (statsValue == null || statsValue.isNull()) {
             return Map.of();
         }
-        Map<String, Float> stats = new HashMap<>();
+        Map<StatKey, Float> stats = new HashMap<>();
         for (JsonValue stat = statsValue.child; stat != null; stat = stat.next) {
             if (stat.name() == null || stat.name().isBlank()) {
                 throw new IllegalArgumentException("Invalid stat entry in " + file.path());
             }
-            stats.put(stat.name(), stat.asFloat());
+            StatKey key = StatCatalog.require(stat.name(), file);
+            stats.put(key, stat.asFloat());
         }
         return stats;
     }

@@ -23,7 +23,8 @@ item references to the `undefined` id.
 
 ## Optional fields
 
-- `stats` (object): map of stat name → float value (example: `{"attack": 6}`).
+- `stats` (object): map of stat name → float value (example: `{"attack": 6}`). Stat names must exist in
+  `assets/stats/index.json` to keep stat keys centralized.
 
 ## Example: stackable material
 
