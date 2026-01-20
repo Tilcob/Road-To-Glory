@@ -17,7 +17,7 @@ import java.util.EnumMap;
 public class InventoryView extends View<InventoryViewModel> {
     private Table inventoryRoot;
     private InventorySlot[][] slots;
-    private EnumMap<ItemCategory, InventorySlot> equipmentSlots;
+    private EnumMap<ItemCategory, EquipmentSlot> equipmentSlots;
     private Table questLog;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
@@ -73,7 +73,7 @@ public class InventoryView extends View<InventoryViewModel> {
         int columns = 4;
         for (int i = 0; i < equipmentCategories.length; i++) {
             ItemCategory category = equipmentCategories[i];
-            InventorySlot equipmentSlot = new InventorySlot(-1, skin, viewModel.getEventBus());
+            EquipmentSlot equipmentSlot = new EquipmentSlot(skin);
             equipmentSlots.put(category, equipmentSlot);
             equipmentGrid.add(buildEquipmentSlot(category, equipmentSlot)).size(35, 35).pad(2.0f);
             if ((i + 1) % columns == 0) {
@@ -103,7 +103,7 @@ public class InventoryView extends View<InventoryViewModel> {
         }
 
         for (ItemCategory category : equipmentSlots.keySet()) {
-            InventorySlot slot = equipmentSlots.get(category);
+            EquipmentSlot slot = equipmentSlots.get(category);
             dragAndDrop.addTarget(new EquipmentSlotTarget(slot, category, viewModel.getEventBus()));
         }
     }
@@ -138,15 +138,16 @@ public class InventoryView extends View<InventoryViewModel> {
             }
         }
 
-        for (InventorySlot equipmentSlot : equipmentSlots.values()) {
+        for (EquipmentSlot equipmentSlot : equipmentSlots.values()) {
             clearSlot(equipmentSlot);
         }
 
         for (ItemModel item : array) {
             if (item.isEquipped()) {
-                InventorySlot equipmentSlot = equipmentSlots.get(item.getCategory());
+                EquipmentSlot equipmentSlot = equipmentSlots.get(item.getCategory());
                 if (equipmentSlot == null) continue;
-                renderItemInSlot(item, equipmentSlot);
+                Image itemImage = renderItemInSlot(item, equipmentSlot);
+                dragAndDrop.addSource(new EquipmentItemSource(itemImage, item.getSlotIdx(), item.getCategory()));
                 continue;
             }
 
@@ -166,7 +167,7 @@ public class InventoryView extends View<InventoryViewModel> {
         inventoryRoot.setVisible(isVisible);
     }
 
-    private Stack buildEquipmentSlot(ItemCategory category, InventorySlot slot) {
+    private Stack buildEquipmentSlot(ItemCategory category, EquipmentSlot slot) {
         Stack stack = new Stack();
         stack.add(slot);
 
@@ -180,20 +181,24 @@ public class InventoryView extends View<InventoryViewModel> {
         return stack;
     }
 
-    private void clearSlot(InventorySlot slot) {
+    private void clearSlot(Stack slot) {
         Actor actor = slot.findActor("itemId");
         if (actor != null) actor.remove();
-        slot.setCount(0);
+        if (slot instanceof InventorySlot inventorySlot) {
+            inventorySlot.setCount(0);
+        }
     }
 
-    private Image renderItemInSlot(ItemModel item, InventorySlot slot) {
+    private Image renderItemInSlot(ItemModel item, Stack slot) {
         Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
         itemImage.setName("itemId");
         itemImage.setScaling(Scaling.fit);
 
         slot.add(itemImage);
-        slot.setCount(item.getCount());
-        slot.getCountTable().toFront();
+        if (slot instanceof InventorySlot inventorySlot) {
+            inventorySlot.setCount(item.getCount());
+            inventorySlot.getCountTable().toFront();
+        }
         return itemImage;
     }
 }

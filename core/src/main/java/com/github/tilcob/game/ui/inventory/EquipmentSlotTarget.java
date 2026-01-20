@@ -9,7 +9,7 @@ public class EquipmentSlotTarget extends DragAndDrop.Target {
     private final ItemCategory category;
     private final GameEventBus eventBus;
 
-    public EquipmentSlotTarget(InventorySlot slot, ItemCategory category, GameEventBus eventBus) {
+    public EquipmentSlotTarget(EquipmentSlot slot, ItemCategory category, GameEventBus eventBus) {
         super(slot);
         this.category = category;
         this.eventBus = eventBus;
@@ -17,13 +17,12 @@ public class EquipmentSlotTarget extends DragAndDrop.Target {
 
     @Override
     public boolean drag(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
-        return true;
+        return payload.getObject() instanceof InventoryItemSource;
     }
 
     @Override
     public void drop(DragAndDrop.Source source, DragAndDrop.Payload payload, float x, float y, int pointer) {
         InventoryItemSource itemSource = (InventoryItemSource) payload.getObject();
-        int fromIdx = itemSource.getFromIdx();
-        eventBus.fire(new EquipItemEvent(category, fromIdx));
+        eventBus.fire(new EquipItemEvent(category, itemSource.getFromIdx()));
     }
 }

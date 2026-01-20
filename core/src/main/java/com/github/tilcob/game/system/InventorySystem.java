@@ -30,6 +30,8 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         this.skin = skin;
 
         eventBus.subscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.subscribe(EquipItemEvent.class, this::onEquipItem);
+        eventBus.subscribe(UnequipItemEvent.class, this::onUnequipItem);
         eventBus.subscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
     }
@@ -188,6 +190,47 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         eventBus.fire(new UpdateInventoryEvent(player));
     }
 
+    private void onEquipItem(EquipItemEvent event) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        Equipment equipment = Equipment.MAPPER.get(player);
+        if (inventory == null || equipment == null) return;
+
+        Entity itemEntity = findItemAtSlot(inventory, event.fromIndex());
+        if (itemEntity == null) return;
+
+        Item item = Item.MAPPER.get(itemEntity);
+        ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
+        if (definition == null || definition.category() != event.category()) return;
+
+        equipment.equip(event.category(), itemEntity);
+        eventBus.fire(new UpdateInventoryEvent(player));
+    }
+
+    private void onUnequipItem(UnequipItemEvent event) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        Equipment equipment = Equipment.MAPPER.get(player);
+        if (inventory == null || equipment == null) return;
+
+        Entity equippedEntity = equipment.getEquipped(event.category());
+        if (equippedEntity == null) return;
+
+        equipment.unequip(event.category());
+
+        Item from = Item.MAPPER.get(equippedEntity);
+        if (from == null) return;
+
+        Entity toEntity = findItemAtSlot(inventory, event.toIndex());
+        if (toEntity == equippedEntity) return;
+
+        if (tryStack(equippedEntity, from, toEntity, inventory)) {
+            eventBus.fire(new UpdateInventoryEvent(player));
+            return;
+        }
+
+        swapOrMove(from, toEntity, from.getSlotIndex(), event.toIndex());
+        eventBus.fire(new UpdateInventoryEvent(player));
+    }
+
     private void swapOrMove(Item from, Entity toEntity, int fromSlot, int toSlot) {
         if (toEntity != null) {
             Item to = Item.MAPPER.get(toEntity);
@@ -268,6 +311,8 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     @Override
     public void dispose() {
         eventBus.unsubscribe(DragAndDropEvent.class, this::onMoveEntity);
+        eventBus.unsubscribe(EquipItemEvent.class, this::onEquipItem);
+        eventBus.unsubscribe(UnequipItemEvent.class, this::onUnequipItem);
         eventBus.unsubscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.unsubscribe(SplitStackEvent.class, this::onSplitStack);
     }
