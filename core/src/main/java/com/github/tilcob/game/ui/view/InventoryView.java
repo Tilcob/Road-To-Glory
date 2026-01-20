@@ -8,10 +8,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
-import com.github.tilcob.game.ui.inventory.InventoryItemSource;
-import com.github.tilcob.game.ui.inventory.InventorySlot;
-import com.github.tilcob.game.ui.inventory.InventorySlotTarget;
+import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.ItemModel;
 
@@ -103,6 +100,11 @@ public class InventoryView extends View<InventoryViewModel> {
                 InventorySlot slot = slots[i][j];
                 dragAndDrop.addTarget(new InventorySlotTarget(slot, viewModel.getEventBus()));
             }
+        }
+
+        for (ItemCategory category : equipmentSlots.keySet()) {
+            InventorySlot slot = equipmentSlots.get(category);
+            dragAndDrop.addTarget(new EquipmentSlotTarget(slot, category, viewModel.getEventBus()));
         }
     }
 
