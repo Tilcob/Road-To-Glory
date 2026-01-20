@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.InventoryItemSource;
@@ -51,6 +52,33 @@ public class InventoryView extends View<InventoryViewModel> {
         table1.add(contentTable).pad(5.0f);
         inventoryRoot.add(table1);
         stage.addActor(inventoryRoot);
+
+        Table equipmentTable = new Table();
+        equipmentTable.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label equipmentLabel = new Label("Equipment", skin, "text_12");
+        equipmentLabel.setColor(skin.getColor("BLACK"));
+        equipmentTable.add(equipmentLabel).row();
+        Table equipmentGrid = new Table();
+        ItemCategory[] equipmentCategories = {
+            ItemCategory.HELMET,
+            ItemCategory.ARMOR,
+            ItemCategory.WEAPON,
+            ItemCategory.SHIELD,
+            ItemCategory.BOOTS,
+            ItemCategory.NECKLACE,
+            ItemCategory.BRACELET,
+            ItemCategory.RING
+        };
+        int columns = 4;
+        for (int i = 0; i < equipmentCategories.length; i++) {
+            ItemCategory category = equipmentCategories[i];
+            equipmentGrid.add(buildEquipmentSlot(category)).size(35, 35).pad(2.0f);
+            if ((i + 1) % columns == 0) {
+                equipmentGrid.row();
+            }
+        }
+        equipmentTable.add(equipmentGrid).pad(5.0f);
+        inventoryRoot.add(equipmentTable).pad(5.0f);
 
         Table scrollTable = new Table();
         scrollTable.setBackground(skin.getDrawable("Other_panel_brown"));
@@ -125,5 +153,20 @@ public class InventoryView extends View<InventoryViewModel> {
 
     private void setInventoryVisibility(boolean isVisible) {
         inventoryRoot.setVisible(isVisible);
+    }
+
+    private Stack buildEquipmentSlot(ItemCategory category) {
+        Stack stack = new Stack();
+        Image image = new Image(skin.getDrawable("Other_panel_border_brown_detail"));
+        stack.add(image);
+
+        Label label = new Label(category.name(), skin, "text_08");
+        label.setColor(skin.getColor("BLACK"));
+        Table labelTable = new Table();
+        labelTable.setFillParent(true);
+        labelTable.add(label).center();
+        stack.add(labelTable);
+
+        return stack;
     }
 }
