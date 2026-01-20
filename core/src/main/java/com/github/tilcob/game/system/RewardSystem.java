@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
-import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestRewardService;
 
 public class RewardSystem extends EntitySystem implements Disposable {

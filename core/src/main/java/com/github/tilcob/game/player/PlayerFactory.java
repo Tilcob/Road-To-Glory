@@ -50,6 +50,9 @@ public class PlayerFactory {
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new AnimationFsm(entity));
         entity.add(new Inventory());
+        entity.add(new Equipment());
+        entity.add(new StatComponent());
+        entity.add(new StatModifierComponent());
         entity.add(new QuestLog());
         entity.add(new DialogFlags());
         entity.add(new Wallet());

@@ -1,14 +1,14 @@
 package com.github.tilcob.game.quest;
 
 import com.badlogic.ashley.core.Entity;
-import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
-import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.QuestCompletedEvent;
+import com.github.tilcob.game.event.QuestRewardEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
 import java.util.Map;

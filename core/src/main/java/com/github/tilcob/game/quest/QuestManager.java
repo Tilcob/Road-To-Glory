@@ -44,7 +44,10 @@ public class QuestManager {
             }
         }
         if (!handled) {
-            executeNode(player, "on_" + eventType);
+            String fallbackNode = "on_" + eventType;
+            if (questYarnRuntime.hasNode(fallbackNode)) {
+                executeNode(player, fallbackNode);
+            }
         }
     }
 

@@ -3,5 +3,11 @@
     "name": "Necklace",
     "category": "NECKLACE",
     "maxStack": 1,
-    "icon": "necklace"
+    "icon": "necklace",
+    "statModifiers": [
+        {
+            "stat": "stamina",
+            "multiplier": 1.1
+        }
+    ]
 }

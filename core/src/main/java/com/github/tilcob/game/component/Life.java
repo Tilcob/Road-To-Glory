@@ -7,12 +7,16 @@ import com.badlogic.gdx.math.MathUtils;
 public class Life implements Component {
     public static final ComponentMapper<Life> MAPPER = ComponentMapper.getFor(Life.class);
 
+    private final float baseMaxLife;
+    private final float baseLifePerSec;
     private float maxLife;
     private float life;
     private float lifePerSec;
 
     public Life(float maxLife, float lifePerSec) {
         this.maxLife = maxLife;
+        this.baseMaxLife = maxLife;
+        this.baseLifePerSec = lifePerSec;
         this.life = maxLife;
         this.lifePerSec = lifePerSec;
     }
@@ -25,6 +29,10 @@ public class Life implements Component {
         return lifePerSec;
     }
 
+    public void setLifePerSec(float lifePerSec) {
+        this.lifePerSec = lifePerSec;
+    }
+
     public float getLife() {
         return life;
     }
@@ -33,7 +41,19 @@ public class Life implements Component {
         this.life = life;
     }
 
+    public float getBaseMaxLife() {
+        return baseMaxLife;
+    }
+
+    public float getBaseLifePerSec() {
+        return baseLifePerSec;
+    }
+
     public float getMaxLife() {
         return maxLife;
+    }
+
+    public void setMaxLife(float maxLife) {
+        this.maxLife = maxLife;
     }
 }

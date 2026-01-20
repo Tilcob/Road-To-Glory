@@ -53,7 +53,7 @@ public class GameServices {
         this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
-        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allQuestDialogs);
+        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
         this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));

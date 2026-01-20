@@ -3,19 +3,18 @@ package com.github.tilcob.game.ui.inventory;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
-import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.item.ItemCategory;
 
-
-public class InventoryItemSource extends DragAndDrop.Source {
+public class EquipmentItemSource extends DragAndDrop.Source {
     private final Image image;
     private final int fromIdx;
-    private final GameEventBus eventBus;
+    private final ItemCategory category;
 
-    public InventoryItemSource(Image image, int fromIdx, GameEventBus eventBus) {
+    public EquipmentItemSource(Image image, int fromIdx, ItemCategory category) {
         super(image);
         this.image = image;
         this.fromIdx = fromIdx;
-        this.eventBus = eventBus;
+        this.category = category;
     }
 
     @Override
@@ -26,17 +25,11 @@ public class InventoryItemSource extends DragAndDrop.Source {
         return payload;
     }
 
-//    @Override
-//    public void dragStop(InputEvent event, float x, float y, int pointer, DragAndDrop.Payload payload, DragAndDrop.Target target) {
-//        if (target != null) return;
-//        eventBus.fire(new InventoryDropEvent(fromIdx));
-//    }
-
-    public Image getImage() {
-        return image;
-    }
-
     public int getFromIdx() {
         return fromIdx;
+    }
+
+    public ItemCategory getCategory() {
+        return category;
     }
 }
