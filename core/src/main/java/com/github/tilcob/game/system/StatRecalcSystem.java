@@ -6,10 +6,12 @@ import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.Id;
+import com.github.tilcob.game.component.Player;
 import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.StatRecalcEvent;
+import com.github.tilcob.game.stat.StatApplier;
 import com.github.tilcob.game.stat.StatModifier;
 import com.github.tilcob.game.stat.StatType;
 
@@ -43,6 +45,7 @@ public class StatRecalcSystem extends EntitySystem implements Disposable {
             float total = getTotal(type, modifiers, base);
             stats.setFinalStat(type, total);
         }
+        StatApplier.apply(entity, stats);
 
         if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
             logStats(entity, stats, modifiers);
@@ -71,7 +74,8 @@ public class StatRecalcSystem extends EntitySystem implements Disposable {
         if (id != null) {
             builder.append(id.getId());
         } else {
-            builder.append(entity);
+            if (Player.MAPPER.has(entity)) builder.append("Player");
+            else builder.append(entity);
         }
         builder.append('\n');
         builder.append("BaseStats: ").append(formatStats(stats, true)).append('\n');

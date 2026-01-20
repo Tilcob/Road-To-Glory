@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
@@ -175,6 +176,7 @@ public class InventoryView extends View<InventoryViewModel> {
         label.setColor(skin.getColor("BLACK"));
         Table labelTable = new Table();
         labelTable.setFillParent(true);
+        labelTable.setTouchable(Touchable.disabled);
         labelTable.add(label).center();
         stack.add(labelTable);
 

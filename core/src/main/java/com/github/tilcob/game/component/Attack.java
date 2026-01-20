@@ -8,7 +8,8 @@ import com.github.tilcob.game.config.Constants;
 public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
-    private final float damage;
+    private final float baseDamage;
+    private float damage;
     private float windup;
     private final float cooldown;
     private float attackTimer;
@@ -21,6 +22,7 @@ public class Attack implements Component {
 
     public Attack (float damage, float windup, float cooldown, SoundAsset soundAsset) {
         this.damage = damage;
+        this.baseDamage = damage;
         this.windup = windup;
         this.cooldown = cooldown;
         this.sfx = soundAsset;
@@ -104,8 +106,16 @@ public class Attack implements Component {
         return true;
     }
 
+    public float getBaseDamage() {
+        return baseDamage;
+    }
+
     public float getDamage() {
         return damage;
+    }
+
+    public void setDamage(float damage) {
+        this.damage = damage;
     }
 
     public SoundAsset getSfx() {

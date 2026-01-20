@@ -123,7 +123,7 @@ public final class ItemLoader {
                 throw new IllegalArgumentException("Item statModifiers entry must include additive or multiplier in " + file.path());
             }
             float additive = hasAdditive ? entry.getFloat("additive") : 0f;
-            float multiplier = hasMultiplier ? entry.getFloat("multiplier") : 1f;
+            float multiplier = hasMultiplier ? entry.getFloat("multiplier") : 0f;
             StatKey key = StatCatalog.require(statId, file);
             modifiers.add(new ItemStatModifier(key, additive, multiplier));
         }
