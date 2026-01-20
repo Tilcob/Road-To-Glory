@@ -4,6 +4,7 @@ journalText: Get to know the locals and settle in.
 startNode: q_welcome_to_town_start
 reward_money: 50
 reward_item: sword
+reward_timing: giver
 step: talk Npc-2
 title: q_welcome_to_town_start
 position: -178,-155

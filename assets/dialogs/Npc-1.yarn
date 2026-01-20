@@ -19,21 +19,21 @@ Take care.
 ===
 
 title: quest_notStarted
-tags: quest_Welcome_To_Town, notstarted
+tags: quest_welcome_to_town, notstarted
 position: 210,-214
 ---
 Welcome in our town!
 ===
 
 title: quest_inProgress
-tags: quest_Welcome_To_Town, inprogress
+tags: quest_welcome_to_town, inprogress
 position: -268,-50
 ---
 Are you new here?
 ===
 
 title: quest_completed
-tags: quest_Welcome_To_Town, completed
+tags: quest_welcome_to_town, completed
 position: 11,-23
 ---
 By my friend!
