@@ -3,10 +3,10 @@ tags: start, root
 position: -193,-349
 ---
 Hello, would you like to do a quest?
--> ... (Quest annehmen)
+-> ... (Take Quest)
     <<add_quest welcome_to_town>>
     <<jump quest_notStarted>>
--> ... (Noch nicht)
+-> ... (not now)
     <<jump npc_1_idle>>
 ===
 

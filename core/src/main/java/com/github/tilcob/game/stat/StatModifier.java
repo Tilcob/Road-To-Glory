@@ -1,6 +1,13 @@
 package com.github.tilcob.game.stat;
 
 public class StatModifier {
+    public static String buildBuffSource(String buffId) {
+        if (buffId == null || buffId.isBlank()) {
+            throw new IllegalArgumentException("buffId must not be blank");
+        }
+        return "buff:" + buffId;
+    }
+
     private StatType statType;
     private float additive;
     private float multiplier;

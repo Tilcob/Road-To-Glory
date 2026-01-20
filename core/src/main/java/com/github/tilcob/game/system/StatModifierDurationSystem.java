@@ -10,6 +10,8 @@ import com.github.tilcob.game.event.StatRecalcEvent;
 import com.github.tilcob.game.stat.StatModifier;
 
 public class StatModifierDurationSystem extends IteratingSystem {
+    private static final String BUFF_SOURCE_PREFIX = "buff:";
+
     private final GameEventBus eventBus;
 
     public StatModifierDurationSystem(GameEventBus eventBus) {
@@ -31,6 +33,7 @@ public class StatModifierDurationSystem extends IteratingSystem {
                 removed = true;
                 continue;
             }
+            if (!isBuffSource(modifier.getSource())) continue;
             if (modifier.getDurationSeconds() != null && modifier.getExpireTimeEpochMs() == null) {
                 long durationMs = Math.max(0L, Math.round(modifier.getDurationSeconds() * 1000f));
                 modifier.setExpireTimeEpochMs(now + durationMs);
@@ -45,5 +48,9 @@ public class StatModifierDurationSystem extends IteratingSystem {
         if (removed) {
             eventBus.fire(new StatRecalcEvent(entity));
         }
+    }
+
+    private static boolean isBuffSource(String source) {
+        return source != null && source.startsWith(BUFF_SOURCE_PREFIX);
     }
 }
