@@ -9,3 +9,11 @@ dependencies {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+
+tasks.register("validateQuestContent", JavaExec) {
+  group = "verification"
+  description = "Validates quest and dialog yarn content for missing headers and references."
+  classpath = sourceSets.main.runtimeClasspath
+  mainClass = "com.github.tilcob.game.tools.QuestContentValidator"
+  args = [project.rootDir.toPath().resolve("assets").toString()]
+}

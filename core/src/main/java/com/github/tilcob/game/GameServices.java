@@ -10,6 +10,7 @@ import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
+import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
@@ -46,6 +47,31 @@ public class GameServices {
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
         SaveManager saveManager = new SaveManager(savePath);
+        this.saveService = new SaveService(saveManager, stateManager, chestRegistry);
+        this.assetManager = new AssetManager(resolver);
+        this.audioManager = new AudioManager(assetManager);
+        this.allQuests = new HashMap<>();
+        this.allQuestDialogs = new HashMap<>();
+        this.allDialogs = new HashMap<>();
+        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
+        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
+        this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
+        this.dialogRepository = new DialogRepository(true, "dialogs",
+            Map.of("Shopkeeper", "shopkeeper"));
+        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
+        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
+        this.questManager = new QuestManager(questYarnRuntime);
+    }
+
+    public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
+        this.eventBus = new GameEventBus();
+        this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
+        this.chestRegistry = new ChestRegistry();
+        this.stateManager = new StateManager(new GameState());
+        SaveManager saveManager = new SaveManager(saveDirectory, saveSlot);
         this.saveService = new SaveService(saveManager, stateManager, chestRegistry);
         this.assetManager = new AssetManager(resolver);
         this.audioManager = new AudioManager(assetManager);

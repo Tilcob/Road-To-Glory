@@ -16,6 +16,7 @@ import com.github.tilcob.game.input.InputBindings;
 import com.github.tilcob.game.input.InputBindingsStorage;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardInputDevice;
+import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.screen.LoadingScreen;
 import com.github.tilcob.game.screen.MenuScreen;
 import com.github.tilcob.game.screen.ScreenFactory;
@@ -49,7 +50,8 @@ public class GdxGame extends Game implements ScreenNavigator {
         inputManager.addDevice(new KeyboardInputDevice(bindings));
 
         services = new GameServices(new InternalFileHandleResolver(),
-            Gdx.files.local("savegame.json").path());
+            Gdx.files.local("saves").path(),
+            SaveSlot.SLOT_1);
         services.loadGame();
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
