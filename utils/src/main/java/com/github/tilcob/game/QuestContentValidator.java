@@ -159,10 +159,12 @@ public final class QuestContentValidator {
                     }
                 }
                 case "collect", "kill" -> {
-                    if (parts.length < 3) {
+                    if (parts.length < 2) {
                         errors.add("Step missing args (" + type + ") in " + questFile);
-                    } else if (!isInteger(parts[2])) {
-                        errors.add("Step amount not a number (" + parts[2] + ") in " + questFile);
+                    } else if (parts.length == 3) {
+                        if (!isInteger(parts[2])) {
+                            errors.add("Step '" + step + "' has invalid amount in " + questFile);
+                        }
                     }
                 }
                 default -> errors.add("Unknown step type '" + parts[0] + "' in " + questFile);
