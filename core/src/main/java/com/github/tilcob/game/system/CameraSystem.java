@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.github.tilcob.game.component.CameraPan;
 import com.github.tilcob.game.component.CameraFollow;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
@@ -28,7 +29,16 @@ public class CameraSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Transform transform = Transform.MAPPER.get(entity);
-        calcTargetPosition(transform.getPosition());
+        CameraPan cameraPan = CameraPan.MAPPER.get(entity);
+        if (cameraPan != null) {
+            cameraPan.update(deltaTime);
+            calcTargetPosition(cameraPan.getTarget());
+            if (cameraPan.isComplete()) {
+                entity.remove(CameraPan.class);
+            }
+        } else {
+            calcTargetPosition(transform.getPosition());
+        }
 
         float progress = smoothingFactor * deltaTime;
         float smoothedX = MathUtils.lerp(camera.position.x, targetPosition.x, progress);

@@ -44,6 +44,7 @@ public class TriggerSystem extends IteratingSystem implements Disposable {
         handlers.put(Trigger.Type.CHANGE_MAP, new ChangeMapTriggerHandler());
         handlers.put(Trigger.Type.QUEST, new QuestTrigger(eventBus));
         handlers.put(Trigger.Type.DIALOG, new DialogTrigger());
+        handlers.put(Trigger.Type.CUTSCENE, new CutsceneTrigger(eventBus));
     }
 
     @Override

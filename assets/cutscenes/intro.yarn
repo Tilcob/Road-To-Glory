@@ -1,0 +1,9 @@
+title: Start
+tags: start
+---
+<<lock_player>>
+<<camera_move 5 5 1.5>>
+<<wait 0.5>>
+<<start_dialog Shopkeeper cutscene_intro>>
+<<unlock_player>>
+===

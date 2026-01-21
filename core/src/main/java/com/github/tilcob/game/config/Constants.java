@@ -65,6 +65,7 @@ public class Constants {
     public static final String SPAWN_CLASS = "PlayerSpawn";
     public static final String LOOT = "loot";
     public static final String QUEST_ID = "questId";
+    public static final String CUTSCENE_ID = "cutsceneId";
     public static final String NPC_TYPE = "npcType";
     public static final String DIALOG_REQUEST = "dialog_request";
     public static final String PATROL_POINTS = "patrolPoints";

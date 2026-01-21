@@ -64,16 +64,14 @@ public class TiledAshleyConfigurator {
             region.getRegionWidth(), region.getRegionHeight(),
             object.getScaleX(), object.getScaleY(), entity
         );
-        addEntityController(object, entity);
-        addEntityMove(tile, entity);
-        addEntityAnimation(tile, entity);
+        addEntityMove(object, tile, entity);
+        addEntityAnimation(object, tile, entity);
         BodyDef.BodyType bodyType = getObjectBodyType(tile, object);
         addEntityPhysic(tile.getObjects(), bodyType, Vector2.Zero, entity);
-        addEntityCameraFollow(object, entity);
         addEntityLife(object, tile, entity);
         addEntityAttack(object, tile, entity);
         addEntityChest(object, entity);
-        addEntityNpc(object, entity);
+        addEntityNpc(object, tile, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new AnimationFsm(entity));
         entity.add(new Tiled(object));
@@ -82,11 +80,14 @@ public class TiledAshleyConfigurator {
         engine.addEntity(entity);
     }
 
-    private void addEntityNpc(MapObject object, Entity entity) {
-        String npcTypeStr = object.getProperties().get(Constants.NPC_TYPE, "", String.class);
+    private void addEntityNpc(MapObject object, TiledMapTile tile, Entity entity) {
+        MapProperties properties = object.getProperties();
+        String npcTypeStr = properties.containsKey(Constants.NPC_TYPE)
+            ? properties.get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class)
+            : tile.getProperties().get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class);
         String name = object.getName();
         if (name == null) return;
-        if (npcTypeStr.isBlank() || npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
+        if (npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
         entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
         entity.add(new PlayerReference(null));
@@ -194,14 +195,6 @@ public class TiledAshleyConfigurator {
         entity.add(new Attack(damage, windup, cooldown, soundAsset));
     }
 
-    private void addEntityCameraFollow(TiledMapTileMapObject object, Entity entity) {
-        boolean cameraFollow = object.getProperties().get(Constants.CAMERA_FOLLOW, false, Boolean.class);
-
-        if (!cameraFollow) return;
-
-        entity.add(new CameraFollow());
-    }
-
     private BodyDef.BodyType getObjectBodyType(TiledMapTile tile, MapObject object) {
         String classType = tile.getProperties().get(Constants.TYPE, "", String.class);
         if (Constants.PROP.equals(classType)) return BodyDef.BodyType.StaticBody;
@@ -228,8 +221,11 @@ public class TiledAshleyConfigurator {
         addEntityPhysic(tmpMapObjects, bodyType, relativeTo, entity);
     }
 
-    private void addEntityAnimation(TiledMapTile tile, Entity entity) {
-        String animationStr = tile.getProperties().get(Constants.ANIMATION, "", String.class);
+    private void addEntityAnimation(MapObject object, TiledMapTile tile, Entity entity) {
+        MapProperties properties = object.getProperties();
+        String animationStr = properties.containsKey(Constants.ANIMATION)
+            ? properties.get(Constants.ANIMATION, "", String.class)
+            : tile.getProperties().get(Constants.ANIMATION, "", String.class);
         if (animationStr.isBlank()) return;
 
         Animation2D.AnimationType animationType = Animation2D.AnimationType.valueOf(animationStr);
@@ -243,18 +239,14 @@ public class TiledAshleyConfigurator {
         entity.add(new Animation2D(atlasAsset, atlasKey, animationType, Animation.PlayMode.LOOP, animationSpeed));
     }
 
-    private void addEntityMove(TiledMapTile tile, Entity entity) {
-        float speed = tile.getProperties().get(Constants.SPEED, 0f, Float.class);
+    private void addEntityMove(MapObject object, TiledMapTile tile, Entity entity) {
+        MapProperties properties = object.getProperties();
+        float speed = properties.containsKey(Constants.SPEED)
+            ? properties.get(Constants.SPEED, 0f, Float.class)
+            : tile.getProperties().get(Constants.SPEED, 0f, Float.class);
         if (speed == 0) return;
 
         entity.add(new Move(speed));
-    }
-
-    private void addEntityController(TiledMapTileMapObject object, Entity entity) {
-        boolean controller = object.getProperties().get(Constants.CONTROLLER, false, Boolean.class);
-        if(!controller) return;
-
-        entity.add(new Controller());
     }
 
     private void addEntityTransform(float x, float y, int z, float w, float h,
@@ -409,6 +401,8 @@ public class TiledAshleyConfigurator {
         entity.add(new Trigger(type));
         String questId = properties.get(Constants.QUEST_ID, "", String.class);
         if (!questId.isBlank()) entity.add(new Quest(questId));
+        String cutsceneId = properties.get(Constants.CUTSCENE_ID, "", String.class);
+        if (!cutsceneId.isBlank()) entity.add(new CutsceneReference(cutsceneId));
         entity.add(tile);
         entity.add(new MapEntity());
         engine.addEntity(entity);

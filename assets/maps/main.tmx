@@ -21,7 +21,7 @@
   <object id="4" gid="195" x="365.333" y="89.3333" width="41" height="63"/>
   <object id="5" gid="194" x="346" y="232.667" width="80" height="112"/>
   <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
-  <object id="12" name="Npc-3" gid="197" x="329.333" y="288.667" width="32" height="32">
+  <object id="12" name="Shopkeeper" gid="197" x="329.333" y="288.667" width="32" height="32">
    <properties>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
    </properties>
@@ -57,18 +57,18 @@
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="20"/>
     <property name="npcType" propertytype="NpcType" value="ENEMY"/>
-    <property name="speed" type="float" value="2"/>
+    <property name="speed" type="float" value="1"/>
    </properties>
   </object>
-  <object id="34" gid="197" x="198.667" y="302" width="32" height="32"/>
   <object id="35" name="Npc-4" gid="196" x="306.667" y="234" width="32" height="32">
    <properties>
-    <property name="bodyType" value="StaticBody"/>
+    <property name="bodyType" value="KinematicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
+    <property name="speed" type="float" value="0"/>
    </properties>
   </object>
   <object id="36" name="Npc-5" gid="196" x="28.6667" y="219.333" width="32" height="32">
