@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.SplitStackEvent;
 

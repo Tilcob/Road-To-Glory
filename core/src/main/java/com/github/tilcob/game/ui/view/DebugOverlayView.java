@@ -30,9 +30,9 @@ public class DebugOverlayView extends Table {
 
         setTouchable(Touchable.disabled);
         setFillParent(true);
-        align(Align.topLeft);
+        align(Align.topRight);
         pad(8f);
-        defaults().left();
+        defaults().right();
 
         for (Label label : new Label[] { fpsLabel, entityLabel, systemLabel, saveSlotLabel }) {
             label.setColor(Color.WHITE);
@@ -40,7 +40,6 @@ public class DebugOverlayView extends Table {
         }
 
         pack();
-        setPosition(8f, Gdx.graphics.getHeight() - getHeight() - 8f);
     }
 
     public void update() {
@@ -50,6 +49,5 @@ public class DebugOverlayView extends Table {
         SaveSlot slot = services.getSaveService().getActiveSlot();
         saveSlotLabel.setText("Save Slot: " + (slot == null ? "legacy" : slot.name()));
         pack();
-        setPosition(8f, Gdx.graphics.getHeight() - getHeight() - 8f);
     }
 }
