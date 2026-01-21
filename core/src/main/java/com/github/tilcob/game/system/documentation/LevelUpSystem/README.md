@@ -1,14 +1,14 @@
 # LevelUpSystem
 
-## Zweck
-Vergibt Level-Up-Stat-Modifier und stößt eine Neuberechnung der Stats an.
+## Purpose
+Grants level-up stat modifiers and triggers a stat recalculation.
 
-## Ablauf
-- Empfängt LevelUpEvent und stellt sicher, dass StatComponent/StatModifierComponent existieren.
-- Entfernt alte levelup:-Modifier und fügt neue Modifier basierend auf totalLevels hinzu.
-- Feuert StatRecalcEvent und schreibt Debug-Logs.
+## Flow
+- Receives `LevelUpEvent` and ensures `StatComponent`/`StatModifierComponent` exist.
+- Removes old `levelup:` modifiers and adds new modifiers based on `totalLevels`.
+- Fires `StatRecalcEvent` and writes debug logs.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - LevelUpEvent
 - StatModifierComponent
 - StatRecalcEvent

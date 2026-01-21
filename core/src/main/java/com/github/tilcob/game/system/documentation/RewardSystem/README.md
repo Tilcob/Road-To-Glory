@@ -1,11 +1,11 @@
 # RewardSystem
 
-## Zweck
-Beansprucht Quest-Belohnungen, sobald ein QuestRewardEvent ausgelöst wird.
+## Purpose
+Claims quest rewards when a `QuestRewardEvent` is emitted.
 
-## Ablauf
-- Subscribt QuestRewardEvent und ruft questRewardService.claimReward auf.
+## Flow
+- Subscribes to `QuestRewardEvent` and calls `questRewardService.claimReward`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - QuestRewardEvent
 - QuestRewardService

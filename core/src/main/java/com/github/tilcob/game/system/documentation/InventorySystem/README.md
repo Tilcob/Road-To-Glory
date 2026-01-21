@@ -1,14 +1,14 @@
 # InventorySystem
 
-## Zweck
-Verwaltet Inventarlogik: Item-Additionen, Stapeln, Verschieben, Droppen und Splitting.
+## Purpose
+Manages inventory logic: adding items, stacking, moving, dropping, and splitting.
 
-## Ablauf
-- Verarbeitet Inventory.itemsToAdd: fügt Items in freie Slots oder bestehende Stacks ein und sendet Quest-Signale.
-- Reagiert auf Drag-and-Drop/Equip/Unequip/Drop/Split-Events und aktualisiert Slots oder Item-Entities.
-- Erzeugt Map-Items beim Droppen und feuert UpdateInventoryEvent.
+## Flow
+- Processes `Inventory.itemsToAdd`: inserts items into empty slots or existing stacks and sends quest signals.
+- Reacts to drag-and-drop/equip/unequip/drop/split events and updates slots or item entities.
+- Spawns map items when dropping and fires `UpdateInventoryEvent`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Inventory
 - Item
 - GameEventBus

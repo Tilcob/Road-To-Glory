@@ -1,13 +1,13 @@
 # PhysicDebugRenderSystem
 
-## Zweck
-Rendert Box2D-Debug-Geometrie über die aktuelle Kameraansicht.
+## Purpose
+Renders Box2D debug geometry over the current camera view.
 
-## Ablauf
-- Ruft debugRenderer.render(world, camera.combined) im update auf.
-- Gibt den Debug-Renderer in dispose frei.
+## Flow
+- Calls `debugRenderer.render(world, camera.combined)` in `update`.
+- Disposes the debug renderer in `dispose`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - World
 - Box2DDebugRenderer
 - Camera

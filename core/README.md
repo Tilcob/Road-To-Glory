@@ -1,61 +1,61 @@
-# Core-Modul
+# Core Module
 
-Dieses Modul enthält die plattformunabhängige Spiellogik für **Road-To-Glory**. Hier liegen die ECS-Komponenten und -Systeme, UI-Ansichten, Dialog- und Quest-Logik sowie zentrale Dienste wie Savegame-Handling und Asset-Management.
+This module contains the platform-independent game logic for **Road-To-Glory**. It houses the ECS components and systems, UI views, dialog and quest logic, and core services such as savegame handling and asset management.
 
-## Schwerpunkte
+## Focus areas
 
-- **ECS (Ashley)**: Komponenten und Systeme für Gameplay, KI, Rendering und Interaktionen.
-- **Dialog & Quests**: Yarn-basierte Dialoge, Questdefinitionen, Validierung.
-- **UI**: Scene2D UI-Layouts und Widgets.
-- **Services**: Savegame, Registry, Ressourcenverwaltung.
+- **ECS (Ashley)**: Components and systems for gameplay, AI, rendering, and interactions.
+- **Dialog & quests**: Yarn-based dialogs, quest definitions, validation.
+- **UI**: Scene2D UI layouts and widgets.
+- **Services**: Savegame, registries, resource management.
 
-## Systeme (com.github.tilcob.game.system)
+## Systems (`com.github.tilcob.game.system`)
 
-- `AiSystem`: Steuert KI-Aktualisierungen.
-- `AnimationSystem`: Aktualisiert Animationen.
-- `AttackSystem`: Verarbeitet Angriffe.
-- `CameraSystem`: Pflegt Kameraposition und -zustand.
-- `ChestSystem`: Verarbeitet Truhen-Interaktionen.
-- `ControllerSystem`: Verarbeitet Eingaben/Controller-Events.
-- `DamageSystem`: Wendet Schaden an.
-- `DialogConsequenceSystem`: Führt Dialogkonsequenzen aus.
-- `DialogQuestBridgeSystem`: Brücke zwischen Dialogen und Quests.
-- `DialogSystem`: Dialogfluss und Anzeige.
-- `EquipmentStatModifierSystem`: Wendet Ausrüstungs-Modifikatoren auf Werte an.
-- `EquipmentSystem`: Verwaltung von Ausrüstung.
-- `FacingSystem`: Aktualisiert Blickrichtung.
-- `FsmSystem`: Aktualisiert FSM-Logik.
-- `InventorySystem`: Inventar-Logik.
-- `LevelUpSystem`: Level-Up-Logik.
-- `LifeSystem`: Lebenspunkte-Logik.
-- `MapChangeSystem`: Kartenwechsel und Übergänge.
-- `NpcPathfindingSystem`: Pfadfindung für NPCs.
-- `PhysicDebugRenderSystem`: Debug-Rendering für Physik.
-- `PhysicMoveSystem`: Bewegungslogik basierend auf Physik.
-- `PhysicSystem`: Physik-Schritt/Simulation.
-- `QuestRewardSchedulerSystem`: Plant Quest-Belohnungen ein.
-- `QuestSystem`: Quest-Zustand und Fortschritt.
-- `RenderSystem`: Rendering der Spielwelt.
-- `RewardSystem`: Ausführen von Belohnungen.
-- `StatModifierDurationSystem`: Zeitbasierte Stat-Modifikatoren.
-- `StatRecalcSystem`: Neuberechnung von Stats.
-- `TriggerSystem`: Trigger-Events.
+- `AiSystem`: Drives AI updates.
+- `AnimationSystem`: Updates animations.
+- `AttackSystem`: Processes attacks.
+- `CameraSystem`: Maintains camera position and state.
+- `ChestSystem`: Handles chest interactions.
+- `ControllerSystem`: Handles input/controller events.
+- `DamageSystem`: Applies damage.
+- `DialogConsequenceSystem`: Applies dialog consequences.
+- `DialogQuestBridgeSystem`: Bridges dialogs and quests.
+- `DialogSystem`: Dialog flow and display.
+- `EquipmentStatModifierSystem`: Applies equipment modifiers to stats.
+- `EquipmentSystem`: Manages equipment.
+- `FacingSystem`: Updates facing direction.
+- `FsmSystem`: Updates FSM logic.
+- `InventorySystem`: Inventory logic.
+- `LevelUpSystem`: Level-up logic.
+- `LifeSystem`: Health logic.
+- `MapChangeSystem`: Map changes and transitions.
+- `NpcPathfindingSystem`: NPC pathfinding.
+- `PhysicDebugRenderSystem`: Physics debug rendering.
+- `PhysicMoveSystem`: Physics-based movement logic.
+- `PhysicSystem`: Physics stepping/simulation.
+- `QuestRewardSchedulerSystem`: Schedules quest rewards.
+- `QuestSystem`: Quest state and progress.
+- `RenderSystem`: Renders the game world.
+- `RewardSystem`: Applies rewards.
+- `StatModifierDurationSystem`: Time-based stat modifiers.
+- `StatRecalcSystem`: Stat recalculation.
+- `TriggerSystem`: Trigger events.
 
-## Wichtige Abhängigkeiten
+## Important dependencies
 
 - LibGDX (Core, Box2D, Freetype)
 - Ashley (ECS)
 - GDX-AI, Box2DLights
-- YarnGdx für Dialoge
+- YarnGdx for dialogs
 
 ## Tests
 
-Tests laufen im Headless-Backend von LibGDX und verwenden die Assets als Working Directory:
+Tests run on the LibGDX headless backend and use the assets as the working directory:
 
 ```bash
 ./gradlew core:test
 ```
 
-## Hinweise zur Struktur
+## Notes on structure
 
-Die High-Level-Dokumentation der Packages befindet sich in `package-info.java` innerhalb des Quellbaums. Neue Subsysteme sollten dort ebenfalls beschrieben werden.
+High-level package documentation lives in `package-info.java` inside the source tree. New subsystems should be described there as well.

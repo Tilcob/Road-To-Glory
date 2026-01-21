@@ -1,13 +1,13 @@
 # PhysicMoveSystem
 
-## Zweck
-Überträgt Move-Richtung in Box2D-Linearvelocity für Physic-Entities.
+## Purpose
+Transfers movement direction into Box2D linear velocity for physics entities.
 
-## Ablauf
-- Setzt die Geschwindigkeit auf 0, wenn rooted oder direction=0 ist.
-- Normalisiert die Richtung und skaliert mit Move.maxSpeed.
+## Flow
+- Sets velocity to 0 when rooted or direction=0.
+- Normalizes direction and scales by `Move.maxSpeed`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Move
 - Physic
 - Body

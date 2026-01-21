@@ -1,14 +1,14 @@
 # TriggerSystem
 
-## Zweck
-Führt Trigger-Logik für Map-Sensoren aus und delegiert an spezifische TriggerHandler.
+## Purpose
+Executes trigger logic for map sensors and delegates to specific TriggerHandlers.
 
-## Ablauf
-- Hält eine Handler-Map für Trigger.Type und verarbeitet Trigger-Queues pro Tick.
-- Löst Exit-Handler bei ExitTriggerEvent aus.
-- Indexiert Entities mit Tiled-IDs, um Trigger auf echte Entities zu mappen.
+## Flow
+- Keeps a handler map by `Trigger.Type` and processes trigger queues each tick.
+- Fires exit handlers on `ExitTriggerEvent`.
+- Indexes entities with Tiled IDs to map triggers to real entities.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Trigger
 - TriggerHandler
 - ExitTriggerEvent

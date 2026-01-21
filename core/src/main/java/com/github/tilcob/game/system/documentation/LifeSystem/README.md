@@ -1,13 +1,13 @@
 # LifeSystem
 
-## Zweck
-Regeneriert Lebenspunkte und synchronisiert das UI für Player-Life.
+## Purpose
+Regenerates health and syncs the UI for player life.
 
-## Ablauf
-- Registriert einen EntityListener für Player-Life-Entities, um initiale UI-Updates zu senden.
-- Regeneriert Life pro Sekunde bis MaxLife und aktualisiert das UI für Spieler-Entities.
+## Flow
+- Registers an `EntityListener` for player life entities to send initial UI updates.
+- Regenerates life per second up to `MaxLife` and updates the UI for player entities.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Life
 - Player
 - GameViewModel

@@ -1,14 +1,14 @@
 # ControllerSystem
 
-## Zweck
-Übersetzt Eingabekommandos in Bewegungs- und Interaktionsaktionen für Entities mit Controller.
+## Purpose
+Translates input commands into movement and interaction actions for entities with controllers.
 
-## Ablauf
-- Setzt die Bewegungsrichtung basierend auf gehaltenen Commands (blockiert bei Dialogauswahl).
-- Verarbeitet Commands aus dem Command-Buffer (z. B. Attack, Pause, Interact, Inventory).
-- Steuert Dialog-Navigation, startet Angriffe und löst Interaktionen mit Truhen oder NPCs aus.
+## Flow
+- Sets movement direction based on held commands (blocked during dialog selection).
+- Processes commands from the command buffer (e.g., Attack, Pause, Interact, Inventory).
+- Drives dialog navigation, starts attacks, and triggers interactions with chests or NPCs.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Controller
 - Move
 - DialogSession

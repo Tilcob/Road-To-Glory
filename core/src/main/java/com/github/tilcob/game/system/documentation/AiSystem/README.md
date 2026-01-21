@@ -1,14 +1,14 @@
 # AiSystem
 
-## Zweck
-Steuert die NPC-KI und sorgt dafür, dass jedes NPC-Entity eine Referenz auf den Spieler erhält, bevor die Zustandsmaschine aktualisiert wird.
+## Purpose
+Drives NPC AI and ensures each NPC entity has a reference to the player before the state machine updates.
 
-## Ablauf
-- Filtert Entities mit Npc und ohne Player.
-- Legt bei Bedarf die PlayerReference auf das erste gefundene Player-Entity.
-- Ruft pro Tick das Update der NpcFsm-Zustandsmaschine auf.
+## Flow
+- Filters entities with `Npc` and without `Player`.
+- Sets `PlayerReference` to the first found player entity when needed.
+- Updates the `NpcFsm` state machine each tick.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Npc
 - Player
 - PlayerReference

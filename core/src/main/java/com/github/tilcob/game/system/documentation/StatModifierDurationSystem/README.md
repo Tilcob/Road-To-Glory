@@ -1,13 +1,13 @@
 # StatModifierDurationSystem
 
-## Zweck
-Löscht abgelaufene Buff-Stat-Modifier und stößt Stat-Rekalkulationen an.
+## Purpose
+Removes expired buff stat modifiers and triggers stat recalculations.
 
-## Ablauf
-- Iteriert Modifier, initialisiert Ablaufzeiten für buff:-Modifier und entfernt abgelaufene Einträge.
-- Feuert StatRecalcEvent, wenn Modifier entfernt wurden.
+## Flow
+- Iterates modifiers, initializes expiry times for `buff:` modifiers, and removes expired entries.
+- Fires `StatRecalcEvent` when modifiers are removed.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - StatModifierComponent
 - StatRecalcEvent
 - StatModifier

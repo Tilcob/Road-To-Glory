@@ -1,14 +1,14 @@
 # DamageSystem
 
-## Zweck
-Verarbeitet Schadensereignisse, reduziert Life, entfernt tote NPCs und triggert Quest-Signale.
+## Purpose
+Processes damage events, reduces life, removes dead NPCs, and triggers quest signals.
 
-## Ablauf
-- Entfernt die Damaged-Komponente und reduziert Life entsprechend.
-- Bei Tod eines Enemy-NPCs wird ein "kill"-Signal an den QuestManager gesendet.
-- Erzeugt Schaden-Feedback über GameViewModel (z. B. Schadenszahlen).
+## Flow
+- Removes the `Damaged` component and reduces life accordingly.
+- When an enemy NPC dies, sends a "kill" signal to the `QuestManager`.
+- Generates damage feedback via `GameViewModel` (e.g., damage numbers).
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Damaged
 - Life
 - Npc

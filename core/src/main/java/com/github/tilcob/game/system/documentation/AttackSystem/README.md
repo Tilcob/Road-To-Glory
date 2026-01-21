@@ -1,15 +1,15 @@
 # AttackSystem
 
-## Zweck
-Führt Nahkampfangriffe aus, spielt SFX, verwurzelt den Angreifer während der Windup-Phase und verteilt Schaden an getroffenen Entities.
+## Purpose
+Executes melee attacks, plays SFX, roots the attacker during windup, and distributes damage to hit entities.
 
-## Ablauf
-- Startet beim Angriff die SFX, setzt Move.rooted und leert die Trefferliste.
-- Während der Trigger-Phase wird die passende Angriffssensor-Form gesucht und ein AABB-Query in der Box2D-World ausgeführt.
-- Treffer werden gefiltert (kein Selbsttreffer, keine FRIEND-NPCs, nur Entities mit Life).
-- Erzeugt/aktualisiert Damaged-Komponenten mit der Angriffs-Stärke.
+## Flow
+- On attack start, plays SFX, sets `Move.rooted`, and clears the hit list.
+- During the trigger phase, finds the matching attack sensor shape and runs an AABB query in the Box2D world.
+- Filters hits (no self-hit, no FRIEND NPCs, only entities with `Life`).
+- Creates/updates `Damaged` components with attack strength.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Attack
 - Facing
 - Physic

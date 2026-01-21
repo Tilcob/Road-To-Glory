@@ -1,15 +1,15 @@
 # ChestSystem
 
-## Zweck
-Öffnet Kisten, überträgt Items in das Inventar des Spielers und lässt Rest-Items in der Kiste.
+## Purpose
+Opens chests, transfers items to the player's inventory, and leaves remaining items in the chest.
 
-## Ablauf
-- Prüft OpenChestRequest auf valide Chest-Entity.
-- Wenn die Kiste offen ist, wird versucht, Inhalte in bestehende Stacks oder freie Slots zu verschieben.
-- Übertragene Items werden zu Inventory.itemsToAdd hinzugefügt, der Rest verbleibt in der Chest.
-- Entfernt den OpenChestRequest und schließt die Kiste.
+## Flow
+- Checks `OpenChestRequest` for a valid chest entity.
+- If the chest is open, tries to move contents into existing stacks or free slots.
+- Adds transferred items to `Inventory.itemsToAdd`; remaining items stay in the chest.
+- Removes the `OpenChestRequest` and closes the chest.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - OpenChestRequest
 - Chest
 - Inventory
