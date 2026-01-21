@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.cutscene.CutsceneRepository;
+import com.github.tilcob.game.cutscene.YarnCutsceneLoader;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.item.ItemDefinition;
@@ -22,15 +24,19 @@ public class GameLoader {
     private final GameServices services;
     private final QuestFactory questFactory;
     private final YarnDialogLoader dialogLoader;
+    private final YarnCutsceneLoader cutsceneLoader;
     private final QuestYarnRegistry questRegistry;
     private final DialogRepository dialogRepository;
+    private final CutsceneRepository cutsceneRepository;
 
     public GameLoader(GameServices services) {
         this.services = services;
         this.questFactory = new QuestFactory(services.getQuestYarnRegistry());
         this.dialogLoader = new YarnDialogLoader();
+        this.cutsceneLoader = new YarnCutsceneLoader();
         this.questRegistry = services.getQuestYarnRegistry();
         this.dialogRepository = services.getDialogRepository();
+        this.cutsceneRepository = services.getCutsceneRepository();
     }
 
     public void queueAll() {
@@ -87,6 +93,23 @@ public class GameLoader {
                 continue;
             }
             services.getAllDialogs().put(npcId, dialogLoader.load(dialogFile));
+        }
+        Map<String, FileHandle> cutsceneFiles = cutsceneRepository.loadAll();
+        if (cutsceneFiles.isEmpty()) {
+            Gdx.app.error(TAG, "No cutscene files loaded from repository.");
+        }
+        for (var entry : cutsceneFiles.entrySet()) {
+            String cutsceneId = entry.getKey();
+            FileHandle cutsceneFile = entry.getValue();
+            if (cutsceneId == null || cutsceneId.isBlank()) {
+                Gdx.app.error(TAG, "Encountered cutscene entry without a cutsceneId.");
+                continue;
+            }
+            if (cutsceneFile == null) {
+                Gdx.app.error(TAG, "Cutscene file missing for cutsceneId: " + cutsceneId);
+                continue;
+            }
+            services.getAllCutscenes().put(cutsceneId, cutsceneLoader.load(cutsceneId, cutsceneFile));
         }
         services.getAssetManager().queue(SkinAsset.DEFAULT);
     }

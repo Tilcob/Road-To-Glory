@@ -150,6 +150,10 @@ public class GameScreenModule {
             new DialogSystem(services.getEventBus(), services.getAllDialogs(), services.getDialogYarnRuntime()),
             SystemOrder.GAMEPLAY
         ));
+        engine.addSystem(withPriority(
+            new CutsceneSystem(services.getEventBus(), services.getAllCutscenes(), services.getCutsceneYarnRuntime()),
+            SystemOrder.GAMEPLAY
+        ));
 
         // Render
         engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));

@@ -3,6 +3,8 @@ package com.github.tilcob.game;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.cutscene.CutsceneData;
+import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
@@ -14,6 +16,8 @@ import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.yarn.CutsceneYarnBridge;
+import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
 import com.github.tilcob.game.yarn.DialogYarnBridge;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 import com.github.tilcob.game.yarn.QuestYarnBridge;
@@ -33,9 +37,12 @@ public class GameServices {
     private final Map<String, Quest> allQuests;
     private final Map<String, DialogData> allQuestDialogs;
     private final Map<String, DialogData> allDialogs;
+    private final Map<String, CutsceneData> allCutscenes;
     private final QuestYarnRegistry questYarnRegistry;
     private final DialogRepository dialogRepository;
+    private final CutsceneRepository cutsceneRepository;
     private final DialogYarnRuntime dialogYarnRuntime;
+    private final CutsceneYarnRuntime cutsceneYarnRuntime;
     private final QuestYarnRuntime questYarnRuntime;
     private final QuestManager questManager;
     private final QuestLifecycleService questLifecycleService;
@@ -53,14 +60,18 @@ public class GameServices {
         this.allQuests = new HashMap<>();
         this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
+        this.allCutscenes = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
         this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
+        this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
@@ -78,14 +89,18 @@ public class GameServices {
         this.allQuests = new HashMap<>();
         this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
+        this.allCutscenes = new HashMap<>();
         this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
         this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
         this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
+        this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
@@ -139,6 +154,10 @@ public class GameServices {
         return allDialogs;
     }
 
+    public Map<String, CutsceneData> getAllCutscenes() {
+        return allCutscenes;
+    }
+
     public QuestYarnRegistry getQuestYarnRegistry() {
         return questYarnRegistry;
     }
@@ -147,8 +166,16 @@ public class GameServices {
         return dialogRepository;
     }
 
+    public CutsceneRepository getCutsceneRepository() {
+        return cutsceneRepository;
+    }
+
     public DialogYarnRuntime getDialogYarnRuntime() {
         return dialogYarnRuntime;
+    }
+
+    public CutsceneYarnRuntime getCutsceneYarnRuntime() {
+        return cutsceneYarnRuntime;
     }
 
     public QuestYarnRuntime getQuestYarnRuntime() {
