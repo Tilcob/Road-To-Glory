@@ -1,5 +1,6 @@
 package com.github.tilcob.game.dialog;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -12,6 +13,17 @@ public class YarnDialogLoader {
     private static final String NODE_SEPARATOR = "===";
 
     public DialogData load(FileHandle fileHandle) {
+        if (fileHandle == null || !fileHandle.exists()) {
+            Gdx.app.error("YarnDialogLoader", "Dialog file missing: " + (fileHandle == null ? "null" : fileHandle.path()));
+            return DialogData.empty();
+        }
+        try {
+            fileHandle.readString("UTF-8");
+        } catch (Exception e) {
+            Gdx.app.error("YarnDialogLoader", "Failed to read dialog file: " + fileHandle.path(), e);
+            return DialogData.empty();
+        }
+
         List<ParsedNode> parsedNodes = parseNodes(fileHandle.readString("UTF-8"));
         ParsedNode rootNode = findTaggedNode(parsedNodes, "root", "start");
         ParsedNode idleNode = findTaggedNode(parsedNodes, "idle");
@@ -305,7 +317,7 @@ public class YarnDialogLoader {
     }
 
     private static boolean isCommand(String line) {
-        return line.startsWith("<<") || line.endsWith(">>");
+        return line.startsWith("<<") && line.endsWith(">>");
     }
 
     private static boolean isIndented(String line) {

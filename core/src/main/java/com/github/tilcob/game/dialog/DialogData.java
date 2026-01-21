@@ -27,6 +27,10 @@ public class DialogData {
     public DialogData() {
     }
 
+    public static DialogData empty() {
+        return new DialogData();
+    }
+
     public Array<String> idle() {
         return idle;
     }

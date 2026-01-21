@@ -40,15 +40,11 @@ public class PatrolState implements State<Entity> {
         }
 
         MoveIntent moveIntent = MoveIntent.MAPPER.get(entity);
-        if (moveIntent == null || moveIntent.isActive()) {
-            return;
-        }
+        if (moveIntent == null || moveIntent.isActive()) return;
 
         route.setWaitTimer();
         Vector2 next = route.advance();
-        if (moveIntent != null && next != null) {
-            moveIntent.setTarget(next, Constants.DEFAULT_ARRIVAL_DISTANCE);
-        }
+        if (next != null) moveIntent.setTarget(next, Constants.DEFAULT_ARRIVAL_DISTANCE);
     }
 
     @Override

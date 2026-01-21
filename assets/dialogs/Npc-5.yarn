@@ -1,0 +1,36 @@
+title: npc_5_start
+tags: start, root
+position: 206,307
+---
+Hello.
+===
+
+title: npc_5_quest_notstarted
+tags: quest_the_first_fight, notstarted
+---
+Who are you?
+===
+
+title: npc_5_quest_inprogress
+tags: quest_the_first_fight, inprogress
+position: -62,189
+---
+You talked to Npc-4, right?
+-> Yes, where is the enemy.
+    He is north of us. Go tiger.
+===
+
+title: npc_5_quest_completed
+tags: quest_the_first_fight, completed
+position: 265,114
+---
+Thank you for helping us out!
+===
+
+title: npc_5_idle
+tags: idle
+position: 41,198
+---
+Goodbye!
+<<set_flag quest_the_first_fight_seen true>>
+===

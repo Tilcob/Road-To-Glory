@@ -105,7 +105,7 @@ public class DialogNavigator {
         DialogNode node = nodes.get(nodeId);
         if (node == null) {
             if (Gdx.app != null) {
-                Gdx.app.debug("DialogNavigator", "Dialog node not found: " + nodeId);
+                Gdx.app.error("DialogNavigator", "Dialog node not found: " + nodeId);
             }
             return false;
         }

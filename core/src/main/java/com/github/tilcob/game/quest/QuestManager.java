@@ -1,6 +1,8 @@
 package com.github.tilcob.game.quest;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
@@ -19,8 +21,9 @@ public class QuestManager {
     }
 
     public void signal(Entity player, String eventType, String target, int amount) {
-        if (eventType == null || eventType.isBlank()) {
-            return;
+        if (eventType == null || eventType.isBlank()) return;
+        if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
+            Gdx.app.debug(TAG, "Quest signal: " + eventType + " target=" + target + " amount=" + amount);
         }
         questYarnRuntime.setVariable(player, "$eventType", eventType);
         questYarnRuntime.setVariable(player, "$eventTarget", target);

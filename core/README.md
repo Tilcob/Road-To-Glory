@@ -8,6 +8,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - **Dialog & quests**: Yarn-based dialogs, quest definitions, validation.
 - **UI**: Scene2D UI layouts and widgets.
 - **Services**: Savegame, registries, resource management.
+- **Debugging**: Debug overlay with runtime stats and recent log buffer when `game.debug` is enabled.
 
 ## Systems (`com.github.tilcob.game.system`)
 
@@ -23,7 +24,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - `DialogSystem`: Dialog flow and display.
 - `EquipmentStatModifierSystem`: Applies equipment modifiers to stats.
 - `EquipmentSystem`: Manages equipment.
-- `FacingSystem`: Updates facing direction.
+- `FacingSystem`: Updates facing a direction.
 - `FsmSystem`: Updates FSM logic.
 - `InventorySystem`: Inventory logic.
 - `LevelUpSystem`: Level-up logic.
@@ -59,3 +60,9 @@ Tests run on the LibGDX headless backend and use the assets as the working direc
 ## Notes on structure
 
 High-level package documentation lives in `package-info.java` inside the source tree. New subsystems should be described there as well.
+
+## Debug overlay
+
+When `game.debug` is enabled, the game installs a debug log buffer and shows a debug overlay 
+with FPS, entity/system counts, save slot, and recent log lines. This is intended for development 
+builds and mirrors the existing `Gdx.app` logger output.

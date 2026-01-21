@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.debug.DebugLogBuffer;
 import com.github.tilcob.game.input.InputBindings;
 import com.github.tilcob.game.input.InputBindingsStorage;
 import com.github.tilcob.game.input.InputManager;
@@ -36,7 +37,12 @@ public class GdxGame extends Game implements ScreenNavigator {
 
     @Override
     public void create() {
-        if (Constants.DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        if (Constants.DEBUG) {
+            Gdx.app.setLogLevel(Application.LOG_DEBUG);
+        } else {
+            Gdx.app.setLogLevel(Application.LOG_ERROR);
+        }
+        DebugLogBuffer.install(Gdx.app, 30);
 
         inputMultiplexer = new InputMultiplexer();
         InputManager inputManager = new InputManager(inputMultiplexer);

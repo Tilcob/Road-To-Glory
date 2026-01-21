@@ -1,0 +1,30 @@
+questId: the_first_fight
+displayName: The first Fight
+journalText: Get ride of the threat
+startNode: q_the_first_fight_start
+reward_money: 100
+reward_timing: completion
+step: talk Npc-5
+step: kill Enemy-1
+
+title: q_the_first_fight_start
+position: 140,166
+---
+<<quest_start the_first_fight>>
+<<quest_stage the_first_fight 0>>
+===
+
+title: q_the_first_fight_on_talk
+position: 162,9
+---
+<<if $eventTarget == "Npc-5">>
+<<quest_stage the_first_fight 1>>
+<<endif>>
+===
+title: q_the_first_fight_on_kill
+position: 251,-155
+---
+<<if $eventTarget == "Enemy-1">>
+<<quest_complete the_first_fight>>
+<<endif>>
+===

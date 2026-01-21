@@ -1,0 +1,46 @@
+title: npc_4_start
+tags: start, root
+position: -193,-349
+---
+Hello traveler, we need your help!
+An enemy of the woods is here in our village.
+Would you be so kind and help us.
+-> Yes I am eager to help. What must I do?
+    <<add_quest the_first_fight>>
+    <<jump npc_4_quest_notStarted>>
+-> I have not time. I am sorry.
+    <<jump npc_4_idle>>
+===
+title: npc_4_quest_notStarted
+tags: quest_the_first_fight, notstarted
+position: 165,-455
+---
+That's very kind of you my friend.
+Go talk to Npc-5. He should know what to do.
+-> I will do that.
+===
+
+title: npc_4_idle
+tags: idle
+position: 178,-242
+---
+Please help us!
+===
+
+title: npc_4_quest_in_progress
+tags: quest_the_first_fight, inprogress
+position: -74,-65
+---
+Have you talked to Npc-4 yet?
+-> No
+    Then go talk to him!
+-> Bye
+===
+
+title: npc_4_quest_completed
+tags: quest_the_first_fight, completed
+position: 205,-27
+---
+You saved us! Thank you my friend!
+<<set_flag quest_the_first_fight_seen true>>
+===
