@@ -27,6 +27,8 @@ item references to the `undefined` id.
   `assets/stats/index.json` to keep stat keys centralized.
 - `statModifiers` (array): list of stat modifier objects. Each entry must include a `stat` key plus at
   least one of `additive` or `multiplier`. Stat names must exist in `assets/stats/index.json`.
+- `requirements` (object): map of stat name → minimum value needed to equip the item. Stat names must
+  match `StatType` ids (example: `{"strength": 5, "stamina": 10}`).
 
 ## Example: stackable material
 
@@ -37,6 +39,10 @@ item references to the `undefined` id.
   "category": "MATERIAL",
   "maxStack": 99,
   "icon": "wood",
+  "requirements": {
+    "strength": 5,
+    "stamina": 2
+  },
   "stats": {
     "burn_time": 1.5
   }

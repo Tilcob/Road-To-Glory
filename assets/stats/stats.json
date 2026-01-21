@@ -4,5 +4,6 @@
     "damage",
     "life_regeneration",
     "max_life",
-    "stamina"
+    "stamina",
+    "strength"
 ]
