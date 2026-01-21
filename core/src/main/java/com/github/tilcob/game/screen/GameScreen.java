@@ -110,6 +110,7 @@ public class GameScreen extends ScreenAdapter {
         pauseView.setVisible(false);
         stage.addActor(pauseView);
         paused = false;
+        services.getEventBus().fire(new PauseEvent(PauseEvent.Action.RESUME));
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
