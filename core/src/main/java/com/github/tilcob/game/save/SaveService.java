@@ -40,4 +40,16 @@ public class SaveService {
             Gdx.app.error("SaveService", "Error saving state: " + e.getMessage());
         }
     }
+
+    public void setActiveSlot(SaveSlot slot) {
+        saveManager.setActiveSlot(slot);
+    }
+
+    public SaveSlot getActiveSlot() {
+        return saveManager.getActiveSlot();
+    }
+
+    public java.util.List<SaveSlotInfo> listSlots() {
+        return saveManager.listSlots();
+    }
 }

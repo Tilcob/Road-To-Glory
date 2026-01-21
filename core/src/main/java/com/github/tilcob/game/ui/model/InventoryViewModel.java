@@ -70,6 +70,7 @@ public class InventoryViewModel extends ViewModel {
             ItemModel model = new ItemModel(
                 idComp.getId(),
                 definition.category(),
+                definition.name(),
                 definition.icon(),
                 item.getSlotIndex(),
                 item.isEquipped(),

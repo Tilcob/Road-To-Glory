@@ -19,6 +19,7 @@ buildscript {
 allprojects {
   apply plugin: 'eclipse'
   apply plugin: 'idea'
+  apply plugin: 'base'
 
   // This allows you to "Build and run using IntelliJ IDEA", an option in IDEA's Settings.
   idea {
@@ -182,5 +183,20 @@ subprojects {
     maven { url = 'https://jitpack.io' }
   }
 }
+
+tasks.named("check") {
+  dependsOn(":utils:validateQuestContent")
+}
+
+project(":lwjgl3") {
+  tasks.matching { it.name == "run" }.configureEach {
+    dependsOn(":utils:validateQuestContent")
+  }
+  tasks.matching { it.name == "build" }.configureEach {
+    dependsOn(":utils:validateQuestContent")
+  }
+}
+
+
 
 eclipse.project.name = 'Road To Glory' + '-parent'

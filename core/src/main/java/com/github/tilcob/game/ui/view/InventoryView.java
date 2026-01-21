@@ -1,8 +1,6 @@
 package com.github.tilcob.game.ui.view;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
@@ -20,6 +18,7 @@ public class InventoryView extends View<InventoryViewModel> {
     private InventorySlot[][] slots;
     private EnumMap<ItemCategory, EquipmentSlot> equipmentSlots;
     private Table questLog;
+    private Label itemDetailsLabel;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -96,6 +95,18 @@ public class InventoryView extends View<InventoryViewModel> {
         scrollTable.add(scrollPane);
         inventoryRoot.add(scrollTable).pad(5.0f);
 
+        inventoryRoot.row();
+        Table detailsTable = new Table();
+        detailsTable.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label detailsHeader = new Label("Item Details", skin, "text_12");
+        detailsHeader.setColor(skin.getColor("BLACK"));
+        detailsTable.add(detailsHeader).left().row();
+        itemDetailsLabel = new Label("Hover an item to see details.", skin, "text_08");
+        itemDetailsLabel.setColor(skin.getColor("BLACK"));
+        itemDetailsLabel.setWrap(true);
+        detailsTable.add(itemDetailsLabel).left().width(280).pad(4.0f);
+        inventoryRoot.add(detailsTable).colspan(3).pad(5.0f);
+
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 InventorySlot slot = slots[i][j];
@@ -133,6 +144,7 @@ public class InventoryView extends View<InventoryViewModel> {
     }
 
     private void updatePlayerItems(Array<ItemModel> array) {
+        clearItemDetails();
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 clearSlot(slots[i][j]);
@@ -195,6 +207,7 @@ public class InventoryView extends View<InventoryViewModel> {
         Image itemImage = new Image(skin.getDrawable(item.getDrawableName()));
         itemImage.setName("itemId");
         itemImage.setScaling(Scaling.fit);
+        itemImage.addListener(new ItemDetailsListener(item));
 
         slot.add(itemImage);
         if (slot instanceof InventorySlot inventorySlot) {
@@ -202,5 +215,48 @@ public class InventoryView extends View<InventoryViewModel> {
             inventorySlot.getCountTable().toFront();
         }
         return itemImage;
+    }
+
+    private void clearItemDetails() {
+        if (itemDetailsLabel != null) {
+            itemDetailsLabel.setText("Hover an item to see details.");
+        }
+    }
+
+    private void showItemDetails(ItemModel item) {
+        if (itemDetailsLabel == null || item == null) {
+            return;
+        }
+        String name = item.getName();
+        if (name == null || name.isBlank()) {
+            name = "Unknown Item";
+        }
+        StringBuilder builder = new StringBuilder();
+        builder.append(name);
+        builder.append(" (").append(item.getCategory().name()).append(")");
+        if (item.getCount() > 1) {
+            builder.append(" x").append(item.getCount());
+        }
+        itemDetailsLabel.setText(builder.toString());
+    }
+
+    private class ItemDetailsListener extends InputListener {
+        private final ItemModel item;
+
+        private ItemDetailsListener(ItemModel item) {
+            this.item = item;
+        }
+
+        @Override
+        public void enter(InputEvent event, float x, float y, int pointer,
+                          Actor fromActor) {
+            showItemDetails(item);
+        }
+
+        @Override
+        public void exit(InputEvent event, float x, float y, int pointer,
+                         Actor toActor) {
+            clearItemDetails();
+        }
     }
 }

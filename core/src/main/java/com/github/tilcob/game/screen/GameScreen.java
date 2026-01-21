@@ -17,6 +17,7 @@ import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.PauseEvent;
@@ -33,6 +34,7 @@ import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
+import com.github.tilcob.game.ui.view.DebugOverlayView;
 import com.github.tilcob.game.ui.view.GameView;
 import com.github.tilcob.game.ui.view.InventoryView;
 import com.github.tilcob.game.ui.view.PauseView;
@@ -60,6 +62,7 @@ public class GameScreen extends ScreenAdapter {
     private Entity player;
     private ActiveEntityReference activeEntityReference;
     private PauseView pauseView;
+    private DebugOverlayView debugOverlayView;
     private boolean paused;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
@@ -105,6 +108,10 @@ public class GameScreen extends ScreenAdapter {
         stage.addActor(gameUiGroup);
         gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
         gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
+        if (Constants.DEBUG) {
+            debugOverlayView = new DebugOverlayView(skin, engine, services);
+            stage.addActor(debugOverlayView);
+        }
 
         pauseView = new PauseView(skin, stage, pauseViewModel);
         pauseView.setVisible(false);
@@ -166,6 +173,9 @@ public class GameScreen extends ScreenAdapter {
 
         uiViewport.apply();
         stage.getBatch().setColor(Color.WHITE);
+        if (Constants.DEBUG && debugOverlayView != null) {
+            debugOverlayView.update();
+        }
         stage.act(delta);
         stage.draw();
     }

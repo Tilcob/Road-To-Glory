@@ -11,17 +11,29 @@ import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.save.states.chest.ChestRegistryState;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 
 public class SaveManager {
     private static final ObjectMapper MAPPER = new ObjectMapper()
         .enable(SerializationFeature.INDENT_OUTPUT)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
     private static final int CURRENT_VERSION = 4;
-    private final FileHandle saveFile;
+    private final FileHandle saveDirectory;
+    private FileHandle saveFile;
+    private SaveSlot activeSlot;
     private final MigrationRegistry migrationRegistry = new MigrationRegistry();
 
     public SaveManager(String path) {
         this.saveFile = Gdx.files.local(path);
+        this.saveDirectory = saveFile.parent();
+        this.activeSlot = null;
+    }
+
+    public SaveManager(String directory, SaveSlot saveSlot) {
+        this.saveDirectory = Gdx.files.local(directory);
+        setActiveSlot(Objects.requireNonNull(saveSlot, "Save slot is required!"));
     }
 
     public void save(GameState gameState) throws IOException {
@@ -46,6 +58,26 @@ public class SaveManager {
         return saveFile.exists();
     }
 
+    public SaveSlot getActiveSlot() {
+        return activeSlot;
+    }
+
+    public void setActiveSlot(SaveSlot slot) {
+        this.activeSlot = slot;
+        this.saveFile = saveDirectory.child(slot.getFileName());
+    }
+
+    public List<SaveSlotInfo> listSlots() {
+        List<SaveSlotInfo> slots = new ArrayList<>();
+        for (SaveSlot slot : SaveSlot.standardSlots()) {
+            FileHandle slotFile = saveDirectory.child(slot.getFileName());
+            boolean exists = slotFile.exists();
+            long lastModified = exists ? slotFile.file().lastModified() : 0L;
+            slots.add(new SaveSlotInfo(slot, exists, lastModified));
+        }
+        return slots;
+    }
+
     private void validate(GameState state) {
         if (state == null) throw new IllegalStateException("GameState is null");
 
@@ -60,14 +92,14 @@ public class SaveManager {
     }
 
     private void atomicWrite(String json) {
-        FileHandle tmp = Gdx.files.local("tmp/" + saveFile.name() + ".tmp");
+        FileHandle tmp = saveDirectory.child("tmp").child(saveFile.name() + ".tmp");
         tmp.file().getParentFile().mkdirs();
         tmp.writeString(json, false);
         tmp.moveTo(saveFile);
     }
 
     private void createBackup() {
-        FileHandle backup = Gdx.files.local("backups/" + saveFile.name() + ".bak");
+        FileHandle backup = saveDirectory.child("backups").child(saveFile.name() + ".bak");
         backup.file().getParentFile().mkdirs();
         if (saveFile.exists()) {
             saveFile.copyTo(backup);

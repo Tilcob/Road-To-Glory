@@ -2,7 +2,6 @@ package com.github.tilcob.game;
 
 import com.badlogic.gdx.*;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.graphics.FPSLogger;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -16,6 +15,7 @@ import com.github.tilcob.game.input.InputBindings;
 import com.github.tilcob.game.input.InputBindingsStorage;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.KeyboardInputDevice;
+import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.screen.LoadingScreen;
 import com.github.tilcob.game.screen.MenuScreen;
 import com.github.tilcob.game.screen.ScreenFactory;
@@ -29,9 +29,7 @@ public class GdxGame extends Game implements ScreenNavigator {
     private OrthographicCamera camera;
     private Viewport viewport;
     private GLProfiler glProfiler;
-    private FPSLogger fpsLogger;
     private InputMultiplexer inputMultiplexer;
-    private InputManager inputManager;
     private final Map<Class<? extends Screen>, Screen> screenCache = new HashMap<>();
     private GameServices services;
     private ScreenFactory screenFactory;
@@ -41,7 +39,7 @@ public class GdxGame extends Game implements ScreenNavigator {
         if (Constants.DEBUG) Gdx.app.setLogLevel(Application.LOG_DEBUG);
 
         inputMultiplexer = new InputMultiplexer();
-        inputManager = new InputManager(inputMultiplexer);
+        InputManager inputManager = new InputManager(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
         InputBindingsStorage bindingsStorage = new InputBindingsStorage("assets/input/input_bindings.json",
             "assets/input/input_bindings.json");
@@ -49,13 +47,13 @@ public class GdxGame extends Game implements ScreenNavigator {
         inputManager.addDevice(new KeyboardInputDevice(bindings));
 
         services = new GameServices(new InternalFileHandleResolver(),
-            Gdx.files.local("savegame.json").path());
+            Gdx.files.local("saves").path(),
+            SaveSlot.SLOT_1);
         services.loadGame();
         batch = new SpriteBatch();
         camera = new OrthographicCamera();
         viewport = new FitViewport(Constants.WIDTH, Constants.HEIGHT, camera);
         glProfiler = new GLProfiler(Gdx.graphics);
-        fpsLogger = new FPSLogger();
         screenFactory = new ScreenFactory(services, batch, camera, viewport, inputManager, this);
 
         if (Constants.DEBUG) glProfiler.enable();
@@ -79,7 +77,6 @@ public class GdxGame extends Game implements ScreenNavigator {
 
         if (Constants.DEBUG) {
             Gdx.graphics.setTitle("GdxGame - Draw Cals: " + glProfiler.getDrawCalls()); // Draw calls should be minimized!!
-            fpsLogger.log();
         }
     }
 

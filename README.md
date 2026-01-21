@@ -75,6 +75,14 @@ To enable debug diagnostics (profiler, FPS logging, debug renderer), pass the JV
 ./gradlew test
 ```
 
+### Validate quest + dialog content
+
+```
+./gradlew :utils:validateQuestContent
+```
+
+This validation checks quest headers, step definitions, start node presence, and dialog quest tags against the quest index.
+
 ### Build configuration flags
 
 These are defined in `gradle.properties` and can be overridden on the command line.

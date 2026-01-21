@@ -1,4 +1,4 @@
-package org.example;
+package com.github.tilcob.game;
 
 import com.badlogic.gdx.tools.texturepacker.TexturePacker;
 

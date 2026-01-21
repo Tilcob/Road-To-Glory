@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.SplitStackEvent;
 
 public class EquipmentSlot extends Stack {
     private final Skin skin;
