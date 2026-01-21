@@ -116,4 +116,6 @@ public class Constants {
     public static final int INVENTORY_CAPACITY = 18;
     public static final int INVENTORY_ROWS = 3;
     public static final int INVENTORY_COLUMNS = 6;
+    public static final String BASE_STAMINA = "stamina";
+    public static final String BASE_STRENGTH = "strength";
 }

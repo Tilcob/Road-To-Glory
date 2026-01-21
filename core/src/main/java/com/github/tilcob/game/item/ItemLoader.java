@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.github.tilcob.game.stat.StatCatalog;
 import com.github.tilcob.game.stat.StatKey;
+import com.github.tilcob.game.stat.StatType;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,8 +56,10 @@ public final class ItemLoader {
             String icon = requireString(root, "icon", file);
             Map<StatKey, Float> stats = parseStats(root.get("stats"), file);
             List<ItemStatModifier> statModifiers = parseStatModifiers(root.get("statModifiers"), file);
+            Map<StatType, Float> requirements = parseRequirements(root.get("requirements"), file);
 
-            definitions.put(id, new ItemDefinition(id, name, category, maxStack, icon, stats, statModifiers));
+            definitions.put(id, new ItemDefinition(id, name, category, maxStack,
+                icon, stats, statModifiers, requirements));
         }
 
         return List.copyOf(definitions.values());
@@ -128,5 +131,27 @@ public final class ItemLoader {
             modifiers.add(new ItemStatModifier(key, additive, multiplier));
         }
         return List.copyOf(modifiers);
+    }
+
+    private static Map<StatType, Float> parseRequirements(JsonValue requirementsValue, FileHandle file) {
+        if (requirementsValue == null || requirementsValue.isNull()) {
+            return Map.of();
+        }
+        if (!requirementsValue.isObject()) {
+            throw new IllegalArgumentException("Item requirements must be a JSON object in " + file.path());
+        }
+        Map<StatType, Float> requirements = new HashMap<>();
+        for (JsonValue requirement = requirementsValue.child; requirement != null; requirement = requirement.next) {
+            String statId = requirement.name() == null ? "" : requirement.name().trim();
+            if (statId.isBlank()) {
+                throw new IllegalArgumentException("Item requirements entry missing stat id in " + file.path());
+            }
+            StatType statType = StatType.fromId(statId);
+            if (statType == null) {
+                throw new IllegalArgumentException("Unknown stat requirement '" + statId + "' in " + file.path());
+            }
+            requirements.put(statType, requirement.asFloat());
+        }
+        return Map.copyOf(requirements);
     }
 }

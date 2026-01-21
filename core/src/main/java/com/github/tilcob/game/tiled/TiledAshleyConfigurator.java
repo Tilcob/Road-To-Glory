@@ -70,8 +70,8 @@ public class TiledAshleyConfigurator {
         BodyDef.BodyType bodyType = getObjectBodyType(tile, object);
         addEntityPhysic(tile.getObjects(), bodyType, Vector2.Zero, entity);
         addEntityCameraFollow(object, entity);
-        addEntityLife(tile, entity);
-        addEntityAttack(tile, entity);
+        addEntityLife(object, tile, entity);
+        addEntityAttack(object, tile, entity);
         addEntityChest(object, entity);
         addEntityNpc(object, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
@@ -158,20 +158,34 @@ public class TiledAshleyConfigurator {
         return loot;
     }
 
-    private void addEntityLife(TiledMapTile tile, Entity entity) {
-        int life = tile.getProperties().get(Constants.LIFE, 0, Integer.class);
+    private void addEntityLife(MapObject object, TiledMapTile tile, Entity entity) {
+        MapProperties properties = object.getProperties();
+        int life = properties.containsKey(Constants.LIFE) ?
+            properties.get(Constants.LIFE, 0, Integer.class) :
+            tile.getProperties().get(Constants.LIFE, 0, Integer.class);
         if (life == 0) return;
 
-        float lifeRegeneration = tile.getProperties().get(Constants.LIFE_REGENERATION, 0f, Float.class);
+        float lifeRegeneration = properties.containsKey(Constants.LIFE_REGENERATION)
+            ? properties.get(Constants.LIFE_REGENERATION, 0f, Float.class)
+            : tile.getProperties().get(Constants.LIFE_REGENERATION, 0f, Float.class);
         entity.add(new Life(life, lifeRegeneration));
     }
 
-    private void addEntityAttack(TiledMapTile tile, Entity entity) {
-        float damage = tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
+    private void addEntityAttack(MapObject object, TiledMapTile tile, Entity entity) {
+        MapProperties properties = object.getProperties();
+        float damage = properties.containsKey(Constants.DAMAGE)
+            ? properties.get(Constants.DAMAGE, 0f, Float.class)
+            : tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
         if (damage == 0) return;
-        float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, Constants.DEFAULT_DAMAGE_DELAY, Float.class);
-        float cooldown = tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
-        String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
+        float windup = properties.containsKey(Constants.ATTACK_WINDUP)
+            ? properties.get(Constants.ATTACK_WINDUP, Constants.DEFAULT_DAMAGE_DELAY, Float.class)
+            : tile.getProperties().get(Constants.ATTACK_WINDUP, Constants.DEFAULT_DAMAGE_DELAY, Float.class);
+        float cooldown = properties.containsKey(Constants.ATTACK_COOLDOWN)
+            ? properties.get(Constants.ATTACK_COOLDOWN, 0f, Float.class)
+            : tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
+        String soundAssetStr = properties.containsKey(Constants.ATTACK_SOUND)
+            ? properties.get(Constants.ATTACK_SOUND, "", String.class)
+            : tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
         SoundAsset soundAsset = null;
         if (!soundAssetStr.isBlank()) {
             soundAsset = SoundAsset.valueOf(soundAssetStr);

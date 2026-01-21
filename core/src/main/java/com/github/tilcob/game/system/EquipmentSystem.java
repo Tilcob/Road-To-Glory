@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.Equipment;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
+import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
@@ -15,6 +16,7 @@ import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.stat.StatType;
 
 public class EquipmentSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
@@ -48,6 +50,7 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
         if (item == null) return;
         ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
         if (definition.category() != event.category()) return;
+        if (!meetsRequirements(player, definition)) return;
 
         Entity previous = equipment.equip(event.category(), itemEntity);
         item.setSlotIndex(-1);
@@ -59,6 +62,18 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
         }
         eventBus.fire(new UpdateInventoryEvent(player));
         eventBus.fire(new UpdateEquipmentEvent(player));
+    }
+
+    private boolean meetsRequirements(Entity entity, ItemDefinition definition) {
+        if (definition.requirements().isEmpty()) return true;
+        StatComponent stats = StatComponent.MAPPER.get(entity);
+        if (stats == null) return false;
+        for (var entry : definition.requirements().entrySet()) {
+            StatType statType = entry.getKey();
+            float required = entry.getValue();
+            if (stats.getFinalStat(statType) < required) return false;
+        }
+        return true;
     }
 
     private void handleUnequip(ItemCategory category, Inventory inventory, Equipment equipment) {

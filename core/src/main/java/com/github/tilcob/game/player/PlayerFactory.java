@@ -18,6 +18,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.stat.StatType;
 import com.github.tilcob.game.tiled.TiledPhysics;
 
 public class PlayerFactory {
@@ -51,7 +52,7 @@ public class PlayerFactory {
         entity.add(new AnimationFsm(entity));
         entity.add(new Inventory());
         entity.add(new Equipment());
-        entity.add(new StatComponent());
+        addEntityStats(entity, player);
         entity.add(new StatModifierComponent());
         entity.add(new QuestLog());
         entity.add(new DialogFlags());
@@ -59,6 +60,16 @@ public class PlayerFactory {
 
         engine.addEntity(entity);
         return entity;
+    }
+
+    private static void addEntityStats(Entity player, TiledMapTile tile) {
+        StatComponent statComponent = new StatComponent();
+        float strength = tile.getProperties().get(Constants.BASE_STRENGTH, 3f, Float.class);
+        float stamina = tile.getProperties().get(Constants.BASE_STAMINA, 3f, Float.class);
+
+        statComponent.setBaseStat(StatType.STRENGTH, strength);
+        statComponent.setBaseStat(StatType.STAMINA, stamina);
+        player.add(statComponent);
     }
 
     private static void addEntityAttack(TiledMapTile tile, Entity entity) {

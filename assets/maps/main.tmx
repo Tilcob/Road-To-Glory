@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="34">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="35">
  <properties>
   <property name="music" value="TOWN"/>
  </properties>
@@ -59,7 +59,7 @@
     <property name="speed" type="float" value="2"/>
    </properties>
   </object>
-  <object id="33" gid="197" x="207.333" y="306.667" width="32" height="32"/>
+  <object id="34" gid="197" x="198.667" y="302" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="5" name="trigger">
   <object id="18" type="Trigger" x="366" y="222" width="13.25" height="9.5">

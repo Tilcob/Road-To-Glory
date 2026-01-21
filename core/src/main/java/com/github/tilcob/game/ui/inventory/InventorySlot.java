@@ -1,10 +1,12 @@
 package com.github.tilcob.game.ui.inventory;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.SplitStackEvent;
 
@@ -36,7 +38,16 @@ public class InventorySlot extends Stack {
                 return false;
             }
         });
-
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == Input.Buttons.LEFT && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
+                    Gdx.app.log("InventorySlot", "CTRL + LEFT CLICK");
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void setupUi() {

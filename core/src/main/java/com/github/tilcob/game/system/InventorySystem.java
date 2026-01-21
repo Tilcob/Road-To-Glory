@@ -16,6 +16,7 @@ import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.QuestManager;
+import com.github.tilcob.game.stat.StatType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
@@ -201,9 +202,28 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         Item item = Item.MAPPER.get(itemEntity);
         ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
         if (definition == null || definition.category() != event.category()) return;
+        if (!meetsRequirements(player, definition)) return;
 
         equipment.equip(event.category(), itemEntity);
         eventBus.fire(new UpdateInventoryEvent(player));
+    }
+
+    private boolean meetsRequirements(Entity entity, ItemDefinition definition) {
+        if (definition.requirements().isEmpty()) {
+            return true;
+        }
+        StatComponent stats = StatComponent.MAPPER.get(entity);
+        if (stats == null) {
+            return false;
+        }
+        for (var entry : definition.requirements().entrySet()) {
+            StatType statType = entry.getKey();
+            float required = entry.getValue();
+            if (stats.getFinalStat(statType) < required) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void onUnequipItem(UnequipItemEvent event) {

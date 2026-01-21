@@ -74,7 +74,7 @@ public class InventoryView extends View<InventoryViewModel> {
         int columns = 4;
         for (int i = 0; i < equipmentCategories.length; i++) {
             ItemCategory category = equipmentCategories[i];
-            EquipmentSlot equipmentSlot = new EquipmentSlot(skin);
+            EquipmentSlot equipmentSlot = new EquipmentSlot(skin, viewModel.getEventBus());
             equipmentSlots.put(category, equipmentSlot);
             equipmentGrid.add(buildEquipmentSlot(category, equipmentSlot)).size(35, 35).pad(2.0f);
             if ((i + 1) % columns == 0) {
