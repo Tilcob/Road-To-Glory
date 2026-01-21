@@ -24,11 +24,13 @@ public class SaveService {
                 GameState loaded = saveManager.load();
                 stateManager.setGameState(loaded);
                 chestRegistry.loadFromState(stateManager.loadChestRegistryState());
+                Gdx.app.log("SaveService", "Loaded save data from slot " + saveManager.getActiveSlot());
             } catch (IOException e) {
                 Gdx.app.error("SaveService", "Error loading state: " + e.getMessage());
             }
         } else {
             stateManager.setGameState(new GameState());
+            Gdx.app.debug("SaveService", "No save data found; initialized new game state.");
         }
     }
 
@@ -36,6 +38,7 @@ public class SaveService {
         try {
             stateManager.saveChestRegistryState(chestRegistry.toState());
             saveManager.save(stateManager.getGameState());
+            Gdx.app.log("SaveService", "Saved game state to slot " + saveManager.getActiveSlot());
         } catch (IOException e) {
             Gdx.app.error("SaveService", "Error saving state: " + e.getMessage());
         }
