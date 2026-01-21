@@ -94,6 +94,10 @@ public class DialogNavigator {
         hasLines();
     }
 
+    public boolean startAtNode(String nodeId) {
+        return switchToNode(nodeId);
+    }
+
     private boolean switchToNode(String nodeId) {
         if (nodeId == null) {
             return false;

@@ -401,6 +401,8 @@ public class TiledAshleyConfigurator {
         entity.add(new Trigger(type));
         String questId = properties.get(Constants.QUEST_ID, "", String.class);
         if (!questId.isBlank()) entity.add(new Quest(questId));
+        String cutsceneId = properties.get(Constants.CUTSCENE_ID, "", String.class);
+        if (!cutsceneId.isBlank()) entity.add(new CutsceneReference(cutsceneId));
         entity.add(tile);
         entity.add(new MapEntity());
         engine.addEntity(entity);

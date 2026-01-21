@@ -33,6 +33,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         eventBus.subscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.subscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.subscribe(FinishedDialogEvent.class, this::onFinishedDialog);
+        eventBus.subscribe(StartDialogEvent.class, this::onStartDialog);
     }
 
     @Override
@@ -76,6 +77,11 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         boolean repeatChoices = dialogData.questDialog() == null;
         DialogSession session = new DialogSession(npcEntity);
         DialogNavigator navigator = new DialogNavigator(dialogData, session, selection, repeatChoices);
+        StartDialogRequest startRequest = StartDialogRequest.MAPPER.get(player);
+        String startNodeId = startRequest != null && startRequest.getNpc() == npcEntity ? startRequest.getNodeId() : null;
+        if (startNodeId != null && !startNodeId.isBlank()) {
+            navigator.startAtNode(startNodeId);
+        }
         if (!navigator.hasLines()) {
             dialog.setState(Dialog.State.IDLE);
             return;
@@ -177,6 +183,41 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         }
     }
 
+    private void onStartDialog(StartDialogEvent event) {
+        Entity player = event.player();
+        String npcId = event.npcId();
+        if (player == null || npcId == null || npcId.isBlank()) {
+            return;
+        }
+        Entity npcEntity = findNpcById(npcId);
+        if (npcEntity == null) {
+            return;
+        }
+        PlayerReference reference = PlayerReference.MAPPER.get(npcEntity);
+        if (reference == null) {
+            npcEntity.add(new PlayerReference(player));
+        } else {
+            reference.setPlayer(player);
+        }
+        player.remove(StartDialogRequest.class);
+        player.add(new StartDialogRequest(npcEntity, event.nodeId()));
+        Dialog dialog = Dialog.MAPPER.get(npcEntity);
+        if (dialog != null) {
+            dialog.setState(Dialog.State.REQUEST);
+        }
+    }
+
+    private Entity findNpcById(String npcId) {
+        if (getEngine() == null) return null;
+        for (Entity entity : getEngine().getEntitiesFor(Family.all(Npc.class, Dialog.class).get())) {
+            Npc npc = Npc.MAPPER.get(entity);
+            if (npc != null && npcId.equals(npc.getName())) {
+                return entity;
+            }
+        }
+        return null;
+    }
+
     private void removeSession(Entity player) {
         player.remove(DialogSession.class);
         navigators.remove(player);
@@ -204,5 +245,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         eventBus.unsubscribe(DialogChoiceSelectEvent.class, this::onChoiceSelect);
         eventBus.unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
         eventBus.unsubscribe(FinishedDialogEvent.class, this::onFinishedDialog);
+        eventBus.unsubscribe(StartDialogEvent.class, this::onStartDialog);
     }
 }

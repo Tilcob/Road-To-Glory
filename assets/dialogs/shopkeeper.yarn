@@ -11,3 +11,10 @@ position: 339,-28
 ---
 Take your time browsing.
 ===
+
+title: cutscene_intro
+tags:
+position: 520,-28
+---
+Thanks for stopping by during the cutscene.
+===

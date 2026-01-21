@@ -24,6 +24,14 @@ public class ControllerSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
         DialogSession dialogSession = DialogSession.MAPPER.get(entity);
+        if (PlayerInputLock.MAPPER.get(entity) != null) {
+            clearMovement(entity);
+            controller.getCommandBuffer().clear();
+            controller.getPressedCommands().clear();
+            controller.getReleasedCommands().clear();
+            controller.getHeldCommands().clear();
+            return;
+        }
         boolean choosingDialog = dialogSession != null && dialogSession.isAwaitingChoice();
 
         updateMovement(entity, controller);
@@ -72,6 +80,13 @@ public class ControllerSystem extends IteratingSystem {
         if (controller.getHeldCommands().contains(Command.LEFT)) x -= 1f;
         if (controller.getHeldCommands().contains(Command.RIGHT)) x += 1f;
         move.getDirection().set(x, y);
+    }
+
+    private void clearMovement(Entity entity) {
+        Move move = Move.MAPPER.get(entity);
+        if (move != null) {
+            move.getDirection().set(0f, 0f);
+        }
     }
 
     private void showEntityInventory(Entity player) {

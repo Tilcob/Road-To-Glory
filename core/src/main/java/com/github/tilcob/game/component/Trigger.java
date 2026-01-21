@@ -38,5 +38,6 @@ public class Trigger implements Component {
         CHANGE_MAP,
         QUEST,
         DIALOG,
+        CUTSCENE,
     }
 }
