@@ -55,6 +55,7 @@ public class QuestYarnRegistry {
         } catch (IOException e) {
             Gdx.app.error(TAG, "Failed to read quest index: " + indexFile.path(), e);
         }
+        Gdx.app.debug(TAG, "Loaded " + definitions.size() + " quests");
         return Collections.unmodifiableMap(definitions);
     }
 

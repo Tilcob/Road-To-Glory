@@ -15,7 +15,7 @@ public class ChaseState implements State<Entity> {
     public void enter(Entity entity) {
         Entity player = NpcStateSupport.findPlayer(entity);
         NpcBehaviorProfile behaviorProfile = NpcStateSupport.behaviorProfile(entity);
-        if (player == null || !behaviorProfile.canChase() || !NpcStateSupport.canAggro(entity, player)) {
+        if (!behaviorProfile.canChase() || !NpcStateSupport.canAggro(entity, player)) {
             NpcFsm.MAPPER.get(entity).getNpcFsm().changeState(NpcState.IDLE);
             return;
         }

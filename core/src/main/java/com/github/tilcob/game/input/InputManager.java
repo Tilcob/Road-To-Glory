@@ -66,7 +66,10 @@ public class InputManager implements InputDeviceListener {
         }
         ControllerState state = stateCache.get(stateClass);
         if (state == null) {
-            throw new GdxRuntimeException("Controller state not found: " + stateClass.getSimpleName());
+            throw new IllegalArgumentException(
+                "Controller state not configured: " + stateClass.getName() +
+                    ". Available: " + stateCache.keySet()
+            );
         }
 
         for (Command command : Command.values()) {

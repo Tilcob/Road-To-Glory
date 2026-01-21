@@ -1,6 +1,8 @@
 package com.github.tilcob.game.quest;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Application;
+import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.dialog.DialogData;
@@ -35,6 +37,9 @@ public class QuestLifecycleService {
 
     public void startQuest(Entity player, String questId) {
         if (player == null || questId == null || questId.isBlank()) return;
+        if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
+            Gdx.app.debug("QuestLifecycleService", "Start quest: " + questId);
+        }
         QuestLog questLog = QuestLog.MAPPER.get(player);
         if (questLog == null) return;
         for (Quest quest : questLog.getQuests()) {
@@ -55,6 +60,9 @@ public class QuestLifecycleService {
 
     public void setQuestStage(Entity player, String questId, int stage) {
         if (player == null || questId == null || questId.isBlank() || stage < 0) return;
+        if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
+            Gdx.app.debug("QuestLifecycleService", "Set quest stage: " + questId + " -> " + stage);
+        }
         QuestLog questLog = QuestLog.MAPPER.get(player);
         if (questLog == null) return;
         Quest quest = questLog.getQuestById(questId);
