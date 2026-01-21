@@ -1,13 +1,13 @@
 # QuestRewardSchedulerSystem
 
-## Zweck
-Plant Quest-Belohnungen nach Dialogen oder Questabschlüssen.
+## Purpose
+Schedules quest rewards after dialogs or quest completions.
 
-## Ablauf
-- Bei DialogFinishedEvent: scheduleRewardFromDialog.
-- Bei QuestCompletedEvent: scheduleRewardFromCompletion.
+## Flow
+- On `DialogFinishedEvent`: `scheduleRewardFromDialog`.
+- On `QuestCompletedEvent`: `scheduleRewardFromCompletion`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - DialogFinishedEvent
 - QuestCompletedEvent
 - QuestLifecycleService

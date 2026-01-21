@@ -1,13 +1,13 @@
 # QuestSystem
 
-## Zweck
-Überwacht aktive Quests und startet neue Quests über Events.
+## Purpose
+Monitors active quests and starts new quests through events.
 
-## Ablauf
-- Iteriert über QuestLog-Quests und ruft notifyQuestCompletion auf.
-- Abonniert AddQuestEvent, um QuestLifecycleService.startQuest aufzurufen.
+## Flow
+- Iterates over `QuestLog` quests and calls `notifyQuestCompletion`.
+- Subscribes to `AddQuestEvent` to call `QuestLifecycleService.startQuest`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - QuestLog
 - QuestLifecycleService
 - AddQuestEvent

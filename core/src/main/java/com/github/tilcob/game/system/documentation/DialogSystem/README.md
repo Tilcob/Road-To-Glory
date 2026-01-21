@@ -1,15 +1,15 @@
 # DialogSystem
 
-## Zweck
-Orchestriert Dialoge zwischen Spieler und NPCs inklusive Auswahl, Fortschritt und Yarn-Kommandos.
+## Purpose
+Orchestrates dialogs between player and NPCs including choices, progression, and Yarn commands.
 
-## Ablauf
-- Startet Dialoge bei Dialog.State.REQUEST, erstellt DialogSession und DialogNavigator.
-- Feuert DialogStartedEvent und dispatcht DialogLine-Events bis zur Auswahl oder zum Ende.
-- Verarbeitet Choice-Navigation/Selection und löst DialogChoiceResolvedEvent aus.
-- Beendet Dialoge bei ExitTrigger oder wenn keine Lines übrig sind.
+## Flow
+- Starts dialogs when `Dialog.State.REQUEST`, creates `DialogSession` and `DialogNavigator`.
+- Fires `DialogStartedEvent` and dispatches dialog line events until a choice or the end.
+- Processes choice navigation/selection and emits `DialogChoiceResolvedEvent`.
+- Ends dialogs on exit triggers or when no lines remain.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Dialog
 - DialogNavigator
 - DialogSession

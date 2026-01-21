@@ -1,14 +1,14 @@
 # StatRecalcSystem
 
-## Zweck
-Berechnet finale Stats aus Basiswerten und Modifikatoren und wendet sie auf Entities an.
+## Purpose
+Calculates final stats from base values and modifiers and applies them to entities.
 
-## Ablauf
-- Reagiert auf StatRecalcEvent und summiert additive/multiplikative Modifier pro StatType.
-- Setzt finalStats und ruft StatApplier.apply auf.
-- Schreibt Debug-Logs für Quellen (item/buff/levelup).
+## Flow
+- Responds to `StatRecalcEvent` and sums additive/multiplicative modifiers per `StatType`.
+- Sets `finalStats` and calls `StatApplier.apply`.
+- Writes debug logs for sources (item/buff/levelup).
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - StatComponent
 - StatModifierComponent
 - StatApplier

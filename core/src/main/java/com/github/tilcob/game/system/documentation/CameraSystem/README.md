@@ -1,14 +1,14 @@
 # CameraSystem
 
-## Zweck
-Bewegt die Kamera weich zur Zielposition des Kamera-Targets und begrenzt die Position auf die Map-Grenzen.
+## Purpose
+Moves the camera smoothly toward the target position and clamps it to map boundaries.
 
-## Ablauf
-- Berechnet eine Zielposition aus Transform + Kamera-Offset.
-- Clampt die Zielposition gegen die Map-Größe und interpoliert mit einem Smoothing-Faktor.
-- SetMap liest Kachel- und Map-Größe aus den Tiled-Properties und initialisiert die Kamera-Position.
+## Flow
+- Computes a target position from `Transform` + camera offset.
+- Clamps the target position against the map size and interpolates with a smoothing factor.
+- `setMap` reads tile and map size from Tiled properties and initializes camera position.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - CameraFollow
 - Transform
 - TiledMap

@@ -1,14 +1,14 @@
 # PhysicSystem
 
-## Zweck
-Steuert die Box2D-Simulation, interpoliert Positionen und verwaltet Trigger-Kontakte.
+## Purpose
+Drives the Box2D simulation, interpolates positions, and manages trigger contacts.
 
-## Ablauf
-- Stept die Box2D-World mit festem Timestep und speichert vorherige Positionen.
-- Interpoliert Transform-Positionen zwischen Physik-Ticks für glattes Rendering.
-- Verarbeitet Contact-Events, erstellt Trigger-Komponenten aus Sensoren und feuert ExitTriggerEvent.
+## Flow
+- Steps the Box2D world with a fixed timestep and stores previous positions.
+- Interpolates `Transform` positions between physics ticks for smooth rendering.
+- Processes contact events, creates trigger components from sensors, and fires `ExitTriggerEvent`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - World
 - Physic
 - Transform

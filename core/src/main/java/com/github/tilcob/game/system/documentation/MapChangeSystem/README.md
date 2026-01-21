@@ -1,14 +1,14 @@
 # MapChangeSystem
 
-## Zweck
-Wechselt Karten, speichert den Zustand und repositioniert den Spieler an den Spawnpunkt.
+## Purpose
+Changes maps, saves state, and repositions the player at the spawn point.
 
-## Ablauf
-- Speichert Map-Zustand, lädt die neue Map und liest den Spawnpunkt aus dem TiledManager.
-- Feuert AutosaveEvent und MapChangeEvent.
-- Setzt Transform/Physic-Position auf den Spawn und entfernt MapChange.
+## Flow
+- Saves map state, loads the new map, and reads the spawn point from the `TiledManager`.
+- Fires `AutosaveEvent` and `MapChangeEvent`.
+- Sets Transform/Physic position to the spawn and removes `MapChange`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - MapChange
 - TiledManager
 - StateManager

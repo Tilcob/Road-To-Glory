@@ -1,14 +1,14 @@
 # RenderSystem
 
-## Zweck
-Rendert Tiled-Map-Layer und Entities mit Transform/Graphic in sortierter Reihenfolge.
+## Purpose
+Renders tiled map layers and entities with `Transform`/`Graphic` in sorted order.
 
-## Ablauf
-- Rendert Hintergrund-Layer, dann Entities sortiert nach Transform, dann Vordergrund-Layer.
-- Zeichnet Sprites mit Skalierung/Rotation und setzt Batch-Farbe aus Graphic.
-- setMap ordnet die Layer vor/hinter dem Object-Layer.
+## Flow
+- Renders background layers, then entities sorted by transform, then foreground layers.
+- Draws sprites with scaling/rotation and sets batch color from `Graphic`.
+- `setMap` orders layers in front of/behind the object layer.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - OrthogonalTiledMapRenderer
 - Transform
 - Graphic

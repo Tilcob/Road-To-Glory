@@ -1,14 +1,14 @@
 # NpcPathfindingSystem
 
-## Zweck
-Übersetzt MoveIntent in eine normalisierte Bewegungsrichtung für NPCs.
+## Purpose
+Translates `MoveIntent` into a normalized movement direction for NPCs.
 
-## Ablauf
-- Wenn Intent inaktiv ist, wird die Richtung auf 0 gesetzt.
-- Bei Ziel-Intent wird der Vektor zum Ziel berechnet und bei Ankunft der Intent gelöscht.
-- Die resultierende Richtung wird normalisiert und in Move.direction geschrieben.
+## Flow
+- If the intent is inactive, sets direction to 0.
+- For target intent, computes the vector to the target and clears the intent on arrival.
+- Normalizes the resulting direction and writes it into `Move.direction`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - MoveIntent
 - Move
 - Npc

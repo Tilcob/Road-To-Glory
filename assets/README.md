@@ -1,20 +1,20 @@
 # Assets
 
-Dieses Verzeichnis enthält die zur Laufzeit benötigten Assets für **Road-To-Glory**. Die Dateien werden vom Spiel geladen und in der Desktop-App direkt als Ressourcen genutzt.
+This directory contains the runtime assets for **Road-To-Glory**. The game loads these files directly as resources in the desktop app.
 
-## Struktur (Auszug)
+## Structure (excerpt)
 
-- `audio/`: Soundeffekte und Musik.
-- `graphics/`: Texturen, Spritesheets und Grafiken.
-- `maps/`: Karten- und Tilemap-Daten.
-- `dialogs/`: Dialogdateien (Yarn).
-- `quests/`: Questdefinitionen und `index.json`.
-- `items/`: Item-Definitionen.
-- `ui/`: UI-Skins, Layouts und UI-Assets.
-- `stats/`: Werte- und Balancing-Daten.
-- `tests/`: Test-/Beispieldaten für Content.
+- `audio/`: sound effects and music.
+- `graphics/`: textures, spritesheets, and graphics.
+- `maps/`: maps and tilemap data.
+- `dialogs/`: dialog files (Yarn).
+- `quests/`: quest definitions and `index.json`.
+- `items/`: item definitions.
+- `ui/`: UI skins, layouts, and UI assets.
+- `stats/`: stat and balancing data.
+- `tests/`: test/sample data for content.
 
-## Hinweise
+## Notes
 
-- `quests/index.json` wird aus den `.yarn`-Dateien generiert.
-- Das Spiel startet mit `assets/` als Working Directory (z. B. über `lwjgl3:run`).
+- `quests/index.json` is generated from the `.yarn` files.
+- The game starts with `assets/` as the working directory (for example via `lwjgl3:run`).

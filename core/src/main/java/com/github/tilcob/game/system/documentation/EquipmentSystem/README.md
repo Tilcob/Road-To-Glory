@@ -1,15 +1,15 @@
 # EquipmentSystem
 
-## Zweck
-Verwaltet Ausrüsten/Abnehmen von Items und synchronisiert Inventar- und Equipment-Slots.
+## Purpose
+Manages equipping/unequipping items and keeps inventory and equipment slots in sync.
 
-## Ablauf
-- Hält eine Player-Referenz über processEntity.
-- Bei EquipItemEvent wird das Item validiert (Slot, Kategorie, Requirements) und ins Equipment verschoben.
-- Beim Unequip wird das Item in einen freien Inventar-Slot gelegt.
-- Feuert UpdateInventoryEvent und UpdateEquipmentEvent.
+## Flow
+- Keeps a player reference via `processEntity`.
+- On `EquipItemEvent`, validates the item (slot, category, requirements) and moves it into equipment.
+- On unequip, places the item into a free inventory slot.
+- Fires `UpdateInventoryEvent` and `UpdateEquipmentEvent`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Equipment
 - Inventory
 - EquipItemEvent

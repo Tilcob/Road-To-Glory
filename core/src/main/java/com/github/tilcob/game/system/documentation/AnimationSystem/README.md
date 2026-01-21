@@ -1,15 +1,15 @@
 # AnimationSystem
 
-## Zweck
-Aktualisiert 2D-Animationen basierend auf Facing und AnimationType und schreibt den aktuellen Frame in die Graphic-Komponente.
+## Purpose
+Updates 2D animations based on facing and `AnimationType`, and writes the current frame into the `Graphic` component.
 
-## Ablauf
-- Erkennt Änderungen an Animation2D (dirty) oder Facing-Wechsel und baut dann eine neue Animation aus dem TextureAtlas.
-- Cached Animationen per Atlas/Key/Typ/Richtung, um wiederholte Lookups zu vermeiden.
-- Setzt das PlayMode und überträgt den aktuellen Keyframe in Graphic.
-- Synchronisiert bei Attack-Animationen die Windup-Dauer mit der Animationsdauer.
+## Flow
+- Detects changes on `Animation2D` (dirty) or facing changes, then builds a new animation from the TextureAtlas.
+- Caches animations by atlas/key/type/direction to avoid repeated lookups.
+- Sets the PlayMode and transfers the current keyframe to `Graphic`.
+- Syncs attack animation windup duration with the animation duration.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Animation2D
 - Graphic
 - Facing

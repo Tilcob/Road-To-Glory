@@ -1,13 +1,13 @@
 # DialogConsequenceSystem
 
-## Zweck
-Wendet Effekte aus aufgelösten Dialogentscheidungen an (Quests, Flags, Quest-Schritte).
+## Purpose
+Applies effects from resolved dialog decisions (quests, flags, quest steps).
 
-## Ablauf
-- Abonniert DialogChoiceResolvedEvent und iteriert über DialogEffect-Liste.
-- Startet Quests, setzt Dialog-Flags oder signalisiert Quest-Schritte an den QuestManager.
+## Flow
+- Subscribes to `DialogChoiceResolvedEvent` and iterates over the `DialogEffect` list.
+- Starts quests, sets dialog flags, or signals quest steps to the `QuestManager`.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - DialogChoiceResolvedEvent
 - DialogEffect
 - QuestLifecycleService

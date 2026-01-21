@@ -1,16 +1,16 @@
 # Utils
 
-Dieses Modul enthält Hilfstools und Validierungslogik für das Projekt. Aktuell liegt der Fokus auf der Prüfung von Quest- und Dialogdaten.
+This module contains helper tools and validation logic for the project. The current focus is validating quest and dialog data.
 
-## Inhalte
+## Contents
 
-- **QuestContentValidator**: Validiert Quest-Header, Schritte und Verweise auf Dialog-Tags.
+- **QuestContentValidator**: validates quest headers, steps, and references to dialog tags.
 
-## Wichtige Gradle-Tasks
+## Important Gradle tasks
 
 ```bash
-# Quest- und Dialogdaten prüfen
+# Validate quest and dialog data
 ./gradlew :utils:validateQuestContent
 ```
 
-Der Task erwartet das Verzeichnis `assets/` als Eingabe und prüft dort die Yarn-Quests.
+The task expects the `assets/` directory as input and validates Yarn quests there.

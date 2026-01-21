@@ -1,14 +1,14 @@
 # EquipmentStatModifierSystem
 
-## Zweck
-Überträgt Stat-Modifikatoren aus ausgerüsteten Items in die StatModifierComponent.
+## Purpose
+Transfers stat modifiers from equipped items into `StatModifierComponent`.
 
-## Ablauf
-- Reagiert auf Equipment-Änderungen (dirty) und entfernt alte item: Modifier.
-- Liest ItemDefinition.statModifiers für jedes ausgerüstete Item und fügt StatModifier hinzu.
-- Triggert StatRecalcEvent nach dem Aktualisieren.
+## Flow
+- Reacts to equipment changes (dirty) and removes old `item:` modifiers.
+- Reads `ItemDefinition.statModifiers` for each equipped item and adds `StatModifier` entries.
+- Triggers `StatRecalcEvent` after updates.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - Equipment
 - StatModifierComponent
 - ItemDefinitionRegistry

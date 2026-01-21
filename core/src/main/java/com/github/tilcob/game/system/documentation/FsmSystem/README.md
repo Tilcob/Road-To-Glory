@@ -1,10 +1,10 @@
 # FsmSystem
 
-## Zweck
-Aktualisiert die Animation-FSM pro Tick.
+## Purpose
+Updates the animation FSM each tick.
 
-## Ablauf
-- Ruft update() auf der AnimationFsm-Komponente jedes passenden Entity auf.
+## Flow
+- Calls `update()` on the `AnimationFsm` component for each matching entity.
 
-## Wichtige Komponenten & Ereignisse
+## Key components & events
 - AnimationFsm
