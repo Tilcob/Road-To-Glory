@@ -5,7 +5,7 @@ position: -193,-349
 Hello, would you like to do a quest?
 -> ... (Take Quest)
     <<add_quest welcome_to_town>>
-    <<jump quest_notStarted>>
+    <<jump npc_1_quest_notStarted>>
 -> ... (not now)
     <<jump npc_1_idle>>
 ===
@@ -18,21 +18,21 @@ Good day sir.
 Take care.
 ===
 
-title: quest_notStarted
+title: npc_1_quest_notStarted
 tags: quest_welcome_to_town, notstarted
 position: 210,-214
 ---
 Welcome in our town!
 ===
 
-title: quest_inProgress
+title: npc_1_quest_inProgress
 tags: quest_welcome_to_town, inprogress
 position: -268,-50
 ---
 Are you new here?
 ===
 
-title: quest_completed
+title: npc_1_quest_completed
 tags: quest_welcome_to_town, completed
 position: 11,-23
 ---

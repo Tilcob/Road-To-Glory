@@ -139,9 +139,19 @@ public class YarnQuestParser {
                 yield new QuestDefinition.StepDefinition("talk", parts[1], null, 0, null, journalText);
             }
             case "collect" -> {
-                if (parts.length < 3) {
-                    Gdx.app.error(TAG, "Collect step missing args: " + questFile.path());
+                if (parts.length < 2) {
+                    Gdx.app.error(TAG, "Collect step missing item: " + questFile.path());
                     yield null;
+                }
+                if (parts.length == 2) {
+                    yield new QuestDefinition.StepDefinition(
+                        "collect",
+                        null,
+                        parts[1],
+                        1,
+                        null,
+                        journalText
+                    );
                 }
                 yield new QuestDefinition.StepDefinition(
                     "collect",
@@ -153,16 +163,26 @@ public class YarnQuestParser {
                 );
             }
             case "kill" -> {
-                if (parts.length < 3) {
-                    Gdx.app.error(TAG, "Kill step missing args: " + questFile.path());
+                if (parts.length < 2) {
+                    Gdx.app.error(TAG, "Kill step missing npc: " + questFile.path());
                     yield null;
                 }
+                if (parts.length == 2) {
+                    yield new QuestDefinition.StepDefinition(
+                        "kill",
+                        null,
+                        null,
+                        1,
+                        parts[1],
+                        journalText
+                    );
+                }
                 yield new QuestDefinition.StepDefinition(
-                    "collect",
+                    "kill",
                     null,
-                    parts[1],
+                    null,
                     parseInt(parts[2], questFile),
-                    null,
+                    parts[1],
                     journalText
                 );
             }

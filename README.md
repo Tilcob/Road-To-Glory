@@ -16,6 +16,16 @@ Quest definitions live in `assets/quests/index.json`, which is generated from th
 `.yarn` quest files in `assets/quests` and loaded from Yarn headers inside each quest
 file.
 
+### Dialog data
+
+Dialog definitions live in `assets/dialogs/index.json`, which is generated from the
+`.yarn` dialog files in `assets/dialogs` and loaded from the file name.
+
+### Item data
+
+Item definitions live in `assets/items/index.json`, which is generated from the
+`.json` quest files in `assets/items` and loaded from file name.
+
 ## Codebase documentation
 
 The core module follows a layered architecture on top of Ashley ECS. The most important packages are documented via

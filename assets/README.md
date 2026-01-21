@@ -16,5 +16,5 @@ This directory contains the runtime assets for **Road-To-Glory**. The game loads
 
 ## Notes
 
-- `quests/index.json` is generated from the `.yarn` files.
-- The game starts with `assets/` as the working directory (for example via `lwjgl3:run`).
+- `quests/index.json`, `dialogs/index.json` and `items/index.json` are generated from the `.yarn` or `.json` files.
+- The game starts with `assets/` as the working directory (for example, via `lwjgl3:run`).

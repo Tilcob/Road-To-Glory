@@ -25,6 +25,15 @@ Inside the quest file headers (before the first `---`):
 - You may also use `reward_items:` with a comma-separated list.
 - Reward timing is optional and uses `reward_timing:` (`giver`, `completion`, or `auto`).
 
+## Steps
+
+There are three types of steps:
+- `talk`: give the name of the npc to talk to. (Example: `talk Npc-2`)
+- `collect`: collect items from the scene. (Example: `collect potion 2`)
+  - If their only `collect potion` then only one item is too collected.
+- `kill`: kill enemies. (Example: `kill Rat 3`)
+  - If their only `kill Enemy-1` then there is only one enemy to be killed.
+
 ## Rewards
 
 Rewards are awarded when the quest is completed (via `QuestRewardEvent`). Rewards belong
