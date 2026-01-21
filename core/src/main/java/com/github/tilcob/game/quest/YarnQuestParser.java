@@ -254,8 +254,4 @@ public class YarnQuestParser {
         }
         return trimmed;
     }
-
-    private String normalizeHeaderKey(String key) {
-        return key.trim().replace('.', '_');
-    }
 }
