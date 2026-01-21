@@ -9,15 +9,19 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.GameServices;
+import com.github.tilcob.game.debug.DebugLogBuffer;
 import com.github.tilcob.game.save.SaveSlot;
 
 public class DebugOverlayView extends Table {
     private final Engine engine;
     private final GameServices services;
+    private final Label consoleLabel;
     private final Label fpsLabel;
     private final Label entityLabel;
     private final Label systemLabel;
     private final Label saveSlotLabel;
+    private final Table statsTable;
+    private final Table consoleTable;
 
     public DebugOverlayView(Skin skin, Engine engine, GameServices services) {
         super(skin);
@@ -27,19 +31,32 @@ public class DebugOverlayView extends Table {
         this.entityLabel = new Label("", skin, "text_08");
         this.systemLabel = new Label("", skin, "text_08");
         this.saveSlotLabel = new Label("", skin, "text_08");
+        this.consoleLabel = new Label("", skin, "text_08");
+        this.statsTable = new Table(skin);
+        this.consoleTable = new Table(skin);
 
         setTouchable(Touchable.disabled);
         setFillParent(true);
-        align(Align.topRight);
         pad(8f);
-        defaults().right();
+
+        statsTable.align(Align.topRight);
+        statsTable.defaults().right();
 
         for (Label label : new Label[] { fpsLabel, entityLabel, systemLabel, saveSlotLabel }) {
             label.setColor(Color.WHITE);
-            add(label).row();
+            statsTable.add(label).row();
         }
 
-        pack();
+        consoleLabel.setColor(Color.WHITE);
+        consoleLabel.setWrap(true);
+        consoleLabel.setAlignment(Align.bottomLeft);
+
+        consoleTable.align(Align.bottomLeft);
+        consoleTable.add(consoleLabel).width(420f).left().bottom();
+
+        add(statsTable).expand().top().right();
+        row();
+        add(consoleTable).expand().bottom().left();
     }
 
     public void update() {
@@ -48,6 +65,8 @@ public class DebugOverlayView extends Table {
         systemLabel.setText("Systems: " + engine.getSystems().size());
         SaveSlot slot = services.getSaveService().getActiveSlot();
         saveSlotLabel.setText("Save Slot: " + (slot == null ? "legacy" : slot.name()));
+        DebugLogBuffer buffer = DebugLogBuffer.getActive();
+        if (buffer != null) consoleLabel.setText(String.join("\n", buffer.getLines()));
         pack();
     }
 }
