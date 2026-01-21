@@ -154,10 +154,30 @@ tasks.register("genItemIndex") {
   }
 }
 
+tasks.register("genCutsceneIndex") {
+  group = "assets"
+  description = "Generates assets/cutscenes/index.json from *.yarn."
+  doLast {
+    def dir = file("$rootDir/assets/cutscenes")
+    if (!dir.exists()) throw new GradleException("Directory not found: $dir")
+
+    def outFile = file("$rootDir/assets/cutscenes/index.json")
+
+    def names = dir.listFiles()
+      .findAll { it.isFile() }
+      .collect { it.name }
+      .findAll { it.toLowerCase().endsWith(".yarn") }
+      .sort()
+
+    outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(names)) + "\n"
+    println "Generated $outFile (${names.size()} entries)"
+  }
+}
+
 tasks.register("genAssetIndexes") {
   group = "assets"
-  description = "Generates quest + dialog + items index files."
-  dependsOn("genQuestIndex", "genDialogIndex", "genItemIndex", "genQuestTestIndex")
+  description = "Generates quest + dialog + items + cutscenes index files."
+  dependsOn("genQuestIndex", "genDialogIndex", "genItemIndex", "genQuestTestIndex", "genCutsceneIndex")
 }
 
 // Automatically run before processResources in all subprojects (core/lwjgl3/etc.)

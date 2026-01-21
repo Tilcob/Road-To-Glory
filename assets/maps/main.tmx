@@ -21,7 +21,7 @@
   <object id="4" gid="195" x="365.333" y="89.3333" width="41" height="63"/>
   <object id="5" gid="194" x="346" y="232.667" width="80" height="112"/>
   <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
-  <object id="12" name="Npc-3" gid="197" x="329.333" y="288.667" width="32" height="32">
+  <object id="12" name="Shopkeeper" gid="197" x="329.333" y="288.667" width="32" height="32">
    <properties>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
    </properties>
