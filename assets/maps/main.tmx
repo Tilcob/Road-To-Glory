@@ -42,6 +42,7 @@
    <properties>
     <property name="bodyType" propertytype="BodyType" value="KinematicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
+    <property name="canWander" type="bool" value="true"/>
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>

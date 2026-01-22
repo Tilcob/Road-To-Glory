@@ -71,6 +71,7 @@ public class Constants {
     public static final String PATROL_POINTS = "patrolPoints";
     public static final String PATROL_LOOP = "patrolLoop";
     public static final String PATROL_WAIT = "patrolWait";
+    public static final String CAN_WANDER = "canWander";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";

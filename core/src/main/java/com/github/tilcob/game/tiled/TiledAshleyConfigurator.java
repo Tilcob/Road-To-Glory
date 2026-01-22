@@ -86,6 +86,7 @@ public class TiledAshleyConfigurator {
             ? properties.get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class)
             : tile.getProperties().get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class);
         String name = object.getName();
+        boolean canWander = properties.get(Constants.CAN_WANDER, false, Boolean.class);
         if (name == null) return;
         if (npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
@@ -94,7 +95,7 @@ public class TiledAshleyConfigurator {
         entity.add(new Dialog());
         entity.add(new MoveIntent());
         entity.add(new NpcFsm(entity));
-        entity.add(new WanderTimer());
+        if (canWander) entity.add(new WanderTimer());
         entity.add(new AggroMemory());
         entity.add(new Equipment());
         entity.add(new StatModifierComponent());

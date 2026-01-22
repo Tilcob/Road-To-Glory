@@ -45,6 +45,7 @@
    <property name="attackWindup" type="float" value="1"/>
    <property name="bodyType" propertytype="BodyType" value="DynamicBody"/>
    <property name="cameraFollow" type="bool" value="true"/>
+   <property name="canWander" type="bool" value="false"/>
    <property name="controller" type="bool" value="true"/>
    <property name="damage" type="float" value="7"/>
    <property name="hasInventory" type="bool" value="true"/>
