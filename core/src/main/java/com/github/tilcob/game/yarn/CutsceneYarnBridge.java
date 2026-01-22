@@ -100,43 +100,35 @@ public class CutsceneYarnBridge {
     }
 
     private void playAnimation(Entity player, String[] args) {
-        if (args == null || args.length < 2) {
-            return;
-        }
+        if (args == null || args.length < 2) return;
+
         Entity target = resolveEntity(player, args[0]);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
+
         Animation2D animation2D = Animation2D.MAPPER.get(target);
-        if (animation2D == null) {
-            return;
-        }
+        if (animation2D == null) return;
+
         Animation2D.AnimationType type = parseAnimationType(args[1]);
-        if (type == null) {
-            return;
-        }
+        if (type == null) return;
+
         Animation.PlayMode playMode = parsePlayMode(args.length > 2 ? args[2] : null, type);
         animation2D.setType(type);
         animation2D.setPlayMode(playMode);
     }
 
     private void moveTo(Entity player, String[] args) {
-        if (args == null || args.length < 3) {
-            return;
-        }
+        if (args == null || args.length < 3) return;
+
         Entity target = resolveEntity(player, args[0]);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
+
         Transform transform = Transform.MAPPER.get(target);
-        if (transform == null) {
-            return;
-        }
+        if (transform == null) return;
+
         float x = parseFloat(args[1], Float.NaN);
         float y = parseFloat(args[2], Float.NaN);
-        if (Float.isNaN(x) || Float.isNaN(y)) {
-            return;
-        }
+        if (Float.isNaN(x) || Float.isNaN(y)) return;
+
         float targetX = transform.getPosition().x + x;
         float targetY = transform.getPosition().y + y;
         float arrivalDistance = args.length > 3 ? Math.max(0f, parseFloat(args[3], 0f)) : 0.1f;
@@ -149,17 +141,14 @@ public class CutsceneYarnBridge {
     }
 
     private void faceEntity(Entity player, String[] args) {
-        if (args == null || args.length < 2) {
-            return;
-        }
+        if (args == null || args.length < 2) return;
+
         Entity target = resolveEntity(player, args[0]);
-        if (target == null) {
-            return;
-        }
+        if (target == null) return;
+
         Facing.FacingDirection direction = parseFacing(args[1]);
-        if (direction == null) {
-            return;
-        }
+        if (direction == null) return;
+
         Facing facing = Facing.MAPPER.get(target);
         if (facing == null) {
             facing = new Facing(direction);
@@ -186,36 +175,25 @@ public class CutsceneYarnBridge {
     }
 
     private void playMusic(Entity player, String[] args) {
-        if (audioManager == null || args == null || args.length == 0) {
-            return;
-        }
+        if (audioManager == null || args == null || args.length == 0) return;
         MusicAsset musicAsset = parseMusicAsset(args[0]);
-        if (musicAsset == null) {
-            return;
-        }
+        if (musicAsset == null) return;
         audioManager.playMusic(musicAsset);
     }
 
     private void playSound(Entity player, String[] args) {
-        if (audioManager == null || args == null || args.length == 0) {
-            return;
-        }
+        if (audioManager == null || args == null || args.length == 0) return;
         SoundAsset soundAsset = parseSoundAsset(args[0]);
-        if (soundAsset == null) {
-            return;
-        }
+        if (soundAsset == null) return;
         audioManager.playSound(soundAsset);
     }
 
     private void setFlag(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) {
-            return;
-        }
+        if (player == null || args == null || args.length == 0) return;
         String flag = args[0];
-        boolean value = args.length <= 1 || Boolean.parseBoolean(args[1]);
-        if (flag == null || flag.isBlank()) {
-            return;
-        }
+        boolean value = args.length == 1 || Boolean.parseBoolean(args[1]);
+        if (flag == null || flag.isBlank()) return;
+
         DialogFlags flags = DialogFlags.MAPPER.get(player);
         if (flags == null) {
             flags = new DialogFlags();
@@ -225,9 +203,8 @@ public class CutsceneYarnBridge {
     }
 
     private void applyFade(Entity player, float targetAlpha, String[] args) {
-        if (player == null) {
-            return;
-        }
+        if (player == null) return;
+
         float duration = args != null && args.length > 0
             ? MathUtils.clamp(parseFloat(args[0], 0f), 0f, 60f)
             : 0f;
@@ -241,26 +218,20 @@ public class CutsceneYarnBridge {
     }
 
     private Entity resolveEntity(Entity player, String entityId) {
-        if (player == null) {
-            return null;
-        }
+        if (player == null) return null;
+
         EntityLookup lookup = entityLookup == null ? null : entityLookup.get();
         if (lookup != null) {
             Entity resolved = lookup.find(player, entityId);
-            if (resolved != null) {
-                return resolved;
-            }
+            if (resolved != null) return resolved;
         }
-        if (entityId == null || entityId.isBlank() || "player".equalsIgnoreCase(entityId)) {
-            return player;
-        }
+        if (entityId == null || entityId.isBlank() || "player".equalsIgnoreCase(entityId)) return player;
         return null;
     }
 
     private Animation2D.AnimationType parseAnimationType(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+        if (value == null || value.isBlank()) return null;
+
         String normalized = value.trim().toUpperCase(Locale.ROOT);
         try {
             return Animation2D.AnimationType.valueOf(normalized);
@@ -277,12 +248,10 @@ public class CutsceneYarnBridge {
             };
         }
         String normalized = value.trim().toUpperCase(Locale.ROOT);
-        if ("LOOP".equals(normalized)) {
-            return Animation.PlayMode.LOOP;
-        }
-        if ("NORMAL".equals(normalized)) {
-            return Animation.PlayMode.NORMAL;
-        }
+        if ("LOOP".equals(normalized)) return Animation.PlayMode.LOOP;
+
+        if ("NORMAL".equals(normalized)) return Animation.PlayMode.NORMAL;
+
         return switch (type) {
             case IDLE, WALK -> Animation.PlayMode.LOOP;
             default -> Animation.PlayMode.NORMAL;
@@ -290,9 +259,8 @@ public class CutsceneYarnBridge {
     }
 
     private Facing.FacingDirection parseFacing(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+        if (value == null || value.isBlank()) return null;
+
         String normalized = value.trim().toUpperCase(Locale.ROOT);
         try {
             return Facing.FacingDirection.valueOf(normalized);
@@ -311,9 +279,8 @@ public class CutsceneYarnBridge {
     }
 
     private MusicAsset parseMusicAsset(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+        if (value == null || value.isBlank()) return null;
+
         String normalized = value.trim().toUpperCase(Locale.ROOT);
         try {
             return MusicAsset.valueOf(normalized);
@@ -323,9 +290,8 @@ public class CutsceneYarnBridge {
     }
 
     private SoundAsset parseSoundAsset(String value) {
-        if (value == null || value.isBlank()) {
-            return null;
-        }
+        if (value == null || value.isBlank()) return null;
+
         String normalized = value.trim().toUpperCase(Locale.ROOT);
         try {
             return SoundAsset.valueOf(normalized);

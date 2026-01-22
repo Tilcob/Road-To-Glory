@@ -9,7 +9,6 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 
-import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Map;
 

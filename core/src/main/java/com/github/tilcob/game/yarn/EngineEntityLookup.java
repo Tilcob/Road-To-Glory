@@ -15,22 +15,15 @@ public class EngineEntityLookup implements EntityLookup {
 
     @Override
     public Entity find(Entity player, String entityId) {
-        if (entityId == null || entityId.isBlank()) {
-            return player;
-        }
+        if (entityId == null || entityId.isBlank()) return player;
         String normalized = entityId.trim();
-        if ("player".equalsIgnoreCase(normalized) || "self".equalsIgnoreCase(normalized)) {
-            return player;
-        }
-        if (engine == null) {
-            return null;
-        }
+        if ("player".equalsIgnoreCase(normalized) || "self".equalsIgnoreCase(normalized)) return player;
+
+        if (engine == null) return null;
         ImmutableArray<Entity> npcs = engine.getEntitiesFor(Family.all(Npc.class).get());
         for (Entity entity : npcs) {
             Npc npc = Npc.MAPPER.get(entity);
-            if (npc != null && normalized.equalsIgnoreCase(npc.getName())) {
-                return entity;
-            }
+            if (npc != null && normalized.equalsIgnoreCase(npc.getName())) return entity;
         }
         return null;
     }

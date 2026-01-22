@@ -7,7 +7,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.component.CameraPan;
 import com.github.tilcob.game.component.CameraPanHome;
-import com.github.tilcob.game.component.Transform;
 
 public class CameraPanSystem extends IteratingSystem {
     private final OrthographicCamera camera;

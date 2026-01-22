@@ -22,9 +22,7 @@ public class DebugLogBuffer implements ApplicationLogger {
     }
 
     public static void install(Application application, int maxLines) {
-        if (application == null) {
-            return;
-        }
+        if (application == null) return;
         DebugLogBuffer buffer = new DebugLogBuffer(application.getApplicationLogger(), maxLines);
         application.setApplicationLogger(buffer);
         active = buffer;
@@ -41,49 +39,37 @@ public class DebugLogBuffer implements ApplicationLogger {
     @Override
     public void log(String tag, String message) {
         addLine("INFO", tag, message);
-        if (delegate != null) {
-            delegate.log(tag, message);
-        }
+        if (delegate != null) delegate.log(tag, message);
     }
 
     @Override
     public void log(String tag, String message, Throwable exception) {
         addLine("INFO", tag, message, exception);
-        if (delegate != null) {
-            delegate.log(tag, message, exception);
-        }
+        if (delegate != null) delegate.log(tag, message, exception);
     }
 
     @Override
     public void error(String tag, String message) {
         addLine("ERROR", tag, message);
-        if (delegate != null) {
-            delegate.error(tag, message);
-        }
+        if (delegate != null) delegate.error(tag, message);
     }
 
     @Override
     public void error(String tag, String message, Throwable exception) {
         addLine("ERROR", tag, message, exception);
-        if (delegate != null) {
-            delegate.error(tag, message, exception);
-        }
+        if (delegate != null) delegate.error(tag, message, exception);
     }
 
     @Override
     public void debug(String tag, String message) {
         addLine("DEBUG", tag, message);
-        if (delegate != null) {
-            delegate.debug(tag, message);
-        }
+        if (delegate != null) delegate.debug(tag, message);
     }
 
     @Override
     public void debug(String tag, String message, Throwable exception) {
         addLine("DEBUG", tag, message, exception);
-        if (delegate != null) {
-            delegate.debug(tag, message, exception);
-        }
+        if (delegate != null) delegate.debug(tag, message, exception);
     }
 
     private void addLine(String level, String tag, String message) {
@@ -104,9 +90,7 @@ public class DebugLogBuffer implements ApplicationLogger {
     }
 
     private void pushLine(String line) {
-        if (lines.size() >= maxLines) {
-            lines.removeFirst();
-        }
+        if (lines.size() >= maxLines) lines.removeFirst();
         lines.addLast(line);
     }
 }
