@@ -108,6 +108,16 @@
             "Parameters": [
                 { "Name": "time", "Type": "number" }
             ]
+        },
+        {
+            "YarnName": "wait_for_camera",
+            "Documentation": "",
+            "Parameters": []
+        },
+        {
+            "YarnName": "wait_for_move",
+            "Documentation": "",
+            "Parameters": []
         }
     ],
     "Functions": []

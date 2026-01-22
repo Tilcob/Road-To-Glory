@@ -11,6 +11,8 @@ public class Cutscene implements Component {
     private int lineIndex;
     private float waitTimerSeconds;
     private boolean awaitingDialog;
+    private boolean awaitingCamera;
+    private boolean awaitingMove;
 
     public Cutscene(String cutsceneId) {
         this.cutsceneId = cutsceneId;
@@ -18,6 +20,8 @@ public class Cutscene implements Component {
         this.lineIndex = 0;
         this.waitTimerSeconds = 0f;
         this.awaitingDialog = false;
+        this.awaitingCamera = false;
+        this.awaitingMove = false;
     }
 
     public String getCutsceneId() {
@@ -58,6 +62,22 @@ public class Cutscene implements Component {
 
     public void setAwaitingDialog(boolean awaitingDialog) {
         this.awaitingDialog = awaitingDialog;
+    }
+
+    public boolean isAwaitingCamera() {
+        return awaitingCamera;
+    }
+
+    public void setAwaitingCamera(boolean awaitingCamera) {
+        this.awaitingCamera = awaitingCamera;
+    }
+
+    public boolean isAwaitingMove() {
+        return awaitingMove;
+    }
+
+    public void setAwaitingMove(boolean awaitingMove) {
+        this.awaitingMove = awaitingMove;
     }
 
     public enum State {

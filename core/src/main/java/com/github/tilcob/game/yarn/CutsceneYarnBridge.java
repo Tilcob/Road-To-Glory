@@ -59,6 +59,7 @@ public class CutsceneYarnBridge {
         if (Float.isNaN(x) || Float.isNaN(y)) return;
         float duration = args.length > 2 ? MathUtils.clamp(parseFloat(args[2], 0f), 0f, 60f) : 0f;
         player.remove(CameraPan.class);
+        player.remove(CameraPanHome.class);
         player.add(new CameraPan(x, y, duration));
     }
 

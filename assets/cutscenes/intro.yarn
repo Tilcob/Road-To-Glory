@@ -5,8 +5,10 @@ position: 0,0
 <<lock_player>>
 <<set_flag cutscene_intro_played true>>
 <<camera_move 10 10 5>>
+<<wait_for_camera>>
 <<wait 0.5>>
 <<camera_move_back 5>>
+<<wait_for_camera>>
 <<start_dialog shopkeeper cutscene_intro>>
 <<unlock_player>>
 ===
