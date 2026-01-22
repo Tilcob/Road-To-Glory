@@ -7,6 +7,9 @@ pause when a command requests it (timer, camera pan, movement, or dialog start).
 ## Built-in cutscene commands
 
 The following commands are available in cutscenes. Use the exact command names shown.
+- `<varible>` placeholders are mandatory.
+- `[varible]` brackets are optional.
+- `<entity>` is if the player should be targeted you write `player` or `self`. For other entities type the entity `name` from Tiled in this field.
 
 ### Flow control
 
@@ -26,7 +29,8 @@ The following commands are available in cutscenes. Use the exact command names s
 
 ### Movement and facing
 
-- `<<move_to <entity> <x> <y> [arrivalDistance]>>`: move an entity to a target location.
+- `<<move_to <entity> <x> <y> [arrivalDistance]>>`: move an entity by a relative offset.
+  - `arrivalDistance`: is the tolerance distance for the movement to complete. If nothing is specified, the default is 0.1.
 - `<<face <entity> <direction>>`: face an entity `UP`, `DOWN`, `LEFT`, or `RIGHT`.
 
 ### Animation
@@ -38,6 +42,11 @@ The following commands are available in cutscenes. Use the exact command names s
 
 - `<<fade_in [seconds]>>`: fade the screen in to full visibility.
 - `<<fade_out [seconds]>>`: fade the screen out to black.
+
+### Audio
+
+- `<<play_music <musicAsset>>>`: play looping music by asset name (see `MusicAsset` enum).
+- `<<play_sound <soundAsset>>>`: play a sound effect by asset name (see `SoundAsset` enum).
 
 ### Dialog and flags
 

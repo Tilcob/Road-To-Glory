@@ -9,7 +9,7 @@ position: 0,0
 <<wait 0.5>>
 <<camera_move_back 2>>
 <<wait_for_camera>>
-<<>>
+<<move_to Npc-4 0 -3>>
 <<start_dialog shopkeeper cutscene_intro>>
 <<unlock_player>>
 ===

@@ -68,7 +68,7 @@
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
-    <property name="speed" type="float" value="0"/>
+    <property name="speed" type="float" value="1"/>
    </properties>
   </object>
   <object id="36" name="Npc-5" gid="196" x="28.6667" y="219.333" width="32" height="32">

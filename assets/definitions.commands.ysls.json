@@ -168,6 +168,20 @@
             "Parameters": [
                 { "Name": "time duration", "Type": "number" }
             ]
+        },
+        {
+            "YarnName": "play_music",
+            "Documentation": "Plays looping music by MusicAsset enum name.",
+            "Parameters": [
+                { "Name": "musicAsset", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "play_sound",
+            "Documentation": "Plays a sound effect by SoundAsset enum name.",
+            "Parameters": [
+                { "Name": "soundAsset", "Type": "string" }
+            ]
         }
     ],
     "Functions": []

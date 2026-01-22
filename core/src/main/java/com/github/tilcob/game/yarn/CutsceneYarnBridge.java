@@ -4,6 +4,9 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.github.tilcob.game.assets.MusicAsset;
+import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
@@ -15,11 +18,13 @@ import java.util.function.Supplier;
 
 public class CutsceneYarnBridge {
     private final GameEventBus eventBus;
+    private final AudioManager audioManager;
     private final Supplier<EntityLookup> entityLookup;
     private final Vector2 tmpVector = new Vector2();
 
-    public CutsceneYarnBridge(GameEventBus eventBus, Supplier<EntityLookup> entityLookup) {
+    public CutsceneYarnBridge(AudioManager audioManager, GameEventBus eventBus, Supplier<EntityLookup> entityLookup) {
         this.eventBus = eventBus;
+        this.audioManager = audioManager;
         this.entityLookup = entityLookup;
     }
 
@@ -40,6 +45,8 @@ public class CutsceneYarnBridge {
         registry.register("fade_out", this::fadeOut);
         registry.register("start_dialog", this::startDialog);
         registry.register("set_flag", this::setFlag);
+        registry.register("play_music", this::playMusic);
+        registry.register("play_sound", this::playSound);
     }
 
     private void lockPlayer(Entity player, String[] args) {
@@ -121,18 +128,24 @@ public class CutsceneYarnBridge {
         if (target == null) {
             return;
         }
+        Transform transform = Transform.MAPPER.get(target);
+        if (transform == null) {
+            return;
+        }
         float x = parseFloat(args[1], Float.NaN);
         float y = parseFloat(args[2], Float.NaN);
         if (Float.isNaN(x) || Float.isNaN(y)) {
             return;
         }
+        float targetX = transform.getPosition().x + x;
+        float targetY = transform.getPosition().y + y;
         float arrivalDistance = args.length > 3 ? Math.max(0f, parseFloat(args[3], 0f)) : 0.1f;
         MoveIntent intent = MoveIntent.MAPPER.get(target);
         if (intent == null) {
             intent = new MoveIntent();
             target.add(intent);
         }
-        intent.setTarget(tmpVector.set(x, y), arrivalDistance);
+        intent.setTarget(tmpVector.set(targetX, targetY), arrivalDistance);
     }
 
     private void faceEntity(Entity player, String[] args) {
@@ -170,6 +183,28 @@ public class CutsceneYarnBridge {
         String nodeId = args.length > 1 ? args[1] : null;
         if (npcId == null || npcId.isBlank()) return;
         eventBus.fire(new StartDialogEvent(player, npcId, nodeId));
+    }
+
+    private void playMusic(Entity player, String[] args) {
+        if (audioManager == null || args == null || args.length == 0) {
+            return;
+        }
+        MusicAsset musicAsset = parseMusicAsset(args[0]);
+        if (musicAsset == null) {
+            return;
+        }
+        audioManager.playMusic(musicAsset);
+    }
+
+    private void playSound(Entity player, String[] args) {
+        if (audioManager == null || args == null || args.length == 0) {
+            return;
+        }
+        SoundAsset soundAsset = parseSoundAsset(args[0]);
+        if (soundAsset == null) {
+            return;
+        }
+        audioManager.playSound(soundAsset);
     }
 
     private void setFlag(Entity player, String[] args) {
@@ -272,6 +307,30 @@ public class CutsceneYarnBridge {
             return Float.parseFloat(value);
         } catch (NumberFormatException e) {
             return fallback;
+        }
+    }
+
+    private MusicAsset parseMusicAsset(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String normalized = value.trim().toUpperCase(Locale.ROOT);
+        try {
+            return MusicAsset.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
+    }
+
+    private SoundAsset parseSoundAsset(String value) {
+        if (value == null || value.isBlank()) {
+            return null;
+        }
+        String normalized = value.trim().toUpperCase(Locale.ROOT);
+        try {
+            return SoundAsset.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return null;
         }
     }
 }

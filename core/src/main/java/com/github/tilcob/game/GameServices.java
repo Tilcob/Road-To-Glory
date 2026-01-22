@@ -64,7 +64,7 @@ public class GameServices {
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus, this::getEntityLookup);
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
@@ -93,7 +93,7 @@ public class GameServices {
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus, this::getEntityLookup);
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
