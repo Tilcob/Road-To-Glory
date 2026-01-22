@@ -1,6 +1,6 @@
 # Road-To-Glory
 
-A LibGDX-based RPG project with a modular architecture split between shared core logic and the LWJGL3 desktop launcher.
+Road-To-Glory is a LibGDX-based RPG with a modular architecture split between shared core logic and the LWJGL3 desktop launcher.
 
 ## Repository layout
 
@@ -8,7 +8,13 @@ A LibGDX-based RPG project with a modular architecture split between shared core
 - `lwjgl3`: Desktop launcher and platform-specific configuration.
 - `assets`: Runtime assets bundled with the game.
 - `assets_raw`: Source assets before processing/export.
-- `utils`: Utility scripts and tooling.
+- `utils`: Utility scripts and tooling (content validation, index generation).
+- `skinComposer.scmp`: Skin composer project file used for UI skin assets.
+
+## Content pipeline
+
+The game loads structured content that is pre-indexed for fast lookup. Index files are generated from the source content
+and kept in `assets` for runtime loading.
 
 ### Quest data
 
@@ -20,6 +26,13 @@ file.
 
 Dialog definitions live in `assets/dialogs/index.json`, which is generated from the
 `.yarn` dialog files in `assets/dialogs` and loaded from the file name.
+
+### Cutscene data
+
+Cutscene scripts live in `assets/cutscenes` as `.yarn` files and are loaded by cutscene
+id. Cutscenes support the same Yarn command line syntax as dialogs, plus custom
+commands such as `<<wait_for_camera>>` and `<<wait_for_move>>` to pause until camera
+pans or scripted movement completes.
 
 ### Item data
 
@@ -41,6 +54,40 @@ The core module follows a layered architecture on top of Ashley ECS. The most im
 
 When introducing new packages or major gameplay features, follow the same pattern by adding or extending
 `package-info.java` descriptions so the high-level intent stays discoverable.
+
+## Quick start
+
+### Run the game
+
+```bash
+./gradlew lwjgl3:run
+```
+
+To enable debug diagnostics (profiler, FPS logging, debug renderer), pass the JVM flag:
+
+```bash
+./gradlew lwjgl3:run -Dgame.debug=true
+```
+
+### Run tests
+
+```bash
+./gradlew test
+```
+
+To run the full verification pipeline (tests plus content validation), use:
+
+```bash
+./gradlew check
+```
+
+### Validate quest + dialog content
+
+```bash
+./gradlew :utils:validateQuestContent
+```
+
+This validation checks quest headers, step definitions, start node presence, and dialog quest tags against the quest index. It also runs automatically as part of `./gradlew check` and before `lwjgl3:run` or `lwjgl3:build`.
 
 ## Gradle
 
@@ -65,34 +112,6 @@ Useful Gradle tasks and flags:
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
 
-## Development
-
-### Run the game
-
-```
-./gradlew lwjgl3:run
-```
-
-To enable debug diagnostics (profiler, FPS logging, debug renderer), pass the JVM flag:
-
-```
-./gradlew lwjgl3:run -Dgame.debug=true
-```
-
-### Run tests
-
-```
-./gradlew test
-```
-
-### Validate quest + dialog content
-
-```
-./gradlew :utils:validateQuestContent
-```
-
-This validation checks quest headers, step definitions, start node presence, and dialog quest tags against the quest index.
-
 ### Build configuration flags
 
 These are defined in `gradle.properties` and can be overridden on the command line.
@@ -101,3 +120,9 @@ These are defined in `gradle.properties` and can be overridden on the command li
 - `useSnapshots`: enable snapshot repository access.
 - `enableDependencyLocking`: enable dependency locking (run `./gradlew --write-locks` to generate lock files).
 - `generateAssetList`: controls whether `assets/assets.txt` is generated during `processResources`.
+
+## Release checklist (local)
+
+- Run `./gradlew clean build` to confirm builds and tests pass.
+- Run `./gradlew :utils:validateQuestContent` to validate quest/dialog content.
+- Use `./gradlew lwjgl3:jar` to create the desktop-runnable jar in `lwjgl3/build/libs`.

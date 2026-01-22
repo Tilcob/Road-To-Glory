@@ -23,21 +23,27 @@ public class CutsceneYarnRuntime {
         }
         String inner = trimmed.substring(2, trimmed.length() - 2).trim();
         if (inner.isEmpty()) {
-            return new CutsceneCommandResult(true, 0f, false);
+            return new CutsceneCommandResult(true, 0f, false, false, false);
         }
         String[] parts = inner.split("\\s+");
         String command = parts[0];
         String[] args = argsFrom(parts);
         if ("wait".equalsIgnoreCase(command)) {
             float waitSeconds = args.length > 0 ? parseFloat(args[0], 0f) : 0f;
-            return new CutsceneCommandResult(true, Math.max(0f, waitSeconds), false);
+            return new CutsceneCommandResult(true, Math.max(0f, waitSeconds), false, false, false);
+        }
+        if ("wait_for_camera".equalsIgnoreCase(command)) {
+            return new CutsceneCommandResult(true, 0f, false, true, false);
+        }
+        if ("wait_for_move".equalsIgnoreCase(command)) {
+            return new CutsceneCommandResult(true, 0f, false, false, true);
         }
         boolean handled = runtime.executeCommand(command, player, args);
         if (!handled && Gdx.app != null) {
             Gdx.app.debug(TAG, "Unhandled cutscene command: " + command);
         }
         boolean waitForDialog = "start_dialog".equalsIgnoreCase(command);
-        return new CutsceneCommandResult(true, 0f, waitForDialog);
+        return new CutsceneCommandResult(true, 0f, waitForDialog, false, false);
     }
 
     private static String[] argsFrom(String[] parts) {

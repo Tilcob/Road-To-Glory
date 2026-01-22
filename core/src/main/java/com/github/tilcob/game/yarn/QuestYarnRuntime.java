@@ -36,9 +36,7 @@ public class QuestYarnRuntime {
     }
 
     public void executeStartNode(Entity player, String startNode) {
-        if (startNode == null || startNode.isBlank()) {
-            return;
-        }
+        if (startNode == null || startNode.isBlank()) return;
         if (YarnRuntime.isCommandLine(startNode.trim())) {
             runtime.executeCommandLine(player, startNode);
             return;
@@ -73,16 +71,12 @@ public class QuestYarnRuntime {
     }
 
     public void setVariable(Entity player, String name, Object value) {
-        if (name == null || name.isBlank()) {
-            return;
-        }
+        if (name == null || name.isBlank()) return;
         getVariablesFor(player, true).put(name, value);
     }
 
     public Object getVariable(Entity player, String name) {
-        if (name == null || name.isBlank()) {
-            return null;
-        }
+        if (name == null || name.isBlank()) return null;
         Map<String, Object> scoped = getVariablesFor(player, false);
         return scoped == null ? null : scoped.get(name);
     }
@@ -114,9 +108,7 @@ public class QuestYarnRuntime {
     }
 
     private Map<String, Object> getVariablesFor(Entity player, boolean create) {
-        if (player == null) {
-            return defaultVariables;
-        }
+        if (player == null) return defaultVariables;
         Map<String, Object> scoped = variables.get(player);
         if (scoped == null && create) {
             scoped = new HashMap<>();
@@ -128,6 +120,7 @@ public class QuestYarnRuntime {
     private DialogNode findNode(String nodeId, boolean logMissing) {
         if (nodeId == null || nodeId.isBlank()) return null;
         DialogNode node = getDialogNode(allDialogs, nodeId);
+
         if (node != null) return node;
         node = getDialogNode(allQuestDialogs, nodeId);
         if (node != null) return node;

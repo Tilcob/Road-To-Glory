@@ -36,13 +36,9 @@ public class CutsceneRepository {
 
     public FileHandle getCutsceneFile(String cutsceneId) {
         FileHandle fileHandle = cutsceneFiles.get(cutsceneId);
-        if (fileHandle != null) {
-            return fileHandle;
-        }
+        if (fileHandle != null) return fileHandle;
         FileHandle resolved = Gdx.files.internal(cutscenesDir + "/" + cutsceneId + ".yarn");
-        if (resolved.exists()) {
-            return resolved;
-        }
+        if (resolved.exists()) return resolved;
         Gdx.app.error(TAG, "Cutscene file not found for cutsceneId: " + cutsceneId + " at " + resolved.path());
         return null;
     }
@@ -110,9 +106,7 @@ public class CutsceneRepository {
             return;
         }
         FileHandle[] files = directory.list();
-        if (files == null) {
-            return;
-        }
+        if (files == null) return;
         for (FileHandle file : files) {
             if ("yarn".equalsIgnoreCase(file.extension())) {
                 registerCutscene(file.nameWithoutExtension(), file);
@@ -122,9 +116,7 @@ public class CutsceneRepository {
 
     private FileHandle resolveCutsceneFileFromEntry(String entry) {
         String fileName = ensureYarnExtension(entry);
-        if (fileName.contains("/")) {
-            return Gdx.files.internal(fileName);
-        }
+        if (fileName.contains("/")) return Gdx.files.internal(fileName);
         return Gdx.files.internal(cutscenesDir + "/" + fileName);
     }
 
@@ -141,9 +133,7 @@ public class CutsceneRepository {
     }
 
     private String ensureYarnExtension(String fileName) {
-        if (fileName.toLowerCase().endsWith(".yarn")) {
-            return fileName;
-        }
+        if (fileName.toLowerCase().endsWith(".yarn")) return fileName;
         return fileName + ".yarn";
     }
 }

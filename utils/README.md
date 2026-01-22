@@ -11,6 +11,9 @@ This module contains helper tools and validation logic for the project. The curr
 ```bash
 # Validate quest and dialog data
 ./gradlew :utils:validateQuestContent
+
+# Run tests plus content validation
+./gradlew check
 ```
 
-The task expects the `assets/` directory as input and validates Yarn quests there.
+The validation task expects the `assets/` directory as input and validates Yarn quests there. The `check` task in the root project includes this validation step.

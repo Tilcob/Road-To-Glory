@@ -5,14 +5,9 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.github.tilcob.game.component.Cutscene;
-import com.github.tilcob.game.component.Npc;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.cutscene.CutsceneData;
-import com.github.tilcob.game.event.CutsceneFinishedEvent;
-import com.github.tilcob.game.event.CutsceneRequestedEvent;
-import com.github.tilcob.game.event.DialogFinishedEvent;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.QuestCompletedEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.yarn.CutsceneCommandResult;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
 
@@ -57,12 +52,26 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         cutscene.setLineIndex(0);
         cutscene.setWaitTimerSeconds(0f);
         cutscene.setAwaitingDialog(false);
+        cutscene.setAwaitingCamera(false);
+        cutscene.setAwaitingMove(false);
         cutscene.setState(Cutscene.State.ACTIVE);
     }
 
     private void updateCutscene(Entity player, Cutscene cutscene, float deltaTime) {
         if (cutscene.isAwaitingDialog()) {
             return;
+        }
+        if (cutscene.isAwaitingCamera()) {
+            if (isCameraPanActive(player)) {
+                return;
+            }
+            cutscene.setAwaitingCamera(false);
+        }
+        if (cutscene.isAwaitingMove()) {
+            if (isMoveActive(player)) {
+                return;
+            }
+            cutscene.setAwaitingMove(false);
         }
         if (cutscene.getWaitTimerSeconds() > 0f) {
             cutscene.setWaitTimerSeconds(cutscene.getWaitTimerSeconds() - deltaTime);
@@ -84,6 +93,14 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
             cutscene.setLineIndex(cutscene.getLineIndex() + 1);
             if (result.waitForDialog()) {
                 cutscene.setAwaitingDialog(true);
+                return;
+            }
+            if (result.waitForCamera()) {
+                cutscene.setAwaitingCamera(true);
+                return;
+            }
+            if (result.waitForMove()) {
+                cutscene.setAwaitingMove(true);
                 return;
             }
             if (result.waitSeconds() > 0f) {
@@ -128,6 +145,11 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         if (!allCutscenes.containsKey(cutsceneId)) {
             return;
         }
+        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
+        String flagKey = cutsceneFlagKey(cutsceneId);
+        if (flagKey != null && dialogFlags != null && dialogFlags.get(flagKey)) {
+            return;
+        }
         Cutscene cutscene = Cutscene.MAPPER.get(player);
         if (cutscene == null) {
             player.add(new Cutscene(cutsceneId));
@@ -140,12 +162,37 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         cutscene.setLineIndex(0);
         cutscene.setWaitTimerSeconds(0f);
         cutscene.setAwaitingDialog(false);
+        cutscene.setAwaitingCamera(false);
+        cutscene.setAwaitingMove(false);
         cutscene.setState(Cutscene.State.REQUEST);
+    }
+
+    private String cutsceneFlagKey(String cutsceneId) {
+        if (cutsceneId == null || cutsceneId.isBlank()) {
+            return null;
+        }
+        String normalizedId = cutsceneId.trim().toLowerCase().replaceAll("\\s+", "_");
+        return "cutscene_" + normalizedId + "_played";
     }
 
     private CutsceneData getCutsceneData(String cutsceneId) {
         if (cutsceneId == null || cutsceneId.isBlank()) return null;
         return allCutscenes.get(cutsceneId);
+    }
+
+    private boolean isCameraPanActive(Entity player) {
+        if (player == null) {
+            return false;
+        }
+        return CameraPan.MAPPER.get(player) != null;
+    }
+
+    private boolean isMoveActive(Entity player) {
+        if (player == null) {
+            return false;
+        }
+        MoveIntent intent = MoveIntent.MAPPER.get(player);
+        return intent != null && intent.isActive();
     }
 
     @Override

@@ -86,15 +86,18 @@ public class TiledAshleyConfigurator {
             ? properties.get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class)
             : tile.getProperties().get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class);
         String name = object.getName();
+        boolean canWander = properties.get(Constants.CAN_WANDER, false, Boolean.class);
         if (name == null) return;
         if (npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
         entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
         entity.add(new PlayerReference(null));
         entity.add(new Dialog());
-        entity.add(new MoveIntent());
         entity.add(new NpcFsm(entity));
-        entity.add(new WanderTimer());
+        if (canWander) {
+            entity.add(new MoveIntent());
+            entity.add(new WanderTimer());
+        }
         entity.add(new AggroMemory());
         entity.add(new Equipment());
         entity.add(new StatModifierComponent());
@@ -398,6 +401,7 @@ public class TiledAshleyConfigurator {
     }
 
     private void createTrigger(Entity entity, Trigger.Type type, MapProperties properties, Tiled tile) {
+        if (type == Trigger.Type.UNDEFINED) return;
         entity.add(new Trigger(type));
         String questId = properties.get(Constants.QUEST_ID, "", String.class);
         if (!questId.isBlank()) entity.add(new Quest(questId));

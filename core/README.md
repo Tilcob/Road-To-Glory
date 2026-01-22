@@ -1,14 +1,21 @@
 # Core Module
 
-This module contains the platform-independent game logic for **Road-To-Glory**. It houses the ECS components and systems, UI views, dialog and quest logic, and core services such as savegame handling and asset management.
+The core module contains the platform-independent game logic for **Road-To-Glory**. It houses ECS components and systems, UI views, dialog and quest logic, and core services such as savegame handling and asset management.
 
 ## Focus areas
 
 - **ECS (Ashley)**: Components and systems for gameplay, AI, rendering, and interactions.
-- **Dialog & quests**: Yarn-based dialogs, quest definitions, validation.
+- **Dialog & quests**: Yarn-based dialogs, quest definitions, validation, and consequences.
+- **Cutscenes**: Yarn-driven scripted sequences that integrate with camera, movement, and dialogs.
 - **UI**: Scene2D UI layouts and widgets.
 - **Services**: Savegame, registries, resource management.
 - **Debugging**: Debug overlay with runtime stats and recent log buffer when `game.debug` is enabled.
+
+## Core flow at a glance
+
+- Content indexes from `assets` provide quick lookup for dialogs, quests, and items.
+- Systems coordinate gameplay updates using Ashley ECS.
+- Cutscenes and dialogs are driven by Yarn scripts with custom commands for camera and movement gating.
 
 ## Systems (`com.github.tilcob.game.system`)
 
@@ -18,6 +25,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - `CameraSystem`: Maintains camera position and state.
 - `ChestSystem`: Handles chest interactions.
 - `ControllerSystem`: Handles input/controller events.
+- `CutsceneSystem`: Plays Yarn-based cutscenes and waits for dialog, camera, and movement gates.
 - `DamageSystem`: Applies damage.
 - `DialogConsequenceSystem`: Applies dialog consequences.
 - `DialogQuestBridgeSystem`: Bridges dialogs and quests.
@@ -30,6 +38,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - `LevelUpSystem`: Level-up logic.
 - `LifeSystem`: Health logic.
 - `MapChangeSystem`: Map changes and transitions.
+- `MoveIntentSystem`: Applies `MoveIntent` movement for non-NPC entities.
 - `NpcPathfindingSystem`: NPC pathfinding.
 - `PhysicDebugRenderSystem`: Physics debug rendering.
 - `PhysicMoveSystem`: Physics-based movement logic.
@@ -63,6 +72,11 @@ High-level package documentation lives in `package-info.java` inside the source 
 
 ## Debug overlay
 
-When `game.debug` is enabled, the game installs a debug log buffer and shows a debug overlay 
-with FPS, entity/system counts, save slot, and recent log lines. This is intended for development 
+When `game.debug` is enabled, the game installs a debug log buffer and shows a debug overlay
+with FPS, entity/system counts, save slot, and recent log lines. This is intended for development
 builds and mirrors the existing `Gdx.app` logger output.
+
+## Editing guidance
+
+- Keep system descriptions aligned with their class names for quick searching.
+- Update this document when new content pipelines or core services are introduced.

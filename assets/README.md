@@ -8,6 +8,7 @@ This directory contains the runtime assets for **Road-To-Glory**. The game loads
 - `graphics/`: textures, spritesheets, and graphics.
 - `maps/`: maps and tilemap data.
 - `dialogs/`: dialog files (Yarn).
+- `cutscenes/`: cutscene scripts (Yarn).
 - `quests/`: quest definitions and `index.json`.
 - `items/`: item definitions.
 - `ui/`: UI skins, layouts, and UI assets.

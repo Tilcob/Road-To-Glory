@@ -39,17 +39,13 @@ public class QuestYarnBridge {
 
     private void startQuest(Entity player, String[] args) {
         String questId = firstArg(args);
-        if (player == null || questId == null) {
-            return;
-        }
+        if (player == null || questId == null) return;
         questLifecycleService.startQuest(player, questId);
     }
 
     private void completeQuest(Entity player, String[] args) {
         String questId = firstArg(args);
-        if (player == null || questId == null) {
-            return;
-        }
+        if (player == null || questId == null) return;
         questLifecycleService.completeQuest(player, questId);
     }
 
@@ -62,14 +58,11 @@ public class QuestYarnBridge {
     }
 
     private void setFlag(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) {
-            return;
-        }
+        if (player == null || args == null || args.length == 0) return;
         String flag = args[0];
         boolean value = args.length <= 1 || Boolean.parseBoolean(args[1]);
-        if (flag == null || flag.isBlank()) {
-            return;
-        }
+        if (flag == null || flag.isBlank()) return;
+
         DialogFlags flags = DialogFlags.MAPPER.get(player);
         if (flags == null) {
             flags = new DialogFlags();
@@ -79,14 +72,11 @@ public class QuestYarnBridge {
     }
 
     private void incrementCounter(Entity player, String[] args) {
-        if (player == null || args == null || args.length == 0) {
-            return;
-        }
+        if (player == null || args == null || args.length == 0) return;
         String counter = args[0];
         int amount = args.length > 1 ? parseInt(args[1], 1) : 1;
-        if (counter == null || counter.isBlank()) {
-            return;
-        }
+        if (counter == null || counter.isBlank()) return;
+
         Counters counters = Counters.MAPPER.get(player);
         if (counters == null) {
             counters = new Counters();
@@ -97,56 +87,46 @@ public class QuestYarnBridge {
 
     private QuestState questState(Entity player, String[] args) {
         String questId = firstArg(args);
-        if (player == null || questId == null) {
-            return QuestState.NOT_STARTED;
-        }
+        if (player == null || questId == null) return QuestState.NOT_STARTED;
+
         QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog == null) {
-            return QuestState.NOT_STARTED;
-        }
+        if (questLog == null) return QuestState.NOT_STARTED;
         return questLog.getQuestStateById(questId);
     }
 
     private Integer currentStage(Entity player, String[] args) {
         String questId = firstArg(args);
-        if (player == null || questId == null) {
-            return -1;
-        }
+        if (player == null || questId == null) return -1;
+
         QuestLog questLog = QuestLog.MAPPER.get(player);
-        if (questLog == null) {
-            return -1;
-        }
+        if (questLog == null) return -1;
+
         Quest quest = questLog.getQuestById(questId);
         return quest == null ? -1 : quest.getCurrentStep();
     }
 
     private Boolean flagValue(Entity player, String[] args) {
         String flag = firstArg(args);
-        if (player == null || flag == null) {
-            return false;
-        }
+        if (player == null || flag == null) return false;
+
         DialogFlags flags = DialogFlags.MAPPER.get(player);
         return flags != null && flags.get(flag);
     }
 
     private Integer counterValue(Entity player, String[] args) {
         String counter = firstArg(args);
-        if (player == null || counter == null) {
-            return 0;
-        }
+        if (player == null || counter == null) return 0;
+
         Counters counters = Counters.MAPPER.get(player);
         return counters == null ? 0 : counters.get(counter);
     }
 
     private Boolean hasItem(Entity player, String[] args) {
         String itemId = firstArg(args);
-        if (player == null || itemId == null) {
-            return false;
-        }
+        if (player == null || itemId == null) return false;
         Inventory inventory = Inventory.MAPPER.get(player);
-        if (inventory == null) {
-            return false;
-        }
+        if (inventory == null) return false;
+
         String resolved = ItemDefinitionRegistry.resolveId(itemId);
         ObjectIntMap<String> counts = new ObjectIntMap<>();
         for (var entity : inventory.getItems()) {
@@ -160,9 +140,7 @@ public class QuestYarnBridge {
     }
 
     private String firstArg(String[] args) {
-        if (args == null || args.length == 0) {
-            return null;
-        }
+        if (args == null || args.length == 0) return null;
         String value = args[0];
         return value == null || value.isBlank() ? null : value;
     }

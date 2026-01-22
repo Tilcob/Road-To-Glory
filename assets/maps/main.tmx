@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="37">
+<map version="1.10" tiledversion="1.11.2" orientation="orthogonal" renderorder="right-down" width="30" height="20" tilewidth="16" tileheight="16" infinite="0" nextlayerid="6" nextobjectid="38">
  <properties>
   <property name="music" value="TOWN"/>
  </properties>
@@ -21,7 +21,7 @@
   <object id="4" gid="195" x="365.333" y="89.3333" width="41" height="63"/>
   <object id="5" gid="194" x="346" y="232.667" width="80" height="112"/>
   <object id="11" gid="198" x="255.75" y="288.125" width="16" height="16"/>
-  <object id="12" name="Shopkeeper" gid="197" x="329.333" y="288.667" width="32" height="32">
+  <object id="12" name="shopkeeper" gid="197" x="329.333" y="288.667" width="32" height="32">
    <properties>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
    </properties>
@@ -40,8 +40,9 @@
   </object>
   <object id="30" name="Npc-1" gid="196" x="230" y="246.667" width="32" height="32">
    <properties>
-    <property name="bodyType" value="KinematicBody"/>
+    <property name="bodyType" propertytype="BodyType" value="KinematicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
+    <property name="canWander" type="bool" value="true"/>
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>
@@ -50,7 +51,7 @@
   </object>
   <object id="32" name="Enemy-1" gid="196" x="178.667" y="58" width="32" height="32">
    <properties>
-    <property name="bodyType" value="KinematicBody"/>
+    <property name="bodyType" propertytype="BodyType" value="DynamicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
     <property name="controller" type="bool" value="false"/>
     <property name="damage" type="float" value="5"/>
@@ -62,18 +63,18 @@
   </object>
   <object id="35" name="Npc-4" gid="196" x="306.667" y="234" width="32" height="32">
    <properties>
-    <property name="bodyType" value="KinematicBody"/>
+    <property name="bodyType" propertytype="BodyType" value="KinematicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
-    <property name="speed" type="float" value="0"/>
+    <property name="speed" type="float" value="1"/>
    </properties>
   </object>
   <object id="36" name="Npc-5" gid="196" x="28.6667" y="219.333" width="32" height="32">
    <properties>
-    <property name="bodyType" value="StaticBody"/>
+    <property name="bodyType" propertytype="BodyType" value="KinematicBody"/>
     <property name="cameraFollow" type="bool" value="false"/>
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
@@ -89,6 +90,12 @@
     <property name="triggerType" propertytype="TriggerType" value="CHANGE_MAP"/>
    </properties>
    <ellipse/>
+  </object>
+  <object id="37" type="Trigger" x="286" y="285.333" width="10.6667" height="14">
+   <properties>
+    <property name="cutsceneId" value="intro"/>
+    <property name="triggerType" propertytype="TriggerType" value="CUTSCENE"/>
+   </properties>
   </object>
  </objectgroup>
  <layer id="4" name="foreground" width="30" height="20">

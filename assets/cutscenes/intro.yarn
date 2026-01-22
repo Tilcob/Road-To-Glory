@@ -1,9 +1,15 @@
-title: Start
+title: intro_start
 tags: start
+position: 0,0
 ---
 <<lock_player>>
-<<camera_move 5 5 1.5>>
+<<set_flag cutscene_intro_played true>>
+<<camera_move_relative 3 4 3>>
+<<wait_for_camera>>
 <<wait 0.5>>
-<<start_dialog Shopkeeper cutscene_intro>>
+<<camera_move_back 2>>
+<<wait_for_camera>>
+<<move_to Npc-4 0 -3>>
+<<start_dialog shopkeeper cutscene_intro>>
 <<unlock_player>>
 ===

@@ -28,8 +28,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 218.99999999999997,
-                "y": 191
+                "x": 256,
+                "y": 190.33333333333331
             }
         },
         "objects.tsx": {
@@ -51,7 +51,7 @@
         "terrain.tsx": {
             "dynamicWrapping": false,
             "scaleInDock": 1,
-            "scaleInEditor": 0.75
+            "scaleInEditor": 2
         }
     },
     "last.objectTypesPath": "C:/Users/jakob/Downloads/propertytypes.json",
@@ -68,10 +68,10 @@
         "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "float",
+    "property.type": "bool",
     "recentFiles": [
-        "player.tmx",
         "terrain.tsx",
+        "player.tmx",
         "objects.tsx",
         "house.tmx",
         "main.tmx"

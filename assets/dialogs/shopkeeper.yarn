@@ -1,11 +1,11 @@
-title: Start
+title: shopkeeper_start
 tags: root start
 position: 55,-25
 ---
 Welcome to my shop.
 ===
 
-title: Idle
+title: shopkeeper_idle
 tags: idle
 position: 339,-28
 ---
