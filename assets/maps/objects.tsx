@@ -43,7 +43,7 @@
    <property name="attackCooldown" type="float" value="0.3"/>
    <property name="attackSound" value="SWING"/>
    <property name="attackWindup" type="float" value="1"/>
-   <property name="bodyType" value="DynamicBody"/>
+   <property name="bodyType" propertytype="BodyType" value="DynamicBody"/>
    <property name="cameraFollow" type="bool" value="true"/>
    <property name="controller" type="bool" value="true"/>
    <property name="damage" type="float" value="7"/>
@@ -90,7 +90,6 @@
    <property name="animation" value="IDLE"/>
    <property name="animationSpeed" type="float" value="1"/>
    <property name="atlasAsset" value="OBJECTS"/>
-   <property name="bodyType" value="StaticBody"/>
    <property name="life" type="int" value="9999"/>
    <property name="lifeRegeneration" type="float" value="99"/>
    <property name="npcType" propertytype="NpcType" value="UNDEFINED"/>

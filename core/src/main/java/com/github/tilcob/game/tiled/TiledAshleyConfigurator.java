@@ -398,6 +398,7 @@ public class TiledAshleyConfigurator {
     }
 
     private void createTrigger(Entity entity, Trigger.Type type, MapProperties properties, Tiled tile) {
+        if (type == Trigger.Type.UNDEFINED) return;
         entity.add(new Trigger(type));
         String questId = properties.get(Constants.QUEST_ID, "", String.class);
         if (!questId.isBlank()) entity.add(new Quest(questId));

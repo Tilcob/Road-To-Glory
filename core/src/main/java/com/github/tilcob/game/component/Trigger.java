@@ -39,5 +39,6 @@ public class Trigger implements Component {
         QUEST,
         DIALOG,
         CUTSCENE,
+        UNDEFINED,
     }
 }

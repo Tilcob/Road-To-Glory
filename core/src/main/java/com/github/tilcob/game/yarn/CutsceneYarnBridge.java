@@ -6,6 +6,7 @@ import com.github.tilcob.game.component.CameraPan;
 import com.github.tilcob.game.component.PlayerInputLock;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.StartDialogEvent;
+import com.github.tilcob.game.input.Command;
 
 public class CutsceneYarnBridge {
     private final GameEventBus eventBus;
@@ -28,7 +29,7 @@ public class CutsceneYarnBridge {
     private void lockPlayer(Entity player, String[] args) {
         if (player == null) return;
         if (PlayerInputLock.MAPPER.get(player) == null) {
-            player.add(new PlayerInputLock());
+            player.add(PlayerInputLock.allow(Command.INTERACT, Command.PAUSE));
         }
     }
 

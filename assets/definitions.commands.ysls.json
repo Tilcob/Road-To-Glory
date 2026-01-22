@@ -67,6 +67,16 @@
                 { "Name": "counter", "Type": "string" },
                 { "Name": "amount", "Type": "number" }
             ]
+        },
+        {
+            "YarnName": "lock_player",
+            "Documentation": "Locks the player in place.",
+            "Parameters": []
+        },
+        {
+            "YarnName": "unlock_player",
+            "Documentation": "Unlocks the player.",
+            "Parameters": []
         }
     ],
     "Functions": []

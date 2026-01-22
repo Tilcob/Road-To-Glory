@@ -1,9 +1,10 @@
 title: Start
 tags: start
+position: 0,0
 ---
 <<lock_player>>
 <<camera_move 5 5 1.5>>
 <<wait 0.5>>
-<<start_dialog Shopkeeper cutscene_intro>>
+<<start_dialog shopkeeper cutscene_intro>>
 <<unlock_player>>
 ===

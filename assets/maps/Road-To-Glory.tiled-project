@@ -17,7 +17,8 @@
             "type": "enum",
             "values": [
                 "StaticBody",
-                "DynamicBody"
+                "DynamicBody",
+                "KinematicBody"
             ],
             "valuesAsFlags": false
         },
@@ -130,6 +131,11 @@
             "id": 5,
             "members": [
                 {
+                    "name": "cutsceneId",
+                    "type": "string",
+                    "value": ""
+                },
+                {
                     "name": "questId",
                     "type": "string",
                     "value": ""
@@ -148,7 +154,7 @@
                     "name": "triggerType",
                     "propertyType": "TriggerType",
                     "type": "string",
-                    "value": "CHEST"
+                    "value": "UNDEFINED"
                 }
             ],
             "name": "Trigger",
@@ -170,7 +176,9 @@
                 "TRAP",
                 "CHANGE_MAP",
                 "QUEST",
-                "DIALOG"
+                "DIALOG",
+                "CUTSCENE",
+                "UNDEFINED"
             ],
             "valuesAsFlags": false
         }

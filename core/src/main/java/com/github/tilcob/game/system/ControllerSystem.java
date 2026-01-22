@@ -9,6 +9,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 
+import java.util.EnumSet;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -24,13 +25,13 @@ public class ControllerSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
         DialogSession dialogSession = DialogSession.MAPPER.get(entity);
-        if (PlayerInputLock.MAPPER.get(entity) != null) {
+        PlayerInputLock lock = PlayerInputLock.MAPPER.get(entity);
+        if (lock != null) {
             clearMovement(entity);
-            controller.getCommandBuffer().clear();
-            controller.getPressedCommands().clear();
-            controller.getReleasedCommands().clear();
-            controller.getHeldCommands().clear();
-            return;
+            controller.getHeldCommands().removeIf(c -> !lock.isAllowed(c));
+            controller.getPressedCommands().removeIf(c -> !lock.isAllowed(c));
+            controller.getReleasedCommands().removeIf(c -> !lock.isAllowed(c));
+            controller.getCommandBuffer().entrySet().removeIf(e -> !lock.isAllowed(e.getKey()));
         }
         boolean choosingDialog = dialogSession != null && dialogSession.isAwaitingChoice();
 
