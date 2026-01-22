@@ -75,13 +75,19 @@ To enable debug diagnostics (profiler, FPS logging, debug renderer), pass the JV
 ./gradlew test
 ```
 
+To run the full verification pipeline (tests plus content validation), use:
+
+```bash
+./gradlew check
+```
+
 ### Validate quest + dialog content
 
 ```bash
 ./gradlew :utils:validateQuestContent
 ```
 
-This validation checks quest headers, step definitions, start node presence, and dialog quest tags against the quest index.
+This validation checks quest headers, step definitions, start node presence, and dialog quest tags against the quest index. It also runs automatically as part of `./gradlew check` and before `lwjgl3:run` or `lwjgl3:build`.
 
 ## Gradle
 

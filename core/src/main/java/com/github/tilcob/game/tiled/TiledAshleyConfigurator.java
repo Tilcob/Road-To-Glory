@@ -93,9 +93,11 @@ public class TiledAshleyConfigurator {
         entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
         entity.add(new PlayerReference(null));
         entity.add(new Dialog());
-        entity.add(new MoveIntent());
         entity.add(new NpcFsm(entity));
-        if (canWander) entity.add(new WanderTimer());
+        if (canWander) {
+            entity.add(new MoveIntent());
+            entity.add(new WanderTimer());
+        }
         entity.add(new AggroMemory());
         entity.add(new Equipment());
         entity.add(new StatModifierComponent());
