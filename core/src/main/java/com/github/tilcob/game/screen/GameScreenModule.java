@@ -19,6 +19,7 @@ import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
+import com.github.tilcob.game.yarn.EngineEntityLookup;
 
 public class GameScreenModule {
     private final GameServices services;
@@ -52,6 +53,7 @@ public class GameScreenModule {
 
     private Dependencies createDependencies(Viewport uiViewport) {
         Engine engine = new Engine();
+        services.setEntityLookup(new EngineEntityLookup(engine));
         World physicWorld = new World(Constants.GRAVITY, true);
         physicWorld.setAutoClearForces(false);
         TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
@@ -159,6 +161,8 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));
         engine.addSystem(withPriority(new CameraSystem(camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
+        engine.addSystem(withPriority(new ScreenFadeSystem(batch, viewport, camera), SystemOrder.RENDER));
+        engine.addSystem(withPriority(new CameraPanSystem(camera), SystemOrder.RENDER));
         if (Constants.DEBUG) {
             engine.addSystem(withPriority(
                 new PhysicDebugRenderSystem(physicWorld, camera),

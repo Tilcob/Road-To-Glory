@@ -16,12 +16,7 @@ import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
-import com.github.tilcob.game.yarn.CutsceneYarnBridge;
-import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
-import com.github.tilcob.game.yarn.DialogYarnBridge;
-import com.github.tilcob.game.yarn.DialogYarnRuntime;
-import com.github.tilcob.game.yarn.QuestYarnBridge;
-import com.github.tilcob.game.yarn.QuestYarnRuntime;
+import com.github.tilcob.game.yarn.*;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -47,6 +42,7 @@ public class GameServices {
     private final QuestManager questManager;
     private final QuestLifecycleService questLifecycleService;
     private final QuestRewardService questRewardService;
+    private EntityLookup entityLookup;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
@@ -68,7 +64,7 @@ public class GameServices {
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus);
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
@@ -97,7 +93,7 @@ public class GameServices {
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus);
+        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
@@ -192,5 +188,13 @@ public class GameServices {
 
     public QuestRewardService getQuestRewardService() {
         return questRewardService;
+    }
+
+    public EntityLookup getEntityLookup() {
+        return entityLookup;
+    }
+
+    public void setEntityLookup(EntityLookup entityLookup) {
+        this.entityLookup = entityLookup;
     }
 }

@@ -28,6 +28,7 @@ public class CameraSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        if (CameraPan.MAPPER.get(entity) != null) return;
         Transform transform = Transform.MAPPER.get(entity);
         CameraPan cameraPan = CameraPan.MAPPER.get(entity);
         if (cameraPan != null) {

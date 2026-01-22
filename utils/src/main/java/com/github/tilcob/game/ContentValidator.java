@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public final class QuestContentValidator {
+public final class ContentValidator {
     private static final Pattern HEADER_PATTERN = Pattern.compile("^([A-Za-z0-9_.-]+)\\s*:\\s*(.*)$");
     private static final Pattern TITLE_PATTERN = Pattern.compile("^title\\s*:\\s*(.+)$");
     private static final Pattern TAGS_PATTERN = Pattern.compile("^tags\\s*:\\s*(.+)$");
@@ -27,13 +27,13 @@ public final class QuestContentValidator {
     private final List<String> errors = new ArrayList<>();
     private final List<String> warnings = new ArrayList<>();
 
-    public QuestContentValidator(Path assetsRoot) {
+    public ContentValidator(Path assetsRoot) {
         this.assetsRoot = assetsRoot;
     }
 
     public static void main(String[] args) {
         Path assetsRoot = args.length > 0 ? Path.of(args[0]) : Path.of("assets");
-        QuestContentValidator validator = new QuestContentValidator(assetsRoot);
+        ContentValidator validator = new ContentValidator(assetsRoot);
         int exitCode = validator.run();
         System.exit(exitCode);
     }

@@ -77,6 +77,37 @@
             "YarnName": "unlock_player",
             "Documentation": "Unlocks the player.",
             "Parameters": []
+        },
+        {
+            "YarnName": "camera_move",
+            "Documentation": "Moves camera to (x,y) position. The time duration says how long it will take",
+            "Parameters": [
+                { "Name": "x Direction", "Type": "number" },
+                { "Name": "y Direction", "Type": "number" },
+                { "Name": "time duration", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "camera_move_back",
+            "Documentation": "Moves camera back to player position. The time duration says how long it will take",
+            "Parameters": [
+                { "Name": "time duration", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "start_dialog",
+            "Documentation": "Starts the dialogs from the *.yarn of the given npc.",
+            "Parameters": [
+                { "Name": "npc name", "Type": "string" },
+                { "Name": "node title", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "wait",
+            "Documentation": "Waits a certain amount of time.",
+            "Parameters": [
+                { "Name": "time", "Type": "number" }
+            ]
         }
     ],
     "Functions": []

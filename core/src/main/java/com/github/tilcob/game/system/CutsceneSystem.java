@@ -6,6 +6,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.Cutscene;
+import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.event.CutsceneFinishedEvent;
@@ -128,6 +129,11 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         if (!allCutscenes.containsKey(cutsceneId)) {
             return;
         }
+        DialogFlags dialogFlags = DialogFlags.MAPPER.get(player);
+        String flagKey = cutsceneFlagKey(cutsceneId);
+        if (flagKey != null && dialogFlags != null && dialogFlags.get(flagKey)) {
+            return;
+        }
         Cutscene cutscene = Cutscene.MAPPER.get(player);
         if (cutscene == null) {
             player.add(new Cutscene(cutsceneId));
@@ -141,6 +147,14 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         cutscene.setWaitTimerSeconds(0f);
         cutscene.setAwaitingDialog(false);
         cutscene.setState(Cutscene.State.REQUEST);
+    }
+
+    private String cutsceneFlagKey(String cutsceneId) {
+        if (cutsceneId == null || cutsceneId.isBlank()) {
+            return null;
+        }
+        String normalizedId = cutsceneId.trim().toLowerCase().replaceAll("\\s+", "_");
+        return "cutscene_" + normalizedId + "_played";
     }
 
     private CutsceneData getCutsceneData(String cutsceneId) {
