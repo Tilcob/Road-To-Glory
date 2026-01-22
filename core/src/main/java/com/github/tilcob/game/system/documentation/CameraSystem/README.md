@@ -6,10 +6,12 @@ Moves the camera smoothly toward the target position and clamps it to map bounda
 ## Flow
 - Computes a target position from `Transform` + camera offset.
 - Clamps the target position against the map size and interpolates with a smoothing factor.
+- Skips follow updates while a cutscene is active so camera pans can hold their final position.
 - `setMap` reads tile and map size from Tiled properties and initializes camera position.
 
 ## Key components & events
 - CameraFollow
+- Cutscene
 - Transform
 - TiledMap
 - Camera

@@ -6,6 +6,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 
 - **ECS (Ashley)**: Components and systems for gameplay, AI, rendering, and interactions.
 - **Dialog & quests**: Yarn-based dialogs, quest definitions, validation.
+- **Cutscenes**: Yarn-driven scripted sequences that integrate with camera, movement, and dialogs.
 - **UI**: Scene2D UI layouts and widgets.
 - **Services**: Savegame, registries, resource management.
 - **Debugging**: Debug overlay with runtime stats and recent log buffer when `game.debug` is enabled.
@@ -18,6 +19,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - `CameraSystem`: Maintains camera position and state.
 - `ChestSystem`: Handles chest interactions.
 - `ControllerSystem`: Handles input/controller events.
+- `CutsceneSystem`: Plays Yarn-based cutscenes and waits for dialog, camera, and movement gates.
 - `DamageSystem`: Applies damage.
 - `DialogConsequenceSystem`: Applies dialog consequences.
 - `DialogQuestBridgeSystem`: Bridges dialogs and quests.
@@ -30,6 +32,7 @@ This module contains the platform-independent game logic for **Road-To-Glory**. 
 - `LevelUpSystem`: Level-up logic.
 - `LifeSystem`: Health logic.
 - `MapChangeSystem`: Map changes and transitions.
+- `MoveIntentSystem`: Applies `MoveIntent` movement for non-NPC entities.
 - `NpcPathfindingSystem`: NPC pathfinding.
 - `PhysicDebugRenderSystem`: Physics debug rendering.
 - `PhysicMoveSystem`: Physics-based movement logic.

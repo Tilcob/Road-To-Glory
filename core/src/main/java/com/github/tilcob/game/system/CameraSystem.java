@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.component.CameraPan;
 import com.github.tilcob.game.component.CameraFollow;
+import com.github.tilcob.game.component.Cutscene;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 
@@ -28,7 +29,10 @@ public class CameraSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
+        Cutscene cutscene = Cutscene.MAPPER.get(entity);
+        if (cutscene != null && cutscene.getState() != Cutscene.State.IDLE) return;
         if (CameraPan.MAPPER.get(entity) != null) return;
+
         Transform transform = Transform.MAPPER.get(entity);
         CameraPan cameraPan = CameraPan.MAPPER.get(entity);
         if (cameraPan != null) {

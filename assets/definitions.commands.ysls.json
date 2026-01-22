@@ -88,6 +88,15 @@
             ]
         },
         {
+            "YarnName": "camera_move_relative",
+            "Documentation": "Moves camera relative to the player position. The time duration says how long it will take",
+            "Parameters": [
+                { "Name": "x Offset", "Type": "number" },
+                { "Name": "y Offset", "Type": "number" },
+                { "Name": "time duration", "Type": "number" }
+            ]
+        },
+        {
             "YarnName": "camera_move_back",
             "Documentation": "Moves camera back to player position. The time duration says how long it will take",
             "Parameters": [
@@ -111,13 +120,54 @@
         },
         {
             "YarnName": "wait_for_camera",
-            "Documentation": "",
+            "Documentation": "Waits for the camera to finish movement.",
             "Parameters": []
         },
         {
             "YarnName": "wait_for_move",
-            "Documentation": "",
+            "Documentation": "Waits for the entity to finish movement.",
             "Parameters": []
+        },
+        {
+            "YarnName": "move_to",
+            "Documentation": "Moves an entity to a target position with an optional arrival distance.",
+            "Parameters": [
+                { "Name": "entity", "Type": "string" },
+                { "Name": "x", "Type": "number" },
+                { "Name": "y", "Type": "number" },
+                { "Name": "arrival distance", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "play_anim",
+            "Documentation": "Plays an animation on an entity with an optional play mode.",
+            "Parameters": [
+                { "Name": "entity", "Type": "string" },
+                { "Name": "animation type", "Type": "string" },
+                { "Name": "play mode", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "face",
+            "Documentation": "Sets an entity facing direction.",
+            "Parameters": [
+                { "Name": "entity", "Type": "string" },
+                { "Name": "direction", "Type": "string" }
+            ]
+        },
+        {
+            "YarnName": "fade_in",
+            "Documentation": "Fades the screen in to full visibility.",
+            "Parameters": [
+                { "Name": "time duration", "Type": "number" }
+            ]
+        },
+        {
+            "YarnName": "fade_out",
+            "Documentation": "Fades the screen out to black.",
+            "Parameters": [
+                { "Name": "time duration", "Type": "number" }
+            ]
         }
     ],
     "Functions": []

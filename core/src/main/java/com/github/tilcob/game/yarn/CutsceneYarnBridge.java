@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.StartDialogEvent;
 import com.github.tilcob.game.input.Command;
@@ -30,6 +31,7 @@ public class CutsceneYarnBridge {
         registry.register("lock_player", this::lockPlayer);
         registry.register("unlock_player", this::unlockPlayer);
         registry.register("camera_move", this::cameraMove);
+        registry.register("camera_move_relative", this::cameraMoveRelative);
         registry.register("camera_move_back", this::cameraMoveBack);
         registry.register("play_anim", this::playAnimation);
         registry.register("move_to", this::moveTo);
@@ -61,6 +63,21 @@ public class CutsceneYarnBridge {
         player.remove(CameraPan.class);
         player.remove(CameraPanHome.class);
         player.add(new CameraPan(x, y, duration));
+    }
+
+    private void cameraMoveRelative(Entity player, String[] args) {
+        if (player == null || args == null || args.length < 2) return;
+        Transform transform = Transform.MAPPER.get(player);
+        if (transform == null) return;
+        float offsetX = parseFloat(args[0], Float.NaN);
+        float offsetY = parseFloat(args[1], Float.NaN);
+        if (Float.isNaN(offsetX) || Float.isNaN(offsetY)) return;
+        float duration = args.length > 2 ? MathUtils.clamp(parseFloat(args[2], 0f), 0f, 60f) : 0f;
+        float targetX = transform.getPosition().x + offsetX;
+        float targetY = transform.getPosition().y + offsetY + Constants.CAMERA_OFFSET_Y;
+        player.remove(CameraPan.class);
+        player.remove(CameraPanHome.class);
+        player.add(new CameraPan(targetX, targetY, duration));
     }
 
     private void cameraMoveBack(Entity player, String[] args) {

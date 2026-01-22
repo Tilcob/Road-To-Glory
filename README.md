@@ -21,6 +21,13 @@ file.
 Dialog definitions live in `assets/dialogs/index.json`, which is generated from the
 `.yarn` dialog files in `assets/dialogs` and loaded from the file name.
 
+### Cutscene data
+
+Cutscene scripts live in `assets/cutscenes` as `.yarn` files and are loaded by cutscene
+id. Cutscenes support the same Yarn command line syntax as dialogs, plus custom
+commands such as `<<wait_for_camera>>` and `<<wait_for_move>>` to pause until camera
+pans or scripted movement completes.
+
 ### Item data
 
 Item definitions live in `assets/items/index.json`, which is generated from the
