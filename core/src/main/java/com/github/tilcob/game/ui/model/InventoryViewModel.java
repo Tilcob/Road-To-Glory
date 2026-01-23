@@ -17,6 +17,7 @@ public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();
     private boolean open = false;
     private boolean paused = false;
+    private boolean isChestOpen = false;
 
     public InventoryViewModel(GameServices services) {
         super(services);
@@ -29,6 +30,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().subscribe(OpenChestEvent.class, this::openChest);
+        getEventBus().subscribe(CloseChestEvent.class, this::closeChest);
     }
 
     private void onQuestLogEvent(UpdateQuestLogEvent event) {
@@ -54,7 +56,7 @@ public class InventoryViewModel extends ViewModel {
     private void onUiEvent(UiEvent event) {
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY) {
-            if (paused) return;
+            if (paused || isChestOpen) return;
             boolean old = open;
             open = !open;
             this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
@@ -116,7 +118,11 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void openChest(OpenChestEvent event) {
-        closeInventory();
+        isChestOpen = true;
+    }
+
+    private void closeChest(CloseChestEvent event) {
+        isChestOpen = false;
     }
 
     @Override
@@ -129,5 +135,6 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().unsubscribe(OpenChestEvent.class, this::openChest);
+        getEventBus().unsubscribe(CloseChestEvent.class, this::closeChest);
     }
 }
