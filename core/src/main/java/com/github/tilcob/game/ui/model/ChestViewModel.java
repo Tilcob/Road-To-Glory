@@ -18,6 +18,7 @@ public class ChestViewModel extends ViewModel {
     private final Array<ItemModel> playerItems = new Array<>();
     private boolean open = false;
     private boolean paused = false;
+    private boolean isPlayerInventoryOpen = false;
     private Entity currentChest;
     private Entity currentPlayer;
 
@@ -33,7 +34,7 @@ public class ChestViewModel extends ViewModel {
     }
 
     private void onOpenChest(OpenChestEvent event) {
-        if (paused) return;
+        if (paused || isPlayerInventoryOpen) return;
         open = true;
         currentChest = event.chestEntity();
         currentPlayer = event.player();
@@ -134,7 +135,7 @@ public class ChestViewModel extends ViewModel {
     private void onUiEvent(UiEvent event) {
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY && open) {
-            getEventBus().fire(new CloseChestEvent(currentPlayer, Chest.MAPPER.get(currentChest)));
+            isPlayerInventoryOpen = !isPlayerInventoryOpen;
         }
     }
 
