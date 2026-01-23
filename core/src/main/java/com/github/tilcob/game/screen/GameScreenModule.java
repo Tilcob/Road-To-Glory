@@ -101,7 +101,7 @@ public class GameScreenModule {
 
         // Combat
         engine.addSystem(withPriority(
-            new AttackSystem(physicWorld, services.getAudioManager()),
+            new AttackSystem(physicWorld, services.getAudioManager(), services.getEventBus()),
             SystemOrder.COMBAT
         ));
         engine.addSystem(withPriority(
@@ -141,6 +141,8 @@ public class GameScreenModule {
             ),
             SystemOrder.GAMEPLAY
         ));
+        engine.addSystem(withPriority(new DialogSessionSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new StartDialogSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new DialogConsequenceSystem(
                 services.getEventBus(),
                 services.getQuestManager(),

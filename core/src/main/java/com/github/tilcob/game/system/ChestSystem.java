@@ -11,14 +11,10 @@ import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.OpenChestRequest;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class ChestSystem extends IteratingSystem implements Disposable {
     private final InventoryService inventoryService;
@@ -34,6 +30,7 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         eventBus.subscribe(CloseChestEvent.class, this::close);
         eventBus.subscribe(TransferChestToPlayerEvent.class, this::transferChestToPlayer);
         eventBus.subscribe(TransferPlayerToChestEvent.class, this::transferPlayerToChest);
+        eventBus.subscribe(CommandEvent.class, this::onCommand);
     }
 
     @Override
@@ -63,50 +60,6 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         }
     }
 
-    @Deprecated
-    private void transferContents(Chest chest, Inventory inventory) {
-        Map<String, Integer> stackSpace = new HashMap<>();
-        int usedSlots = inventory.getItems().size;
-        int emptySlots = Constants.INVENTORY_CAPACITY - usedSlots;
-
-        for (var entity : inventory.getItems()) {
-            Item item = Item.MAPPER.get(entity);
-            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
-            if (!definition.isStackable()) continue;
-            int space = definition.maxStack() - item.getCount();
-            if (space > 0) {
-                stackSpace.merge(item.getItemId(), space, Integer::sum);
-            }
-        }
-
-        List<String> remaining = new ArrayList<>();
-        List<String> transferred = new ArrayList<>();
-
-        for (String itemId : chest.getContents()) {
-            ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
-            if (definition.isStackable() && stackSpace.getOrDefault(itemId, 0) > 0) {
-                stackSpace.put(itemId, stackSpace.get(itemId) - 1);
-                transferred.add(itemId);
-                continue;
-            }
-
-            if (emptySlots > 0) {
-                emptySlots--;
-                transferred.add(itemId);
-                continue;
-            }
-
-            remaining.add(itemId);
-        }
-
-        if (!transferred.isEmpty()) {
-            for (String itemId : transferred) {
-                inventory.getItemsToAdd().add(itemId);
-            }
-        }
-        chest.setContents(remaining);
-    }
-
     private void close(CloseChestEvent event) {
         event.player().remove(OpenChestRequest.class);
         if (event.chest() != null) {
@@ -117,6 +70,24 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         }
         openChestEntity = null;
         openPlayer = null;
+    }
+
+    private void onCommand(CommandEvent event) {
+        if (event.isHandled()) return;
+        if (event.getCommand() != Command.INTERACT) return;
+        Entity player = event.getPlayer();
+        if (openPlayer != null && openPlayer == player && openChestEntity != null) {
+            event.setHandled(true);
+            eventBus.fire(new CloseChestEvent(player, Chest.MAPPER.get(openChestEntity)));
+            return;
+        }
+        OpenChestRequest req = OpenChestRequest.MAPPER.get(player);
+        if (req == null) return;
+        event.setHandled(true);
+
+        Entity chestEntity = req.getChest();
+        Chest chest = Chest.MAPPER.get(chestEntity);
+        if (chest != null) chest.open();
     }
 
     private void transferPlayerToChest(TransferPlayerToChestEvent event) {
@@ -194,5 +165,6 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         eventBus.unsubscribe(CloseChestEvent.class, this::close);
         eventBus.unsubscribe(TransferChestToPlayerEvent.class, this::transferChestToPlayer);
         eventBus.unsubscribe(TransferPlayerToChestEvent.class, this::transferPlayerToChest);
+        eventBus.unsubscribe(CommandEvent.class, this::onCommand);
     }
 }

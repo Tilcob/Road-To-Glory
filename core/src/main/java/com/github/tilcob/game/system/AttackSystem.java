@@ -8,24 +8,30 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.CommandEvent;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.npc.NpcType;
 
-public class AttackSystem extends IteratingSystem {
+public class AttackSystem extends IteratingSystem implements Disposable {
     private static final Rectangle attackAABB = new Rectangle();
+
     private final AudioManager audioManager;
     private final World world;
     private final Vector2 tmpVertex;
     private final ObjectSet<Entity> hitEntities;
+    private final GameEventBus eventBus;
     private Body attackerBody;
     private Entity attackerEntity;
     private float attackDamage;
 
-    public AttackSystem(World world, AudioManager audioManager) {
+    public AttackSystem(World world, AudioManager audioManager, GameEventBus eventBus) {
         super(Family.all(Attack.class, Facing.class, Physic.class).get());
         this.world = world;
         this.audioManager = audioManager;
@@ -34,6 +40,9 @@ public class AttackSystem extends IteratingSystem {
         this.attackerBody = null;
         this.attackerEntity = null;
         this.attackDamage = 0;
+        this.eventBus = eventBus;
+
+        eventBus.subscribe(CommandEvent.class, this::onCommand);
     }
 
     @Override
@@ -63,6 +72,17 @@ public class AttackSystem extends IteratingSystem {
 
         if (attack.consumeFinished()) {
             setRooted(entity, false);
+        }
+    }
+
+    private void onCommand(CommandEvent event) {
+        if (event.isHandled()) return;
+        if (event.getCommand() != Command.SELECT) return;
+        Attack attack = Attack.MAPPER.get(event.getPlayer());
+        if (attack == null) return;
+        if (attack.canAttack()) {
+            attack.startAttack();
+            event.setHandled(true);
         }
     }
 
@@ -136,5 +156,10 @@ public class AttackSystem extends IteratingSystem {
         } else {
             return fixture.getUserData() != null ? fixture.getUserData().toString() : null;
         }
+    }
+
+    @Override
+    public void dispose() {
+        eventBus.unsubscribe(CommandEvent.class, this::onCommand);
     }
 }
