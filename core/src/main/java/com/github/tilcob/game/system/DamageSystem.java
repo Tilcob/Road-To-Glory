@@ -25,7 +25,12 @@ public class DamageSystem extends IteratingSystem {
         entity.remove(Damaged.class);
 
         Life life = Life.MAPPER.get(entity);
+        Protection protection = Protection.MAPPER.get(entity);
         float dealtDamage = damaged.getDamage();
+        if (protection != null) {
+            dealtDamage *= (1f - Math.max(0f, Math.min(.95f, protection.getProtection() / 100f)));
+        }
+
         if (life != null) {
             dealtDamage = Math.min(damaged.getDamage(), life.getLife());
             life.addLife(-damaged.getDamage());

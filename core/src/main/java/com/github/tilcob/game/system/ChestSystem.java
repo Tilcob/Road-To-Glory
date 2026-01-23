@@ -37,19 +37,27 @@ public class ChestSystem extends IteratingSystem implements Disposable {
     protected void processEntity(Entity player, float deltaTime) {
         Entity chestEntity = OpenChestRequest.MAPPER.get(player).getChest();
         inventoryService.setPlayer(player);
-        if (chestEntity == null) return;
+        if (chestEntity == null) {
+            player.remove(OpenChestRequest.class);
+            return;
+        }
         Chest chest = Chest.MAPPER.get(chestEntity);
-        if (chest == null) return;
+        if (chest == null) {
+            player.remove(OpenChestRequest.class);
+            return;
+        }
 
         if (chest.isOpen()) {
             Inventory inventory = Inventory.MAPPER.get(player);
             if (inventory == null) {
                 chest.close();
+                player.remove(OpenChestRequest.class);
                 return;
             }
             openChestEntity = chestEntity;
             openPlayer = player;
             eventBus.fire(new OpenChestEvent(player, chestEntity));
+            player.remove(OpenChestRequest.class);
         }
     }
 
