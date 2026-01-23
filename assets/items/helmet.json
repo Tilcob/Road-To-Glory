@@ -3,5 +3,11 @@
     "name": "Helmet",
     "category": "HELMET",
     "maxStack": 1,
-    "icon": "helmet"
+    "icon": "helmet",
+    "statModifiers": [
+        {
+            "stat": "protection",
+            "additive": 5
+        }
+    ]
 }

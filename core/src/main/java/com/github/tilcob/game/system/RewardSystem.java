@@ -29,7 +29,7 @@ public class RewardSystem extends EntitySystem implements Disposable {
     private void onCommand(CommandEvent event) {
         if (event.isHandled()) return;
         if (event.getCommand() != Command.INTERACT) return;
-        if (RewardDialogState.MAPPER.get(event.getPlayer()) != null) return;
+        if (RewardDialogState.MAPPER.get(event.getPlayer()) == null) return;
         event.setHandled(true);
         eventBus.fire(new DialogAdvanceEvent(event.getPlayer()));
     }

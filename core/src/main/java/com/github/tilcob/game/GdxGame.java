@@ -42,7 +42,7 @@ public class GdxGame extends Game implements ScreenNavigator {
         } else {
             Gdx.app.setLogLevel(Application.LOG_ERROR);
         }
-        DebugLogBuffer.install(Gdx.app, 30);
+        DebugLogBuffer.install(Gdx.app, 20);
 
         inputMultiplexer = new InputMultiplexer();
         InputManager inputManager = new InputManager(inputMultiplexer);

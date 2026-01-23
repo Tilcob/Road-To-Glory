@@ -3,5 +3,11 @@
     "name": "Armor",
     "category": "ARMOR",
     "maxStack": 1,
-    "icon": "armor"
+    "icon": "armor",
+    "statModifiers": [
+        {
+            "stat": "protection",
+            "additive": 15
+        }
+    ]
 }

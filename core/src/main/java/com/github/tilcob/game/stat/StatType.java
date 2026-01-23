@@ -10,7 +10,8 @@ public enum StatType {
     LIFE_REGENERATION("life_regeneration"),
     MAX_LIFE("max_life"),
     STAMINA("stamina"),
-    STRENGTH("strength"),;
+    STRENGTH("strength"),
+    PROTECTION("protection"),;
 
     private final String id;
     private static final Map<String, StatType> BY_ID = new HashMap<>();
