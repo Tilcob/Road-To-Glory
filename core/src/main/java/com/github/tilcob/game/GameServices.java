@@ -8,6 +8,7 @@ import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.save.SaveManager;
@@ -42,6 +43,7 @@ public class GameServices {
     private final QuestManager questManager;
     private final QuestLifecycleService questLifecycleService;
     private final QuestRewardService questRewardService;
+    private final InventoryService inventoryService;
     private EntityLookup entityLookup;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
@@ -71,6 +73,7 @@ public class GameServices {
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
+        this.inventoryService = new InventoryService(eventBus, questManager);
     }
 
     public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
@@ -100,6 +103,7 @@ public class GameServices {
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
+        this.inventoryService = new InventoryService(eventBus, questManager);
     }
 
     public void loadGame() {
@@ -188,6 +192,10 @@ public class GameServices {
 
     public QuestRewardService getQuestRewardService() {
         return questRewardService;
+    }
+
+    public InventoryService getInventoryService() {
+        return inventoryService;
     }
 
     public EntityLookup getEntityLookup() {

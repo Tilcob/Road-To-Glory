@@ -62,6 +62,12 @@ public class ChestState {
     }
 
     @JsonIgnore
+    public void setContentsForGame(Array<String> contents) {
+        clearContents();
+        addItems(contents);
+    }
+
+    @JsonIgnore
     private void addItems(Array<String> contents) {
         for (String item : contents) {
             this.contents.add(item);

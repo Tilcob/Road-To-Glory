@@ -11,6 +11,9 @@
   <objectgroup draworder="index" id="2">
    <object id="1" x="0" y="0" width="16" height="16"/>
    <object id="2" type="Trigger" x="-0.5" y="14.375" width="17.125" height="6.75">
+    <properties>
+     <property name="triggerType" propertytype="TriggerType" value="CHEST"/>
+    </properties>
     <ellipse/>
    </object>
   </objectgroup>

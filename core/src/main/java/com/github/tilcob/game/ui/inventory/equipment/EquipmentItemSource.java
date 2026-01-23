@@ -1,4 +1,4 @@
-package com.github.tilcob.game.ui.inventory;
+package com.github.tilcob.game.ui.inventory.equipment;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;

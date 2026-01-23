@@ -117,6 +117,8 @@ public class ControllerSystem extends IteratingSystem {
             Entity chestEntity = openChestRequest.getChest();
             Chest.MAPPER.get(chestEntity).open();
             return;
+        } else {
+            eventBus.fire(new CloseChestEvent(player, null));
         }
         if (StartDialogRequest.MAPPER.get(player) != null) {
             StartDialogRequest startDialogRequest = StartDialogRequest.MAPPER.get(player);

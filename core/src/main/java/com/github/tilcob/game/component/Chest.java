@@ -40,4 +40,8 @@ public class Chest implements Component {
     public void setContents(List<String> items) {
         state.setContents(items);
     }
+
+    public void setContents(Array<String> items) {
+        state.setContentsForGame(items);
+    }
 }

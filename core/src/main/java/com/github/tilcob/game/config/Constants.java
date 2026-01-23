@@ -112,6 +112,9 @@ public class Constants {
     public static final String HIDE_DIALOG_CHOICES = "hideDialogChoices";
     public static final String SHOW_REWARD_DIALOG = "showRewardDialog";
     public static final String HIDE_REWARD_DIALOG = "hideRewardDialog";
+    public static final String OPEN_CHEST_INVENTORY = "openChestInventory";
+    public static final String ADD_ITEMS_TO_CHEST = "addItemsToChest";
+    public static final String ADD_ITEMS_TO_PLAYER_IN_CHEST = "addItemsToPlayerInChest";
 
     // Player properties
     public static final int PLAYER_ID = 4;

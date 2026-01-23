@@ -7,7 +7,13 @@ import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.ui.inventory.*;
+import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
+import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
+import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlot;
+import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlotTarget;
+import com.github.tilcob.game.ui.inventory.player.PlayerItemSource;
+import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
+import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.ItemModel;
 
@@ -15,7 +21,7 @@ import java.util.EnumMap;
 
 public class InventoryView extends View<InventoryViewModel> {
     private Table inventoryRoot;
-    private InventorySlot[][] slots;
+    private PlayerSlot[][] slots;
     private EnumMap<ItemCategory, EquipmentSlot> equipmentSlots;
     private Table questLog;
     private Label itemDetailsLabel;
@@ -26,7 +32,7 @@ public class InventoryView extends View<InventoryViewModel> {
 
     @Override
     protected void setupUI() {
-        slots = new InventorySlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
+        slots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         equipmentSlots = new EnumMap<>(ItemCategory.class);
         dragAndDrop = new InventoryDragAndDrop();
 
@@ -44,7 +50,7 @@ public class InventoryView extends View<InventoryViewModel> {
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 int index = i * Constants.INVENTORY_COLUMNS + j;
-                InventorySlot slot = new InventorySlot(index, skin, viewModel.getEventBus());
+                PlayerSlot slot = new PlayerSlot(index, skin, viewModel.getEventBus());
                 this.slots[i][j] = slot;
                 contentTable.add(slot).size(35,35);
             }
@@ -109,8 +115,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
-                InventorySlot slot = slots[i][j];
-                dragAndDrop.addTarget(new InventorySlotTarget(slot, viewModel.getEventBus()));
+                PlayerSlot slot = slots[i][j];
+                dragAndDrop.addTarget(new PlayerSlotTarget(slot, viewModel.getEventBus()));
             }
         }
 
@@ -169,10 +175,10 @@ public class InventoryView extends View<InventoryViewModel> {
             int col = idx % Constants.INVENTORY_COLUMNS;
             if (row < 0 || row >= Constants.INVENTORY_ROWS || col < 0) continue;
 
-            InventorySlot slot = slots[row][col];
+            PlayerSlot slot = slots[row][col];
             Image itemImage = renderItemInSlot(item, slot);
 
-            dragAndDrop.addSource(new InventoryItemSource(itemImage, item.getSlotIdx(), viewModel.getEventBus()));
+            dragAndDrop.addSource(new PlayerItemSource(itemImage, item.getSlotIdx()));
         }
     }
 
@@ -198,8 +204,8 @@ public class InventoryView extends View<InventoryViewModel> {
     private void clearSlot(Stack slot) {
         Actor actor = slot.findActor("itemId");
         if (actor != null) actor.remove();
-        if (slot instanceof InventorySlot inventorySlot) {
-            inventorySlot.setCount(0);
+        if (slot instanceof PlayerSlot playerSlot) {
+            playerSlot.setCount(0);
         }
     }
 
@@ -210,9 +216,9 @@ public class InventoryView extends View<InventoryViewModel> {
         itemImage.addListener(new ItemDetailsListener(item));
 
         slot.add(itemImage);
-        if (slot instanceof InventorySlot inventorySlot) {
-            inventorySlot.setCount(item.getCount());
-            inventorySlot.getCountTable().toFront();
+        if (slot instanceof PlayerSlot playerSlot) {
+            playerSlot.setCount(item.getCount());
+            playerSlot.getCountTable().toFront();
         }
         return itemImage;
     }
