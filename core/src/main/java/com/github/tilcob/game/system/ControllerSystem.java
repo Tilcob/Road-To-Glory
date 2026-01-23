@@ -51,10 +51,10 @@ public class ControllerSystem extends IteratingSystem {
                 case DOWN -> {
                     if (choosingDialog) eventBus.fire(new DialogChoiceNavigateEvent(entity, 1));
                 }
-                case SELECT -> startEntityAttack(entity);
+                case SELECT -> select(entity);
                 case PAUSE -> eventBus.fire(new PauseEvent(PauseEvent.Action.TOGGLE));
                 case INTERACT -> interact(entity);
-                case INVENTORY -> showEntityInventory(entity);
+                case INVENTORY -> inventory(entity);
                 default -> {
                 }
             }
@@ -89,49 +89,17 @@ public class ControllerSystem extends IteratingSystem {
         }
     }
 
-    private void showEntityInventory(Entity player) {
+    private void inventory(Entity player) {
         Inventory inventory = Inventory.MAPPER.get(player);
         if (inventory == null) return;
-
         eventBus.fire(new UiEvent(Command.INVENTORY, UiEvent.Action.PRESS));
     }
 
     private void interact(Entity player) {
-        if (RewardDialogState.MAPPER.get(player) != null) {
-            eventBus.fire(new DialogAdvanceEvent(player));
-            return;
-        }
-        DialogSession dialogSession = DialogSession.MAPPER.get(player);
-        if (dialogSession != null) {
-            if (dialogSession.isAwaitingChoice()) {
-                eventBus.fire(new DialogChoiceSelectEvent(player));
-            } else {
-                eventBus.fire(new DialogAdvanceEvent(player));
-            }
-            return;
-        }
-        eventBus.fire(new DialogAdvanceEvent(player));
-
-        if (OpenChestRequest.MAPPER.get(player) != null) {
-            OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(player);
-            Entity chestEntity = openChestRequest.getChest();
-            Chest.MAPPER.get(chestEntity).open();
-            return;
-        } else {
-            eventBus.fire(new CloseChestEvent(player, null));
-        }
-        if (StartDialogRequest.MAPPER.get(player) != null) {
-            StartDialogRequest startDialogRequest = StartDialogRequest.MAPPER.get(player);
-            Entity npc = startDialogRequest.getNpc();
-            PlayerReference.MAPPER.get(npc).setPlayer(player);
-            Dialog.MAPPER.get(npc).setState(Dialog.State.REQUEST);
-        }
+        eventBus.fire(new CommandEvent(player, Command.INTERACT));
     }
 
-    private void startEntityAttack(Entity entity) {
-        Attack attack = Attack.MAPPER.get(entity);
-        if (attack != null && attack.canAttack()) {
-            attack.startAttack();
-        }
+    private void select(Entity player) {
+        eventBus.fire(new CommandEvent(player, Command.SELECT));
     }
 }

@@ -2,7 +2,6 @@ package com.github.tilcob.game.ui.model;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Chest;
 import com.github.tilcob.game.component.Id;
@@ -10,6 +9,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
@@ -29,6 +29,7 @@ public class ChestViewModel extends ViewModel {
         getEventBus().subscribe(UpdateInventoryEvent.class, this::onPlayerInventoryUpdate);
         getEventBus().subscribe(CloseChestEvent.class, this::onCloseChest);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
+        getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
 
     private void onOpenChest(OpenChestEvent event) {
@@ -128,6 +129,13 @@ public class ChestViewModel extends ViewModel {
             ));
         }
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_PLAYER_IN_CHEST, null, playerItems);
+    }
+
+    private void onUiEvent(UiEvent event) {
+        if (event.action() == UiEvent.Action.RELEASE) return;
+        if (event.command() == Command.INVENTORY && open) {
+            getEventBus().fire(new CloseChestEvent(currentPlayer, Chest.MAPPER.get(currentChest)));
+        }
     }
 
     @Override

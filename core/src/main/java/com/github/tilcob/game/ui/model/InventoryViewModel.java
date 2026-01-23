@@ -28,6 +28,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
+        getEventBus().subscribe(OpenChestEvent.class, this::openChest);
     }
 
     private void onQuestLogEvent(UpdateQuestLogEvent event) {
@@ -114,6 +115,10 @@ public class InventoryViewModel extends ViewModel {
         this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, false);
     }
 
+    private void openChest(OpenChestEvent event) {
+        closeInventory();
+    }
+
     @Override
     public void dispose() {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
@@ -123,5 +128,6 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
+        getEventBus().unsubscribe(OpenChestEvent.class, this::openChest);
     }
 }
