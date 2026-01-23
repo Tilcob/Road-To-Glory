@@ -3,33 +3,26 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectIntMap;
-import com.github.tilcob.game.component.*;
-import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.inventory.InventoryService;
-import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.QuestManager;
-import com.github.tilcob.game.stat.StatType;
 
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestManager questManager;
     private final InventoryService service;
-    private Entity player;
 
     public InventorySystem(GameEventBus eventBus, QuestManager questManager, Skin skin) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
         this.questManager = questManager;
-        this.service = new InventoryService(eventBus, getEngine(), questManager, skin, player);
+        this.service = new InventoryService(eventBus, questManager, skin);
 
         eventBus.subscribe(DragAndDropPlayerEvent.class, this::onMoveEntity);
         eventBus.subscribe(EquipItemEvent.class, this::onEquipItem);
@@ -41,7 +34,8 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     @Override
     protected void processEntity(Entity player, float deltaTime) {
         Inventory inventory = Inventory.MAPPER.get(player);
-        this.player = player;
+        service.setEngine(getEngine());
+        service.setPlayer(player);
         if (inventory.getItemsToAdd().isEmpty()) return;
 
         boolean inventoryFull = false;

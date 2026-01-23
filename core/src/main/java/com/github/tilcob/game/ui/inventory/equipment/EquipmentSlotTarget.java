@@ -5,7 +5,6 @@ import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
-import com.github.tilcob.game.ui.inventory.chest.ChestSlotTarget;
 import com.github.tilcob.game.ui.inventory.player.PlayerItemSource;
 
 public class EquipmentSlotTarget extends DragAndDrop.Target {

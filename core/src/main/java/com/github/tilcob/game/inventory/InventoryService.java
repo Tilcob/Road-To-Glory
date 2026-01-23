@@ -20,16 +20,22 @@ import com.github.tilcob.game.stat.StatType;
 
 public class InventoryService {
     private final GameEventBus eventBus;
-    private final Engine engine;
+    private Engine engine;
     private final QuestManager questManager;
     private final Skin skin;
-    private final Entity player;
+    private Entity player;
 
-    public InventoryService(GameEventBus eventBus, Engine engine, QuestManager questManager, Skin skin, Entity player) {
+    public InventoryService(GameEventBus eventBus, QuestManager questManager, Skin skin) {
         this.eventBus = eventBus;
-        this.engine = engine;
         this.questManager = questManager;
         this.skin = skin;
+    }
+
+    public void setEngine(Engine engine) {
+        this.engine = engine;
+    }
+
+    public void setPlayer(Entity player) {
         this.player = player;
     }
 
