@@ -13,9 +13,11 @@ import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.*;
+import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
+import com.github.tilcob.game.ui.model.ChestInventoryViewModel;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
@@ -71,8 +73,11 @@ public class GameScreenModule {
         Stage stage = new Stage(uiViewport, batch);
         GameViewModel gameViewModel = new GameViewModel(services, viewport);
         InventoryViewModel inventoryViewModel = new InventoryViewModel(services);
+        ChestInventoryViewModel chestInventoryViewModel = new ChestInventoryViewModel(services);
         PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
         Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
+        services.getInventoryService().setSkin(skin);
+        services.getInventoryService().setEngine(engine);
 
         // Input
         engine.addSystem(withPriority(
@@ -115,7 +120,7 @@ public class GameScreenModule {
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(
-            new InventorySystem(services.getEventBus(), services.getQuestManager(), skin),
+            new InventorySystem(services.getEventBus(), services.getQuestManager(), services.getInventoryService()),
             SystemOrder.GAMEPLAY
         ));
         engine.addSystem(withPriority(new EquipmentSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
@@ -123,7 +128,7 @@ public class GameScreenModule {
         engine.addSystem(withPriority(new StatModifierDurationSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new LevelUpSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new StatRecalcSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new ChestSystem(), SystemOrder.GAMEPLAY));
+        engine.addSystem(withPriority(new ChestSystem(services.getInventoryService(), services.getEventBus()), SystemOrder.GAMEPLAY));
         engine.addSystem(withPriority(new QuestSystem(
             services.getEventBus(), services.getQuestLifecycleService()),
             SystemOrder.GAMEPLAY));
@@ -182,11 +187,13 @@ public class GameScreenModule {
             stage,
             gameViewModel,
             inventoryViewModel,
+            chestInventoryViewModel,
             pauseViewModel,
             skin,
             inputManager,
             services.getAudioManager(),
-            activeEntityReference
+            activeEntityReference,
+            services.getInventoryService()
         );
     }
 
@@ -206,10 +213,12 @@ public class GameScreenModule {
         Stage stage,
         GameViewModel gameViewModel,
         InventoryViewModel inventoryViewModel,
+        ChestInventoryViewModel chestInventoryViewModel,
         PauseViewModel pauseViewModel,
         Skin skin,
         InputManager inputManager,
         AudioManager audioManager,
-        ActiveEntityReference activeEntityReference
+        ActiveEntityReference activeEntityReference,
+        InventoryService inventoryService
     ) {}
 }

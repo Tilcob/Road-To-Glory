@@ -3,7 +3,6 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.ObjectIntMap;
@@ -16,13 +15,13 @@ import com.github.tilcob.game.quest.QuestManager;
 public class InventorySystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
     private final QuestManager questManager;
-    private final InventoryService service;
+    private final InventoryService inventoryService;
 
-    public InventorySystem(GameEventBus eventBus, QuestManager questManager, Skin skin) {
+    public InventorySystem(GameEventBus eventBus, QuestManager questManager, InventoryService inventoryService) {
         super(Family.all(Inventory.class).get());
         this.eventBus = eventBus;
         this.questManager = questManager;
-        this.service = new InventoryService(eventBus, questManager, skin);
+        this.inventoryService = inventoryService;
 
         eventBus.subscribe(DragAndDropPlayerEvent.class, this::onMoveEntity);
         eventBus.subscribe(EquipItemEvent.class, this::onEquipItem);
@@ -34,8 +33,7 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     @Override
     protected void processEntity(Entity player, float deltaTime) {
         Inventory inventory = Inventory.MAPPER.get(player);
-        service.setEngine(getEngine());
-        service.setPlayer(player);
+        inventoryService.setPlayer(player);
         if (inventory.getItemsToAdd().isEmpty()) return;
 
         boolean inventoryFull = false;
@@ -50,13 +48,13 @@ public class InventorySystem extends IteratingSystem implements Disposable {
                 continue;
             }
 
-            int slotIndex = service.emptySlotIndex(inventory);
+            int slotIndex = inventoryService.emptySlotIndex(inventory);
             if (slotIndex == -1) {
                 inventoryFull = true;
                 remaining.add(resolvedId);
                 continue;
             }
-            service.addItem(inventory, resolvedId, slotIndex);
+            inventoryService.addItem(inventory, resolvedId, slotIndex);
             addedAny = true;
             addedCounts.getAndIncrement(resolvedId, 0, 1);
         }
@@ -72,23 +70,23 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     }
 
     private void onDropItem(InventoryDropEvent event) {
-        service.dropItem(event.slotIndex());
+        inventoryService.dropItem(event.slotIndex());
     }
 
     private void onMoveEntity(DragAndDropPlayerEvent event) {
-        service.moveEntity(event.toIdx(), event.fromIdx());
+        inventoryService.moveEntity(event.toIdx(), event.fromIdx());
     }
 
     private void onEquipItem(EquipItemEvent event) {
-        service.equipItem(event.category(), event.fromIndex());
+        inventoryService.equipItem(event.category(), event.fromIndex());
     }
 
     private void onUnequipItem(UnequipItemEvent event) {
-        service.unequipItem(event.category(), event.toIndex());
+        inventoryService.unequipItem(event.category(), event.toIndex());
     }
 
     private void onSplitStack(SplitStackEvent event) {
-        service.splitStack(event.slotIndex());
+        inventoryService.splitStack(event.slotIndex());
     }
 
     @Override

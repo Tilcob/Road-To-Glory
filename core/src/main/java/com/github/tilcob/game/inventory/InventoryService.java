@@ -22,13 +22,12 @@ public class InventoryService {
     private final GameEventBus eventBus;
     private Engine engine;
     private final QuestManager questManager;
-    private final Skin skin;
+    private Skin skin;
     private Entity player;
 
-    public InventoryService(GameEventBus eventBus, QuestManager questManager, Skin skin) {
+    public InventoryService(GameEventBus eventBus, QuestManager questManager) {
         this.eventBus = eventBus;
         this.questManager = questManager;
-        this.skin = skin;
     }
 
     public void setEngine(Engine engine) {
@@ -37,6 +36,10 @@ public class InventoryService {
 
     public void setPlayer(Entity player) {
         this.player = player;
+    }
+
+    public void setSkin(Skin skin) {
+        this.skin = skin;
     }
 
     public void addItem(Inventory inventory, String itemId, int slotIndex) {

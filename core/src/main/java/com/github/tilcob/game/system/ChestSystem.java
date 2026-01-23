@@ -8,6 +8,10 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.OpenChestRequest;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.CloseChestEvent;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.OpenChestEvent;
+import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
@@ -17,14 +21,21 @@ import java.util.List;
 import java.util.Map;
 
 public class ChestSystem extends IteratingSystem {
+    private final InventoryService inventoryService;
+    private final GameEventBus eventBus;
 
-    public ChestSystem() {
+    public ChestSystem(InventoryService inventoryService, GameEventBus eventBus) {
         super(Family.all(OpenChestRequest.class).get());
+        this.inventoryService = inventoryService;
+        this.eventBus = eventBus;
+
+        eventBus.subscribe(CloseChestEvent.class, this::close);
     }
 
     @Override
     protected void processEntity(Entity player, float deltaTime) {
         Entity chestEntity = OpenChestRequest.MAPPER.get(player).getChest();
+        inventoryService.setPlayer(player);
         if (chestEntity == null) {
             player.remove(OpenChestRequest.class);
             return;
@@ -38,12 +49,11 @@ public class ChestSystem extends IteratingSystem {
         if (chest.isOpen()) {
             Inventory inventory = Inventory.MAPPER.get(player);
             if (inventory == null) {
-                close(player, chest);
+                chest.close();
                 return;
             }
-
-            transferContents(chest, inventory);
-            close(player, chest);
+            eventBus.fire(new OpenChestEvent(player, chestEntity));
+            player.remove(OpenChestRequest.class);
         }
     }
 
@@ -90,8 +100,8 @@ public class ChestSystem extends IteratingSystem {
         chest.setContents(remaining);
     }
 
-    private void close(Entity player, Chest chest) {
-        player.remove(OpenChestRequest.class);
-        chest.close();
+    private void close(CloseChestEvent event) {
+        event.player().remove(OpenChestRequest.class);
+        event.chest().close();
     }
 }
