@@ -1,4 +1,4 @@
-package com.github.tilcob.game.ui.inventory;
+package com.github.tilcob.game.ui.inventory.equipment;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;

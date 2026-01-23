@@ -1,6 +1,5 @@
-package com.github.tilcob.game.ui.inventory;
+package com.github.tilcob.game.ui.inventory.chest;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
@@ -9,14 +8,14 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.SplitStackEvent;
 
-public class InventorySlot extends Stack {
+public class ChestSlot extends Stack {
     private final int slotIndex;
     private final Skin skin;
     private final Label countLabel;
     private final GameEventBus eventBus;
     private Table countTable;
 
-    public InventorySlot(int slotIndex, Skin skin, GameEventBus eventBus) {
+    public ChestSlot(int slotIndex, Skin skin, GameEventBus eventBus) {
         this.slotIndex = slotIndex;
         this.skin = skin;
         this.eventBus = eventBus;
@@ -24,29 +23,6 @@ public class InventorySlot extends Stack {
         setupUi();
         setupInput();
         this.countLabel = findActor("countLabel");
-    }
-
-    private void setupInput() {
-        addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (button == Input.Buttons.RIGHT) {
-                    eventBus.fire(new SplitStackEvent(slotIndex));
-                    return true;
-                }
-                return false;
-            }
-        });
-        addListener(new InputListener() {
-            @Override
-            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
-                if (button == Input.Buttons.LEFT && Gdx.input.isKeyPressed(Input.Keys.CONTROL_LEFT)) {
-                    Gdx.app.log("InventorySlot", "CTRL + LEFT CLICK");
-                    return true;
-                }
-                return false;
-            }
-        });
     }
 
     private void setupUi() {
@@ -65,6 +41,19 @@ public class InventorySlot extends Stack {
         countTable.add(label).expand().bottom().right().padRight(2).padBottom(2);
 
         add(countTable);
+    }
+
+    private void setupInput() {
+        addListener(new InputListener() {
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                if (button == Input.Buttons.RIGHT) {
+                    eventBus.fire(new SplitStackEvent(slotIndex));
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     public void setCount(int count) {
