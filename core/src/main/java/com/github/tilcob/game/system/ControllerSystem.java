@@ -97,6 +97,8 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
+        eventBus.fire(new InteractEvent(player));
+
         if (RewardDialogState.MAPPER.get(player) != null) {
             eventBus.fire(new DialogAdvanceEvent(player));
             return;
