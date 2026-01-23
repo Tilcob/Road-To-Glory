@@ -17,7 +17,7 @@ import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
-import com.github.tilcob.game.ui.model.ChestInventoryViewModel;
+import com.github.tilcob.game.ui.model.ChestViewModel;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
@@ -73,7 +73,7 @@ public class GameScreenModule {
         Stage stage = new Stage(uiViewport, batch);
         GameViewModel gameViewModel = new GameViewModel(services, viewport);
         InventoryViewModel inventoryViewModel = new InventoryViewModel(services);
-        ChestInventoryViewModel chestInventoryViewModel = new ChestInventoryViewModel(services);
+        ChestViewModel chestViewModel = new ChestViewModel(services);
         PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
         Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
         services.getInventoryService().setSkin(skin);
@@ -187,7 +187,7 @@ public class GameScreenModule {
             stage,
             gameViewModel,
             inventoryViewModel,
-            chestInventoryViewModel,
+            chestViewModel,
             pauseViewModel,
             skin,
             inputManager,
@@ -213,7 +213,7 @@ public class GameScreenModule {
         Stage stage,
         GameViewModel gameViewModel,
         InventoryViewModel inventoryViewModel,
-        ChestInventoryViewModel chestInventoryViewModel,
+        ChestViewModel chestViewModel,
         PauseViewModel pauseViewModel,
         Skin skin,
         InputManager inputManager,

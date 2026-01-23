@@ -31,7 +31,7 @@ import com.github.tilcob.game.system.CameraSystem;
 import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
-import com.github.tilcob.game.ui.model.ChestInventoryViewModel;
+import com.github.tilcob.game.ui.model.ChestViewModel;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
@@ -54,7 +54,7 @@ public class GameScreen extends ScreenAdapter {
     private Stage stage;
     private GameViewModel gameViewModel;
     private InventoryViewModel inventoryViewModel;
-    private ChestInventoryViewModel chestInventoryViewModel;
+    private ChestViewModel chestViewModel;
     private PauseViewModel pauseViewModel;
     private Skin skin;
     private InputManager inputManager;
@@ -83,7 +83,7 @@ public class GameScreen extends ScreenAdapter {
         this.stage = dependencies.stage();
         this.gameViewModel = dependencies.gameViewModel();
         this.inventoryViewModel = dependencies.inventoryViewModel();
-        this.chestInventoryViewModel = dependencies.chestInventoryViewModel();
+        this.chestViewModel = dependencies.chestViewModel();
         this.pauseViewModel = dependencies.pauseViewModel();
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
@@ -108,7 +108,7 @@ public class GameScreen extends ScreenAdapter {
         stage.addActor(gameUiGroup);
         gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
         gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        gameUiGroup.addActor(new ChestView(skin, stage, chestInventoryViewModel));
+        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
         if (Constants.DEBUG) {
             debugOverlayView = new DebugOverlayView(skin, engine, services);
             stage.addActor(debugOverlayView);
