@@ -202,8 +202,10 @@ public class TiledAshleyConfigurator {
         String classType = tile.getProperties().get(Constants.TYPE, "", String.class);
         if (Constants.PROP.equals(classType)) return BodyDef.BodyType.StaticBody;
 
-        String bodyTypeStr = object.getProperties().get(Constants.BODY_TYPE, "", String.class);
-        if (bodyTypeStr.isBlank()) bodyTypeStr = tile.getProperties().get(Constants.BODY_TYPE, "DynamicBody", String.class);
+        MapProperties properties = object.getProperties();
+        String bodyTypeStr = properties.containsKey(Constants.BODY_TYPE)
+            ? properties.get(Constants.BODY_TYPE, "DynamicBody", String.class)
+            : tile.getProperties().get(Constants.BODY_TYPE, "DynamicBody", String.class);
         return BodyDef.BodyType.valueOf(bodyTypeStr);
     }
 

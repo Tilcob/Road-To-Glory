@@ -95,15 +95,12 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     @Override
     public void beginContact(Contact contact) {
-        Fixture fixtureA = contact.getFixtureA();
-        Object userDataA = fixtureA.getBody().getUserData();
-        Fixture fixtureB = contact.getFixtureB();
-        Object userDataB = fixtureB.getBody().getUserData();
+        Collision collision = getCollision(contact);
+        if (collision == null) return;
 
-        if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
-        if (isPlayer(entityA, fixtureA) && isAttackFixture(fixtureA)) return;
-        if (isPlayer(entityB, fixtureB) && isAttackFixture(fixtureB)) return;
-        onEnter(entityA, fixtureA, entityB, fixtureB);
+        if (isPlayer(collision.entityA, collision.fixtureA) && isAttackFixture(collision.fixtureA)) return;
+        if (isPlayer(collision.entityB, collision.fixtureB) && isAttackFixture(collision.fixtureB)) return;
+        onEnter(collision.entityA, collision.fixtureA, collision.entityB, collision.fixtureB);
     }
 
     private void onEnter(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
@@ -122,16 +119,13 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
 
     @Override
     public void endContact(Contact contact) {
-        Fixture fixtureA = contact.getFixtureA();
-        Object userDataA = fixtureA.getBody().getUserData();
-        Fixture fixtureB = contact.getFixtureB();
-        Object userDataB = fixtureB.getBody().getUserData();
+        Collision collision = getCollision(contact);
+        if (collision == null) return;
 
-        if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return;
-        if (isPlayer(entityA, fixtureA) && isAttackFixture(fixtureA)) return;
-        if (isPlayer(entityB, fixtureB) && isAttackFixture(fixtureB)) return;
+        if (isPlayer(collision.entityA, collision.fixtureA) && isAttackFixture(collision.fixtureA)) return;
+        if (isPlayer(collision.entityB, collision.fixtureB) && isAttackFixture(collision.fixtureB)) return;
 
-        onExit(entityA, fixtureA, entityB, fixtureB);
+        onExit(collision.entityA, collision.fixtureA, collision.entityB, collision.fixtureB);
     }
 
     private void onExit(Entity entityA, Fixture fixtureA, Entity entityB, Fixture fixtureB) {
@@ -204,5 +198,18 @@ public class PhysicSystem extends IteratingSystem implements EntityListener, Con
                 && mapObject.getProperties().get(Constants.SENSOR, false, Boolean.class);
         }
         return false;
+    }
+
+    private Collision getCollision(Contact contact) {
+        Fixture fixtureA = contact.getFixtureA();
+        Object userDataA = fixtureA.getBody().getUserData();
+        Fixture fixtureB = contact.getFixtureB();
+        Object userDataB = fixtureB.getBody().getUserData();
+
+        if (!(userDataA instanceof Entity entityA) || !(userDataB instanceof Entity entityB)) return null;
+        return new Collision(fixtureA, fixtureB, entityA, entityB);
+    }
+
+    public record Collision(Fixture fixtureA, Fixture fixtureB, Entity entityA, Entity entityB) {
     }
 }
