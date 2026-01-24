@@ -105,11 +105,11 @@ public class GameScreenModule {
             SystemOrder.COMBAT
         ));
         engine.addSystem(withPriority(
-            new DamageSystem(gameViewModel, services.getQuestManager()),
+            new DamageSystem(gameViewModel, services.getQuestManager(), services.getEventBus()),
             SystemOrder.COMBAT
         ));
         engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
-        engine.addSystem(withPriority(new GameOverSystem(screenNavigator), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(new GameOverSystem(screenNavigator, services.getEventBus()), SystemOrder.COMBAT));
         engine.addSystem(withPriority(
             new TriggerSystem(services.getAudioManager(), services.getEventBus()),
             SystemOrder.COMBAT
