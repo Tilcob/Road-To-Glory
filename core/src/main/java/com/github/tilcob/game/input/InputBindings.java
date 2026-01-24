@@ -75,7 +75,7 @@ public class InputBindings {
         bindings.put(Command.DOWN, Input.Keys.S);
         bindings.put(Command.LEFT, Input.Keys.A);
         bindings.put(Command.RIGHT, Input.Keys.D);
-        bindings.put(Command.SELECT, Input.Keys.SPACE);
+        bindings.put(Command.ATTACK, Input.Keys.SPACE);
         bindings.put(Command.PAUSE, Input.Keys.ESCAPE);
         bindings.put(Command.INTERACT, Input.Keys.E);
         bindings.put(Command.INVENTORY, Input.Keys.I);

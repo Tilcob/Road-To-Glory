@@ -19,6 +19,7 @@ public class InputBindingsStorage {
 
     public InputBindings load() {
         FileHandle localFile = Gdx.files.local(localPath);
+        Gdx.app.debug("InputBindingsStorage", "Loading bindings from " + localFile.file().getAbsolutePath());
         if (localFile.exists()) {
             return readBindings(localFile);
         }

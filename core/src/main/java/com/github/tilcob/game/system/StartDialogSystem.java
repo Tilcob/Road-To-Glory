@@ -24,7 +24,7 @@ public class StartDialogSystem extends EntitySystem implements Disposable {
         if (event.getCommand() != Command.INTERACT) return;
         StartDialogRequest startDialogRequest = StartDialogRequest.MAPPER.get(event.getPlayer());
         if (startDialogRequest == null) return;
-        event.setHandled(true);
+        event.handle();
 
         Entity npc = startDialogRequest.getNpc();
         PlayerReference.MAPPER.get(npc).setPlayer(event.getPlayer());

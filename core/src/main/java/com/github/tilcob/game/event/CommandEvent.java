@@ -3,7 +3,7 @@ package com.github.tilcob.game.event;
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.input.Command;
 
-public class CommandEvent {
+public class CommandEvent implements GameEvent {
     private final Entity player;
     private final Command command;
     private boolean handled;
@@ -21,10 +21,12 @@ public class CommandEvent {
         return command;
     }
 
+    @Override
     public boolean isHandled() {
         return handled;
     }
 
+    @Override
     public void setHandled(boolean handled) {
         this.handled = handled;
     }

@@ -4,7 +4,7 @@
         "DOWN": "S",
         "LEFT": "A",
         "RIGHT": "D",
-        "SELECT": "SPACEBAR",
+        "ATTACK": "SPACEBAR",
         "PAUSE": "ESC",
         "INTERACT": "E",
         "INVENTORY": "I"

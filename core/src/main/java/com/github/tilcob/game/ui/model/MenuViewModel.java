@@ -21,14 +21,16 @@ public class MenuViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent uiEvent) {
+        if (uiEvent.isHandled()) return;
         if (uiEvent.action() == UiEvent.Action.RELEASE) return;
 
+        uiEvent.handle();
         switch (uiEvent.command()) {
             case LEFT ->  onLeft();
             case RIGHT ->  onRight();
             case UP -> onUp();
             case DOWN -> onDown();
-            case SELECT -> onSelect();
+            case ATTACK -> onSelect();
         }
     }
 

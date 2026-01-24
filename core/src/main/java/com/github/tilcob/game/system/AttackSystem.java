@@ -77,12 +77,12 @@ public class AttackSystem extends IteratingSystem implements Disposable {
 
     private void onCommand(CommandEvent event) {
         if (event.isHandled()) return;
-        if (event.getCommand() != Command.SELECT) return;
+        if (event.getCommand() != Command.ATTACK) return;
         Attack attack = Attack.MAPPER.get(event.getPlayer());
         if (attack == null) return;
         if (attack.canAttack()) {
             attack.startAttack();
-            event.setHandled(true);
+            event.handle();
         }
     }
 

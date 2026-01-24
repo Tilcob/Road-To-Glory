@@ -5,7 +5,7 @@ public enum Command {
     RIGHT,
     DOWN,
     UP,
-    SELECT,
+    ATTACK,
     PAUSE,
     CANCEL,
     INTERACT,

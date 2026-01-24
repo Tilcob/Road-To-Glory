@@ -47,8 +47,8 @@ public class GdxGame extends Game implements ScreenNavigator {
         inputMultiplexer = new InputMultiplexer();
         InputManager inputManager = new InputManager(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
-        InputBindingsStorage bindingsStorage = new InputBindingsStorage("assets/input/input_bindings.json",
-            "assets/input/input_bindings.json");
+        InputBindingsStorage bindingsStorage = new InputBindingsStorage("input/input_bindings.json",
+            "input/input_bindings.json");
         InputBindings bindings = bindingsStorage.load();
         inputManager.addDevice(new KeyboardInputDevice(bindings));
 

@@ -19,12 +19,13 @@ public class PauseViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent event) {
+        if (event.isHandled()) return;
         if (event.action() == UiEvent.Action.RELEASE) return;
-
+        event.handle();
         switch (event.command()) {
             case UP -> onUp();
             case DOWN -> onDown();
-            case SELECT -> onSelect();
+            case ATTACK -> onSelect();
             case PAUSE, CANCEL -> resumeGame();
             default -> {}
         }

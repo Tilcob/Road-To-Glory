@@ -133,9 +133,11 @@ public class ChestViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent event) {
+        if (event.isHandled()) return;
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY && open) {
             isPlayerInventoryOpen = !isPlayerInventoryOpen;
+            event.handle();
         }
     }
 

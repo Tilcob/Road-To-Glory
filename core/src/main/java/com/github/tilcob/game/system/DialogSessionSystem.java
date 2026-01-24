@@ -23,7 +23,7 @@ public class DialogSessionSystem extends EntitySystem implements Disposable {
         DialogSession dialogSession = DialogSession.MAPPER.get(event.getPlayer());
         if (dialogSession == null) return;
 
-        event.setHandled(true);
+        event.handle();
         if (dialogSession.isAwaitingChoice()) {
             eventBus.fire(new DialogChoiceSelectEvent(event.getPlayer()));
         } else {

@@ -78,13 +78,13 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         if (event.getCommand() != Command.INTERACT) return;
         Entity player = event.getPlayer();
         if (openPlayer != null && openPlayer == player && openChestEntity != null) {
-            event.setHandled(true);
+            event.handle();
             eventBus.fire(new CloseChestEvent(player, Chest.MAPPER.get(openChestEntity)));
             return;
         }
         OpenChestRequest req = OpenChestRequest.MAPPER.get(player);
         if (req == null) return;
-        event.setHandled(true);
+        event.handle();
 
         Entity chestEntity = req.getChest();
         Chest chest = Chest.MAPPER.get(chestEntity);

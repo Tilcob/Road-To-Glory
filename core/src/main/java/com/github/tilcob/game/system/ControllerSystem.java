@@ -33,8 +33,6 @@ public class ControllerSystem extends IteratingSystem {
             controller.getCommandBuffer().entrySet().removeIf(e -> !lock.isAllowed(e.getKey()));
         }
         boolean choosingDialog = dialogSession != null && dialogSession.isAwaitingChoice();
-
-        updateMovement(entity, controller);
         float nowSeconds = TimeUtils.millis() / 1000f;
 
         for (Iterator<Map.Entry<Command, Float>> iterator = controller.getCommandBuffer().entrySet().iterator();
@@ -51,7 +49,7 @@ public class ControllerSystem extends IteratingSystem {
                 case DOWN -> {
                     if (choosingDialog) eventBus.fire(new DialogChoiceNavigateEvent(entity, 1));
                 }
-                case SELECT -> select(entity);
+                case ATTACK -> attack(entity);
                 case PAUSE -> eventBus.fire(new PauseEvent(PauseEvent.Action.TOGGLE));
                 case INTERACT -> interact(entity);
                 case INVENTORY -> inventory(entity);
@@ -60,6 +58,7 @@ public class ControllerSystem extends IteratingSystem {
             }
             iterator.remove();
         }
+        updateMovement(entity, controller);
         controller.getPressedCommands().clear();
         controller.getReleasedCommands().clear();
     }
@@ -84,9 +83,7 @@ public class ControllerSystem extends IteratingSystem {
 
     private void clearMovement(Entity entity) {
         Move move = Move.MAPPER.get(entity);
-        if (move != null) {
-            move.getDirection().set(0f, 0f);
-        }
+        if (move != null) move.getDirection().set(0f, 0f);
     }
 
     private void inventory(Entity player) {
@@ -99,7 +96,7 @@ public class ControllerSystem extends IteratingSystem {
         eventBus.fire(new CommandEvent(player, Command.INTERACT));
     }
 
-    private void select(Entity player) {
-        eventBus.fire(new CommandEvent(player, Command.SELECT));
+    private void attack(Entity player) {
+        eventBus.fire(new CommandEvent(player, Command.ATTACK));
     }
 }

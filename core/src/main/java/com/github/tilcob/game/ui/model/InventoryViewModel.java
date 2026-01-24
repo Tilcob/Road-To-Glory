@@ -54,9 +54,11 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void onUiEvent(UiEvent event) {
+        if (event.isHandled()) return;
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY) {
             if (paused || isChestOpen) return;
+            event.handle();
             boolean old = open;
             open = !open;
             this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
