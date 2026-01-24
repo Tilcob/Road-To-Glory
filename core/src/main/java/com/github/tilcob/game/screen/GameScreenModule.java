@@ -109,6 +109,7 @@ public class GameScreenModule {
             SystemOrder.COMBAT
         ));
         engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
+        engine.addSystem(withPriority(new GameOverSystem(screenNavigator), SystemOrder.COMBAT));
         engine.addSystem(withPriority(
             new TriggerSystem(services.getAudioManager(), services.getEventBus()),
             SystemOrder.COMBAT
