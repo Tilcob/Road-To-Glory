@@ -5,6 +5,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.GameOverEvent;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.ui.model.GameViewModel;
@@ -12,11 +14,13 @@ import com.github.tilcob.game.ui.model.GameViewModel;
 public class DamageSystem extends IteratingSystem {
     private final GameViewModel viewModel;
     private final QuestManager questManager;
+    private final GameEventBus eventBus;
 
-    public DamageSystem(GameViewModel viewModel, QuestManager questManager) {
+    public DamageSystem(GameViewModel viewModel, QuestManager questManager, GameEventBus eventBus) {
         super(Family.all(Damaged.class).get());
         this.viewModel = viewModel;
         this.questManager = questManager;
+        this.eventBus = eventBus;
     }
 
     @Override
@@ -32,8 +36,8 @@ public class DamageSystem extends IteratingSystem {
         }
 
         if (life != null) {
-            dealtDamage = Math.min(damaged.getDamage(), life.getLife());
-            life.addLife(-damaged.getDamage());
+            dealtDamage = Math.min(dealtDamage, life.getLife());
+            life.addLife(-dealtDamage);
             if (life.getLife() <= 0 && Player.MAPPER.get(entity) == null) {
                 Npc npc = Npc.MAPPER.get(entity);
                 if (npc != null && npc.getType() == NpcType.ENEMY) {
@@ -41,6 +45,8 @@ public class DamageSystem extends IteratingSystem {
                 }
                 getEngine().removeEntity(entity);
                 return;
+            } else if (life.getLife() <= 0 && Player.MAPPER.get(entity) != null) {
+                eventBus.fire(new GameOverEvent(entity));
             }
         }
 
