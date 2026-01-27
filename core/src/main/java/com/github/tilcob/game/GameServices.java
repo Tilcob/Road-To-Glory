@@ -73,7 +73,7 @@ public class GameServices {
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
-        this.inventoryService = new InventoryService(eventBus, questManager);
+        this.inventoryService = new InventoryService(eventBus);
     }
 
     public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
@@ -103,7 +103,7 @@ public class GameServices {
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
-        this.inventoryService = new InventoryService(eventBus, questManager);
+        this.inventoryService = new InventoryService(eventBus);
     }
 
     public void loadGame() {

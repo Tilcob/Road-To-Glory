@@ -15,17 +15,20 @@ import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.quest.QuestManager;
 
 public class ChestSystem extends IteratingSystem implements Disposable {
     private final InventoryService inventoryService;
     private final GameEventBus eventBus;
+    private final QuestManager questManager;
     private Entity openChestEntity;
     private Entity openPlayer;
 
-    public ChestSystem(InventoryService inventoryService, GameEventBus eventBus) {
+    public ChestSystem(InventoryService inventoryService, GameEventBus eventBus, QuestManager questManager) {
         super(Family.all(OpenChestRequest.class).get());
         this.inventoryService = inventoryService;
         this.eventBus = eventBus;
+        this.questManager = questManager;
 
         eventBus.subscribe(CloseChestEvent.class, this::close);
         eventBus.subscribe(TransferChestToPlayerEvent.class, this::transferChestToPlayer);
@@ -147,6 +150,8 @@ public class ChestSystem extends IteratingSystem implements Disposable {
                     targetItem.add(1);
                     contents.removeIndex(event.fromIndex());
                     chest.setContents(contents);
+
+                    questManager.signal(openPlayer, "collect", itemId, 1);
                     eventBus.fire(new UpdateInventoryEvent(openPlayer));
                     eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
                 }
@@ -157,6 +162,8 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         inventory.add(newItem);
         contents.removeIndex(event.fromIndex());
         chest.setContents(contents);
+
+        questManager.signal(openPlayer, "collect", itemId, 1);
         eventBus.fire(new UpdateInventoryEvent(openPlayer));
         eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
     }

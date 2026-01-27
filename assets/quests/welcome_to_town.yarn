@@ -6,6 +6,7 @@ reward_money: 50
 reward_item: sword
 reward_timing: giver
 step: talk Npc-2
+step: collect helmet 1
 title: q_welcome_to_town_start
 position: -178,-155
 ---
@@ -18,6 +19,13 @@ position: -178,-155
 ---
 <<if $eventTarget == "Npc-2">>
 <<quest_stage welcome_to_town 1>>
+<<endif>>
+===
+
+title: q_welcome_to_town_on_collect
+position: -178,-155
+---
+<<if $eventTarget == "helmet">>
 <<quest_complete welcome_to_town>>
 <<endif>>
 ===

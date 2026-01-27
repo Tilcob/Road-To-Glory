@@ -21,13 +21,11 @@ import com.github.tilcob.game.stat.StatType;
 public class InventoryService {
     private final GameEventBus eventBus;
     private Engine engine;
-    private final QuestManager questManager;
     private Skin skin;
     private Entity player;
 
-    public InventoryService(GameEventBus eventBus, QuestManager questManager) {
+    public InventoryService(GameEventBus eventBus) {
         this.eventBus = eventBus;
-        this.questManager = questManager;
     }
 
     public void setEngine(Engine engine) {
@@ -87,9 +85,8 @@ public class InventoryService {
         Entity fromEntity = findItemAtSlot(inventory, fromIndex);
         if (fromEntity == null) return;
 
-        Entity toEntity = findItemAtSlot(inventory, toIndex);
-
         Item from = Item.MAPPER.get(fromEntity);
+        Entity toEntity = findItemAtSlot(inventory, toIndex);
 
         if (tryStack(fromEntity, from, toEntity, inventory)) {
             eventBus.fire(new UpdateInventoryEvent(player));
