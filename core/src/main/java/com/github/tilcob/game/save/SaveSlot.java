@@ -3,10 +3,10 @@ package com.github.tilcob.game.save;
 import java.util.List;
 
 public enum SaveSlot {
-    SLOT_1("slot_1.json"),
-    SLOT_2("slot_2.json"),
-    SLOT_3("slot_3.json"),
-    AUTO("autosave.json"),;
+    SLOT_1("slot_1.sav"),
+    SLOT_2("slot_2.sav"),
+    SLOT_3("slot_3.sav"),
+    AUTO("autosave.sav"),;
 
     private final String fileName;
 
