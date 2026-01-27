@@ -1,6 +1,9 @@
 package com.github.tilcob.game.flow.commands;
 
-import com.badlogic.ashley.core.Entity;
+import com.github.tilcob.game.event.DialogGiveItemEvent;
+import com.github.tilcob.game.event.DialogGiveMoneyEvent;
+import com.github.tilcob.game.event.DialogIncCounterEvent;
+import com.github.tilcob.game.event.DialogSetFlagEvent;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowAction;
 
@@ -12,7 +15,6 @@ public final class DialogCommandModule {
 
         registry.register("give_money", (call, ctx) -> {
             int amount = Integer.parseInt(call.arguments().get(0));
-            // TODO: replace DialogGiveMoneyEvent with your existing event, if it already exists
             return List.of(new FlowAction.EmitEvent(new DialogGiveMoneyEvent(ctx.player(), amount)));
         });
 
@@ -34,9 +36,4 @@ public final class DialogCommandModule {
             return List.of(new FlowAction.EmitEvent(new DialogIncCounterEvent(ctx.player(), counter, delta)));
         });
     }
-
-    public record DialogGiveMoneyEvent(Entity player, int amount) {}
-    public record DialogGiveItemEvent(Entity player, String itemId, int count) {}
-    public record DialogSetFlagEvent(Entity player, String flag, boolean value) {}
-    public record DialogIncCounterEvent(Entity player, String counter, int delta) {}
 }

@@ -5,19 +5,19 @@ import com.github.tilcob.game.component.Counters;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Wallet;
-import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 public class DialogCommandHandler {
 
     public DialogCommandHandler(GameEventBus eventBus) {
-        eventBus.subscribe(DialogCommandModule.DialogGiveMoneyEvent.class, this::giveMoney);
-        eventBus.subscribe(DialogCommandModule.DialogGiveItemEvent.class, this::giveItem);
-        eventBus.subscribe(DialogCommandModule.DialogSetFlagEvent.class, this::setFlag);
-        eventBus.subscribe(DialogCommandModule.DialogIncCounterEvent.class, this::incCounter);
+        eventBus.subscribe(DialogGiveMoneyEvent.class, this::giveMoney);
+        eventBus.subscribe(DialogGiveItemEvent.class, this::giveItem);
+        eventBus.subscribe(DialogSetFlagEvent.class, this::setFlag);
+        eventBus.subscribe(DialogIncCounterEvent.class, this::incCounter);
     }
 
-    private void giveMoney(DialogCommandModule.DialogGiveMoneyEvent event) {
+    private void giveMoney(DialogGiveMoneyEvent event) {
         Entity player = event.player();
         int amount = event.amount();
 
@@ -31,7 +31,7 @@ public class DialogCommandHandler {
         wallet.earn(amount);
     }
 
-    private void giveItem(DialogCommandModule.DialogGiveItemEvent event) {
+    private void giveItem(DialogGiveItemEvent event) {
         Entity player = event.player();
         String itemId = event.itemId();
         int count = event.count();
@@ -46,7 +46,7 @@ public class DialogCommandHandler {
         for (int i = 0; i < count; i++) inventory.getItemsToAdd().add(resolved);
     }
 
-    private void setFlag(DialogCommandModule.DialogSetFlagEvent event) {
+    private void setFlag(DialogSetFlagEvent event) {
         Entity player = event.player();
         String flag = event.flag();
         boolean value = event.value();
@@ -61,7 +61,7 @@ public class DialogCommandHandler {
         flags.set(flag, value);
     }
 
-    private void incCounter(DialogCommandModule.DialogIncCounterEvent event) {
+    private void incCounter(DialogIncCounterEvent event) {
         Entity player = event.player();
         String counter = event.counter();
         int delta = event.delta();
