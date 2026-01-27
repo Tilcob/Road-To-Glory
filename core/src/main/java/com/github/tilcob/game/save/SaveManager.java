@@ -10,16 +10,27 @@ import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.save.states.chest.ChestRegistryState;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
+import java.io.*;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
+import java.util.zip.ZipOutputStream;
 
 public class SaveManager {
     private static final ObjectMapper MAPPER = new ObjectMapper()
         .enable(SerializationFeature.INDENT_OUTPUT)
         .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
     private static final int CURRENT_VERSION = 4;
+    private static final int SAV_FORMAT_VERSION = 1;
+    private static final int BACKUP_ROTATION_LIMIT = 20;
+    private static final DateTimeFormatter BACKUP_TIME_STAMP =
+        DateTimeFormatter.ofPattern("yyyy-MM-dd_HH-mm-ss");
+
     private final FileHandle saveDirectory;
     private FileHandle saveFile;
     private SaveSlot activeSlot;
@@ -39,19 +50,27 @@ public class SaveManager {
     public void save(GameState gameState) throws IOException {
         gameState.setSaveVersion(CURRENT_VERSION);
         validate(gameState);
-        createBackup();
-        String json = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsString(gameState);
-        atomicWrite(json);
+
+        byte[] stateJson = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsBytes(gameState);
+        FileHandle tmp = tmpFileFor(saveFile);
+        writeSavZip(tmp, stateJson);
+        createBackups();
+        tmp.moveTo(saveFile);
     }
 
     public GameState load() throws IOException {
-        if (!saveFile.exists()) {
-            throw new IOException("Savegame doesn't exist");
+        if (!saveFile.exists()) throw new IOException("Savegame doesn't exist");
+
+        try {
+            return loadFrom(saveFile);
+        } catch (IOException primaryFail) {
+            FileHandle restored = tryRestoreFromBackup();
+            if (restored != null) {
+                restored.copyTo(saveFile);
+                return loadFrom(saveFile);
+            }
+            throw primaryFail;
         }
-        GameState state = MAPPER.readValue(saveFile.readString(), GameState.class);
-        migrationRegistry.migrate(state);
-        state.rebuild();
-        return state;
     }
 
     public boolean exists() {
@@ -78,6 +97,128 @@ public class SaveManager {
         return slots;
     }
 
+    private GameState loadFrom(FileHandle save) throws IOException {
+        if (!save.exists()) throw new IOException("Savegame doesn't exist: " + save.path());
+        SavRead read = readSavZip(save);
+
+        String expected = read.meta.stateSha256;
+        String actual = sha256Hex(read.stateJson);
+        if (expected != null && !expected.isBlank() && !expected.equalsIgnoreCase(actual)) {
+            throw new IOException("Save integrity check failed (sha mismatch) for: " + save.name());
+        }
+
+        GameState state = MAPPER.readValue(read.stateJson, GameState.class);
+        migrationRegistry.migrate(state);
+        state.rebuild();
+        return state;
+    }
+
+    private FileHandle tmpFileFor(FileHandle target) {
+        FileHandle tmp = saveDirectory.child("tmp").child(target.name() + ".tmp");
+        tmp.file().getParentFile().mkdirs();
+        return tmp;
+    }
+
+    private void writeSavZip(FileHandle tmpSave, byte[] stateJson) throws IOException {
+        SavMeta meta = new SavMeta();
+        meta.format = SAV_FORMAT_VERSION;
+        meta.savedAt = LocalDateTime.now().toString();
+        meta.gameVersion = System.getProperty("game.version", "unknown");
+        meta.stateSha256 = sha256Hex(stateJson);
+        meta.stateBytes = stateJson.length;
+
+        byte[] metaJson = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsBytes(meta);
+
+        try (OutputStream outputStream = tmpSave.write(false)) {
+            ZipOutputStream zipOutputStream = new ZipOutputStream(outputStream);
+            ZipEntry metaEntry = new ZipEntry("meta.json");
+            zipOutputStream.putNextEntry(metaEntry);
+            zipOutputStream.write(metaJson);
+            zipOutputStream.closeEntry();
+
+            ZipEntry stateEntry = new ZipEntry("state.json");
+            zipOutputStream.putNextEntry(stateEntry);
+            zipOutputStream.write(stateJson);
+            zipOutputStream.closeEntry();
+            zipOutputStream.close();
+        }
+    }
+
+    private SavRead readSavZip(FileHandle save) throws IOException {
+        SavMeta meta = null;
+        byte[] state = null;
+
+        try (InputStream inputStream = save.read();
+             ZipInputStream zipInputStream = new ZipInputStream(inputStream)) {
+
+            ZipEntry e;
+            while ((e = zipInputStream.getNextEntry()) != null) {
+                if (e.isDirectory()) continue;
+
+                if ("meta.json".equals(e.getName())) {
+                    byte[] bytes = readAllBytes(zipInputStream);
+                    meta = MAPPER.readValue(bytes, SavMeta.class);
+                } else if ("state.json".equals(e.getName())) {
+                    state = readAllBytes(zipInputStream);
+                }
+                zipInputStream.closeEntry();
+            }
+        }
+
+        if (meta == null) throw new IOException("Invalid save: meta.json missing (" + save.name() + ")");
+        if (state == null) throw new IOException("Invalid save: state.json missing (" + save.name() + ")");
+        return new SavRead(meta, state);
+    }
+
+    private void createBackups() {
+        if (!saveFile.exists()) return;
+
+        FileHandle slotBackupDir = backupsDirForActive();
+        slotBackupDir.file().mkdirs();
+
+        FileHandle last = slotBackupDir.child("last.sav");
+        saveFile.copyTo(last);
+
+        String ts = LocalDateTime.now().format(BACKUP_TIME_STAMP);
+        FileHandle rotating = slotBackupDir.child(ts + ".sav");
+        saveFile.copyTo(rotating);
+
+        rotateBackups(slotBackupDir, BACKUP_ROTATION_LIMIT);
+    }
+
+    private void rotateBackups(FileHandle slotBackupDir, int keepLastN) {
+        FileHandle[] files = slotBackupDir.list((dir, name) ->
+            name.endsWith(".sav") && !name.equals("last.sav")
+        );
+
+        Arrays.sort(files, Comparator.comparingLong((FileHandle f) ->
+            f.file().lastModified()).reversed());
+
+        for (int i = keepLastN; i < files.length; i++) {
+            files[i].delete();
+        }
+    }
+
+    private FileHandle backupsDirForActive() {
+        String baseName = saveFile.nameWithoutExtension();
+        return saveDirectory.child("backups").child(baseName);
+    }
+
+    private FileHandle tryRestoreFromBackup() {
+        FileHandle directory = backupsDirForActive();
+        if (!directory.exists()) return null;
+
+        FileHandle lastBackup = directory.child("last.sav");
+        if (lastBackup.exists()) return lastBackup;
+
+        FileHandle[] backups = directory.list((dir, name) -> name.endsWith(".sav"));
+        if (backups == null || backups.length == 0) return null;
+
+        Arrays.sort(backups, Comparator.comparingLong((FileHandle f) ->
+            f.file().lastModified()).reversed());
+        return backups[0];
+    }
+
     private void validate(GameState state) {
         if (state == null) throw new IllegalStateException("GameState is null");
 
@@ -91,18 +232,37 @@ public class SaveManager {
         if (crs.getChestsByName() == null) throw new IllegalStateException("ChestsByName is null");
     }
 
-    private void atomicWrite(String json) {
-        FileHandle tmp = saveDirectory.child("tmp").child(saveFile.name() + ".tmp");
-        tmp.file().getParentFile().mkdirs();
-        tmp.writeString(json, false);
-        tmp.moveTo(saveFile);
+    private static byte[] readAllBytes(InputStream inputStream) throws IOException {
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        byte[] buffer = new byte[8192];
+        int read;
+        while ((read = inputStream.read(buffer)) >= 0) {
+            byteArrayOutputStream.write(buffer, 0, read);
+        }
+        return byteArrayOutputStream.toByteArray();
     }
 
-    private void createBackup() {
-        FileHandle backup = saveDirectory.child("backups").child(saveFile.name() + ".bak");
-        backup.file().getParentFile().mkdirs();
-        if (saveFile.exists()) {
-            saveFile.copyTo(backup);
+    private static String sha256Hex(byte[] data) {
+        try {
+            MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
+            byte[] digest = messageDigest.digest(data);
+            StringBuilder sb = new StringBuilder(digest.length * 2);
+            for (byte b : digest) {
+                sb.append(String.format("%02x", b));
+            }
+            return sb.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
         }
+    }
+
+    private record SavRead(SavMeta meta, byte[] stateJson) { }
+
+    private static final class SavMeta {
+        public int format;
+        public String savedAt;
+        public String gameVersion;
+        public String stateSha256;
+        public int stateBytes;
     }
 }

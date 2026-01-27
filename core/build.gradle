@@ -14,7 +14,6 @@ dependencies {
   api "com.github.tommyettinger:regexodus:$regExodusVersion"
   api "com.github.tommyettinger:textratypist:$textratypistVersion"
   api "com.fasterxml.jackson.core:jackson-databind:2.17.0"
-  api "com.github.kyperbelt:YarnGdx:master-SNAPSHOT"
 
   testImplementation "com.badlogicgames.gdx:gdx-backend-headless:$gdxVersion"
   testImplementation "org.junit.jupiter:junit-jupiter-api:5.10.2"
