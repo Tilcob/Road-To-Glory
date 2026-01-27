@@ -15,6 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.DialogFlags;
+import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
@@ -148,6 +149,7 @@ public class GameScreen extends ScreenAdapter {
             PlayerStateApplier.apply(services.getStateManager().getGameState().getPlayerState(), player);
         } else {
             Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
+            Physic.MAPPER.get(player).getBody().setTransform(tiledManager.getSpawnPoint(), 0);
         }
         services.getStateManager().loadDialogFlags(DialogFlags.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
