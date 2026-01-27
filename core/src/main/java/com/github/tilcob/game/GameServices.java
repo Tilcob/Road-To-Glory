@@ -8,6 +8,11 @@ import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.flow.CommandRegistry;
+import com.github.tilcob.game.flow.FlowExecutor;
+import com.github.tilcob.game.flow.FlowTrace;
+import com.github.tilcob.game.flow.commands.DialogCommandHandler;
+import com.github.tilcob.game.flow.commands.DialogCommandModule;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
@@ -44,10 +49,14 @@ public class GameServices {
     private final QuestLifecycleService questLifecycleService;
     private final QuestRewardService questRewardService;
     private final InventoryService inventoryService;
+    private final CommandRegistry commandRegistry;
+    private final FlowTrace flowTrace;
+    private final FlowExecutor flowExecutor;
     private EntityLookup entityLookup;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
+        new DialogCommandHandler(eventBus);
         this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
@@ -65,10 +74,14 @@ public class GameServices {
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        this.commandRegistry = new CommandRegistry();
+        this.flowTrace = new FlowTrace(200);
+        this.flowExecutor = new FlowExecutor(eventBus, flowTrace);
+        new DialogCommandModule().register(commandRegistry);
+        YarnRuntime runtime = new YarnRuntime();
         CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
-        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, commandRegistry, flowExecutor);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
@@ -78,6 +91,7 @@ public class GameServices {
 
     public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
         this.eventBus = new GameEventBus();
+        new DialogCommandHandler(eventBus);
         this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
@@ -95,10 +109,14 @@ public class GameServices {
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
+        this.commandRegistry = new CommandRegistry();
+        this.flowTrace = new FlowTrace(200);
+        this.flowExecutor = new FlowExecutor(eventBus, flowTrace);
+        new DialogCommandModule().register(commandRegistry);
+        YarnRuntime runtime = new YarnRuntime();
         CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
-        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, commandRegistry, flowExecutor);
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
@@ -200,6 +218,22 @@ public class GameServices {
 
     public EntityLookup getEntityLookup() {
         return entityLookup;
+    }
+
+    public ItemEntityRegistry getItemEntityRegistry() {
+        return itemEntityRegistry;
+    }
+
+    public CommandRegistry getCommandRegistry() {
+        return commandRegistry;
+    }
+
+    public FlowTrace getFlowTrace() {
+        return flowTrace;
+    }
+
+    public FlowExecutor getFlowExecutor() {
+        return flowExecutor;
     }
 
     public void setEntityLookup(EntityLookup entityLookup) {
