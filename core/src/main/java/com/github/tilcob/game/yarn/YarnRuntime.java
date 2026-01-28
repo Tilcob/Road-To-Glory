@@ -2,9 +2,9 @@ package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
+import com.github.tilcob.game.flow.CommandCall;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
     private static final String TAG = YarnRuntime.class.getSimpleName();
@@ -24,6 +24,7 @@ public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
         functionHandlers.put(function, handler);
     }
 
+    @Deprecated
     public boolean executeCommandLine(Entity player, String line) {
         if (line == null) return false;
         String trimmed = line.trim();
@@ -42,6 +43,7 @@ public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
         return true;
     }
 
+    @Deprecated
     public boolean executeCommand(String command, Entity player, String[] args) {
         if (command == null) return false;
         CommandHandler handler = commandHandlers.get(command);
@@ -66,5 +68,52 @@ public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
         String[] args = new String[parts.length - 1];
         System.arraycopy(parts, 1, args, 0, args.length);
         return args;
+    }
+
+    public Optional<CommandCall> parseCommandLine(String line) {
+        return parseCommandLine(line, CommandCall.SourcePos.unknown());
+    }
+
+    public Optional<CommandCall> parseCommandLine(String line, CommandCall.SourcePos sourcePos) {
+        if (line == null) return Optional.empty();
+
+        String trimmed = line.trim();
+        if (!isCommandLine(line)) return Optional.empty();
+
+        String inner = trimmed.substring(2, trimmed.length() - 2).trim();
+        if (inner.isEmpty()) return Optional.empty();
+
+        List<String> tokens = tokenize(inner);
+        if (tokens.isEmpty()) return Optional.empty();
+
+        String command = tokens.get(0);
+        List<String> arguments = tokens.size() > 1 ? tokens.subList(1, tokens.size()) : List.of();
+
+        return Optional.of(new CommandCall(command, arguments, Map.of(), sourcePos));
+    }
+
+    private List<String> tokenize(String inner) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inQuotes = false;
+
+        for (int i = 0; i < inner.length(); i++) {
+            char c = inner.charAt(i);
+            if (c == '"') {
+                inQuotes = !inQuotes;
+                continue;
+            }
+            if (!inQuotes && Character.isWhitespace(c)) {
+                if (!current.isEmpty()) {
+                    tokens.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(c);
+            }
+        }
+
+        if (!current.isEmpty()) tokens.add(current.toString());
+        return tokens;
     }
 }

@@ -15,7 +15,6 @@ import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
-import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.stat.StatType;
 
 public class InventoryService {

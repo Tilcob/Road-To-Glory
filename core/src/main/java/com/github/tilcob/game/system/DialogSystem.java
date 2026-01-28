@@ -11,6 +11,7 @@ import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.flow.CommandCall;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 
 import java.util.Map;
@@ -228,7 +229,11 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         if (session == null) return false;
         while (navigator.hasLines()) {
             String line = navigator.currentLine();
-            if (dialogYarnRuntime.executeCommandLine(player, line)) {
+            if (dialogYarnRuntime.tryExecuteCommandLine(player, line,
+                new CommandCall.SourcePos("dialog",
+                    session.getCurrentNodeId(),
+                    session.getLineIndex()))
+            ) {
                 if (!navigator.advance()) return false;
                 continue;
             }

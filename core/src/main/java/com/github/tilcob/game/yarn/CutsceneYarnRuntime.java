@@ -1,58 +1,59 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
+import com.github.tilcob.game.flow.*;
+import com.github.tilcob.game.flow.commands.CutsceneCommandResult;
+
+import java.util.List;
+import java.util.Optional;
 
 public class CutsceneYarnRuntime {
     private static final String TAG = CutsceneYarnRuntime.class.getSimpleName();
 
     private final YarnRuntime runtime;
+    private final CommandRegistry registry;
+    private final FlowExecutor executor;
 
-    public CutsceneYarnRuntime(CutsceneYarnBridge bridge) {
-        this.runtime = new YarnRuntime();
-        bridge.registerAll(runtime);
+    public CutsceneYarnRuntime(YarnRuntime runtime, CommandRegistry registry, FlowExecutor executor) {
+        this.runtime = runtime;
+        this.registry = registry;
+        this.executor = executor;
     }
 
-    public CutsceneCommandResult executeCommandLine(Entity player, String line) {
-        if (line == null) {
-            return CutsceneCommandResult.notCommand();
+    public CutsceneCommandResult executeLine(Entity player, String line, CommandCall.SourcePos source) {
+        Optional<CommandCall> callOptional = runtime.parseCommandLine(line, source);
+        if (callOptional.isEmpty()) return CutsceneCommandResult.notACommand();
+
+        CommandCall call = callOptional.get();
+        switch (call.command()) {
+            case "wait" -> {
+                float seconds = parseFloat(call, 0, 0f);
+                return CutsceneCommandResult.waitSeconds(seconds);
+            }
+            case "wait_for_camera" -> {
+                return CutsceneCommandResult.waitForCamera();
+            }
+            case "wait_for_move" -> {
+                return CutsceneCommandResult.waitForMove();
+            }
+            case "wait_for_dialog" -> {
+                return CutsceneCommandResult.waitForDialog();
+            }
+            default -> {
+                List<FlowAction> actions = registry.dispatch(call, new FlowContext(player));
+                executor.execute(actions);
+                return CutsceneCommandResult.commandExecuted();
+            }
         }
-        String trimmed = line.trim();
-        if (!YarnRuntime.isCommandLine(trimmed)) {
-            return CutsceneCommandResult.notCommand();
-        }
-        String inner = trimmed.substring(2, trimmed.length() - 2).trim();
-        if (inner.isEmpty()) {
-            return new CutsceneCommandResult(true, 0f, false, false, false);
-        }
-        String[] parts = inner.split("\\s+");
-        String command = parts[0];
-        String[] args = argsFrom(parts);
-        if ("wait".equalsIgnoreCase(command)) {
-            float waitSeconds = args.length > 0 ? parseFloat(args[0], 0f) : 0f;
-            return new CutsceneCommandResult(true, Math.max(0f, waitSeconds), false, false, false);
-        }
-        if ("wait_for_camera".equalsIgnoreCase(command)) {
-            return new CutsceneCommandResult(true, 0f, false, true, false);
-        }
-        if ("wait_for_move".equalsIgnoreCase(command)) {
-            return new CutsceneCommandResult(true, 0f, false, false, true);
-        }
-        boolean handled = runtime.executeCommand(command, player, args);
-        if (!handled && Gdx.app != null) {
-            Gdx.app.debug(TAG, "Unhandled cutscene command: " + command);
-        }
-        boolean waitForDialog = "start_dialog".equalsIgnoreCase(command);
-        return new CutsceneCommandResult(true, 0f, waitForDialog, false, false);
     }
 
-    private static String[] argsFrom(String[] parts) {
-        if (parts.length <= 1) {
-            return new String[0];
-        }
-        String[] args = new String[parts.length - 1];
-        System.arraycopy(parts, 1, args, 0, args.length);
-        return args;
+    public CutsceneCommandResult executeLine(Entity player, String line) {
+        return executeLine(player, line, CommandCall.SourcePos.unknown());
+    }
+
+    private static float parseFloat(CommandCall call, int argIndex, float fallback) {
+        if (call.arguments().size() <= argIndex) return fallback;
+        return Float.parseFloat(call.arguments().get(argIndex));
     }
 
     private float parseFloat(String raw, float fallback) {

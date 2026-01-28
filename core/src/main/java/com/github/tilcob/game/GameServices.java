@@ -8,6 +8,7 @@ import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.flow.FlowBootstrap;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
@@ -44,6 +45,7 @@ public class GameServices {
     private final QuestLifecycleService questLifecycleService;
     private final QuestRewardService questRewardService;
     private final InventoryService inventoryService;
+    private final FlowBootstrap flowBootstrap;
     private EntityLookup entityLookup;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
@@ -65,12 +67,13 @@ public class GameServices {
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
-        QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
-        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
-        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
+        YarnRuntime runtime = new YarnRuntime();
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.questYarnRuntime = new QuestYarnRuntime(
+            runtime, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            flowBootstrap.executor(), flowBootstrap.functions());
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
         this.inventoryService = new InventoryService(eventBus);
@@ -95,12 +98,13 @@ public class GameServices {
         this.dialogRepository = new DialogRepository(true, "dialogs",
             Map.of("Shopkeeper", "shopkeeper"));
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        DialogYarnBridge dialogYarnBridge = new DialogYarnBridge();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
-        QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
-        this.dialogYarnRuntime = new DialogYarnRuntime(dialogYarnBridge);
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
-        this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
+        this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
+        YarnRuntime runtime = new YarnRuntime();
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.questYarnRuntime = new QuestYarnRuntime(
+            runtime, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            flowBootstrap.executor(), flowBootstrap.functions());
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
         this.inventoryService = new InventoryService(eventBus);
@@ -200,6 +204,14 @@ public class GameServices {
 
     public EntityLookup getEntityLookup() {
         return entityLookup;
+    }
+
+    public ItemEntityRegistry getItemEntityRegistry() {
+        return itemEntityRegistry;
+    }
+
+    public FlowBootstrap getFlowBootstrap() {
+        return flowBootstrap;
     }
 
     public void setEntityLookup(EntityLookup entityLookup) {

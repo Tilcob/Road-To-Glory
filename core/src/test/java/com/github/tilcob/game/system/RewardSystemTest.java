@@ -8,12 +8,14 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
-import com.github.tilcob.game.quest.*;
+import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.quest.QuestReward;
+import com.github.tilcob.game.quest.QuestRewardService;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
