@@ -8,7 +8,8 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.yarn.CutsceneCommandResult;
+import com.github.tilcob.game.flow.CommandCall;
+import com.github.tilcob.game.flow.commands.CutsceneCommandResult;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
 
 import java.util.Map;
@@ -89,22 +90,21 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
         }
         while (cutscene.getLineIndex() < lines.size) {
             String line = lines.get(cutscene.getLineIndex());
-            CutsceneCommandResult result = cutsceneYarnRuntime.executeCommandLine(player, line);
+            CutsceneCommandResult result = cutsceneYarnRuntime.executeLine(player, line,
+                new CommandCall.SourcePos("cutscene", cutscene.getCutsceneId(), cutscene.getLineIndex()));
             cutscene.setLineIndex(cutscene.getLineIndex() + 1);
-            if (result.waitForDialog()) {
+
+            if (result.waitTime() instanceof CutsceneCommandResult.Wait.Dialog) {
                 cutscene.setAwaitingDialog(true);
                 return;
-            }
-            if (result.waitForCamera()) {
+            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Camera) {
                 cutscene.setAwaitingCamera(true);
                 return;
-            }
-            if (result.waitForMove()) {
+            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Move) {
                 cutscene.setAwaitingMove(true);
                 return;
-            }
-            if (result.waitSeconds() > 0f) {
-                cutscene.setWaitTimerSeconds(result.waitSeconds());
+            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Seconds seconds) {
+                cutscene.setWaitTimerSeconds(seconds.seconds());
                 return;
             }
         }

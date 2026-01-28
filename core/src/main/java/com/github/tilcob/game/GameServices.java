@@ -13,6 +13,7 @@ import com.github.tilcob.game.flow.FlowExecutor;
 import com.github.tilcob.game.flow.FlowTrace;
 import com.github.tilcob.game.flow.commands.DialogCommandHandler;
 import com.github.tilcob.game.flow.commands.DialogCommandModule;
+import com.github.tilcob.game.flow.commands.InitCommands;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
@@ -56,7 +57,6 @@ public class GameServices {
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         this.eventBus = new GameEventBus();
-        new DialogCommandHandler(eventBus);
         this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
@@ -77,12 +77,11 @@ public class GameServices {
         this.commandRegistry = new CommandRegistry();
         this.flowTrace = new FlowTrace(200);
         this.flowExecutor = new FlowExecutor(eventBus, flowTrace);
-        new DialogCommandModule().register(commandRegistry);
+        new InitCommands(eventBus, this::getEntityLookup, audioManager, commandRegistry);
         YarnRuntime runtime = new YarnRuntime();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(runtime, commandRegistry, flowExecutor);
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, commandRegistry, flowExecutor);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
@@ -91,7 +90,6 @@ public class GameServices {
 
     public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
         this.eventBus = new GameEventBus();
-        new DialogCommandHandler(eventBus);
         this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
@@ -112,12 +110,11 @@ public class GameServices {
         this.commandRegistry = new CommandRegistry();
         this.flowTrace = new FlowTrace(200);
         this.flowExecutor = new FlowExecutor(eventBus, flowTrace);
-        new DialogCommandModule().register(commandRegistry);
+        new InitCommands(eventBus, this::getEntityLookup, audioManager, commandRegistry);
         YarnRuntime runtime = new YarnRuntime();
-        CutsceneYarnBridge cutsceneYarnBridge = new CutsceneYarnBridge(audioManager, eventBus, this::getEntityLookup);
         QuestYarnBridge questYarnBridge = new QuestYarnBridge(questLifecycleService);
         this.dialogYarnRuntime = new DialogYarnRuntime(runtime, commandRegistry, flowExecutor);
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(cutsceneYarnBridge);
+        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, commandRegistry, flowExecutor);
         this.questYarnRuntime = new QuestYarnRuntime(questYarnBridge, allDialogs, allQuestDialogs);
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
