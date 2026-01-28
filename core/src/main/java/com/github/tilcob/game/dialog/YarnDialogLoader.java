@@ -5,12 +5,11 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.event.QuestStepEvent;
+import com.github.tilcob.game.yarn.YarnParser;
 
 import java.util.*;
 
 public class YarnDialogLoader {
-    private static final String HEADER_SEPARATOR = "---";
-    private static final String NODE_SEPARATOR = "===";
 
     public DialogData load(FileHandle fileHandle) {
         if (fileHandle == null || !fileHandle.exists()) {
@@ -24,7 +23,15 @@ public class YarnDialogLoader {
             return DialogData.empty();
         }
 
-        List<ParsedNode> parsedNodes = parseNodes(fileHandle.readString("UTF-8"));
+        List<YarnParser.YarnNodeRaw> rawNodes = YarnParser.parse(fileHandle.readString("UTF-8"));
+
+        List<ParsedNode> parsedNodes = new ArrayList<>();
+        for (YarnParser.YarnNodeRaw raw : rawNodes) {
+            ParsedNode p = new ParsedNode(raw.id(), raw.tags());
+            parseBody(raw.bodyLines(), p);
+            parsedNodes.add(p);
+        }
+
         ParsedNode rootNode = findTaggedNode(parsedNodes, "root", "start");
         ParsedNode idleNode = findTaggedNode(parsedNodes, "idle");
 
@@ -138,76 +145,6 @@ public class YarnDialogLoader {
             }
         }
         return null;
-    }
-
-    private static List<ParsedNode> parseNodes(String content) {
-        String[] lines = content.split("\\R", -1);
-        List<ParsedNode> nodes = new ArrayList<>();
-        List<String> headerLines = new ArrayList<>();
-        List<String> bodyLines = new ArrayList<>();
-        boolean inBody = false;
-
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (NODE_SEPARATOR.equals(trimmed)) {
-                ParsedNode node = buildNode(headerLines, bodyLines);
-                if (node != null) {
-                    nodes.add(node);
-                }
-                headerLines.clear();
-                bodyLines.clear();
-                inBody = false;
-                continue;
-            }
-            if (!inBody && HEADER_SEPARATOR.equals(trimmed)) {
-                inBody = true;
-                continue;
-            }
-            if (inBody) {
-                bodyLines.add(line);
-            } else {
-                if (!trimmed.isEmpty()) {
-                    headerLines.add(line);
-                }
-            }
-        }
-
-        ParsedNode node = buildNode(headerLines, bodyLines);
-        if (node != null) {
-            nodes.add(node);
-        }
-        return nodes;
-    }
-
-    private static ParsedNode buildNode(List<String> headerLines, List<String> bodyLines) {
-        String title = null;
-        Set<String> tags = new HashSet<>();
-
-        for (String headerLine : headerLines) {
-            String trimmed = headerLine.trim();
-            String lower = trimmed.toLowerCase(Locale.ROOT);
-
-            if (lower.startsWith("title:")) {
-                title = trimmed.substring("title:".length()).trim();
-            } else if (lower.startsWith("tags:")) {
-                String tagValue = trimmed.substring("tags:".length()).trim();
-                if (!tagValue.isEmpty()) {
-                    for (String tag : tagValue.split("[,\\s]+")) {
-                        if (!tag.isEmpty()) {
-                            tags.add(tag.toLowerCase(Locale.ROOT));
-                        }
-                    }
-                }
-            }
-        }
-
-        if (title == null || title.isEmpty()) {
-            return null;
-        }
-
-        ParsedNode parsedNode = new ParsedNode(title, tags);
-        parseBody(bodyLines, parsedNode);
-        return parsedNode;
     }
 
     private static void parseBody(List<String> bodyLines, ParsedNode parsedNode) {
