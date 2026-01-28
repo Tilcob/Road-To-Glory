@@ -11,8 +11,6 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowExecutor;
 import com.github.tilcob.game.flow.FlowTrace;
-import com.github.tilcob.game.flow.commands.DialogCommandHandler;
-import com.github.tilcob.game.flow.commands.DialogCommandModule;
 import com.github.tilcob.game.flow.commands.InitCommands;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;

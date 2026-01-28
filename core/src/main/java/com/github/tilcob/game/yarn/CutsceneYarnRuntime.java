@@ -1,7 +1,6 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.flow.*;
 import com.github.tilcob.game.flow.commands.CutsceneCommandResult;
 

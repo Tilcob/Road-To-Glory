@@ -7,7 +7,6 @@ import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.Animation2D;
 import com.github.tilcob.game.component.Facing;
-import com.github.tilcob.game.component.ScreenFade;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowAction;
