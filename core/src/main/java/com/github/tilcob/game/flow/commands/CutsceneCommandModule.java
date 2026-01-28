@@ -102,7 +102,7 @@ public class CutsceneCommandModule {
         registry.register("set_flag", (call, ctx) -> {
             String flag = call.arguments().get(0);
             boolean value = call.arguments().size() < 2 || Boolean.parseBoolean(call.arguments().get(1));
-            return List.of(new FlowAction.EmitEvent(new SetFlagEvent(ctx.player(), flag, value)));
+            return List.of(new FlowAction.EmitEvent(new CutsceneSetFlagEvent(ctx.player(), flag, value)));
         });
 
         registry.register("play_music", (call, ctx) -> {

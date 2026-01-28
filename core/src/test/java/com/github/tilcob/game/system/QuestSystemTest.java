@@ -11,13 +11,7 @@ import com.github.tilcob.game.event.AddQuestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
-import com.github.tilcob.game.flow.CommandRegistry;
-import com.github.tilcob.game.flow.FlowExecutor;
-import com.github.tilcob.game.flow.FlowTrace;
-import com.github.tilcob.game.flow.commands.DialogCommandHandler;
-import com.github.tilcob.game.flow.commands.DialogCommandModule;
-import com.github.tilcob.game.flow.commands.QuestCommandHandler;
-import com.github.tilcob.game.flow.commands.QuestCommandModule;
+import com.github.tilcob.game.flow.FlowBootstrap;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestReward;
@@ -181,15 +175,11 @@ class QuestSystemTest extends HeadlessGdxTest {
                                                        Map<String, DialogData> allQuestDialogs) {
 
         YarnRuntime yarn = new YarnRuntime();
-        CommandRegistry commandRegistry = new CommandRegistry();
-        FlowExecutor executor = new FlowExecutor(eventBus, new FlowTrace(200));
+        FlowBootstrap flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService,
+            null, () -> null);
 
-        new QuestCommandModule().register(commandRegistry);
-        new DialogCommandModule().register(commandRegistry);
-
-        new QuestCommandHandler(eventBus, questLifecycleService);
-        new DialogCommandHandler(eventBus);
-
-        return new QuestYarnRuntime(yarn, allDialogs, allQuestDialogs, commandRegistry, executor);
+        return new QuestYarnRuntime(
+            yarn, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            flowBootstrap.executor(), flowBootstrap.functions());
     }
 }

@@ -18,20 +18,23 @@ public class QuestYarnRuntime {
     private final Map<String, Object> defaultVariables;
     private final Map<String, DialogData> allDialogs;
     private final Map<String, DialogData> allQuestDialogs;
-    private final CommandRegistry registry;
+    private final CommandRegistry commandRegistry;
+    private final FunctionRegistry functionRegistry;
     private final FlowExecutor flowExecutor;
 
     public QuestYarnRuntime(YarnRuntime runtime,
                             Map<String, DialogData> allDialogs,
                             Map<String, DialogData> allQuestDialogs,
-                            CommandRegistry registry,
-                            FlowExecutor flowExecutor) {
+                            CommandRegistry commandRegistry,
+                            FlowExecutor flowExecutor,
+                            FunctionRegistry functionRegistry) {
         this.runtime = runtime;
         this.variables = new HashMap<>();
         this.defaultVariables = new HashMap<>();
         this.allDialogs = allDialogs == null ? Collections.emptyMap() : allDialogs;
         this.allQuestDialogs = allQuestDialogs == null ? Collections.emptyMap() : allQuestDialogs;
-        this.registry = registry;
+        this.commandRegistry = commandRegistry;
+        this.functionRegistry = functionRegistry;
         this.flowExecutor = flowExecutor;
     }
 
@@ -101,14 +104,27 @@ public class QuestYarnRuntime {
         String inner = line.substring(2, line.length() - 2).trim();
         String condition = inner.substring("if ".length()).trim();
         String[] parts = condition.split("==", 2);
+
         if (parts.length != 2) return false;
         String left = parts[0].trim();
         String right = parts[1].trim();
+
         if (right.startsWith("\"") && right.endsWith("\"") && right.length() >= 2) {
             right = right.substring(1, right.length() - 1);
         }
-        Object value = getVariable(player, left);
+
+        Object value = evaluateLeft(player, left, new CommandCall.SourcePos("quest", "condition", -1));
         return value != null && right.equals(String.valueOf(value));
+    }
+
+    private Object evaluateLeft(Entity player, String leftExpr, CommandCall.SourcePos source) {
+        if (leftExpr.startsWith("$")) {
+            List<String> toks = List.of(leftExpr.split("\\s+"));
+            String function = toks.get(0);
+            List<String> arguments = toks.size() > 1 ? toks.subList(1, toks.size()) : List.of();
+            return functionRegistry.evaluate(FunctionCall.simple(function, arguments, source), new FlowContext(player));
+        }
+        return getVariable(player, leftExpr);
     }
 
     private Map<String, Object> getVariablesFor(Entity player, boolean create) {
@@ -149,7 +165,7 @@ public class QuestYarnRuntime {
         Optional<CommandCall> callOptional = runtime.parseCommandLine(line, source);
         if (callOptional.isEmpty()) return false;
 
-        List<FlowAction> actions = registry.dispatch(callOptional.get(), new FlowContext(player));
+        List<FlowAction> actions = commandRegistry.dispatch(callOptional.get(), new FlowContext(player));
         flowExecutor.execute(actions);
         return true;
     }

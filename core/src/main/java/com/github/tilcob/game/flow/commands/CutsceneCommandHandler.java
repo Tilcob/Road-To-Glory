@@ -25,7 +25,6 @@ public class CutsceneCommandHandler {
         eventBus.subscribe(FaceEntityEvent.class, this::faceEntity);
         eventBus.subscribe(FadeInEvent.class, this::fadeIn);
         eventBus.subscribe(FadeOutEvent.class, this::fadeOut);
-        eventBus.subscribe(SetFlagEvent.class, this::setFlag);
         eventBus.subscribe(PlayMusicEvent.class, this::playMusic);
         eventBus.subscribe(PlaySoundEvent.class, this::playSound);
     }
@@ -107,16 +106,6 @@ public class CutsceneCommandHandler {
 
     private void fadeOut(FadeOutEvent event) {
         applyFade(event.player(), event.alpha(), event.duration());
-    }
-
-    private void setFlag(SetFlagEvent event) {
-        if (event.player() == null) return;
-        DialogFlags flags = DialogFlags.MAPPER.get(event.player());
-        if (flags == null) {
-            flags = new DialogFlags();
-            event.player().add(flags);
-        }
-        flags.set(event.flag(), event.value());
     }
 
     private void playMusic(PlayMusicEvent event) {

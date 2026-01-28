@@ -14,7 +14,7 @@ public record FunctionCall(String function,
         source = (source == null) ? CommandCall.SourcePos.unknown() : source;
     }
 
-    public FunctionCall simple(String function, List<String> arguments, CommandCall.SourcePos source) {
+    public static FunctionCall simple(String function, List<String> arguments, CommandCall.SourcePos source) {
         return new FunctionCall(function, arguments, Map.of(), source);
     }
 }
