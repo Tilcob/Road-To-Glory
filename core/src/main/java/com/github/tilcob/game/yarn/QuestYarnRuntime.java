@@ -118,13 +118,23 @@ public class QuestYarnRuntime {
     }
 
     private Object evaluateLeft(Entity player, String leftExpr, CommandCall.SourcePos source) {
-        if (leftExpr.startsWith("$")) {
-            List<String> toks = List.of(leftExpr.split("\\s+"));
-            String function = toks.get(0);
-            List<String> arguments = toks.size() > 1 ? toks.subList(1, toks.size()) : List.of();
-            return functionRegistry.evaluate(FunctionCall.simple(function, arguments, source), new FlowContext(player));
+        if (leftExpr == null || leftExpr.isBlank()) return null;
+        leftExpr = leftExpr.trim();
+        if (!leftExpr.startsWith("$")) return getVariable(player, leftExpr);
+
+        String[] tokens = leftExpr.split("\\s+");
+        String functionName = tokens[0];
+
+        if (functionRegistry.has(functionName)) {
+            List<String> arguments = tokens.length > 1
+                ? List.of(Arrays.copyOfRange(tokens, 1, tokens.length))
+                : List.of();
+            return functionRegistry.evaluate(
+                FunctionCall.simple(functionName, arguments, source),
+                new FlowContext(player)
+            );
         }
-        return getVariable(player, leftExpr);
+        return getVariable(player, functionName);
     }
 
     private Map<String, Object> getVariablesFor(Entity player, boolean create) {
