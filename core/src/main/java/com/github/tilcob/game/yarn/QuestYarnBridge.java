@@ -8,6 +8,7 @@ import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestState;
 
+@Deprecated
 public class QuestYarnBridge {
     private final QuestLifecycleService questLifecycleService;
 

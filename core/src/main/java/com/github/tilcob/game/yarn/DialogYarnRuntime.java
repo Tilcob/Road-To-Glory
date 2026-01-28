@@ -29,9 +29,4 @@ public class DialogYarnRuntime {
     public boolean tryExecuteCommandLine(Entity player, String line) {
         return tryExecuteCommandLine(player, line, CommandCall.SourcePos.unknown());
     }
-
-    @Deprecated
-    public boolean executeCommandLine(Entity player, String line) {
-        return runtime.executeCommandLine(player, line);
-    }
 }

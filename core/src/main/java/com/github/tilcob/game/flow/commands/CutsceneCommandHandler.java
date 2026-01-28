@@ -11,11 +11,9 @@ import com.github.tilcob.game.input.Command;
 public class CutsceneCommandHandler {
     private final AudioManager audioManager;
     private final Vector2 tmpVector = new Vector2();
-    private final GameEventBus eventBus;
 
     public CutsceneCommandHandler(GameEventBus eventBus, AudioManager audioManager) {
         this.audioManager = audioManager;
-        this.eventBus = eventBus;
 
         eventBus.subscribe(LockPlayerEvent.class, this::lockPlayer);
         eventBus.subscribe(UnlockPlayerEvent.class, this::unlockPlayer);
@@ -27,7 +25,6 @@ public class CutsceneCommandHandler {
         eventBus.subscribe(FaceEntityEvent.class, this::faceEntity);
         eventBus.subscribe(FadeInEvent.class, this::fadeIn);
         eventBus.subscribe(FadeOutEvent.class, this::fadeOut);
-        eventBus.subscribe(StartDialogCommandEvent.class, this::startDialog);
         eventBus.subscribe(SetFlagEvent.class, this::setFlag);
         eventBus.subscribe(PlayMusicEvent.class, this::playMusic);
         eventBus.subscribe(PlaySoundEvent.class, this::playSound);
@@ -110,11 +107,6 @@ public class CutsceneCommandHandler {
 
     private void fadeOut(FadeOutEvent event) {
         applyFade(event.player(), event.alpha(), event.duration());
-    }
-
-    private void startDialog(StartDialogCommandEvent event) {
-        if (event.player() == null || event.npcId() == null || event.nodeId() == null) return;
-        eventBus.fire(new StartDialogEvent(event.player(), event.npcId(), event.nodeId()));
     }
 
     private void setFlag(SetFlagEvent event) {

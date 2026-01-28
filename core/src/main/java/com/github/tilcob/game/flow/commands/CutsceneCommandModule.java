@@ -97,7 +97,7 @@ public class CutsceneCommandModule {
         registry.register("start_dialog", (call, ctx) -> {
             String npcId = call.arguments().get(0);
             String nodeId = call.arguments().get(1);
-            return List.of(new FlowAction.EmitEvent(new StartDialogCommandEvent(ctx.player(), npcId, nodeId)));
+            return List.of(new FlowAction.EmitEvent(new StartDialogEvent(ctx.player(), npcId, nodeId)));
         });
 
         registry.register("set_flag", (call, ctx) -> {

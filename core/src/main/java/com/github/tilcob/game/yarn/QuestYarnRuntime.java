@@ -6,10 +6,9 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogNode;
+import com.github.tilcob.game.flow.*;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class QuestYarnRuntime {
     private static final String TAG = QuestYarnRuntime.class.getSimpleName();
@@ -19,26 +18,27 @@ public class QuestYarnRuntime {
     private final Map<String, Object> defaultVariables;
     private final Map<String, DialogData> allDialogs;
     private final Map<String, DialogData> allQuestDialogs;
+    private final CommandRegistry registry;
+    private final FlowExecutor flowExecutor;
 
-    public QuestYarnRuntime(QuestYarnBridge bridge) {
-        this(bridge, Collections.emptyMap(), Collections.emptyMap());
-    }
-
-    public QuestYarnRuntime(QuestYarnBridge bridge,
+    public QuestYarnRuntime(YarnRuntime runtime,
                             Map<String, DialogData> allDialogs,
-                            Map<String, DialogData> allQuestDialogs) {
-        this.runtime = new YarnRuntime();
+                            Map<String, DialogData> allQuestDialogs,
+                            CommandRegistry registry,
+                            FlowExecutor flowExecutor) {
+        this.runtime = runtime;
         this.variables = new HashMap<>();
         this.defaultVariables = new HashMap<>();
         this.allDialogs = allDialogs == null ? Collections.emptyMap() : allDialogs;
         this.allQuestDialogs = allQuestDialogs == null ? Collections.emptyMap() : allQuestDialogs;
-        bridge.registerAll(runtime);
+        this.registry = registry;
+        this.flowExecutor = flowExecutor;
     }
 
     public void executeStartNode(Entity player, String startNode) {
         if (startNode == null || startNode.isBlank()) return;
         if (YarnRuntime.isCommandLine(startNode.trim())) {
-            runtime.executeCommandLine(player, startNode);
+            tryExecuteCommandLine(player, startNode, new CommandCall.SourcePos("quest", startNode, 0));
             return;
         }
         executeNode(player, startNode);
@@ -50,7 +50,8 @@ public class QuestYarnRuntime {
         Array<String> lines = node.lines();
         if (lines == null) return false;
         boolean shouldExecute = true;
-        for (String line : lines) {
+        for (int i = 0; i < lines.size; i++) {
+            String line = lines.get(i);
             String trimmed = line == null ? "" : line.trim();
             if (isIfLine(trimmed)) {
                 shouldExecute = evaluateCondition(player, trimmed);
@@ -61,13 +62,16 @@ public class QuestYarnRuntime {
                 continue;
             }
             if (!shouldExecute) continue;
-            runtime.executeCommandLine(player, line);
+            String trimmedLine = line == null ? "" : line.trim();
+            if (tryExecuteCommandLine(player, trimmedLine, new CommandCall.SourcePos("quest", nodeId, i))) {
+                continue;
+            }
         }
         return true;
     }
 
-    public boolean executeCommandLine(Entity player, String line) {
-        return runtime.executeCommandLine(player, line);
+    public void executeCommandLine(Entity player, String line) {
+        tryExecuteCommandLine(player, line, new CommandCall.SourcePos("quest", "inline", -1));
     }
 
     public void setVariable(Entity player, String name, Object value) {
@@ -139,5 +143,14 @@ public class QuestYarnRuntime {
             if (node != null) return node;
         }
         return null;
+    }
+
+    private boolean tryExecuteCommandLine(Entity player, String line, CommandCall.SourcePos source) {
+        Optional<CommandCall> callOptional = runtime.parseCommandLine(line, source);
+        if (callOptional.isEmpty()) return false;
+
+        List<FlowAction> actions = registry.dispatch(callOptional.get(), new FlowContext(player));
+        flowExecutor.execute(actions);
+        return true;
     }
 }
