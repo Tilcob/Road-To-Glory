@@ -2,17 +2,18 @@ package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class DialogData {
-    private Array<String> idle;
-    private Array<String> rootLines;
+    private Array<ScriptEvent> idle;
+    private Array<ScriptEvent> rootLines;
     private Array<DialogChoice> choices;
     private Array<DialogFlagDialog> flagDialogs;
     private QuestDialog questDialog;
     private Array<DialogNode> nodes;
     private ObjectMap<String, DialogNode> nodesById;
 
-    public DialogData(Array<String> idle, Array<String> rootLines, Array<DialogChoice> choices,
+    public DialogData(Array<ScriptEvent> idle, Array<ScriptEvent> rootLines, Array<DialogChoice> choices,
                       Array<DialogFlagDialog> flagDialogs, QuestDialog questDialog, Array<DialogNode> nodes,
                       ObjectMap<String, DialogNode> nodesById) {
         this.idle = idle;
@@ -31,11 +32,11 @@ public class DialogData {
         return new DialogData();
     }
 
-    public Array<String> idle() {
+    public Array<ScriptEvent> idle() {
         return idle;
     }
 
-    public Array<String> rootLines() {
+    public Array<ScriptEvent> rootLines() {
         return rootLines;
     }
 

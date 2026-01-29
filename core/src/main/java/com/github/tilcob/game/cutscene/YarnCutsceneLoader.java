@@ -5,6 +5,8 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.yarn.YarnParser;
+import com.github.tilcob.game.yarn.script.ScriptComplier;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 import java.util.*;
 
@@ -26,11 +28,13 @@ public class YarnCutsceneLoader {
 
         List<YarnParser.YarnNodeRaw> parsedNodes = YarnParser.parse(content);
         YarnParser.YarnNodeRaw startNode = findStartNode(parsedNodes);
-        Array<String> startLines = startNode == null ? new Array<>() : toGdxArrayTrimmed(startNode.bodyLines());
+        Array<ScriptEvent> startEvents = startNode == null
+            ? new Array<>()
+            : toGdxEvents(startNode.bodyLines());
 
         Array<CutsceneNode> nodes = new Array<>();
-        for (YarnParser.YarnNodeRaw n : parsedNodes) {
-            nodes.add(new CutsceneNode(n.id(), toGdxArrayTrimmed(n.bodyLines())));
+        for (YarnParser.YarnNodeRaw node : parsedNodes) {
+            nodes.add(new CutsceneNode(node.id(), toGdxEvents(node.bodyLines())));
         }
 
         ObjectMap<String, CutsceneNode> nodesById = new ObjectMap<>();
@@ -40,7 +44,7 @@ public class YarnCutsceneLoader {
             }
         }
 
-        return new CutsceneData(cutsceneId, startLines, nodesById);
+        return new CutsceneData(cutsceneId, startEvents, nodesById);
     }
 
     private static YarnParser.YarnNodeRaw findStartNode(List<YarnParser.YarnNodeRaw> parsedNodes) {
@@ -53,13 +57,11 @@ public class YarnCutsceneLoader {
         return parsedNodes.isEmpty() ? null : parsedNodes.get(0);
     }
 
-    private static Array<String> toGdxArrayTrimmed(List<String> lines) {
-        Array<String> array = new Array<>();
-        if (lines == null) return array;
-        for (String line : lines) {
-            if (line == null) continue;
-            array.add(line.trim());
+    private static Array<ScriptEvent> toGdxEvents(List<String> bodyLines) {
+        Array<ScriptEvent> out = new Array<>();
+        for (ScriptEvent ev : ScriptComplier.compile(bodyLines)) {
+            out.add(ev);
         }
-        return array;
+        return out;
     }
 }

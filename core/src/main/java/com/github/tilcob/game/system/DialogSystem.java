@@ -13,6 +13,8 @@ import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandCall;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
+import com.github.tilcob.game.yarn.IfStack;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 import java.util.Map;
 
@@ -21,6 +23,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private final Map<String, DialogData> allDialogs;
     private final ObjectMap<Entity, DialogNavigator> navigators;
     private final DialogYarnRuntime dialogYarnRuntime;
+    private final ObjectMap<Entity, IfStack> ifStacks = new ObjectMap<>();
 
     public DialogSystem(GameEventBus eventBus, Map<String, DialogData> allDialogs, DialogYarnRuntime dialogYarnRuntime) {
         super(Family.all(Dialog.class).get());
@@ -91,6 +94,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         NpcFsm.MAPPER.get(npcEntity).getNpcFsm().changeState(NpcState.TALKING);
         player.add(session);
         navigators.put(player, navigator);
+        ifStacks.put(player, new IfStack());
         eventBus.fire(new DialogStartedEvent(npcEntity, player));
         if (!dispatchNextLine(player, navigator, npcEntity)) {
             removeSession(player);
@@ -222,23 +226,65 @@ public class DialogSystem extends IteratingSystem implements Disposable {
     private void removeSession(Entity player) {
         player.remove(DialogSession.class);
         navigators.remove(player);
+        ifStacks.remove(player);
     }
 
     private boolean dispatchNextLine(Entity player, DialogNavigator navigator, Entity npcEntity) {
         DialogSession session = DialogSession.MAPPER.get(player);
         if (session == null) return false;
+
+        IfStack ifStack = ifStacks.get(player);
+        if (ifStack == null) {
+            ifStack = new IfStack();
+            ifStacks.put(player, ifStack);
+        }
+
         while (navigator.hasLines()) {
-            String line = navigator.currentLine();
-            if (dialogYarnRuntime.tryExecuteCommandLine(player, line,
-                new CommandCall.SourcePos("dialog",
-                    session.getCurrentNodeId(),
-                    session.getLineIndex()))
-            ) {
+            ScriptEvent event = navigator.currentLine();
+            CommandCall.SourcePos sourcePos = new CommandCall.SourcePos(
+                "dialog",
+                session.getCurrentNodeId(),
+                session.getLineIndex()
+            );
+
+            if (event instanceof ScriptEvent.IfStart ifs) {
+                boolean cond = dialogYarnRuntime.evaluateCondition(player, ifs.condition(), sourcePos);
+                ifStack.push(cond);
                 if (!navigator.advance()) return false;
                 continue;
             }
-            eventBus.fire(new DialogEvent(navigator.toDialogLine(), npcEntity));
-            return true;
+            if (event instanceof ScriptEvent.Else) {
+                ifStack.elseBlock();
+                if (!navigator.advance()) return false;
+                continue;
+            }
+            if (event instanceof ScriptEvent.EndIf) {
+                ifStack.pop();
+                if (!navigator.advance()) return false;
+                continue;
+            }
+
+            if (!ifStack.isExecuting()) {
+                if (!navigator.advance()) return false;
+                continue;
+            }
+
+            if (event instanceof ScriptEvent.Command cmd) {
+                if (dialogYarnRuntime.tryExecuteCommandLine(player, cmd.raw(), sourcePos)) {
+                    if (!navigator.advance()) return false;
+                    continue;
+                }
+                // falls Command nicht erkannt: einfach weiter (oder log)
+                if (!navigator.advance()) return false;
+                continue;
+            }
+
+            if (event instanceof ScriptEvent.Text text) {
+                eventBus.fire(new DialogEvent(navigator.toDialogLine(), npcEntity));
+                return true;
+            }
+
+            if (!navigator.advance()) return false;
         }
         return false;
     }

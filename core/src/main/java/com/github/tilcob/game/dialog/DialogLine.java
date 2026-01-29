@@ -1,4 +1,6 @@
 package com.github.tilcob.game.dialog;
 
-public record DialogLine(String text, int index, int total) {
+import com.github.tilcob.game.yarn.script.ScriptEvent;
+
+public record DialogLine(ScriptEvent text, int index, int total) {
 }

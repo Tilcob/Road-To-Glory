@@ -11,6 +11,7 @@ import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandCall;
 import com.github.tilcob.game.flow.commands.CutsceneCommandResult;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 import java.util.Map;
 
@@ -83,29 +84,31 @@ public class CutsceneSystem extends IteratingSystem implements Disposable {
             cutscene.setState(Cutscene.State.FINISHED);
             return;
         }
-        Array<String> lines = data.lines();
-        if (lines == null || lines.isEmpty()) {
+        Array<ScriptEvent> events = data.scriptEvents();
+        if (events == null || events.isEmpty()) {
             cutscene.setState(Cutscene.State.FINISHED);
             return;
         }
-        while (cutscene.getLineIndex() < lines.size) {
-            String line = lines.get(cutscene.getLineIndex());
-            CutsceneCommandResult result = cutsceneYarnRuntime.executeLine(player, line,
-                new CommandCall.SourcePos("cutscene", cutscene.getCutsceneId(), cutscene.getLineIndex()));
-            cutscene.setLineIndex(cutscene.getLineIndex() + 1);
+        while (cutscene.getLineIndex() < events.size) {
+            ScriptEvent event = events.get(cutscene.getLineIndex());
+            if (event instanceof ScriptEvent.Command command) {
+                CutsceneCommandResult result = cutsceneYarnRuntime.executeLine(player, command.raw(),
+                    new CommandCall.SourcePos("cutscene", cutscene.getCutsceneId(), cutscene.getLineIndex()));
+                cutscene.setLineIndex(cutscene.getLineIndex() + 1);
 
-            if (result.waitTime() instanceof CutsceneCommandResult.Wait.Dialog) {
-                cutscene.setAwaitingDialog(true);
-                return;
-            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Camera) {
-                cutscene.setAwaitingCamera(true);
-                return;
-            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Move) {
-                cutscene.setAwaitingMove(true);
-                return;
-            } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Seconds seconds) {
-                cutscene.setWaitTimerSeconds(seconds.seconds());
-                return;
+                if (result.waitTime() instanceof CutsceneCommandResult.Wait.Dialog) {
+                    cutscene.setAwaitingDialog(true);
+                    return;
+                } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Camera) {
+                    cutscene.setAwaitingCamera(true);
+                    return;
+                } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Move) {
+                    cutscene.setAwaitingMove(true);
+                    return;
+                } else if (result.waitTime() instanceof CutsceneCommandResult.Wait.Seconds seconds) {
+                    cutscene.setWaitTimerSeconds(seconds.seconds());
+                    return;
+                }
             }
         }
         cutscene.setState(Cutscene.State.FINISHED);

@@ -8,10 +8,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.dialog.DialogLine;
 import com.github.tilcob.game.ui.model.DialogChoiceDisplay;
 import com.github.tilcob.game.ui.model.DialogDisplay;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.RewardDisplay;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 import com.github.tommyettinger.textra.TextraLabel;
 import com.github.tommyettinger.textra.TypingLabel;
 
@@ -151,11 +153,21 @@ public class GameView extends View<GameViewModel> {
         dialogContainer.setVisible(true);
         speakerLabel.setText(display.speaker());
         dialogProgressLabel.setText(display.line().index() + "/" + display.line().total());
-        dialogText.setText(display.line().text());
+        setText(display.line(), dialogText);
         if (dialogHintLabel != null) {
             dialogHintLabel.setText("Continue with E");
         }
         dialogText.restart();
+    }
+
+    private void setText(DialogLine line, TypingLabel label) {
+        String text;
+        if (line.text() instanceof ScriptEvent.Text t) {
+            text = t.text();
+        } else {
+            text = String.valueOf(line.text());
+        }
+        dialogText.setText(text);
     }
 
     private void hideDialog() {

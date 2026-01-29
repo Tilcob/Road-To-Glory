@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogNode;
 import com.github.tilcob.game.flow.*;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 import java.util.*;
 
@@ -50,25 +51,27 @@ public class QuestYarnRuntime {
     public boolean executeNode(Entity player, String nodeId) {
         DialogNode node = findNode(nodeId, true);
         if (node == null) return false;
-        Array<String> lines = node.lines();
+        Array<ScriptEvent> lines = node.events();
         if (lines == null) return false;
         boolean shouldExecute = true;
         for (int i = 0; i < lines.size; i++) {
-            String line = lines.get(i);
-            String trimmed = line == null ? "" : line.trim();
-            if (isIfLine(trimmed)) {
-                shouldExecute = evaluateCondition(player, trimmed);
+            ScriptEvent event = lines.get(i);
+            if (event instanceof ScriptEvent.IfStart ifs) {
+                shouldExecute = evaluateCondition(player, ifs.condition());
                 continue;
             }
-            if (isEndIfLine(trimmed)) {
+            if (event instanceof ScriptEvent.EndIf) {
                 shouldExecute = true;
                 continue;
             }
             if (!shouldExecute) continue;
-            String trimmedLine = line == null ? "" : line.trim();
-            if (tryExecuteCommandLine(player, trimmedLine, new CommandCall.SourcePos("quest", nodeId, i))) {
-                continue;
+
+            if (event instanceof ScriptEvent.Command cmd) {
+                if (tryExecuteCommandLine(player, cmd.raw(), new CommandCall.SourcePos("quest", nodeId, i))) {
+                    continue;
+                }
             }
+
         }
         return true;
     }

@@ -59,8 +59,8 @@ class YarnDialogLoaderTest {
         assertEquals(2, dialogData.getNodes().size);
         DialogNode node = dialogData.getNodes().first();
         assertEquals("Idle", node.id());
-        assertEquals(1, node.lines().size);
-        assertEquals("Welcome in my shop!", node.lines().first());
+        assertEquals(1, node.events().size);
+        assertEquals("Welcome in my shop!", node.events().first());
     }
 
     @Test
