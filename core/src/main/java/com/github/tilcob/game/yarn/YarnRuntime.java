@@ -6,69 +6,7 @@ import com.github.tilcob.game.flow.CommandCall;
 
 import java.util.*;
 
-public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
-    private static final String TAG = YarnRuntime.class.getSimpleName();
-
-    private final Map<String, CommandHandler> commandHandlers = new HashMap<>();
-    private final Map<String, FunctionHandler> functionHandlers = new HashMap<>();
-
-    @Override
-    public void register(String command, CommandHandler handler) {
-        if (command == null || command.isBlank() || handler == null) return;
-        commandHandlers.put(command, handler);
-    }
-
-    @Override
-    public void register(String function, FunctionHandler handler) {
-        if (function == null || function.isBlank() || handler == null) return;
-        functionHandlers.put(function, handler);
-    }
-
-    @Deprecated
-    public boolean executeCommandLine(Entity player, String line) {
-        if (line == null) return false;
-        String trimmed = line.trim();
-        if (!isCommandLine(trimmed)) return false;
-        String inner = trimmed.substring(2, trimmed.length() - 2).trim();
-        if (inner.isEmpty()) return true;
-
-        String[] parts = inner.split("\\s+");
-        String command = parts[0];
-        String[] args = argsFrom(parts);
-        boolean executed = executeCommand(command, player, args);
-
-        if (!executed && Gdx.app != null) {
-            Gdx.app.debug(TAG, "Unhandled Yarn command: " + command);
-        }
-        return true;
-    }
-
-    @Deprecated
-    public boolean executeCommand(String command, Entity player, String[] args) {
-        if (command == null) return false;
-        CommandHandler handler = commandHandlers.get(command);
-        if (handler == null) return false;
-        handler.handle(player, args == null ? new String[0] : args);
-        return true;
-    }
-
-    public Object evaluateFunction(String function, Entity player, String[] args) {
-        if (function == null) return null;
-        FunctionHandler handler = functionHandlers.get(function);
-        if (handler == null) return null;
-        return handler.evaluate(player, args == null ? new String[0] : args);
-    }
-
-    public static boolean isCommandLine(String line) {
-        return line.startsWith("<<") && line.endsWith(">>");
-    }
-
-    private static String[] argsFrom(String[] parts) {
-        if (parts.length <= 1) return new String[0];
-        String[] args = new String[parts.length - 1];
-        System.arraycopy(parts, 1, args, 0, args.length);
-        return args;
-    }
+public class YarnRuntime {
 
     public Optional<CommandCall> parseCommandLine(String line) {
         return parseCommandLine(line, CommandCall.SourcePos.unknown());
@@ -78,7 +16,7 @@ public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
         if (line == null) return Optional.empty();
 
         String trimmed = line.trim();
-        if (!isCommandLine(line)) return Optional.empty();
+        if (!isCommandLine(trimmed)) return Optional.empty(); // FIX: use trimmed
 
         String inner = trimmed.substring(2, trimmed.length() - 2).trim();
         if (inner.isEmpty()) return Optional.empty();
@@ -92,28 +30,44 @@ public class YarnRuntime implements YarnCommandRegistry, YarnFunctionRegistry {
         return Optional.of(new CommandCall(command, arguments, Map.of(), sourcePos));
     }
 
-    private List<String> tokenize(String inner) {
+    public boolean isCommandLine(String line) {
+        if (line == null) return false;
+        return line.startsWith("<<") && line.endsWith(">>");
+    }
+
+    public List<String> tokenize(String inner) {
         List<String> tokens = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inQuotes = false;
 
         for (int i = 0; i < inner.length(); i++) {
             char c = inner.charAt(i);
+
             if (c == '"') {
                 inQuotes = !inQuotes;
+                current.append(c);
                 continue;
             }
+
             if (!inQuotes && Character.isWhitespace(c)) {
                 if (!current.isEmpty()) {
-                    tokens.add(current.toString());
+                    tokens.add(stripQuotes(current.toString()));
                     current.setLength(0);
                 }
-            } else {
-                current.append(c);
+                continue;
             }
+
+            current.append(c);
         }
 
-        if (!current.isEmpty()) tokens.add(current.toString());
+        if (!current.isEmpty()) tokens.add(stripQuotes(current.toString()));
         return tokens;
+    }
+
+    private String stripQuotes(String token) {
+        if (token != null && token.length() >= 2 && token.startsWith("\"") && token.endsWith("\"")) {
+            return token.substring(1, token.length() - 1);
+        }
+        return token;
     }
 }

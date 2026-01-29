@@ -69,10 +69,10 @@ public class GameServices {
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
         YarnRuntime runtime = new YarnRuntime();
-        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor(), flowBootstrap.functions());
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
         this.questYarnRuntime = new QuestYarnRuntime(
-            runtime, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            runtime, questYarnRegistry, flowBootstrap.commands(),
             flowBootstrap.executor(), flowBootstrap.functions());
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
@@ -100,10 +100,10 @@ public class GameServices {
         this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
         this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
         YarnRuntime runtime = new YarnRuntime();
-        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
+        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor(), flowBootstrap.functions());
         this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
         this.questYarnRuntime = new QuestYarnRuntime(
-            runtime, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            runtime, questYarnRegistry, flowBootstrap.commands(),
             flowBootstrap.executor(), flowBootstrap.functions());
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);

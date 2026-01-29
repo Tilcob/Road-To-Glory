@@ -9,26 +9,56 @@ public final class IfStack {
         return stack.size == 0 || stack.peek().executing;
     }
 
-    public void push(boolean condResult) {
-        boolean parentExec = stack.size == 0 || stack.peek().executing;
-        stack.add(new Frame(parentExec, condResult, parentExec && condResult, false));
+    public void clear() {
+        stack.clear();
     }
 
-    public void elseBlock() {
+    public void onIfStart(boolean conditionResult) {
+        boolean parentExec = stack.size == 0 || stack.peek().executing;
+        boolean ifTaken = parentExec && conditionResult;
+        stack.add(new Frame(parentExec, ifTaken, ifTaken, false));
+    }
+
+    /** Called when encountering <<else>> */
+    public void onElse() {
         if (stack.size == 0) return;
+
         Frame f = stack.pop();
         if (f.elseUsed) {
             stack.add(f);
             return;
         }
-        boolean exec = f.parentExecuting && !f.conditionResult;
-        stack.add(new Frame(f.parentExecuting, f.conditionResult, exec, true));
+
+        boolean elseExec = f.parentExecuting && !f.branchTaken;
+        boolean newBranchTaken = f.branchTaken || elseExec;
+
+        stack.add(new Frame(f.parentExecuting, newBranchTaken, elseExec, true));
     }
 
-    public void pop() {
+    /** Called when encountering <<endif>> */
+    public void onEndIf() {
         if (stack.size > 0) stack.pop();
     }
 
-    private record Frame(boolean parentExecuting, boolean conditionResult, boolean executing, boolean elseUsed) {}
+    @Deprecated
+    public void push(boolean condResult) {
+        onIfStart(condResult);
+    }
+
+    @Deprecated
+    public void elseBlock() {
+        onElse();
+    }
+
+    @Deprecated
+    public void pop() {
+        onEndIf();
+    }
+
+    private record Frame(boolean parentExecuting,
+                         boolean branchTaken,
+                         boolean executing,
+                         boolean elseUsed) {
+    }
 }
 
