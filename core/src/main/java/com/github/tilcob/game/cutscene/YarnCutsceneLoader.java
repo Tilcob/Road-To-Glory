@@ -8,7 +8,7 @@ import com.github.tilcob.game.yarn.YarnParser;
 import com.github.tilcob.game.yarn.script.ScriptComplier;
 import com.github.tilcob.game.yarn.script.ScriptEvent;
 
-import java.util.*;
+import java.util.List;
 
 public class YarnCutsceneLoader {
 
