@@ -2,6 +2,7 @@ package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.flow.*;
+import com.github.tilcob.game.yarn.expression.ExpressionEvaluator;
 
 import java.util.*;
 
@@ -73,67 +74,15 @@ public abstract class BaseYarnRuntime {
         String expr = condition.trim();
         if (expr.isEmpty()) return false;
 
-        // Shorthand: treat expression as boolean/truthy check:
-        //   <<if $has_flag guard_angry>>
-        //   <<if someVar>>
-        if (!expr.contains("==") && !expr.contains("!=")) {
-            Object v = evalValue(player, expr, source);
-            return truthy(v);
+        try {
+            var evaluator = new ExpressionEvaluator(
+                functionRegistry,
+                this::getVariable
+            );
+            return evaluator.evalBool(player, expr, source);
+        } catch (Exception ex) {
+            return false;
         }
-
-        boolean notEquals = expr.contains("!=");
-        String[] parts = expr.split(notEquals ? "!=" : "==", 2);
-        if (parts.length != 2) return false;
-
-        Object leftValue = evalValue(player, parts[0].trim(), source);
-        Object rightValue = evalValue(player, parts[1].trim(), source);
-
-        boolean eq = Objects.equals(stringify(leftValue), stringify(rightValue));
-        return notEquals ? !eq : eq;
-    }
-
-    private Object evalValue(Entity player, String token, CommandCall.SourcePos source) {
-        if (token == null) return null;
-        String t = token.trim();
-        if (t.isEmpty()) return null;
-
-        if (t.length() >= 2 && t.startsWith("\"") && t.endsWith("\"")) {
-            return t.substring(1, t.length() - 1);
-        }
-        if ("true".equalsIgnoreCase(t)) return true;
-        if ("false".equalsIgnoreCase(t)) return false;
-
-        if (t.matches("-?\\d+")) {
-            try { return Integer.parseInt(t); } catch (NumberFormatException ignored) {}
-        }
-        if (t.matches("-?\\d+\\.\\d+")) {
-            try { return Float.parseFloat(t); } catch (NumberFormatException ignored) {}
-        }
-
-        String expr = t.startsWith("$") ? t.substring(1) : t;
-        String[] tokens = expr.split("\\s+");
-        String head = tokens[0];
-
-        if (functionRegistry != null && functionRegistry.has(head)) {
-            List<String> args = tokens.length > 1
-                ? List.of(Arrays.copyOfRange(tokens, 1, tokens.length))
-                : List.of();
-            return functionRegistry.evaluate(FunctionCall.simple(head, args, source), new FlowContext(player));
-        }
-
-        return getVariable(player, expr);
-    }
-
-    private static boolean truthy(Object v) {
-        if (v == null) return false;
-        if (v instanceof Boolean b) return b;
-        if (v instanceof Number n) return n.doubleValue() != 0.0;
-        if (v instanceof String s) return !s.isBlank() && !"0".equals(s) && !"false".equalsIgnoreCase(s);
-        return true;
-    }
-
-    private static String stringify(Object v) {
-        return v == null ? null : String.valueOf(v);
     }
 
     private Map<String, Object> getVariablesFor(Entity player, boolean create) {
