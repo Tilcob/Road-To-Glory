@@ -19,7 +19,6 @@ public final class IfStack {
         stack.add(new Frame(parentExec, ifTaken, ifTaken, false));
     }
 
-    /** Called when encountering <<else>> */
     public void onElse() {
         if (stack.size == 0) return;
 
@@ -35,24 +34,8 @@ public final class IfStack {
         stack.add(new Frame(f.parentExecuting, newBranchTaken, elseExec, true));
     }
 
-    /** Called when encountering <<endif>> */
     public void onEndIf() {
         if (stack.size > 0) stack.pop();
-    }
-
-    @Deprecated
-    public void push(boolean condResult) {
-        onIfStart(condResult);
-    }
-
-    @Deprecated
-    public void elseBlock() {
-        onElse();
-    }
-
-    @Deprecated
-    public void pop() {
-        onEndIf();
     }
 
     private record Frame(boolean parentExecuting,

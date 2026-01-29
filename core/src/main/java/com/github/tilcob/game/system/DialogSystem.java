@@ -249,17 +249,17 @@ public class DialogSystem extends IteratingSystem implements Disposable {
 
             if (event instanceof ScriptEvent.IfStart ifs) {
                 boolean cond = dialogYarnRuntime.evaluateCondition(player, ifs.condition(), sourcePos);
-                ifStack.push(cond);
+                ifStack.onIfStart(cond);
                 if (!navigator.advance()) return false;
                 continue;
             }
             if (event instanceof ScriptEvent.Else) {
-                ifStack.elseBlock();
+                ifStack.onElse();
                 if (!navigator.advance()) return false;
                 continue;
             }
             if (event instanceof ScriptEvent.EndIf) {
-                ifStack.pop();
+                ifStack.onEndIf();
                 if (!navigator.advance()) return false;
                 continue;
             }
