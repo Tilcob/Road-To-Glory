@@ -3,6 +3,7 @@ package com.github.tilcob.game.dialog;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.event.QuestStepEvent;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -10,8 +11,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 class YarnDialogLoaderTest {
     @TempDir
@@ -47,20 +47,20 @@ class YarnDialogLoaderTest {
 
         assertNotNull(dialogData);
         assertEquals(1, dialogData.idle().size);
-        assertEquals("Welcome in my shop!", dialogData.idle().first());
+        assertEquals("Welcome in my shop!", firstText(dialogData.idle()));
         assertEquals(1, dialogData.rootLines().size);
-        assertEquals("Welcome, traveler!", dialogData.rootLines().first());
+        assertEquals("Welcome, traveler!", firstText(dialogData.rootLines()));
         assertEquals(1, dialogData.choices().size);
         DialogChoice choice = dialogData.choices().first();
         assertEquals("Show me your wares.", choice.text());
         assertEquals("shop_wares", choice.next());
         assertEquals(1, choice.lines().size);
-        assertEquals("I'm still setting up.", choice.lines().first());
+        assertEquals("I'm still setting up.", firstText(choice.lines()));
         assertEquals(2, dialogData.getNodes().size);
         DialogNode node = dialogData.getNodes().first();
         assertEquals("Idle", node.id());
-        assertEquals(1, node.lines().size);
-        assertEquals("Welcome in my shop!", node.lines().first());
+        assertEquals(1, node.events().size);
+        assertEquals("Welcome in my shop!", firstText(node.events()));
     }
 
     @Test
@@ -138,18 +138,27 @@ class YarnDialogLoaderTest {
 
         assertNotNull(dialogData.questDialog());
         assertEquals("welcome_to_town", dialogData.questDialog().questId());
-        assertEquals("Welcome in our town!", dialogData.questDialog().notStarted().first());
-        assertEquals("Are you new here?", dialogData.questDialog().inProgress().first());
-        assertEquals("By my friend!", dialogData.questDialog().completed().first());
+        assertEquals("Welcome in our town!", firstText(dialogData.questDialog().notStarted()));
+        assertEquals("Are you new here?", firstText(dialogData.questDialog().inProgress()));
+        assertEquals("By my friend!", firstText(dialogData.questDialog().completed()));
         assertNotNull(dialogData.flagDialogs());
         assertEquals(1, dialogData.flagDialogs().size);
         assertEquals("shop_seen", dialogData.flagDialogs().first().flag());
-        assertEquals("Good to see you again.", dialogData.flagDialogs().first().lines().first());
+        assertEquals("Good to see you again.", firstText(dialogData.flagDialogs().first().lines()));
     }
 
     private FileHandle writeTempYarn(String name, String content) throws IOException {
         Path file = tempDir.resolve(name + ".yarn");
         Files.writeString(file, content);
         return new FileHandle(file.toFile());
+    }
+
+    private static String textOf(ScriptEvent e) {
+        assertTrue(e instanceof ScriptEvent.Text, "Expected ScriptEvent.Text but was: " + e);
+        return ((ScriptEvent.Text) e).text();
+    }
+
+    private static String firstText(Array<ScriptEvent> events) {
+        return textOf(events.first());
     }
 }

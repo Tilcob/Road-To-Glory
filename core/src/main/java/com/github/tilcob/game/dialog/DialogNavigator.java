@@ -5,12 +5,13 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.component.DialogSession;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class DialogNavigator {
     private final DialogData dialogData;
     private final DialogSession session;
     private final boolean repeatableChoices;
-    private Array<String> lines;
+    private Array<ScriptEvent> lines;
     private Array<DialogChoice> choices;
 
     public DialogNavigator(DialogData dialogData, DialogSession session, DialogSelection selection, boolean repeatableChoices) {
@@ -25,10 +26,8 @@ public class DialogNavigator {
         return new DialogLine(currentLine(), session.getLineIndex() + 1, getTotal());
     }
 
-    public String currentLine() {
-        if (lines.isEmpty()) {
-            return "";
-        }
+    public ScriptEvent currentLine() {
+        if (lines.isEmpty()) return null;
         return lines.get(session.getLineIndex());
     }
 
@@ -113,17 +112,17 @@ public class DialogNavigator {
             }
             return false;
         }
-        resetForLines(node.lines(), node.choices(), nodeId, false);
+        resetForLines(node.events(), node.choices(), nodeId, false);
         return true;
     }
 
-    private void setLines(Array<String> lines) {
+    private void setLines(Array<ScriptEvent> lines) {
         Array<DialogChoice> nextChoices = repeatableChoices ? choices : new Array<>();
         boolean nextChoiceConsumed = !repeatableChoices;
         resetForLines(lines, nextChoices, null, nextChoiceConsumed);
     }
 
-    private void resetForLines(Array<String> lines, Array<DialogChoice> choices, String nodeId, boolean choiceConsumed) {
+    private void resetForLines(Array<ScriptEvent> lines, Array<DialogChoice> choices, String nodeId, boolean choiceConsumed) {
         this.lines = lines == null ? new Array<>() : lines;
         this.choices = choices == null ? new Array<>() : choices;
         session.setCurrentNodeId(nodeId);

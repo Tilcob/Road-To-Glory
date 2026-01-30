@@ -5,12 +5,13 @@ import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.quest.QuestState;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class DialogSelector {
 
     public static DialogSelection select(DialogData dialogData, QuestLog questLog, DialogFlags dialogFlags) {
         QuestDialog questDialog = dialogData.questDialog();
-        Array<String> rootLines = dialogData.rootLines();
+        Array<ScriptEvent> rootLines = dialogData.rootLines();
         if (rootLines == null || rootLines.size == 0) rootLines = dialogData.idle();
 
         if (questDialog != null && questLog != null) {
@@ -20,7 +21,7 @@ public class DialogSelector {
         return new DialogSelection(rootLines, dialogData.choices());
     }
 
-    public static DialogSelection select(Array<String> rootLines, Array<String> idle,
+    public static DialogSelection select(Array<ScriptEvent> rootLines, Array<ScriptEvent> idle,
                                          Array<DialogChoice> rootChoices,
                                          QuestDialog questDialog, QuestLog questLog, DialogFlags dialogFlags) {
         if (questDialog != null) {
@@ -68,20 +69,20 @@ public class DialogSelector {
             return null;
         }
         String key = String.valueOf(stepIndex);
-        Array<String> lines = questDialog.stepDialogs().get(key);
+        Array<ScriptEvent> lines = questDialog.stepDialogs().get(key);
         if (lines == null) return null;
 
         Array<DialogChoice> choices = questDialog.stepChoices() == null ? null : questDialog.stepChoices().get(key);
         return new DialogSelection(lines, choices);
     }
 
-    private static DialogSelection selectCompleted(Array<String> rootLines, Array<String> idle,
+    private static DialogSelection selectCompleted(Array<ScriptEvent> rootLines, Array<ScriptEvent> idle,
                                                   Array<DialogChoice> rootChoices,
                                                   QuestDialog questDialog, DialogFlags dialogFlags) {
         String flagKey = completedDialogFlagKey(questDialog.questId());
         boolean completedSeen = flagKey != null && dialogFlags != null && dialogFlags.get(flagKey);
         if (completedSeen) {
-            Array<String> idleLines = (idle == null || idle.size == 0) ? rootLines : idle;
+            Array<ScriptEvent> idleLines = (idle == null || idle.size == 0) ? rootLines : idle;
             return new DialogSelection(idleLines, new Array<>());
         }
         return new DialogSelection(questDialog.completed(), questDialog.completedChoices());

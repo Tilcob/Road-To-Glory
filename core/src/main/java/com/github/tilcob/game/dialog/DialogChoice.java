@@ -1,19 +1,20 @@
 package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class DialogChoice {
     private String text;
-    private Array<String> lines;
+    private Array<ScriptEvent> lines;
     private Array<DialogEffect> effects;
     private String next;
 
-    public DialogChoice(String text, Array<String> lines) {
+    public DialogChoice(String text, Array<ScriptEvent> lines) {
         this.text = text;
         this.lines = lines;
     }
 
-    public DialogChoice(String text, Array<String> lines, Array<DialogEffect> effects, String next) {
+    public DialogChoice(String text, Array<ScriptEvent> lines, Array<DialogEffect> effects, String next) {
         this.text = text;
         this.lines = lines;
         this.effects = effects;
@@ -27,7 +28,7 @@ public class DialogChoice {
         return text;
     }
 
-    public Array<String> lines() {
+    public Array<ScriptEvent> lines() {
         return lines;
     }
 

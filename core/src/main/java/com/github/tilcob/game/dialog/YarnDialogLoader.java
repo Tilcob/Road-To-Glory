@@ -5,12 +5,16 @@ import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.event.QuestStepEvent;
+import com.github.tilcob.game.yarn.YarnParser;
+import com.github.tilcob.game.yarn.script.ScriptComplier;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 public class YarnDialogLoader {
-    private static final String HEADER_SEPARATOR = "---";
-    private static final String NODE_SEPARATOR = "===";
 
     public DialogData load(FileHandle fileHandle) {
         if (fileHandle == null || !fileHandle.exists()) {
@@ -24,12 +28,21 @@ public class YarnDialogLoader {
             return DialogData.empty();
         }
 
-        List<ParsedNode> parsedNodes = parseNodes(fileHandle.readString("UTF-8"));
+        List<YarnParser.YarnNodeRaw> rawNodes = YarnParser.parse(fileHandle.readString("UTF-8"));
+
+        List<ParsedNode> parsedNodes = new ArrayList<>();
+        for (YarnParser.YarnNodeRaw raw : rawNodes) {
+            ParsedNode p = new ParsedNode(raw.id(), raw.tags());
+            parseBody(raw.bodyLines(), p);
+            p.events = ScriptComplier.compile(p.lines);
+            parsedNodes.add(p);
+        }
+
         ParsedNode rootNode = findTaggedNode(parsedNodes, "root", "start");
         ParsedNode idleNode = findTaggedNode(parsedNodes, "idle");
 
-        Array<String> idleLines = idleNode == null ? new Array<>() : toGdxArray(idleNode.lines);
-        Array<String> rootLines = rootNode == null ? new Array<>() : toGdxArray(rootNode.lines);
+        Array<ScriptEvent> idleEvents = idleNode == null ? new Array<>() : toGdxEvents(idleNode.events);
+        Array<ScriptEvent> rootEvents = rootNode == null ? new Array<>() : toGdxEvents(rootNode.events);
         Array<DialogChoice> rootChoices = rootNode == null ? new Array<>() : toChoiceArray(rootNode.choices);
 
         Array<DialogNode> nodes = new Array<>();
@@ -37,68 +50,68 @@ public class YarnDialogLoader {
 
         QuestDialog questDialog = null;
         String questId = null;
-        Array<String> questNotStarted = null;
-        Array<String> questInProgress = null;
-        Array<String> questCompleted = null;
+        Array<ScriptEvent> questNotStarted = null;
+        Array<ScriptEvent> questInProgress = null;
+        Array<ScriptEvent> questCompleted = null;
         Array<DialogChoice> questNotStartedChoices = null;
         Array<DialogChoice> questInProgressChoices = null;
         Array<DialogChoice> questCompletedChoices = null;
-        ObjectMap<String, Array<String>> stepDialogs = new ObjectMap<>();
+        ObjectMap<String, Array<ScriptEvent>> stepDialogs = new ObjectMap<>();
         ObjectMap<String, Array<DialogChoice>> stepChoices = new ObjectMap<>();
 
         for (ParsedNode parsedNode : parsedNodes) {
             if (parsedNode == rootNode) continue;
 
-            // --- QUEST NODES: collect quest lines AND keep as normal nodes so <<jump quest_...>> works ---
+            // --- QUEST NODES: collect quest scriptEvents AND keep as normal nodes so <<jump quest_...>> works ---
             String questTag = findQuestTag(parsedNode.tags);
             if (questTag != null) {
                 // questId from tag "quest_<id>"
                 questId = questTag;
 
-                Array<String> questLines = toGdxArray(parsedNode.lines);
+                Array<ScriptEvent> questEvents = toGdxEvents(parsedNode.events);
                 Array<DialogChoice> questChoices = toChoiceArray(parsedNode.choices);
 
                 if (parsedNode.tags.contains("notstarted")) {
-                    questNotStarted = questLines;
+                    questNotStarted = questEvents;
                     questNotStartedChoices = questChoices;
                 } else if (parsedNode.tags.contains("inprogress")) {
-                    questInProgress = questLines;
+                    questInProgress = questEvents;
                     questInProgressChoices = questChoices;
                 } else if (parsedNode.tags.contains("completed")) {
-                    questCompleted = questLines;
+                    questCompleted = questEvents;
                     questCompletedChoices = questChoices;
                 } else {
                     String stepIndex = findStepIndex(parsedNode.tags);
                     if (stepIndex != null) {
-                        stepDialogs.put(stepIndex, questLines);
+                        stepDialogs.put(stepIndex, questEvents);
                         stepChoices.put(stepIndex, questChoices);
                     }
                 }
 
                 // IMPORTANT: ALSO store it as a normal DialogNode so jump/goto can target it
-                nodes.add(new DialogNode(parsedNode.id, questLines, toChoiceArray(parsedNode.choices)));
+                nodes.add(new DialogNode(parsedNode.id, questEvents, toChoiceArray(parsedNode.choices)));
                 continue;
             }
 
             // --- FLAG DIALOGS ---
             String flagTag = findFlagTag(parsedNode.tags);
             if (flagTag != null) {
-                flagDialogs.add(new DialogFlagDialog(flagTag, toGdxArray(parsedNode.lines)));
+                flagDialogs.add(new DialogFlagDialog(flagTag, toGdxEvents(parsedNode.events)));
                 continue;
             }
 
             // --- NORMAL NODES ---
-            nodes.add(new DialogNode(parsedNode.id, toGdxArray(parsedNode.lines), toChoiceArray(parsedNode.choices)));
+            nodes.add(new DialogNode(parsedNode.id, toGdxEvents(parsedNode.events), toChoiceArray(parsedNode.choices)));
         }
 
         if (questId != null) {
-            ObjectMap<String, Array<String>> stepDialogMap = stepDialogs.size == 0 ? null : stepDialogs;
+            ObjectMap<String, Array<ScriptEvent>> stepDialogMap = stepDialogs.size == 0 ? null : stepDialogs;
             ObjectMap<String, Array<DialogChoice>> stepChoiceMap = stepChoices.size == 0 ? null : stepChoices;
             questDialog = new QuestDialog(
                 questId,
-                defaultLines(questNotStarted),
-                defaultLines(questInProgress),
-                defaultLines(questCompleted),
+                defaultEvents(questNotStarted),
+                defaultEvents(questInProgress),
+                defaultEvents(questCompleted),
                 stepDialogMap,
                 defaultChoices(questNotStartedChoices),
                 defaultChoices(questInProgressChoices),
@@ -110,7 +123,7 @@ public class YarnDialogLoader {
         Array<DialogFlagDialog> flagDialogArray = flagDialogs.size == 0 ? null : flagDialogs;
         ObjectMap<String, DialogNode> nodesById = buildNodeMap(nodes);
 
-        return new DialogData(idleLines, rootLines, rootChoices, flagDialogArray, questDialog, nodes, nodesById);
+        return new DialogData(idleEvents, rootEvents, rootChoices, flagDialogArray, questDialog, nodes, nodesById);
     }
 
     private ObjectMap<String, DialogNode> buildNodeMap(Array<DialogNode> nodes) {
@@ -138,76 +151,6 @@ public class YarnDialogLoader {
             }
         }
         return null;
-    }
-
-    private static List<ParsedNode> parseNodes(String content) {
-        String[] lines = content.split("\\R", -1);
-        List<ParsedNode> nodes = new ArrayList<>();
-        List<String> headerLines = new ArrayList<>();
-        List<String> bodyLines = new ArrayList<>();
-        boolean inBody = false;
-
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (NODE_SEPARATOR.equals(trimmed)) {
-                ParsedNode node = buildNode(headerLines, bodyLines);
-                if (node != null) {
-                    nodes.add(node);
-                }
-                headerLines.clear();
-                bodyLines.clear();
-                inBody = false;
-                continue;
-            }
-            if (!inBody && HEADER_SEPARATOR.equals(trimmed)) {
-                inBody = true;
-                continue;
-            }
-            if (inBody) {
-                bodyLines.add(line);
-            } else {
-                if (!trimmed.isEmpty()) {
-                    headerLines.add(line);
-                }
-            }
-        }
-
-        ParsedNode node = buildNode(headerLines, bodyLines);
-        if (node != null) {
-            nodes.add(node);
-        }
-        return nodes;
-    }
-
-    private static ParsedNode buildNode(List<String> headerLines, List<String> bodyLines) {
-        String title = null;
-        Set<String> tags = new HashSet<>();
-
-        for (String headerLine : headerLines) {
-            String trimmed = headerLine.trim();
-            String lower = trimmed.toLowerCase(Locale.ROOT);
-
-            if (lower.startsWith("title:")) {
-                title = trimmed.substring("title:".length()).trim();
-            } else if (lower.startsWith("tags:")) {
-                String tagValue = trimmed.substring("tags:".length()).trim();
-                if (!tagValue.isEmpty()) {
-                    for (String tag : tagValue.split("[,\\s]+")) {
-                        if (!tag.isEmpty()) {
-                            tags.add(tag.toLowerCase(Locale.ROOT));
-                        }
-                    }
-                }
-            }
-        }
-
-        if (title == null || title.isEmpty()) {
-            return null;
-        }
-
-        ParsedNode parsedNode = new ParsedNode(title, tags);
-        parseBody(bodyLines, parsedNode);
-        return parsedNode;
     }
 
     private static void parseBody(List<String> bodyLines, ParsedNode parsedNode) {
@@ -248,6 +191,7 @@ public class YarnDialogLoader {
         if (currentChoice != null) {
             parsedNode.choices.add(currentChoice);
         }
+        parsedNode.events = ScriptComplier.compile(parsedNode.lines);
     }
 
     private static boolean tryApplyJump(String line, ChoiceBuilder builder) {
@@ -332,8 +276,15 @@ public class YarnDialogLoader {
         return array;
     }
 
-    private static Array<String> defaultLines(Array<String> lines) {
-        return lines == null ? new Array<>() : lines;
+    private static Array<ScriptEvent> toGdxEvents(List<ScriptEvent> events) {
+        Array<ScriptEvent> out = new Array<>();
+        if (events == null) return out;
+        for (ScriptEvent e : events) out.add(e);
+        return out;
+    }
+
+    private static Array<ScriptEvent> defaultEvents(Array<ScriptEvent> events) {
+        return events == null ? new Array<>() : events;
     }
 
     private static Array<DialogChoice> defaultChoices(Array<DialogChoice> choices) {
@@ -397,6 +348,7 @@ public class YarnDialogLoader {
         private final Set<String> tags;
         private final List<String> lines = new ArrayList<>();
         private final List<ChoiceBuilder> choices = new ArrayList<>();
+        private List<ScriptEvent> events = List.of();
 
         private ParsedNode(String id, Set<String> tags) {
             this.id = id;
@@ -416,7 +368,7 @@ public class YarnDialogLoader {
 
         private DialogChoice toDialogChoice() {
             Array<DialogEffect> effectArray = effects.isEmpty() ? null : toGdxEffectArray(effects);
-            return new DialogChoice(text, toGdxArray(lines), effectArray, next);
+            return new DialogChoice(text, toGdxEvents(ScriptComplier.compile(lines)), effectArray, next);
         }
     }
 }

@@ -2,27 +2,28 @@ package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class QuestDialog {
     private String questId;
-    private Array<String> notStarted;
-    private Array<String> inProgress;
-    private Array<String> completed;
-    private ObjectMap<String, Array<String>> stepDialogs;
+    private Array<ScriptEvent> notStarted;
+    private Array<ScriptEvent> inProgress;
+    private Array<ScriptEvent> completed;
+    private ObjectMap<String, Array<ScriptEvent>> stepDialogs;
     private Array<DialogChoice> notStartedChoices;
     private Array<DialogChoice> inProgressChoices;
     private Array<DialogChoice> completedChoices;
     private ObjectMap<String, Array<DialogChoice>> stepChoices;
 
-    public QuestDialog(String questId, Array<String> notStarted, Array<String> inProgress, Array<String> completed) {
+    public QuestDialog(String questId, Array<ScriptEvent> notStarted, Array<ScriptEvent> inProgress, Array<ScriptEvent> completed) {
         this.questId = questId;
         this.notStarted = notStarted;
         this.inProgress = inProgress;
         this.completed = completed;
     }
 
-    public QuestDialog(String questId, Array<String> notStarted, Array<String> inProgress, Array<String> completed,
-                       ObjectMap<String, Array<String>> stepDialogs) {
+    public QuestDialog(String questId, Array<ScriptEvent> notStarted, Array<ScriptEvent> inProgress, Array<ScriptEvent> completed,
+                       ObjectMap<String, Array<ScriptEvent>> stepDialogs) {
         this.questId = questId;
         this.notStarted = notStarted;
         this.inProgress = inProgress;
@@ -30,8 +31,8 @@ public class QuestDialog {
         this.stepDialogs = stepDialogs;
     }
 
-    public QuestDialog(String questId, Array<String> notStarted, Array<String> inProgress, Array<String> completed,
-                       ObjectMap<String, Array<String>> stepDialogs, Array<DialogChoice> notStartedChoices,
+    public QuestDialog(String questId, Array<ScriptEvent> notStarted, Array<ScriptEvent> inProgress, Array<ScriptEvent> completed,
+                       ObjectMap<String, Array<ScriptEvent>> stepDialogs, Array<DialogChoice> notStartedChoices,
                        Array<DialogChoice> inProgressChoices, Array<DialogChoice> completedChoices,
                        ObjectMap<String, Array<DialogChoice>> stepChoices) {
         this.questId = questId;
@@ -51,19 +52,19 @@ public class QuestDialog {
         return questId;
     }
 
-    public Array<String> notStarted() {
+    public Array<ScriptEvent> notStarted() {
         return notStarted;
     }
 
-    public Array<String> inProgress() {
+    public Array<ScriptEvent> inProgress() {
         return inProgress;
     }
 
-    public Array<String> completed() {
+    public Array<ScriptEvent> completed() {
         return completed;
     }
 
-    public ObjectMap<String, Array<String>> stepDialogs() {
+    public ObjectMap<String, Array<ScriptEvent>> stepDialogs() {
         return stepDialogs;
     }
 

@@ -36,7 +36,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
 
-        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, Map.of(), Map.of());
+        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, registry);
         questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
 
         QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
@@ -65,7 +65,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
 
-        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, Map.of(), Map.of());
+        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, registry);
         questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
 
         QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
@@ -97,7 +97,7 @@ class QuestSystemTest extends HeadlessGdxTest {
 
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
 
-        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, Map.of(), questDialogs);
+        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, registry);
         questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
 
         QuestSystem questSystem = new QuestSystem(eventBus, questLifecycleService);
@@ -121,7 +121,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
 
-        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, Map.of(), Map.of());
+        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, registry);
         questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
 
         Entity player = new Entity();
@@ -146,7 +146,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
 
-        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, Map.of(), Map.of());
+        QuestYarnRuntime questYarnRuntime = createQuestRuntime(eventBus, questLifecycleService, registry);
         questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
 
         Entity player = new Entity();
@@ -171,15 +171,14 @@ class QuestSystemTest extends HeadlessGdxTest {
 
     private static QuestYarnRuntime createQuestRuntime(GameEventBus eventBus,
                                                        QuestLifecycleService questLifecycleService,
-                                                       Map<String, DialogData> allDialogs,
-                                                       Map<String, DialogData> allQuestDialogs) {
+                                                       QuestYarnRegistry questYarnRegistry) {
 
         YarnRuntime yarn = new YarnRuntime();
         FlowBootstrap flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService,
             null, () -> null);
 
         return new QuestYarnRuntime(
-            yarn, allDialogs, allQuestDialogs, flowBootstrap.commands(),
+            yarn, questYarnRegistry, flowBootstrap.commands(),
             flowBootstrap.executor(), flowBootstrap.functions());
     }
 }

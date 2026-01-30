@@ -1,32 +1,21 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
-import com.github.tilcob.game.flow.*;
+import com.github.tilcob.game.flow.CommandCall;
+import com.github.tilcob.game.flow.CommandRegistry;
+import com.github.tilcob.game.flow.FlowExecutor;
+import com.github.tilcob.game.flow.FunctionRegistry;
 
-import java.util.List;
-import java.util.Optional;
+public class DialogYarnRuntime extends BaseYarnRuntime {
 
-public class DialogYarnRuntime {
-    private final YarnRuntime runtime;
-    private final CommandRegistry commandRegistry;
-    private final FlowExecutor flowExecutor;
-
-    public DialogYarnRuntime(YarnRuntime runtime, CommandRegistry commandRegistry, FlowExecutor flowExecutor) {
-        this.runtime = runtime;
-        this.commandRegistry = commandRegistry;
-        this.flowExecutor = flowExecutor;
+    public DialogYarnRuntime(YarnRuntime runtime,
+                             CommandRegistry commandRegistry,
+                             FlowExecutor flowExecutor,
+                             FunctionRegistry functionRegistry) {
+        super(runtime, commandRegistry, flowExecutor, functionRegistry);
     }
 
-    public boolean tryExecuteCommandLine(Entity player, String line, CommandCall.SourcePos source) {
-        Optional<CommandCall> callOptional = runtime.parseCommandLine(line, source);
-        if (callOptional.isEmpty()) return false;
-
-        CommandCall call = callOptional.get();
-        List<FlowAction> actions = commandRegistry.dispatch(call, new FlowContext(player));
-        return true;
-    }
-
-    public boolean tryExecuteCommandLine(Entity player, String line) {
-        return tryExecuteCommandLine(player, line, CommandCall.SourcePos.unknown());
+    public boolean evaluateCondition(Entity player, String condition, CommandCall.SourcePos source) {
+        return super.evaluateCondition(player, condition, source);
     }
 }

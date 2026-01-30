@@ -1,15 +1,16 @@
 package com.github.tilcob.game.dialog;
 
 import com.badlogic.gdx.utils.Array;
+import com.github.tilcob.game.yarn.script.ScriptEvent;
 
 public class DialogNode {
     private String id;
-    private Array<String> lines;
+    private Array<ScriptEvent> events;
     private Array<DialogChoice> choices;
 
-    public DialogNode(String id, Array<String> lines, Array<DialogChoice> choices) {
+    public DialogNode(String id, Array<ScriptEvent> events, Array<DialogChoice> choices) {
         this.id = id;
-        this.lines = lines;
+        this.events = events;
         this.choices = choices;
     }
 
@@ -20,8 +21,8 @@ public class DialogNode {
         return id;
     }
 
-    public Array<String> lines() {
-        return lines;
+    public Array<ScriptEvent> events() {
+        return events;
     }
 
     public Array<DialogChoice> choices() {
