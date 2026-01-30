@@ -111,8 +111,8 @@ public class ExpressionEvaluator {
             Object right = evalNode(player, binary.right(), sourcePos);
 
             return switch (binary.type()) {
-                case EQUAL -> Objects.equals(stringify(left), stringify(right));
-                case NOT_EQUAL -> !Objects.equals(stringify(left), stringify(right));
+                case EQUAL -> equalsOp(left, right);
+                case NOT_EQUAL -> !equalsOp(left, right);
                 case GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> compare(left, right, binary.type());
                 case ADD, SUBTRACT, MULTIPLY, DIVIDE -> arithmetic(left, right, binary.type());
                 default -> throw new IllegalStateException("Unsupported binary type: " + binary.type());
@@ -138,12 +138,44 @@ public class ExpressionEvaluator {
         };
     }
 
+    private static boolean equalsOp(Object left, Object right) {
+        if (left == null || right == null) return Objects.equals(left, right);
+
+        if (left instanceof Number || right instanceof Number) {
+            Double leftDouble = toNumber(left);
+            Double rightDouble = toNumber(right);
+            if (leftDouble != null && rightDouble != null) return Double.compare(leftDouble, rightDouble) == 0;
+            return false;
+        }
+        if (left instanceof Boolean leftBoolean && right instanceof Boolean rightBoolean) {
+            return leftBoolean == rightBoolean;
+        }
+        if (left instanceof Boolean || right instanceof Boolean) {
+            Boolean leftBoolean = toBoolean(left);
+            Boolean rightBoolean = toBoolean(right);
+            if (leftBoolean != null && rightBoolean != null) return leftBoolean == rightBoolean;
+            return false;
+        }
+
+        if (left instanceof String ls && right instanceof String rs) return ls.equals(rs);
+        return Objects.equals(String.valueOf(left), String.valueOf(right));
+    }
+
+    private static Boolean toBoolean(Object v) {
+        if (v instanceof Boolean b) return b;
+        if (v instanceof String s) {
+            String t = s.trim();
+            if (t.equalsIgnoreCase("true")) return true;
+            if (t.equalsIgnoreCase("false")) return false;
+        }
+        return null;
+    }
+
     private static Double toNumber(Object v) {
         if (v instanceof Number n) return n.doubleValue();
         if (v instanceof String s) {
             try { return Double.parseDouble(s.trim()); } catch (Exception ignored) {}
         }
-        if (v instanceof Boolean b) return b ? 1.0 : 0.0;
         return null;
     }
 
@@ -153,10 +185,6 @@ public class ExpressionEvaluator {
         if (v instanceof Number n) return n.doubleValue() != 0.0;
         if (v instanceof String s) return !s.isBlank() && !"0".equals(s) && !"false".equalsIgnoreCase(s);
         return true;
-    }
-
-    private static String stringify(Object v) {
-        return v == null ? null : String.valueOf(v);
     }
 
     private static String normalizeName(String n) {
