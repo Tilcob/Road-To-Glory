@@ -121,7 +121,7 @@ public class CutsceneCommandModule {
 
         EntityLookup lookup = entityLookup == null ? null : entityLookup.get();
         if (lookup != null) {
-            Entity resolved = lookup.find(player, entityId);
+            Entity resolved = lookup.find(entityId);
             if (resolved != null) return resolved;
         }
         if (entityId == null || entityId.isBlank() || "player".equalsIgnoreCase(entityId)) return player;
