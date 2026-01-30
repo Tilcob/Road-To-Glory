@@ -5,7 +5,7 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.flow.commands.*;
 import com.github.tilcob.game.flow.functions.QuestFunctionModule;
 import com.github.tilcob.game.quest.QuestLifecycleService;
-import com.github.tilcob.game.yarn.EntityLookup;
+import com.github.tilcob.game.entity.EntityLookup;
 
 import java.util.function.Supplier;
 
