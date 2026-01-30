@@ -53,9 +53,8 @@ public class ExpressionParser {
         Node left = parseTerm();
         while (match(ExpressionTokenType.LESS, ExpressionTokenType.LESS_OR_EQUAL,
             ExpressionTokenType.GREATER, ExpressionTokenType.GREATER_OR_EQUAL)) {
-
             ExpressionToken operator = previous();
-            Node right = parseUnary();
+            Node right = parseTerm();
             left = new Node.Binary(left, operator.type(), right);
         }
         return left;

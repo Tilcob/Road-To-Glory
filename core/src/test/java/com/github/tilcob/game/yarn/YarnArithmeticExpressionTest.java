@@ -50,8 +50,6 @@ class YarnArithmeticExpressionTest {
             "(money() + 10) * 2 >= cost * 3",
             CommandCall.SourcePos.unknown()
         );
-
-        // (5+10)*2=30  >= 21 -> true
         assertTrue(r);
     }
 

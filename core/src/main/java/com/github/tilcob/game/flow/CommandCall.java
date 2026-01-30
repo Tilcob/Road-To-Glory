@@ -25,5 +25,11 @@ public record CommandCall(
         public static SourcePos unknown() {
             return new SourcePos("unknown", "unknown", -1);
         }
+
+        @Override
+        public String toString() {
+            if (line >= 0) return origin + ":" + node + ":" + line;
+            return origin + ":" + node;
+        }
     }
 }
