@@ -29,7 +29,6 @@ public class ExpressionParser {
         return left;
     }
 
-    // and -> equality ( "&&" equality )*
     private Node parseAnd() {
         Node left = parseEquality();
         while (match(ExpressionTokenType.AND)) {
@@ -40,7 +39,6 @@ public class ExpressionParser {
         return left;
     }
 
-    // equality -> comparison ( (== | !=) comparison )*
     private Node parseEquality() {
         Node left = parseComparison();
         while (match(ExpressionTokenType.EQUAL, ExpressionTokenType.NOT_EQUAL)) {
@@ -51,35 +49,27 @@ public class ExpressionParser {
         return left;
     }
 
-    // comparison -> unary ( (< | <= | > | >=) unary )*
     private Node parseComparison() {
-        Node left = parseUnary();
+        Node left = parseTerm();
         while (match(ExpressionTokenType.LESS, ExpressionTokenType.LESS_OR_EQUAL,
             ExpressionTokenType.GREATER, ExpressionTokenType.GREATER_OR_EQUAL)) {
-            ExpressionToken op = previous();
+
+            ExpressionToken operator = previous();
             Node right = parseUnary();
-            left = new Node.Binary(left, op.type(), right);
+            left = new Node.Binary(left, operator.type(), right);
         }
         return left;
     }
 
-    // unary -> ( ! unary ) | primary
     private Node parseUnary() {
-        if (match(ExpressionTokenType.NOT)) {
-            ExpressionToken op = previous();
+        if (match(ExpressionTokenType.NOT, ExpressionTokenType.SUBTRACT)) {
+            ExpressionToken operator = previous();
             Node right = parseUnary();
-            return new Node.Unary(op.type(), right);
+            return new Node.Unary(operator.type(), right);
         }
         return parsePrimary();
     }
 
-    // primary:
-    // - literal
-    // - (expr)
-    // - identifier (variable)
-    // - identifier(args...)   // function call in two styles:
-    //    a) ident "(" expr ("," expr)* ")"
-    //    b) ident <primaryArg> <primaryArg> ...   (until operator/EOF/RPAREN)
     private Node parsePrimary() {
         if (match(ExpressionTokenType.TRUE)) return new Node.Literal(true);
         if (match(ExpressionTokenType.FALSE)) return new Node.Literal(false);
@@ -103,7 +93,6 @@ public class ExpressionParser {
         if (match(ExpressionTokenType.IDENT)) {
             String name = previous().value();
 
-            // paren style call: foo(...)
             if (match(ExpressionTokenType.LEFT_PARENTHESIS)) {
                 List<Node> args = new ArrayList<>();
                 if (!check(ExpressionTokenType.RIGHT_PARENTHESIS)) {
@@ -115,20 +104,14 @@ public class ExpressionParser {
                 return new Node.Call(name, args, true);
             }
 
-            // space-args call style: foo "bar" 2 baz
-            // We'll treat it as a call ONLY if the next token looks like an argument (literal/ident/'('),
-            // and not an operator or EOF or ')'.
             if (looksLikeArgStart(peek())) {
                 List<Node> args = new ArrayList<>();
                 while (looksLikeArgStart(peek())) {
-                    // parse unary would allow '!' which we DON'T want as an arg start here.
-                    // so use primary-ish subset:
                     args.add(parseArgAtom());
                 }
                 return new Node.Call(name, args, false);
             }
 
-            // otherwise variable
             return new Node.Var(name);
         }
 
@@ -149,6 +132,26 @@ public class ExpressionParser {
         throw error(peek(), "Expected argument");
     }
 
+    private Node parseTerm() {
+        Node left = parseFactor();
+        while (match(ExpressionTokenType.ADD, ExpressionTokenType.SUBTRACT)) {
+            ExpressionToken op = previous();
+            Node right = parseFactor();
+            left = new Node.Binary(left, op.type(), right);
+        }
+        return left;
+    }
+
+    private Node parseFactor() {
+        Node left = parseUnary();
+        while (match(ExpressionTokenType.MULTIPLY, ExpressionTokenType.DIVIDE)) {
+            ExpressionToken op = previous();
+            Node right = parseUnary();
+            left = new Node.Binary(left, op.type(), right);
+        }
+        return left;
+    }
+
     private static boolean looksLikeArgStart(ExpressionToken tok) {
         return tok.type() == ExpressionTokenType.STRING
             || tok.type() == ExpressionTokenType.NUMBER
@@ -157,8 +160,6 @@ public class ExpressionParser {
             || tok.type() == ExpressionTokenType.IDENT
             || tok.type() == ExpressionTokenType.LEFT_PARENTHESIS;
     }
-
-    // ---------------------------------------------------------------------
 
     private boolean match(ExpressionTokenType... types) {
         for (ExpressionTokenType type : types) {

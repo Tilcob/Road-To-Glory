@@ -11,7 +11,8 @@ public record CommandCall(
     SourcePos source
 ) {
     public CommandCall {
-        if (command == null || command.isBlank()) throw new IllegalArgumentException("Command command must be non-empty.");
+        if (command == null || command.isBlank())
+            throw new IllegalArgumentException("Command command must be non-empty.");
         arguments = arguments == null ? List.of() : List.copyOf(arguments);
         namedArguments = namedArguments == null ? Map.of() : Map.copyOf(namedArguments);
     }
@@ -21,6 +22,8 @@ public record CommandCall(
     }
 
     public record SourcePos(String origin, String node, int line) {
-        public static SourcePos unknown() { return new SourcePos("unknown", "unknown", -1); }
+        public static SourcePos unknown() {
+            return new SourcePos("unknown", "unknown", -1);
+        }
     }
 }

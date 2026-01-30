@@ -60,6 +60,10 @@ public class ExpressionEvaluator {
             Object r = evalNode(player, u.right(), sourcePos);
             return switch (u.type()) {
                 case NOT -> !truthy(r);
+                case SUBTRACT -> {
+                    Double number = toNumber(r);
+                    yield number == null ? 0.0 : -number;
+                }
                 default -> throw new IllegalStateException("Unsupported unary type: " + u.type());
             };
         }
@@ -76,6 +80,8 @@ public class ExpressionEvaluator {
                 case NOT_EQUAL -> !Objects.equals(stringify(left), stringify(right));
 
                 case GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> compare(left, right, binary.type());
+
+                case ADD, SUBTRACT, MULTIPLY, DIVIDE -> arithmetic(left, right, binary.type());
 
                 default -> throw new IllegalStateException("Unsupported binary type: " + binary.type());
             };
@@ -130,5 +136,19 @@ public class ExpressionEvaluator {
 
     public interface VarResolver {
         Object get(Entity player, String name);
+    }
+
+    private static Object arithmetic(Object left, Object right, ExpressionTokenType operand) {
+        Double leftOperand = toNumber(left);
+        Double rightOperand = toNumber(right);
+        if (leftOperand == null || rightOperand == null) return 0.0;
+
+        return switch (operand) {
+            case ADD -> leftOperand + rightOperand;
+            case SUBTRACT -> leftOperand - rightOperand;
+            case MULTIPLY -> leftOperand * rightOperand;
+            case DIVIDE -> (rightOperand == 0.0) ? 0.0 : (leftOperand / rightOperand);
+            default -> throw new IllegalStateException("Not arithmetic operand: " + operand);
+        };
     }
 }

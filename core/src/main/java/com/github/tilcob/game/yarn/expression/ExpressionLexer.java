@@ -53,9 +53,21 @@ public class ExpressionLexer {
                     else throw error(start, "Unexpected '|' (did you mean '||')?");
                 }
                 case '"' -> addToken(readString(start));
+                case '+' -> addToken(ExpressionTokenType.ADD, "+", start);
+                case '-' -> {
+                    if (peekDigit()) {
+                        // rewind one char and let readNumber handle it
+                        i--; // step back to include '-'
+                        addToken(readNumber(start));
+                    } else {
+                        addToken(ExpressionTokenType.SUBTRACT, "-", start);
+                    }
+                }
+                case '*' -> addToken(ExpressionTokenType.MULTIPLY, "*", start);
+                case '/' -> addToken(ExpressionTokenType.DIVIDE, "/", start);
 
                 default -> {
-                    if (isDigit(c) || (c == '-' && peekDigit())) {
+                    if (isDigit(c)) {
                         addToken(readNumber(start));
                     } else if (isIdentStart(c)) {
                         addToken(readIdent(start));
