@@ -1,6 +1,8 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
+import com.github.tilcob.game.component.EntityId;
+import com.github.tilcob.game.entity.EntityIdGenerator;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.flow.*;
 import org.junit.jupiter.api.BeforeEach;
@@ -9,15 +11,14 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.*;
 
 class YarnShortCircuitTest {
-
     private Entity player;
     private BaseYarnRuntime runtime;
-
     private int called;
 
     @BeforeEach
     void setup() {
         player = new Entity();
+        player.add(new EntityId(EntityIdGenerator.next()));
         FunctionRegistry functions = new FunctionRegistry();
 
         called = 0;
