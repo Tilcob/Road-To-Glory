@@ -31,7 +31,6 @@ public class GameScreenModule {
     private final Viewport viewport;
     private final InputManager inputManager;
     private final ScreenNavigator screenNavigator;
-    private EntityIdService entityIdService;
 
     public GameScreenModule(
         GameServices services,
@@ -57,7 +56,7 @@ public class GameScreenModule {
 
     private Dependencies createDependencies(Viewport uiViewport) {
         Engine engine = new Engine();
-        entityIdService = new EntityIdService(engine);
+        EntityIdService entityIdService = new EntityIdService(engine);
         services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
         World physicWorld = new World(Constants.GRAVITY, true);
         physicWorld.setAutoClearForces(false);
