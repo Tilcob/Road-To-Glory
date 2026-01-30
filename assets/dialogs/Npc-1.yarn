@@ -14,8 +14,12 @@ title: npc_1_idle
 tags: idle
 position: 206,-403
 ---
+<<if quest_is_completed("welcome_to_town")>>
+Good to see you
+<<else>>
 Good day sir.
 Take care.
+<<endif>>
 ===
 
 title: npc_1_quest_notStarted

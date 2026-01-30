@@ -55,6 +55,36 @@ The core module follows a layered architecture on top of Ashley ECS. The most im
 When introducing new packages or major gameplay features, follow the same pattern by adding or extending
 `package-info.java` descriptions so the high-level intent stays discoverable.
 
+## Debug / Strict Mode (Yarn)
+
+The Yarn Expression Engine supports a **Strict Mode** that is
+automatically coupled to the debug state:
+
+- **Debug enabled** → `BaseYarnRuntime.strict == true`
+- **Debug disabled** → `BaseYarnRuntime.strict == false`
+
+The debug state is determined via: `runtime.isDebugMode()`
+
+### What Strict Mode Means
+
+- **Strict mode**
+    - Operand types must match exactly
+    - Example: `"1" == 1` → **false**
+
+- **Non-strict mode**
+    - Limited, safe fallback comparisons may apply
+    - Example: string fallback via `String.valueOf(...)`
+    - Only used when types are not dangerous
+
+Important rule (always enforced):
+- **Boolean ↔ Number comparisons are NEVER allowed**
+    - `true == 1` → **false** (always)
+
+### Expression Debug Logging
+
+When debug logging is enabled (`LogLevel.DEBUG`), the expression engine
+emits additional diagnostics under the log tag:
+
 ## Quick start
 
 ### Run the game

@@ -16,23 +16,31 @@ and directory listing are no longer used. Do not add metadata files like
 
 ## Registry format
 
-Inside the quest file headers (before the first `---`):
+Innside the quest file headers (before the first `---`):
 - Each quest starts with a `questId:` line.
-- Required fields: `displayName:`, `journalText:`, and `startNode:`.
+- Required fields:
+    - `displayName:`
+    - `journalText:`
+    - `startNode:`
 - Steps are expressed as `step:` lines using `talk`, `collect`, or `kill`.
-- Optional step journal text can be provided with `step_journal:` lines (one per step, in order).
-- Rewards are optional and use `reward_money:` / `reward_item:`.
-- You may also use `reward_items:` with a comma-separated list.
-- Reward timing is optional and uses `reward_timing:` (`giver`, `completion`, or `auto`).
+- Optional step journal text can be provided with `step_journal:` lines
+  (one per step, in order).
+- Rewards are optional and defined via:
+    - `reward_money:`
+    - `reward_item:`
+    - `reward_items:`
+- Reward timing is optional via `reward_timing:`
+  (`giver`, `completion`, or `auto`, default: `giver`).
 
 ## Steps
 
-There are three types of steps:
-- `talk`: give the name of the npc to talk to. (Example: `talk Npc-2`)
-- `collect`: collect items from the scene. (Example: `collect potion 2`)
-  - If their only `collect potion` then only one item is too collected.
-- `kill`: kill enemies. (Example: `kill Rat 3`)
-  - If their only `kill Enemy-1` then there is only one enemy to be killed.
+There are three supported step types:
+
+- `talk <npcId>`
+- `collect <itemId> [amount]`
+- `kill <enemyId> [amount]`
+
+If no amount is specified, the default is `1`.
 
 ## Rewards
 
@@ -57,8 +65,24 @@ Quest nodes should only drive quest state and flags; rewards belong in the heade
 - `<<quest_stage <questId> <stage>>>`: Set the quest stage (0-based).
 - `<<quest_complete <questId>>>`: Mark the quest as completed and emit completion events.
 - `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
-- `<<inc_counter <counter> <amount>>>`: Increment a named counter (amount defaults to `1`).
+- `<<inc_counter <counter> [amount]>>`: Increment a named counter (amount defaults to `1`).
 
+## Conditional logic and functions
+
+Quest Yarn uses the **same expression system as dialog Yarn**.
+
+- `<<if>>` blocks are evaluated at runtime
+- Functions are read-only
+- `$` prefix is optional and ignored
+
+Available functions:
+
+- `flag(name)`
+- `counter(name)`
+- `has_item(itemId)`
+- `quest_is_active(questId)`
+- `quest_is_completed(questId)`
+- `quest_stage(questId)`
 
 ### Example (single quest)
 
