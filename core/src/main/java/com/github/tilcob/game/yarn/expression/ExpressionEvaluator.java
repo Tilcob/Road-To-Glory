@@ -80,6 +80,20 @@ public class ExpressionEvaluator {
         }
 
         if (node instanceof ExpressionParser.Node.Binary binary) {
+            if (binary.type() == ExpressionTokenType.OR) {
+                Object left = evalNode(player, binary.left(), sourcePos);
+                if (truthy(left)) return true;
+                Object right = evalNode(player, binary.right(), sourcePos);
+                return truthy(right);
+            }
+
+            if (binary.type() == ExpressionTokenType.AND) {
+                Object left = evalNode(player, binary.left(), sourcePos);
+                if (!truthy(left)) return false;
+                Object right = evalNode(player, binary.right(), sourcePos);
+                return truthy(right);
+            }
+
             Object left = evalNode(player, binary.left(), sourcePos);
             Object right = evalNode(player, binary.right(), sourcePos);
 
