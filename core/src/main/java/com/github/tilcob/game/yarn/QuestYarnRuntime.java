@@ -13,7 +13,7 @@ import java.util.List;
 public class QuestYarnRuntime extends BaseYarnRuntime {
     private final IfStack ifStack = new IfStack();
     private final QuestScriptStore scriptStore;
-
+    private String nodeId;
     public QuestYarnRuntime(YarnRuntime runtime,
                             QuestYarnRegistry questYarnRegistry,
                             CommandRegistry commandRegistry,
@@ -33,52 +33,21 @@ public class QuestYarnRuntime extends BaseYarnRuntime {
 
     public boolean executeNode(Entity player, String nodeId) {
         List<ScriptEvent> events = scriptStore.get(nodeId);
+        this.nodeId = nodeId;
         if (events == null) return false;
 
         runCompiled(player, events);
         return true;
     }
 
-    public void run(Entity player, List<String> lines) {
-        ifStack.clear();
-        for (String line : lines) {
-            if (line == null) continue;
-            String trimmed = line.trim();
-            if (trimmed.isEmpty()) continue;
-
-            if (trimmed.startsWith("<<if ")) {
-                String expr = trimmed;
-                if (expr.startsWith("<<") && expr.endsWith(">>")) {
-                    expr = expr.substring(2, expr.length() - 2).trim();
-                    if (expr.startsWith("if")) expr = expr.substring(2).trim();
-                }
-                boolean r = evaluateCondition(player, expr, CommandCall.SourcePos.unknown());
-                ifStack.onIfStart(r);
-                continue;
-            }
-
-            if (trimmed.startsWith("<<else")) {
-                ifStack.onElse();
-                continue;
-            }
-
-            if (trimmed.startsWith("<<endif")) {
-                ifStack.onEndIf();
-                continue;
-            }
-
-            if (!ifStack.isExecuting()) continue;
-
-            tryExecuteCommandLine(player, trimmed, CommandCall.SourcePos.unknown());
-        }
-    }
-
     private void runCompiled(Entity player, List<ScriptEvent> events) {
         ifStack.clear();
 
-        for (ScriptEvent e : events) {
+        for (int i = 0; i < events.size(); i++) {
+            ScriptEvent e = events.get(i);
+            CommandCall.SourcePos pos = new CommandCall.SourcePos("quests", nodeId, i);
             if (e instanceof ScriptEvent.IfStart ifs) {
-                boolean r = evaluateCondition(player, ifs.condition(), CommandCall.SourcePos.unknown());
+                boolean r = evaluateCondition(player, ifs.condition(), pos);
                 ifStack.onIfStart(r);
                 continue;
             }
@@ -94,8 +63,7 @@ public class QuestYarnRuntime extends BaseYarnRuntime {
             if (!ifStack.isExecuting()) continue;
 
             if (e instanceof ScriptEvent.Command cmd) {
-                // cmd.raw already is "<<...>>"
-                tryExecuteCommandLine(player, cmd.raw(), CommandCall.SourcePos.unknown());
+                tryExecuteCommandLine(player, cmd.raw(), pos);
             }
         }
     }
