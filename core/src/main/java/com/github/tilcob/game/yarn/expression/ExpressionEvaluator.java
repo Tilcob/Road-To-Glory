@@ -9,10 +9,13 @@ import com.github.tilcob.game.flow.FunctionRegistry;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 public class ExpressionEvaluator {
     private final FunctionRegistry functionRegistry;
     private final VarResolver vars;
+    private final ConcurrentMap<String, ExpressionParser.Node> cache = new ConcurrentHashMap<>();
 
     public ExpressionEvaluator(FunctionRegistry functionRegistry, VarResolver vars) {
         this.functionRegistry = functionRegistry;
@@ -25,18 +28,28 @@ public class ExpressionEvaluator {
     }
 
     public Object eval(Entity player, String expr, CommandCall.SourcePos sourcePos) {
+        String key = expr == null ? "" : expr.trim();
+        if (key.isEmpty()) return false;
+
         try {
-            List<ExpressionToken> tokens = new ExpressionLexer(expr, sourcePos).lex();
-            ExpressionParser.Node parsed = new ExpressionParser(tokens, expr, sourcePos).parse();
+            ExpressionParser.Node parsed = cache.computeIfAbsent(key, k -> {
+                List<ExpressionToken> tokens = new ExpressionLexer(k, CommandCall.SourcePos.unknown()).lex();
+                return new ExpressionParser(tokens, k, CommandCall.SourcePos.unknown()).parse();
+            });
             return evalNode(player, parsed, sourcePos);
-        } catch (YarnExpressionException e) {
-            throw e;
-        } catch (Exception e) {
+        } catch (YarnExpressionException ex) {
+            throw new YarnExpressionException(
+                sourcePos == null ? CommandCall.SourcePos.unknown() : sourcePos,
+                ex.expression(),
+                ex.expressionPos(),
+                ex.getMessage()
+            );
+        } catch (Exception ex) {
             throw new YarnExpressionException(
                 sourcePos == null ? CommandCall.SourcePos.unknown() : sourcePos,
                 expr,
                 0,
-                "Evaluation error: " + e.getMessage()
+                "Evaluation error: " + ex.getMessage()
             );
         }
     }
@@ -98,16 +111,10 @@ public class ExpressionEvaluator {
             Object right = evalNode(player, binary.right(), sourcePos);
 
             return switch (binary.type()) {
-                case OR -> truthy(left) || truthy(right);
-                case AND -> truthy(left) && truthy(right);
-
                 case EQUAL -> Objects.equals(stringify(left), stringify(right));
                 case NOT_EQUAL -> !Objects.equals(stringify(left), stringify(right));
-
                 case GREATER, GREATER_OR_EQUAL, LESS, LESS_OR_EQUAL -> compare(left, right, binary.type());
-
                 case ADD, SUBTRACT, MULTIPLY, DIVIDE -> arithmetic(left, right, binary.type());
-
                 default -> throw new IllegalStateException("Unsupported binary type: " + binary.type());
             };
         }

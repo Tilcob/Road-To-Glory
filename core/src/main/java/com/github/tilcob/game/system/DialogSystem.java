@@ -242,7 +242,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         while (navigator.hasLines()) {
             ScriptEvent event = navigator.currentLine();
             CommandCall.SourcePos sourcePos = new CommandCall.SourcePos(
-                "dialog",
+                "dialogs",
                 session.getCurrentNodeId(),
                 session.getLineIndex()
             );
@@ -274,7 +274,6 @@ public class DialogSystem extends IteratingSystem implements Disposable {
                     if (!navigator.advance()) return false;
                     continue;
                 }
-                // falls Command nicht erkannt: einfach weiter (oder log)
                 if (!navigator.advance()) return false;
                 continue;
             }

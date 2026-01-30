@@ -16,6 +16,7 @@ public abstract class BaseYarnRuntime {
     protected final FunctionRegistry functionRegistry;
     protected final FlowExecutor flowExecutor;
     private final boolean strictYarnErrors;
+    private final ExpressionEvaluator evaluator;
 
     private final Map<Entity, Map<String, Object>> variables = new HashMap<>();
     private final Map<String, Object> defaultVariables = new HashMap<>();
@@ -37,6 +38,7 @@ public abstract class BaseYarnRuntime {
         this.flowExecutor = flowExecutor;
         this.functionRegistry = functionRegistry;
         this.strictYarnErrors = strictYarnErrors;
+        this.evaluator = new ExpressionEvaluator(functionRegistry, this::getVariable);
     }
 
     public boolean tryExecuteCommandLine(Entity player, String line) {
@@ -89,10 +91,6 @@ public abstract class BaseYarnRuntime {
         if (expr.isEmpty()) return false;
 
         try {
-            var evaluator = new ExpressionEvaluator(
-                functionRegistry,
-                this::getVariable
-            );
             return evaluator.evalBool(player, expr, source);
         } catch (YarnExpressionException ex) {
             String message = formatExpressionError(ex);
