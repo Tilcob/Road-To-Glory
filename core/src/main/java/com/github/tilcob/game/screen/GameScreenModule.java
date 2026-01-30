@@ -169,6 +169,9 @@ public class GameScreenModule {
             new CutsceneSystem(services.getEventBus(), services.getAllCutscenes(), services.getCutsceneYarnRuntime()),
             SystemOrder.GAMEPLAY
         ));
+        engine.addSystem(withPriority(
+            new YarnScopeCleanupSystem(services.getDialogYarnRuntime(), services.getQuestYarnRuntime()),
+            SystemOrder.GAMEPLAY));
 
         // Render
         engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));
