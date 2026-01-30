@@ -184,5 +184,54 @@
             ]
         }
     ],
-    "Functions": []
+    "Functions": [
+        {
+            "YarnName": "quest_is_active",
+            "Documentation": "Returns true if the given quest exists in the quest log and is currently in progress.",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" }
+            ],
+            "ReturnType": "bool"
+        },
+        {
+            "YarnName": "quest_is_completed",
+            "Documentation": "Returns true if the given quest exists in the quest log and is marked as completed.",
+            "Parameters": [
+            { "Name": "questId", "Type": "string" }
+            ],
+            "ReturnType": "bool"
+        },
+        {
+            "YarnName": "quest_stage",
+            "Documentation": "Returns the current quest stage/step index (0-based). Returns -1 if the quest is unknown or not started.",
+            "Parameters": [
+                { "Name": "questId", "Type": "string" }
+            ],
+            "ReturnType": "number"
+        },
+        {
+            "YarnName": "flag",
+            "Documentation": "Returns the current value of a dialog/game flag for the player. Missing flags default to false.",
+            "Parameters": [
+                { "Name": "flag", "Type": "string" }
+            ],
+            "ReturnType": "bool"
+        },
+        {
+            "YarnName": "counter",
+            "Documentation": "Returns the current value of a named counter for the player. Missing counters default to 0.",
+            "Parameters": [
+                { "Name": "counter", "Type": "string" }
+            ],
+            "ReturnType": "number"
+        },
+        {
+            "YarnName": "has_item",
+            "Documentation": "Returns true if the player has at least one instance of the given itemId in their inventory (supports item id aliases).",
+            "Parameters": [
+                { "Name": "itemId", "Type": "string" }
+            ],
+            "ReturnType": "bool"
+        }
+    ]
 }

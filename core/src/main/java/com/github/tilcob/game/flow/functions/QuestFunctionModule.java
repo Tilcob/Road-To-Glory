@@ -12,12 +12,12 @@ import com.github.tilcob.game.quest.QuestState;
 public final class QuestFunctionModule {
 
     public void register(FunctionRegistry registry) {
-        registry.register("$quest_is_active", (call, args) -> questState(call, args) == QuestState.IN_PROGRESS);
-        registry.register("$quest_is_completed", (call, args) -> questState(call, args) == QuestState.COMPLETED);
-        registry.register("$quest_stage", this::currentStage);
-        registry.register("$flag", this::flagValue);
-        registry.register("$counter", this::counterValue);
-        registry.register("$has_item", this::hasItem);
+        registry.register("quest_is_active", (call, args) -> questState(call, args) == QuestState.IN_PROGRESS);
+        registry.register("quest_is_completed", (call, args) -> questState(call, args) == QuestState.COMPLETED);
+        registry.register("quest_stage", this::currentStage);
+        registry.register("flag", this::flagValue);
+        registry.register("counter", this::counterValue);
+        registry.register("has_item", this::hasItem);
     }
 
     private QuestState questState(FunctionCall call, FlowContext context) {

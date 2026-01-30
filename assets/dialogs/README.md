@@ -6,7 +6,7 @@ Yarn dialog files are parsed with the **Yarn Spinner Java** format (dependency `
 - `---` marks the start of the body
 - `===` ends a node
 
-### Node → `DialogData` mapping
+## Node → `DialogData` mapping
 
 - `title:` becomes `DialogNode.id`
 - Body lines (non-command lines) become `DialogNode.lines`
@@ -14,7 +14,7 @@ Yarn dialog files are parsed with the **Yarn Spinner Java** format (dependency `
 - Indented lines under an option become `DialogChoice.lines`
 - `<<jump NodeId>>` or `<<goto NodeId>>` inside an option sets `DialogChoice.next`
 
-### Entry points and tags
+## Entry points and tags
 
 Use tags to decide how nodes populate the top-level dialog fields:
 
@@ -24,7 +24,7 @@ Use tags to decide how nodes populate the top-level dialog fields:
 
 If no tagged root exists, the loader falls back to the node named `Start`.
 
-### Quest and flag dialogs
+## Quest and flag dialogs
 
 Quest and flag dialog lines are derived from tags on nodes:
 
@@ -41,7 +41,7 @@ To show a quest `completed` dialog only once, set the dialog flag
 `quest_<questId>_completed_seen` (for example, via `<<set_flag quest_<questId>_completed_seen true>>`).
 When the flag is set, completed dialogs fall back to idle/root lines.
 
-### File name → NPC mapping
+## File name → NPC mapping
 
 Each `.yarn` file produces a single `DialogData` entry keyed by the file name (without extension). For example, `Shopkeeper.yarn` creates the dialog entry `Shopkeeper`.
 
@@ -51,7 +51,7 @@ NPC ids follow the same convention as file names. An NPC id like `Npc-2` resolve
 If you need a different file name, supply an alias map when constructing the dialog
 repository so `npcId` can point to a different `*.yarn` file.
 
-### Dialog discovery
+## Dialog discovery
 
 Dialogs can be loaded by listing the `dialogs/` directory or by using a manifest file at
 `dialogs/index.json`.
@@ -77,6 +77,69 @@ The manifest supports two formats:
 }
 ```
 
+## Custom Yarn commands
+
+The project defines additional Yarn commands that are interpreted by the dialog loader (effects)
+or by the quest Yarn runtime (command lines in quest nodes). Use the exact casing shown below.
+
+### Conditional logic
+
+Dialog Yarn supports conditional blocks like:
+```yarn
+<<if <expression>>>
+Text when condition is true
+<<else>>
+Text when condition is false
+<<endif>>
+```
+
+### Rules
+
+- `<<if ...>>` works both inside and outside choices
+- Outside of choices, `<<if ...>>` is used only for text filtering
+- Conditional blocks are evaluated at compile time
+- Lines that do not match the condition are not added to the dialog
+
+### Expression functions
+
+Functions may only be used inside expressions (for example, in `<<if ...>>`).
+Standalone calls like ``<<has_item "potion">>``, are not supported and will be treated as commands.
+
+### Available functions
+
+All functions are read-only and evaluated against the current player state.
+- `flag("<name>")` returns `bool`
+- `counter("<name>")` returns `int`
+- `has_item("<itemId>")` returns `bool`
+- `quest_is_active("<questId>")` returns `bool`
+- `quest_is_completed("<questId>")` returns `bool`
+- `quest_stage("<questId>")` returns `int`
+
+### Dialog choice effects (parsed by the dialog loader)
+
+These commands are only recognized when they appear inside an indented choice body.
+
+- `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
+- `<<add_quest <questId>>>`: Add a quest to the player's quest log.
+- `<<quest_step <type> <target>>>`: Trigger a quest step event.
+
+### Dialog runtime commands (command lines inside dialog nodes)
+
+Direct reward commands are only supported in dialog yarn nodes (never in quest yarn).
+
+- `<<give_money <amount>>>`: Grant currency to the player.
+- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
+
+### Example: outside a choice <<if ...>>
+
+```yarn
+<<if has_item("potion")>>
+You look well prepared.
+<<else>>
+You seem unprepared.
+<<endif>>
+```
+
 ### Example: idle + root
 
 ```yarn
@@ -99,37 +162,6 @@ title: shop_wares
 I'm still setting up. Come back soon!
 ===
 ```
-
-## Effects (commands inside choices)
-
-Dialog effects are intentionally limited to quest and flag state changes. Effects are parsed from command lines inside a choice body
-
-- `ADD_QUEST`
-- `SET_FLAG`
-- `QUEST_STEP`
-
-Rewards (currency, items, experience, etc.) **must not** be applied through dialog effects. If dialog-triggered rewards become necessary in the future, add a **dedicated dialog event type** that is handled by a reward-specific system instead of mutating economy state directly from dialog processing.
-
-## Custom Yarn commands
-
-The project defines additional Yarn commands that are interpreted by the dialog loader (effects)
-or by the quest Yarn runtime (command lines in quest nodes). Use the exact casing shown below.
-
-### Dialog choice effects (parsed by the dialog loader)
-
-These commands are only recognized when they appear inside an indented choice body.
-
-- `<<set_flag <flag> <true|false>>>`: Set a dialog flag (boolean).
-- `<<add_quest <questId>>>`: Add a quest to the player's quest log.
-- `<<quest_step <type> <target>>>`: Trigger a quest step event.
-
-### Dialog runtime commands (command lines inside dialog nodes)
-
-Direct reward commands are only supported in dialog yarn nodes (never in quest yarn).
-
-- `<<give_money <amount>>>`: Grant currency to the player.
-- `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
-
 
 ### Example: choices + node jumps
 
