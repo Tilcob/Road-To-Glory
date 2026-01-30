@@ -19,6 +19,8 @@ import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.debug.ContentHotReload;
+import com.github.tilcob.game.debug.ContentReloadService;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.PauseEvent;
@@ -64,6 +66,7 @@ public class GameScreen extends ScreenAdapter {
     private PauseView pauseView;
     private DebugOverlayView debugOverlayView;
     private boolean paused;
+    private ContentHotReload contentHotReload;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -113,6 +116,10 @@ public class GameScreen extends ScreenAdapter {
         if (Constants.DEBUG) {
             debugOverlayView = new DebugOverlayView(skin, engine, services);
             stage.addActor(debugOverlayView);
+
+            ContentReloadService contentReloadService = new ContentReloadService(services);
+            contentHotReload = new ContentHotReload(contentReloadService,
+                contentReloadService.collectWatchRoots(), 1f);
         }
 
         pauseView = new PauseView(skin, stage, pauseViewModel);
@@ -178,6 +185,9 @@ public class GameScreen extends ScreenAdapter {
         stage.getBatch().setColor(Color.WHITE);
         if (Constants.DEBUG && debugOverlayView != null) {
             debugOverlayView.update();
+        }
+        if (contentHotReload != null) {
+            contentHotReload.update(delta);
         }
         stage.act(delta);
         stage.draw();
