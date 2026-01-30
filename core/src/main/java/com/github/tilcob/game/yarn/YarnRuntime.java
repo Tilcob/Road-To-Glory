@@ -1,5 +1,7 @@
 package com.github.tilcob.game.yarn;
 
+import com.badlogic.gdx.Application;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.flow.CommandCall;
 
 import java.util.ArrayList;
@@ -70,5 +72,9 @@ public class YarnRuntime {
             return token.substring(1, token.length() - 1);
         }
         return token;
+    }
+
+    public boolean isDebugMode() {
+        return Constants.DEBUG;
     }
 }

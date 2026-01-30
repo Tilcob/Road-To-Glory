@@ -25,7 +25,7 @@ public abstract class BaseYarnRuntime {
                               CommandRegistry commandRegistry,
                               FlowExecutor flowExecutor,
                               FunctionRegistry functionRegistry) {
-        this(runtime, commandRegistry, flowExecutor, functionRegistry, false);
+        this(runtime, commandRegistry, flowExecutor, functionRegistry, runtime.isDebugMode());
     }
 
     protected BaseYarnRuntime(YarnRuntime runtime,
