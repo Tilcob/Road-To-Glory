@@ -23,7 +23,8 @@ class YarnArithmeticExpressionTest {
             new YarnRuntime(),
             new CommandRegistry(),
             new FlowExecutor(new GameEventBus(), new FlowTrace(200)),
-            functionRegistry
+            functionRegistry,
+            true
         ) {};
     }
 

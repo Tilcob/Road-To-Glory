@@ -6,20 +6,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ExpressionLexer {
-    private final String src;
+    private final String expression;
     private final int len;
+    private final CommandCall.SourcePos source;
     private int i = 0;
     private List<ExpressionToken> tokens;
 
-    public ExpressionLexer(String src) {
-        this.src = src == null ? "" : src;
-        this.len = this.src.length();
+    public ExpressionLexer(String expression, CommandCall.SourcePos source) {
+        this.expression = expression == null ? "" : expression;
+        this.len = this.expression.length();
+        this.source = source == null ? CommandCall.SourcePos.unknown() : source;
     }
 
     public List<ExpressionToken> lex() {
         tokens = new ArrayList<>();
 
         while (!isAtEnd()) {
+            int before = i;
+
             skipWhitespace();
             if (isAtEnd()) break;
 
@@ -58,8 +62,6 @@ public class ExpressionLexer {
                 case '+' -> addToken(ExpressionTokenType.ADD, "+", start);
                 case '-' -> {
                     if (peekDigit()) {
-                        // rewind one char and let readNumber handle it
-                        i--; // step back to include '-'
                         addToken(readNumber(start));
                     } else {
                         addToken(ExpressionTokenType.SUBTRACT, "-", start);
@@ -77,6 +79,11 @@ public class ExpressionLexer {
                         throw error(start, "Unexpected character: '" + c + "'");
                     }
                 }
+            }
+
+            if (before == i) {
+                throw new IllegalStateException("Lexer made no progress at index " + i +
+                    " near '" + (isAtEnd() ? "<eof>" : peek()) + "' in: " + expression);
             }
         }
         addToken(ExpressionTokenType.EOF, "", len);
@@ -108,17 +115,17 @@ public class ExpressionLexer {
 
     private ExpressionToken readNumber(int startPos) {
         while (!isAtEnd() && isDigit(peek())) advance();
-        if (!isAtEnd() && peek() == '.' && (i + 1 < len) && isDigit(src.charAt(i + 1))) {
+        if (!isAtEnd() && peek() == '.' && (i + 1 < len) && isDigit(expression.charAt(i + 1))) {
             do advance();
             while (!isAtEnd() && isDigit(peek()));
         }
-        String text = src.substring(startPos, i);
+        String text = expression.substring(startPos, i);
         return new ExpressionToken(ExpressionTokenType.NUMBER, text, startPos);
     }
 
     private ExpressionToken readIdent(int startPos) {
         while (!isAtEnd() && isIdentPart(peek())) advance();
-        String text = src.substring(startPos, i);
+        String text = expression.substring(startPos, i);
 
         return switch (text) {
             case "true" -> new ExpressionToken(ExpressionTokenType.TRUE, text, startPos);
@@ -145,13 +152,13 @@ public class ExpressionLexer {
 
     private boolean isAtEnd() { return i >= len; }
 
-    private char advance() { return src.charAt(i++); }
+    private char advance() { return expression.charAt(i++); }
 
-    private char peek() { return src.charAt(i); }
+    private char peek() { return expression.charAt(i); }
 
     private boolean match(char expected) {
         if (isAtEnd()) return false;
-        if (src.charAt(i) != expected) return false;
+        if (expression.charAt(i) != expected) return false;
         i++;
         return true;
     }
@@ -161,17 +168,17 @@ public class ExpressionLexer {
         return isDigit(peek());
     }
 
-    private static boolean isDigit(char c) { return c >= '0' && c <= '9'; }
+    private boolean isDigit(char c) { return c >= '0' && c <= '9'; }
 
-    private static boolean isIdentStart(char c) {
+    private boolean isIdentStart(char c) {
         return Character.isLetter(c) || c == '_' || c == '$';
     }
 
-    private static boolean isIdentPart(char c) {
+    private boolean isIdentPart(char c) {
         return isIdentStart(c) || isDigit(c);
     }
 
-    private static IllegalArgumentException error(int pos, String msg) {
-        return new IllegalArgumentException("ExprLexer@" + pos + ": " + msg);
+    private YarnExpressionException error(int pos, String msg) {
+        return new YarnExpressionException(source, expression, pos, "Lexer error: " + msg);
     }
 }

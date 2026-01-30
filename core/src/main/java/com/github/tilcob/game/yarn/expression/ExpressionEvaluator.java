@@ -25,9 +25,20 @@ public class ExpressionEvaluator {
     }
 
     public Object eval(Entity player, String expr, CommandCall.SourcePos sourcePos) {
-        List<ExpressionToken> tokens = new ExpressionLexer(expr).lex();
-        ExpressionParser.Node parsed = new ExpressionParser(tokens).parse();
-        return evalNode(player, parsed, sourcePos);
+        try {
+            List<ExpressionToken> tokens = new ExpressionLexer(expr, sourcePos).lex();
+            ExpressionParser.Node parsed = new ExpressionParser(tokens, expr, sourcePos).parse();
+            return evalNode(player, parsed, sourcePos);
+        } catch (YarnExpressionException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new YarnExpressionException(
+                sourcePos == null ? CommandCall.SourcePos.unknown() : sourcePos,
+                expr,
+                0,
+                "Evaluation error: " + e.getMessage()
+            );
+        }
     }
 
     private Object evalNode(Entity player, ExpressionParser.Node node, CommandCall.SourcePos sourcePos) {

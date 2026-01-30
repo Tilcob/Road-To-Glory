@@ -1,16 +1,20 @@
 package com.github.tilcob.game.yarn.expression;
 
+import com.github.tilcob.game.flow.CommandCall;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class ExpressionParser {
-
-
     private final List<ExpressionToken> tokens;
     private int index = 0;
+    private final CommandCall.SourcePos sourcePos;
+    private final String expression;
 
-    public ExpressionParser(List<ExpressionToken> tokens) {
+    public ExpressionParser(List<ExpressionToken> tokens, String expression, CommandCall.SourcePos sourcePos) {
         this.tokens = tokens;
+        this.expression = expression == null ? "" : expression;
+        this.sourcePos = sourcePos == null ? CommandCall.SourcePos.unknown() : sourcePos;
     }
 
     public Node parse() {
@@ -198,8 +202,9 @@ public class ExpressionParser {
         return tokens.get(index - 1);
     }
 
-    private static IllegalArgumentException error(ExpressionToken token, String msg) {
-        return new IllegalArgumentException("ExprParser@" + token.pos() + ": " + msg + " (got " + token + ")");
+    private YarnExpressionException error(ExpressionToken token, String msg) {
+        return new YarnExpressionException(sourcePos, expression, token.pos(),
+            "Parser error: " + msg + " (got " + token.type() + ")");
     }
 
     public sealed interface Node permits Node.Literal, Node.Var, Node.Call, Node.Unary, Node.Binary {
