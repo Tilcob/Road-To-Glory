@@ -15,5 +15,14 @@ tasks.register("validateQuestContent", JavaExec) {
   description = "Validates quest and dialog yarn content for missing headers and references."
   classpath = sourceSets.main.runtimeClasspath
   mainClass = "com.github.tilcob.game.ContentValidator"
-  args = [project.rootDir.toPath().resolve("assets").toString()]
+  args = [
+    project.rootDir.toPath().resolve("assets").toString(),
+    project.rootDir.toPath().resolve("assets").resolve("assets/definitions.commands.ysls.json").toString()
+  ]
+
+  inputs.files(
+    fileTree(project.rootDir.toPath().resolve("assets").resolve("quests")) { include "**/*.yarn", "index.json" },
+    fileTree(project.rootDir.toPath().resolve("assets").resolve("dialogs")) { include "**/*.yarn", "index.json" },
+    fileTree(project.rootDir.toPath().resolve("assets").resolve("cutscenes")) { include "**/*.yarn", "index.json" }
+  )
 }

@@ -6,13 +6,7 @@ import com.badlogic.gdx.utils.JsonValue;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,10 +16,16 @@ public final class ContentValidator {
     private static final Pattern TAGS_PATTERN = Pattern.compile("^tags\\s*:\\s*(.+)$");
     private static final String HEADER_TERMINATOR = "---";
     private static final Set<String> VALID_REWARD_TIMINGS = Set.of("GIVER", "COMPLETION");
-
+    private static final Pattern COMMAND_LINE = Pattern.compile("^<<\\s*([a-zA-Z_][a-zA-Z0-9_]*)\\b.*>>\\s*$");
+    private static final Pattern JUMP_LINE = Pattern.compile("^<<\\s*(jump|goto)\\s+([^>\\s]+)\\s*>>\\s*$");
+    private static final Pattern IF_LINE = Pattern.compile("^<<\\s*if\\s+(.*)\\s*>>\\s*$");
+    private static final Pattern FUNC_CALL = Pattern.compile("\\b([a-zA-Z_][a-zA-Z0-9_]*)\\s*\\(");
+    private static final Set<String> STRUCTURAL = Set.of("if", "else", "endif", "jump", "goto");
     private final Path assetsRoot;
     private final List<String> errors = new ArrayList<>();
     private final List<String> warnings = new ArrayList<>();
+    private final Set<String> knownCommands = new HashSet<>();
+    private final Set<String> knownFunctions = new HashSet<>();
 
     public ContentValidator(Path assetsRoot) {
         this.assetsRoot = assetsRoot;
@@ -39,10 +39,57 @@ public final class ContentValidator {
     }
 
     public int run() {
+        loadYarnApi(assetsRoot.resolve("assets/definitions.commands.ysls.json"));
         Set<String> questIds = validateQuestIndex();
         validateDialogTags(questIds);
+        validateAllDialogsYarn();
+        validateManifestedYarnDirectory("quests", "quest");
+        validateManifestedYarnDirectory("cutscenes", "cutscene");
+
         reportSummary();
         return errors.isEmpty() ? 0 : 1;
+    }
+
+    private void loadYarnApi(Path yarnApiPath) {
+        if (!Files.exists(yarnApiPath)) {
+            warnings.add("Missing Yarn API file (commands/functions validation disabled): " + yarnApiPath);
+            return;
+        }
+
+        JsonValue root;
+        try {
+            root = new JsonReader().parse(Files.readString(yarnApiPath));
+        } catch (IOException e) {
+            errors.add("Failed to read Yarn API file: " + yarnApiPath + " (" + e.getMessage() + ")");
+            return;
+        }
+
+        JsonValue commands = root.get("Commands");
+        if (commands != null && commands.isArray()) {
+            for (JsonValue entry = commands.child; entry != null; entry = entry.next) {
+                String yarnName = entry.getString("YarnName", null);
+                if (yarnName != null && !yarnName.isBlank()) {
+                    knownCommands.add(yarnName.trim());
+                }
+            }
+        }
+
+        JsonValue functions = root.get("Functions");
+        if (functions != null && functions.isArray()) {
+            for (JsonValue entry = functions.child; entry != null; entry = entry.next) {
+                String yarnName = entry.getString("YarnName", null);
+                if (yarnName != null && !yarnName.isBlank()) {
+                    knownFunctions.add(yarnName.trim());
+                }
+            }
+        }
+
+        if (knownCommands.isEmpty()) {
+            warnings.add("Yarn API contains no Commands. Command validation disabled.");
+        }
+        if (knownFunctions.isEmpty()) {
+            warnings.add("Yarn API contains no Functions. Function validation disabled.");
+        }
     }
 
     private Set<String> validateQuestIndex() {
@@ -106,6 +153,7 @@ public final class ContentValidator {
         String displayName = getFirst(headers, "displayName");
         String journalText = getFirst(headers, "journalText");
         String startNode = getFirst(headers, "startNode");
+
         if (questId == null || questId.isBlank()) {
             errors.add("Quest file missing questId: " + questFile);
         } else {
@@ -126,17 +174,19 @@ public final class ContentValidator {
                 warnings.add("QuestId '" + questId + "' does not match file name '" + fileStem + "' in " + questFile);
             }
         }
+
         validateRewardTiming(headers, questFile);
         validateStepHeaders(headers, questFile);
         validateStartNodeExists(startNode, lines, questFile);
+        validateYarnFile(questFile);
+
         return questIds;
     }
 
     private void validateRewardTiming(Map<String, List<String>> headers, Path questFile) {
         String timing = getFirst(headers, "reward_timing");
-        if (timing == null || timing.isBlank()) {
-            return;
-        }
+        if (timing == null || timing.isBlank()) return;
+
         String normalized = normalizeHeaderValue(timing).toUpperCase(Locale.ROOT);
         if (!VALID_REWARD_TIMINGS.contains(normalized)) {
             errors.add("Invalid reward_timing '" + timing + "' in " + questFile);
@@ -154,17 +204,13 @@ public final class ContentValidator {
             String type = parts[0].toLowerCase(Locale.ROOT);
             switch (type) {
                 case "talk" -> {
-                    if (parts.length < 2) {
-                        errors.add("Talk step missing npc in " + questFile);
-                    }
+                    if (parts.length < 2) errors.add("Talk step missing npc in " + questFile);
                 }
                 case "collect", "kill" -> {
                     if (parts.length < 2) {
                         errors.add("Step missing args (" + type + ") in " + questFile);
-                    } else if (parts.length == 3) {
-                        if (!isInteger(parts[2])) {
-                            errors.add("Step '" + step + "' has invalid amount in " + questFile);
-                        }
+                    } else if (parts.length == 3 && !isInteger(parts[2])) {
+                        errors.add("Step '" + step + "' has invalid amount in " + questFile);
                     }
                 }
                 default -> errors.add("Unknown step type '" + parts[0] + "' in " + questFile);
@@ -173,9 +219,8 @@ public final class ContentValidator {
     }
 
     private void validateStartNodeExists(String startNode, List<String> lines, Path questFile) {
-        if (startNode == null || startNode.isBlank()) {
-            return;
-        }
+        if (startNode == null || startNode.isBlank()) return;
+
         Set<String> nodeTitles = parseNodeTitles(lines);
         if (!nodeTitles.contains(startNode)) {
             errors.add("startNode '" + startNode + "' not found in " + questFile);
@@ -207,9 +252,8 @@ public final class ContentValidator {
         }
         for (String line : lines) {
             Matcher matcher = TAGS_PATTERN.matcher(line.trim());
-            if (!matcher.matches()) {
-                continue;
-            }
+            if (!matcher.matches()) continue;
+
             String[] tags = matcher.group(1).split(",");
             for (String tag : tags) {
                 String trimmed = tag.trim();
@@ -219,6 +263,127 @@ public final class ContentValidator {
                         errors.add("Dialog tag references unknown quest '" + questId + "' in " + dialogFile);
                     }
                 }
+            }
+        }
+    }
+
+    private void validateAllDialogsYarn() {
+        Path dialogDir = assetsRoot.resolve("dialogs");
+        if (!Files.isDirectory(dialogDir)) return;
+
+        try {
+            Files.list(dialogDir)
+                .filter(p -> p.getFileName().toString().toLowerCase(Locale.ROOT).endsWith(".yarn"))
+                .forEach(this::validateYarnFile);
+        } catch (IOException e) {
+            errors.add("Failed to read dialog directory for yarn validation: " + dialogDir + " (" + e.getMessage() + ")");
+        }
+    }
+
+    private void validateManifestedYarnDirectory(String folderName, String labelPrefix) {
+        Path indexPath = assetsRoot.resolve(folderName).resolve("index.json");
+        if (!Files.exists(indexPath)) {
+            warnings.add("Missing " + labelPrefix + " index: " + indexPath);
+            return;
+        }
+
+        JsonValue root;
+        try {
+            root = new JsonReader().parse(Files.readString(indexPath));
+        } catch (IOException e) {
+            errors.add("Failed to read " + labelPrefix + " index: " + indexPath + " (" + e.getMessage() + ")");
+            return;
+        }
+
+        if (!root.isArray()) {
+            errors.add(labelPrefix + " index must be a JSON array: " + indexPath);
+            return;
+        }
+
+        for (JsonValue entry = root.child; entry != null; entry = entry.next) {
+            if (!entry.isString()) {
+                errors.add("Invalid " + labelPrefix + " index entry (not a string): " + entry);
+                continue;
+            }
+            String value = entry.asString();
+            Path file = resolveYarnFile(folderName, value);
+            if (!Files.exists(file)) {
+                errors.add("Missing " + labelPrefix + " yarn file for index entry '" + value + "': " + file);
+                continue;
+            }
+            validateYarnFile(file);
+        }
+    }
+
+    private Path resolveYarnFile(String folderName, String entry) {
+        String fileName = entry.toLowerCase(Locale.ROOT).endsWith(".yarn") ? entry : entry + ".yarn";
+        if (fileName.contains("/")) return assetsRoot.resolve(fileName);
+        return assetsRoot.resolve(folderName).resolve(fileName);
+    }
+
+    private void validateYarnFile(Path yarnFile) {
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(yarnFile);
+        } catch (IOException e) {
+            errors.add("Failed to read yarn file: " + yarnFile + " (" + e.getMessage() + ")");
+            return;
+        }
+
+        Set<String> titles = parseNodeTitles(lines);
+        if (titles.isEmpty()) {
+            errors.add("No yarn nodes found in " + yarnFile);
+            return;
+        }
+
+        String currentNode = "<unknown>";
+        for (String raw : lines) {
+            String line = raw.trim();
+
+            Matcher titleM = TITLE_PATTERN.matcher(line);
+            if (titleM.matches()) {
+                currentNode = normalizeHeaderValue(titleM.group(1));
+                continue;
+            }
+
+            if (!(line.startsWith("<<") && line.endsWith(">>"))) continue;
+
+            Matcher jm = JUMP_LINE.matcher(line);
+            if (jm.matches()) {
+                String target = jm.group(2);
+                if (!titles.contains(target)) {
+                    errors.add("Missing jump target '" + target + "' in " + yarnFile + " (node '" + currentNode + "')");
+                }
+                continue;
+            }
+
+            Matcher ifm = IF_LINE.matcher(line);
+            if (ifm.matches()) {
+                validateIfFunctions(ifm.group(1), yarnFile, currentNode);
+                continue;
+            }
+
+            Matcher cm = COMMAND_LINE.matcher(line);
+            if (cm.matches()) {
+                String cmd = cm.group(1);
+                if (STRUCTURAL.contains(cmd)) continue;
+
+                if (!knownCommands.isEmpty() && !knownCommands.contains(cmd)) {
+                    errors.add("Unknown command '" + cmd + "' in " + yarnFile + " (node '" + currentNode + "'): " + line);
+                }
+            }
+        }
+    }
+
+    private void validateIfFunctions(String condition, Path yarnFile, String currentNode) {
+        if (knownFunctions.isEmpty()) return;
+
+        Matcher m = FUNC_CALL.matcher(condition);
+        while (m.find()) {
+            String fn = m.group(1);
+            if (!knownFunctions.contains(fn)) {
+                errors.add("Unknown function '" + fn + "' in if-condition in " + yarnFile +
+                    " (node '" + currentNode + "'): <<if " + condition + ">>");
             }
         }
     }
@@ -237,12 +402,8 @@ public final class ContentValidator {
     private List<String> readHeaderLines(List<String> lines) {
         List<String> headers = new ArrayList<>();
         for (String line : lines) {
-            if (line.trim().equals(HEADER_TERMINATOR)) {
-                break;
-            }
-            if (!line.trim().isEmpty()) {
-                headers.add(line);
-            }
+            if (line.trim().equals(HEADER_TERMINATOR)) break;
+            if (!line.trim().isEmpty()) headers.add(line);
         }
         return headers;
     }
@@ -251,9 +412,8 @@ public final class ContentValidator {
         Map<String, List<String>> headers = new HashMap<>();
         for (String line : headerLines) {
             Matcher matcher = HEADER_PATTERN.matcher(line);
-            if (!matcher.matches()) {
-                continue;
-            }
+            if (!matcher.matches()) continue;
+
             String key = matcher.group(1);
             String value = normalizeHeaderValue(matcher.group(2));
             if (!value.isBlank()) {
@@ -265,9 +425,7 @@ public final class ContentValidator {
 
     private String getFirst(Map<String, List<String>> headers, String key) {
         List<String> values = headers.get(key);
-        if (values == null || values.isEmpty()) {
-            return null;
-        }
+        if (values == null || values.isEmpty()) return null;
         return values.get(0);
     }
 
@@ -298,6 +456,14 @@ public final class ContentValidator {
             System.err.println("Errors:");
             errors.forEach(error -> System.err.println("  - " + error));
         }
-        System.out.println("Quest validation complete. Errors: " + errors.size() + ", Warnings: " + warnings.size());
+        System.out.println("Content validation complete. Errors: " + errors.size() + ", Warnings: " + warnings.size());
+    }
+
+    public List<String> getErrors() {
+        return List.copyOf(errors);
+    }
+
+    public List<String> getWarnings() {
+        return List.copyOf(warnings);
     }
 }
