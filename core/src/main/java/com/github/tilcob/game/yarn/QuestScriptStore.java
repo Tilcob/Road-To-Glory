@@ -3,8 +3,6 @@ package com.github.tilcob.game.yarn;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
-import com.github.tilcob.game.dialog.DialogData;
-import com.github.tilcob.game.dialog.DialogNode;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.yarn.script.ScriptComplier;
 import com.github.tilcob.game.yarn.script.ScriptEvent;

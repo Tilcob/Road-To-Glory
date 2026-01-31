@@ -57,6 +57,7 @@ When introducing new packages or major gameplay features, follow the same patter
 
 ## Debug / Strict Mode (Yarn)
 
+If the debug mode is enabled with key `F5` you can hot reload the assets except the ui, maps, and the visuals.
 The Yarn Expression Engine supports a **Strict Mode** that is
 automatically coupled to the debug state:
 
