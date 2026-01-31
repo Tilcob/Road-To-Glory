@@ -27,6 +27,7 @@ public class ChestView extends View<ChestViewModel> {
 
     @Override
     protected void setupUI() {
+        setFillParent(true);
         chestSlots = new ChestSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         playerSlots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         dragAndDrop = new InventoryDragAndDrop();
@@ -34,6 +35,8 @@ public class ChestView extends View<ChestViewModel> {
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
         inventoryRoot.setVisible(false);
+
+        addActor(inventoryRoot);
 
         Table chestTable = new Table();
         chestTable.setBackground(skin.getDrawable("Other_panel_brown"));
@@ -52,13 +55,13 @@ public class ChestView extends View<ChestViewModel> {
             contentTable.row();
         }
         chestTable.add(contentTable).pad(5.0f);
-        inventoryRoot.add(chestTable).row();
 
         Table playerTable = new Table();
         playerTable.setBackground(skin.getDrawable("Other_panel_brown"));
         Label playerLabel = new Label("Inventory", skin, "text_12");
         playerLabel.setColor(skin.getColor("BLACK"));
         playerTable.add(playerLabel).row();
+
         Table playerContentTable = new Table();
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
@@ -70,9 +73,14 @@ public class ChestView extends View<ChestViewModel> {
             playerContentTable.row();
         }
         playerTable.add(playerContentTable).pad(5.0f);
-        inventoryRoot.add(playerTable);
 
-        stage.addActor(inventoryRoot);
+        Table panelRoot = new Table();
+        panelRoot.defaults().pad(5.0f);
+        panelRoot.add(chestTable).row();
+        panelRoot.add(playerTable);
+
+        inventoryRoot.clearChildren();
+        inventoryRoot.add(panelRoot).expand().center();
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {

@@ -103,7 +103,6 @@ public class InputManager implements InputDeviceListener {
         }
     }
 
-
     @Override
     public void onCommandPressed(Command command) {
         if (command == null || activeState == null) {
