@@ -27,6 +27,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.entity.EntityIdGenerator;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.loot.LootTableType;
 import com.github.tilcob.game.npc.NpcType;
@@ -58,6 +59,7 @@ public class TiledAshleyConfigurator {
         TextureRegion region = getTextureRegion(tile);
         int z = tile.getProperties().get(Constants.Z, 1, Integer.class);
 
+        entity.add(new EntityId(EntityIdGenerator.next()));
         entity.add(new Graphic(Color.WHITE.cpy(), region));
         addEntityTransform(
             object.getX(), object.getY(), z,

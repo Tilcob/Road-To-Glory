@@ -25,6 +25,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.MapEntity;
+import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 
@@ -89,10 +90,13 @@ public class TiledManager {
 
     public void clearMapEntities(Engine engine) {
         ImmutableArray<Entity> entities = engine.getEntitiesFor(Family.all(MapEntity.class).get());
+        com.badlogic.gdx.utils.Array<Entity> snapshot = new com.badlogic.gdx.utils.Array<>(entities.size());
+        for (int i = 0; i < entities.size(); i++) {
+            snapshot.add(entities.get(i));
+        }
 
-
-        for (Entity entity : entities) {
-            engine.removeEntity(entity);
+        for (Entity e : snapshot) {
+            engine.removeEntity(e);
         }
     }
 

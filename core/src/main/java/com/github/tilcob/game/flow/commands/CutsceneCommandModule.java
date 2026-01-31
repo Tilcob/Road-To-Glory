@@ -10,7 +10,7 @@ import com.github.tilcob.game.component.Facing;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowAction;
-import com.github.tilcob.game.yarn.EntityLookup;
+import com.github.tilcob.game.entity.EntityLookup;
 
 import java.util.List;
 import java.util.Locale;
@@ -121,7 +121,7 @@ public class CutsceneCommandModule {
 
         EntityLookup lookup = entityLookup == null ? null : entityLookup.get();
         if (lookup != null) {
-            Entity resolved = lookup.find(player, entityId);
+            Entity resolved = lookup.find(entityId);
             if (resolved != null) return resolved;
         }
         if (entityId == null || entityId.isBlank() || "player".equalsIgnoreCase(entityId)) return player;

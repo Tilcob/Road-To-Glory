@@ -2,6 +2,8 @@ package com.github.tilcob.game.assets;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.loaders.FileHandleResolver;
+import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TiledMapTile;
 import com.badlogic.gdx.maps.tiled.TiledMapTileSet;
@@ -10,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.config.Constants;
 import com.github.tommyettinger.freetypist.FreeTypistSkinLoader;
+
+import java.util.Locale;
 
 public class AssetManager implements Disposable {
     private final com.badlogic.gdx.assets.AssetManager assetManager;
@@ -58,6 +62,48 @@ public class AssetManager implements Disposable {
 
     public void debugDiagnostics() {
         Gdx.app.debug("AssetManager", assetManager.getDiagnostics());
+    }
+
+    public boolean isLoaded(String internalPath) {
+        return assetManager.isLoaded(internalPath);
+    }
+
+    public void reloadByPath(String internalPath) {
+        if (internalPath == null || internalPath.isBlank()) return;
+
+        String path = internalPath.replace("\\", "/");
+        if (assetManager.isLoaded(path)) {
+            assetManager.unload(path);
+        }
+
+        String lower = path.toLowerCase(Locale.ROOT);
+
+        if (lower.endsWith(".atlas")) {
+            assetManager.load(path, TextureAtlas.class);
+            assetManager.finishLoadingAsset(path);
+            return;
+        }
+        if (lower.endsWith(".json")) {
+            assetManager.load(path, Skin.class);
+            assetManager.finishLoadingAsset(path);
+            return;
+        }
+        if (lower.endsWith(".tmx")) {
+            assetManager.load(path, TiledMap.class);
+            assetManager.finishLoadingAsset(path);
+            return;
+        }
+        if (lower.endsWith(".wav") || lower.endsWith(".ogg") || lower.endsWith(".mp3")) {
+            assetManager.load(path, Sound.class);
+            assetManager.finishLoadingAsset(path);
+            return;
+        }
+
+        Gdx.app.error("AssetManager", "Unknown asset type for reload: " + path);
+    }
+
+    public void resetCaches() {
+        playerMap = null;
     }
 
     @Override

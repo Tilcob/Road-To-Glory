@@ -1,6 +1,7 @@
 package com.github.tilcob.game.yarn;
 
 import com.badlogic.ashley.core.Entity;
+import com.github.tilcob.game.component.EntityId;
 import com.github.tilcob.game.flow.*;
 import com.github.tilcob.game.yarn.expression.ExpressionEvaluator;
 import com.github.tilcob.game.yarn.expression.YarnExpressionException;
@@ -18,7 +19,7 @@ public abstract class BaseYarnRuntime {
     private final boolean strictYarnErrors;
     private final ExpressionEvaluator evaluator;
 
-    private final Map<Entity, Map<String, Object>> variables = new HashMap<>();
+    private final Map<Long, Map<String, Object>> variables = new HashMap<>();
     private final Map<String, Object> defaultVariables = new HashMap<>();
 
     protected BaseYarnRuntime(YarnRuntime runtime,
@@ -78,6 +79,13 @@ public abstract class BaseYarnRuntime {
         return scoped == null ? null : scoped.get(key);
     }
 
+    public void clearVariables(Entity entity) {
+        if (entity == null) return;
+        EntityId entityId = EntityId.MAPPER.get(entity);
+        if (entityId == null) return;
+        variables.remove(entityId.getId());
+    }
+
     private static String normalizeName(String name) {
         if (name == null) return null;
         String n = name.trim();
@@ -103,10 +111,18 @@ public abstract class BaseYarnRuntime {
     private Map<String, Object> getVariablesFor(Entity player, boolean create) {
         if (player == null) return defaultVariables;
 
-        Map<String, Object> scoped = variables.get(player);
+        EntityId entityId = EntityId.MAPPER.get(player);
+        if (entityId == null) {
+            String msg = "Missing EntityId component on entity used for Yarn variables: " + player;
+            logYarnError(msg);
+            if (strictYarnErrors) throw new IllegalStateException(msg);
+            return defaultVariables;
+        }
+        long id = entityId.getId();
+        Map<String, Object> scoped = variables.get(id);
         if (scoped == null && create) {
             scoped = new HashMap<>();
-            variables.put(player, scoped);
+            variables.put(id, scoped);
         }
         return scoped;
     }

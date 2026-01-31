@@ -18,6 +18,7 @@ import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.entity.EntityIdGenerator;
 import com.github.tilcob.game.stat.StatType;
 import com.github.tilcob.game.tiled.TiledPhysics;
 
@@ -39,6 +40,7 @@ public class PlayerFactory {
         ));
 
         entity.add(new Player());
+        entity.add(new EntityId(EntityIdGenerator.next()));
         entity.add(new Controller(true));
         float speed = player.getProperties().get(Constants.SPEED, 0f, Float.class);
         entity.add(new Move(speed));

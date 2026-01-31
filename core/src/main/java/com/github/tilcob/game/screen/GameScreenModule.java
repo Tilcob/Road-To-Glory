@@ -12,6 +12,7 @@ import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.entity.EntityIdService;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.system.*;
@@ -21,7 +22,7 @@ import com.github.tilcob.game.ui.model.ChestViewModel;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
-import com.github.tilcob.game.yarn.EngineEntityLookup;
+import com.github.tilcob.game.entity.EngineEntityLookup;
 
 public class GameScreenModule {
     private final GameServices services;
@@ -55,7 +56,8 @@ public class GameScreenModule {
 
     private Dependencies createDependencies(Viewport uiViewport) {
         Engine engine = new Engine();
-        services.setEntityLookup(new EngineEntityLookup(engine));
+        EntityIdService entityIdService = new EntityIdService(engine);
+        services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
         World physicWorld = new World(Constants.GRAVITY, true);
         physicWorld.setAutoClearForces(false);
         TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
@@ -167,6 +169,9 @@ public class GameScreenModule {
             new CutsceneSystem(services.getEventBus(), services.getAllCutscenes(), services.getCutsceneYarnRuntime()),
             SystemOrder.GAMEPLAY
         ));
+        engine.addSystem(withPriority(
+            new YarnScopeCleanupSystem(services.getDialogYarnRuntime(), services.getQuestYarnRuntime()),
+            SystemOrder.GAMEPLAY));
 
         // Render
         engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));

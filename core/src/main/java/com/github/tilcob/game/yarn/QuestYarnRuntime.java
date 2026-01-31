@@ -67,4 +67,8 @@ public class QuestYarnRuntime extends BaseYarnRuntime {
             }
         }
     }
+
+    public String getQuestSignalNodeId(String questId, String eventType) {
+        return scriptStore.getQuestSignalNodeId(questId, eventType);
+    }
 }

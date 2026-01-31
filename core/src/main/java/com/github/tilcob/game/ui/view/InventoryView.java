@@ -32,6 +32,7 @@ public class InventoryView extends View<InventoryViewModel> {
 
     @Override
     protected void setupUI() {
+        setFillParent(true);
         slots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         equipmentSlots = new EnumMap<>(ItemCategory.class);
         dragAndDrop = new InventoryDragAndDrop();
@@ -39,6 +40,8 @@ public class InventoryView extends View<InventoryViewModel> {
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
         inventoryRoot.setVisible(false);
+
+        addActor(inventoryRoot);
 
         Table table1 = new Table();
         table1.setBackground(skin.getDrawable("Other_panel_brown"));
@@ -57,8 +60,6 @@ public class InventoryView extends View<InventoryViewModel> {
             contentTable.row();
         }
         table1.add(contentTable).pad(5.0f);
-        inventoryRoot.add(table1);
-        stage.addActor(inventoryRoot);
 
         Table equipmentTable = new Table();
         equipmentTable.setBackground(skin.getDrawable("Other_panel_brown"));
@@ -87,31 +88,40 @@ public class InventoryView extends View<InventoryViewModel> {
             }
         }
         equipmentTable.add(equipmentGrid).pad(5.0f);
-        inventoryRoot.add(equipmentTable).pad(5.0f);
 
         Table scrollTable = new Table();
         scrollTable.setBackground(skin.getDrawable("Other_panel_brown"));
         Label questLabel = new Label("Quest Log", skin, "text_12");
         questLabel.setColor(skin.getColor("BLACK"));
         scrollTable.add(questLabel).row();
+
         questLog = new Table();
         ScrollPane scrollPane = new ScrollPane(questLog, skin);
         scrollPane.setHeight(inventoryRoot.getHeight());
         scrollPane.setScrollingDisabled(true, false);
         scrollTable.add(scrollPane);
-        inventoryRoot.add(scrollTable).pad(5.0f);
 
-        inventoryRoot.row();
         Table detailsTable = new Table();
         detailsTable.setBackground(skin.getDrawable("Other_panel_brown"));
         Label detailsHeader = new Label("Item Details", skin, "text_12");
         detailsHeader.setColor(skin.getColor("BLACK"));
         detailsTable.add(detailsHeader).left().row();
+
         itemDetailsLabel = new Label("Hover an item to see details.", skin, "text_08");
         itemDetailsLabel.setColor(skin.getColor("BLACK"));
         itemDetailsLabel.setWrap(true);
         detailsTable.add(itemDetailsLabel).left().width(280).pad(4.0f);
-        inventoryRoot.add(detailsTable).colspan(3).pad(5.0f);
+
+        Table panelRoot = new Table();
+        panelRoot.defaults().pad(5.0f);
+
+        panelRoot.add(table1).top();
+        panelRoot.add(equipmentTable).top();
+        panelRoot.add(scrollTable).top().row();
+        panelRoot.add(detailsTable).colspan(3).left();
+
+        inventoryRoot.clearChildren();
+        inventoryRoot.add(panelRoot).center();
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {

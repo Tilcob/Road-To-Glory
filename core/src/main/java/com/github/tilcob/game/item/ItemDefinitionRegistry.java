@@ -75,4 +75,8 @@ public final class ItemDefinitionRegistry {
         }
         return rawId;
     }
+
+    public static void clear() {
+        DEFINITIONS.clear();
+    }
 }

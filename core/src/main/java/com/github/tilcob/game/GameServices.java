@@ -7,6 +7,8 @@ import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.DialogRepository;
+import com.github.tilcob.game.entity.EntityIdService;
+import com.github.tilcob.game.entity.EntityLookup;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.flow.FlowBootstrap;
 import com.github.tilcob.game.inventory.InventoryService;

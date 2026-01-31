@@ -174,10 +174,57 @@ tasks.register("genCutsceneIndex") {
   }
 }
 
+def genIndex = { String dirPath, List<String> exts ->
+  return {
+    def dir = file("$rootDir/assets/$dirPath")
+    if (!dir.exists()) throw new GradleException("Directory not found: $dir")
+
+    def outFile = file("$rootDir/assets/$dirPath/index.json")
+
+    def names = dir.listFiles()
+      .findAll { it.isFile() }
+      .collect { it.name }
+      .findAll { n -> exts.any { n.toLowerCase().endsWith(it) } }
+      .findAll { it != "index.json" }
+      .sort()
+
+    outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(names)) + "\n"
+    println "Generated $outFile (${names.size()} entries)"
+  }
+}
+
+tasks.register("genGraphicsIndex") {
+  group = "assets"
+  description = "Generates assets/graphics/index.json from *.atlas."
+  doLast genIndex("graphics", [".atlas"])
+}
+
+tasks.register("genAudioIndex") {
+  group = "assets"
+  description = "Generates assets/audio/index.json from *.wav/*.ogg/*.mp3."
+  doLast genIndex("audio", [".wav", ".ogg", ".mp3"])
+}
+
+tasks.register("genUiIndex") {
+  group = "assets"
+  description = "Generates assets/ui/index.json from skin.atlas + skin.json (filtered)."
+  doLast genIndex("ui", [".atlas", ".json"])
+}
+
+tasks.register("genMapsIndex") {
+  group = "assets"
+  description = "Generates assets/maps/index.json from *.tmx."
+  doLast genIndex("maps", [".tmx"])
+}
+
 tasks.register("genAssetIndexes") {
   group = "assets"
   description = "Generates quest + dialog + items + cutscenes index files."
-  dependsOn("genQuestIndex", "genDialogIndex", "genItemIndex", "genQuestTestIndex", "genCutsceneIndex")
+  dependsOn(
+    "genQuestIndex", "genDialogIndex", "genItemIndex",
+    "genQuestTestIndex", "genCutsceneIndex", "genGraphicsIndex",
+    "genAudioIndex", "genUiIndex", "genMapsIndex"
+  )
 }
 
 // Automatically run before processResources in all subprojects (core/lwjgl3/etc.)

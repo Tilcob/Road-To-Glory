@@ -3,6 +3,8 @@ package com.github.tilcob.game.yarn;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.github.tilcob.game.dialog.DialogData;
+import com.github.tilcob.game.dialog.DialogNode;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.yarn.script.ScriptComplier;
 import com.github.tilcob.game.yarn.script.ScriptEvent;
@@ -15,7 +17,7 @@ public final class QuestScriptStore {
     private static final String TAG = QuestScriptStore.class.getSimpleName();
 
     private final QuestYarnRegistry questYarnRegistry;
-
+    private final Map<String, Map<String, String>> questSignalIndex = new HashMap<>();
     private final Map<String, List<ScriptEvent>> nodes = new HashMap<>();
     private boolean loaded = false;
 
@@ -76,10 +78,35 @@ public final class QuestScriptStore {
 
                 List<ScriptEvent> compiled = ScriptComplier.compile(raw.bodyLines());
                 nodes.put(id, compiled);
+                indexQuestSignalNodeId(id);
             }
         }
 
         logDebug("Loaded quest nodes: " + nodes.size());
+    }
+
+    private void indexQuestSignalNodeId(String nodeId) {
+        if (nodeId == null) return;
+        if (!nodeId.startsWith("q_")) return;
+
+        int onIndex = nodeId.indexOf("_on_");
+        if (onIndex <= 2) return;
+
+        String questId = nodeId.substring(2, onIndex);
+        String eventType = nodeId.substring(onIndex + 4).toLowerCase();
+
+        if (questId.isBlank() || eventType.isBlank()) return;
+
+        questSignalIndex
+            .computeIfAbsent(questId, q -> new HashMap<>())
+            .put(eventType, nodeId);
+    }
+
+    public String getQuestSignalNodeId(String questId, String eventType) {
+        if (questId == null || eventType == null) return null;
+        Map<String, String> map = questSignalIndex.get(questId);
+        if (map == null) return null;
+        return map.get(eventType.toLowerCase());
     }
 
     private static void logDebug(String msg) {

@@ -22,6 +22,7 @@ public class QuestManager {
 
     public void signal(Entity player, String eventType, String target, int amount) {
         if (eventType == null || eventType.isBlank()) return;
+        eventType = eventType.toLowerCase();
         if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
             Gdx.app.debug(TAG, "Quest signal: " + eventType + " target=" + target + " amount=" + amount);
         }
@@ -39,8 +40,8 @@ public class QuestManager {
                     if (quest == null || quest.isCompleted()) {
                         continue;
                     }
-                    String nodeId = "q_" + quest.getQuestId() + "_on_" + eventType;
-                    if (executeNode(player, nodeId)) {
+                    String nodeId = questYarnRuntime.getQuestSignalNodeId(quest.getQuestId(), eventType);
+                    if (nodeId != null && executeNode(player, nodeId)) {
                         handled = true;
                     }
                 }
