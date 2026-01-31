@@ -11,12 +11,10 @@ import com.github.tilcob.game.ui.UiServices;
 
 public class MenuViewModel extends ViewModel {
     private final ScreenNavigator screenNavigator;
-    private final UiServices uiServices;
 
     public MenuViewModel(GameServices services, ScreenNavigator screenNavigator, UiServices uiServices) {
         super(services);
         this.screenNavigator = screenNavigator;
-        this.uiServices = uiServices;
 
         getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
@@ -59,10 +57,6 @@ public class MenuViewModel extends ViewModel {
 
     public void quitGame() {
         Gdx.app.exit();
-    }
-
-    public UiServices getUiServices() {
-        return uiServices;
     }
 
     @Override

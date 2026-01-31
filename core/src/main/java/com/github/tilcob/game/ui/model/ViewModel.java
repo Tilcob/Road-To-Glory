@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.model;
 
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.ui.UiServices;
 
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -31,6 +32,10 @@ public abstract class ViewModel {
 
     public GameEventBus getEventBus() {
         return gameEventBus;
+    }
+
+    public UiServices getUiServices() {
+        return services.getUiServices();
     }
 
     public void dispose() {}
