@@ -22,6 +22,7 @@ public class GameState {
     private ChestRegistryState chestRegistryState;
     private List<QuestState> quests = new ArrayList<>();
     private Map<String, Boolean> dialogFlags = new HashMap<>();
+    private Map<String, Integer> counters = new HashMap<>();
     private int saveVersion = 1;
 
     public GameState() {}
@@ -56,6 +57,14 @@ public class GameState {
 
     public void setDialogFlags(Map<String, Boolean> dialogFlags) {
         this.dialogFlags = dialogFlags;
+    }
+
+    public Map<String, Integer> getCounters() {
+        return counters;
+    }
+
+    public void setCounters(Map<String, Integer> counters) {
+        this.counters = counters;
     }
 
     @JsonIgnore

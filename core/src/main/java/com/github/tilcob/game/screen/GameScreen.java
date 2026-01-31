@@ -15,10 +15,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.assets.SkinAsset;
-import com.github.tilcob.game.component.DialogFlags;
-import com.github.tilcob.game.component.Physic;
-import com.github.tilcob.game.component.QuestLog;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.debug.ContentHotReload;
 import com.github.tilcob.game.debug.ContentReloadService;
@@ -160,6 +157,7 @@ public class GameScreen extends ScreenAdapter {
             Physic.MAPPER.get(player).getBody().setTransform(tiledManager.getSpawnPoint(), 0);
         }
         services.getStateManager().loadDialogFlags(DialogFlags.MAPPER.get(player));
+        services.getStateManager().loadCounters(Counters.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
         services.getEventBus().fire(new UpdateInventoryEvent(player));
     }
@@ -204,7 +202,9 @@ public class GameScreen extends ScreenAdapter {
         services.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
         services.getStateManager().saveDialogFlags(DialogFlags.MAPPER.get(player));
         services.getStateManager().setPlayerState(player);
+        services.getStateManager().saveCounters(Counters.MAPPER.get(player));
         services.saveGame();
+
     }
 
     private void togglePause(PauseEvent event) {

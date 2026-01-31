@@ -3,16 +3,18 @@ package com.github.tilcob.game.quest;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Gdx;
-import com.github.tilcob.game.component.Npc;
-import com.github.tilcob.game.component.QuestLog;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestCompletedEvent;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
+import com.github.tilcob.game.inventory.InventoryService;
+import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
 
+import java.util.Locale;
 import java.util.Map;
 
 public class QuestLifecycleService {
@@ -20,6 +22,9 @@ public class QuestLifecycleService {
     private final QuestYarnRegistry questYarnRegistry;
     private final QuestFactory questFactory;
     private final Map<String, DialogData> allDialogs;
+    private QuestManager questManager;
+    private InventoryService inventoryService;
+    private boolean autoProgressRunning = false;
     private QuestYarnRuntime questYarnRuntime;
 
     public QuestLifecycleService(GameEventBus eventBus,
@@ -56,6 +61,7 @@ public class QuestLifecycleService {
             questYarnRuntime.executeStartNode(player, definition.startNode());
         }
         eventBus.fire(new UpdateQuestLogEvent(player));
+        autoProgressQuest(player, questId);
     }
 
     public void setQuestStage(Entity player, String questId, int stage) {
@@ -73,6 +79,7 @@ public class QuestLifecycleService {
             eventBus.fire(new QuestCompletedEvent(player, questId));
         }
         eventBus.fire(new UpdateQuestLogEvent(player));
+        autoProgressQuest(player, questId);
     }
 
     public void completeQuest(Entity player, String questId) {
@@ -128,5 +135,93 @@ public class QuestLifecycleService {
     private QuestDefinition questDefinitionFor(String questId) {
         if (questYarnRegistry.isEmpty()) questYarnRegistry.loadAll();
         return questYarnRegistry.getQuestDefinition(questId);
+    }
+
+    private void autoProgressQuest(Entity player, String questId) {
+        if (autoProgressRunning) return;
+        if (player == null || questId == null) return;
+        if (questManager == null) return;
+
+        QuestDefinition definition = questDefinitionFor(questId);
+        if (definition == null) return;
+
+        QuestLog questLog = QuestLog.MAPPER.get(player);
+        if (questLog == null) return;
+
+        Quest quest = questLog.getQuestById(questId);
+        if (quest == null || quest.isCompleted()) return;
+
+        autoProgressRunning = true;
+        try {
+            int safety = 0;
+            boolean progressed;
+
+            do {
+                progressed = false;
+
+                int stage = quest.getCurrentStep();
+                if (stage < 0 || stage >= definition.steps().size()) return;
+
+                QuestDefinition.StepDefinition step = definition.steps().get(stage);
+                String type = step.type();
+
+                if ("collect".equals(type)) {
+                    String itemId = ItemDefinitionRegistry.resolveId(step.itemId());
+                    int have = countInventoryItem(player, itemId);
+                    if (have >= step.amount()) {
+                        questManager.signal(player, "collect", itemId, have);
+                        progressed = true;
+                    }
+                } else if ("kill".equals(type)) {
+                    String enemy = step.enemy();
+                    int kills = getCounter(player, killCounterKey(enemy));
+                    if (kills >= step.amount()) {
+                        questManager.signal(player, "kill", enemy, kills);
+                        progressed = true;
+                    }
+                }
+            } while (progressed && safety++ < 32);
+
+        } finally {
+            autoProgressRunning = false;
+        }
+    }
+
+    private static int getCounter(Entity player, String key) {
+        Counters counters = Counters.MAPPER.get(player);
+        return counters == null ? 0 : counters.get(key);
+    }
+
+    private static String killCounterKey(String enemyName) {
+        if (enemyName == null) return "kill:unknown";
+        return "kill:" + enemyName.toLowerCase(Locale.ROOT);
+    }
+
+    private static int countInventoryItem(Entity player, String itemId) {
+        Inventory inventory = Inventory.MAPPER.get(player);
+        if (inventory == null || itemId == null) return 0;
+
+        String resolved = ItemDefinitionRegistry.resolveId(itemId);
+        int total = 0;
+
+        for (var entity : inventory.getItems()) {
+            Item item = Item.MAPPER.get(entity);
+            if (item != null && resolved.equals(item.getItemId())) {
+                total += item.getCount();
+            }
+        }
+        for (String pending : inventory.getItemsToAdd()) {
+            String p = ItemDefinitionRegistry.resolveId(pending);
+            if (resolved.equals(p)) total += 1;
+        }
+        return total;
+    }
+
+    public void setQuestManager(QuestManager questManager) {
+        this.questManager = questManager;
+    }
+
+    public void setInventoryService(InventoryService inventoryService) {
+        this.inventoryService = inventoryService;
     }
 }
