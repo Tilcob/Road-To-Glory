@@ -40,7 +40,7 @@ public class TriggerSystem extends IteratingSystem implements Disposable {
         eventBus.subscribe(ExitTriggerEvent.class, this::onExit);
 
         handlers.put(Trigger.Type.TRAP, new TrapTriggerHandler(audioManager));
-        handlers.put(Trigger.Type.CHEST, new ChestTriggerHandler());
+        handlers.put(Trigger.Type.CHEST, new ChestTriggerHandler(eventBus));
         handlers.put(Trigger.Type.CHANGE_MAP, new ChangeMapTriggerHandler());
         handlers.put(Trigger.Type.QUEST, new QuestTrigger(eventBus));
         handlers.put(Trigger.Type.DIALOG, new DialogTrigger());
