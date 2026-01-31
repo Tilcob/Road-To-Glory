@@ -14,6 +14,7 @@ import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MapAsset;
+import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.QuestLog;
@@ -66,6 +67,7 @@ public class GameScreen extends ScreenAdapter {
     private PauseView pauseView;
     private DebugOverlayView debugOverlayView;
     private boolean paused;
+    private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
@@ -117,9 +119,8 @@ public class GameScreen extends ScreenAdapter {
             debugOverlayView = new DebugOverlayView(skin, engine, services);
             stage.addActor(debugOverlayView);
 
-            ContentReloadService contentReloadService = new ContentReloadService(services);
-            contentHotReload = new ContentHotReload(contentReloadService,
-                contentReloadService.collectWatchRoots(), 1f);
+            contentReloadService = new ContentReloadService(services);
+            contentHotReload = new ContentHotReload(contentReloadService.collectWatchFiles(), 1f);
         }
 
         pauseView = new PauseView(skin, stage, pauseViewModel);
@@ -179,15 +180,20 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void render(float delta) {
         delta = Math.min(delta, 1 / 30f);
+
+        if (contentHotReload != null) {
+            contentHotReload.update(delta);
+            if (contentHotReload.consumeReloadRequested()) {
+                performHotReload();
+            }
+        }
+
         if (!paused) engine.update(delta);
 
         uiViewport.apply();
         stage.getBatch().setColor(Color.WHITE);
         if (Constants.DEBUG && debugOverlayView != null) {
             debugOverlayView.update();
-        }
-        if (contentHotReload != null) {
-            contentHotReload.update(delta);
         }
         stage.act(delta);
         stage.draw();
@@ -223,6 +229,51 @@ public class GameScreen extends ScreenAdapter {
             inputManager.setActiveState(UiControllerState.class);
         } else {
             inputManager.setActiveState(GameControllerState.class);
+        }
+    }
+
+    private void performHotReload() {
+        if (contentReloadService == null || contentHotReload == null) return;
+        contentHotReload.beginReload();
+        try {
+            var playerPos = Transform.MAPPER.get(player).getPosition().cpy();
+            float playerRot = Physic.MAPPER.get(player).getBody().getAngle();
+
+            contentReloadService.reloadAll();
+
+            MapAsset current = tiledManager.getCurrentMapAsset();
+            tiledManager.setMap(tiledManager.loadMap(current));
+            services.getEventBus().fire(new MapChangeEvent(current.name().toLowerCase()));
+
+            Transform.MAPPER.get(player).getPosition().set(playerPos);
+            Physic.MAPPER.get(player).getBody().setTransform(playerPos, playerRot);
+
+            skin = services.getAssetManager().get(SkinAsset.DEFAULT);
+            rebuildUiAfterHotReload();
+        } finally {
+            contentHotReload.endReload();
+        }
+    }
+
+    private void rebuildUiAfterHotReload() {
+        gameUiGroup.clearChildren();
+        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
+        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
+        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
+
+        if (pauseView != null) {
+            pauseView.remove();
+        }
+        pauseView = new PauseView(skin, stage, pauseViewModel);
+        pauseView.setVisible(paused);
+        stage.addActor(pauseView);
+
+        if (Constants.DEBUG) {
+            if (debugOverlayView != null) {
+                debugOverlayView.remove();
+            }
+            debugOverlayView = new DebugOverlayView(skin, engine, services);
+            stage.addActor(debugOverlayView);
         }
     }
 

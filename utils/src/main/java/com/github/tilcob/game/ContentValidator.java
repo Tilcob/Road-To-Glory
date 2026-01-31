@@ -45,6 +45,7 @@ public final class ContentValidator {
         validateAllDialogsYarn();
         validateManifestedYarnDirectory("quests", "quest");
         validateManifestedYarnDirectory("cutscenes", "cutscene");
+        validateAssetIndexes();
 
         reportSummary();
         return errors.isEmpty() ? 0 : 1;
@@ -445,6 +446,112 @@ public final class ContentValidator {
         } catch (NumberFormatException e) {
             return false;
         }
+    }
+
+    private void validateAssetIndexes() {
+        validateManifestedAssetDirectory("graphics", "graphics asset", Set.of(".atlas"), null);
+
+        validateManifestedAssetDirectory("audio", "audio asset", Set.of(".wav", ".ogg", ".mp3"), null);
+
+        validateManifestedAssetDirectory("ui", "ui asset", Set.of(".json", ".atlas"), Set.of("skin.json", "skin.atlas"));
+
+        validateManifestedAssetDirectory("maps", "map asset", Set.of(".tmx"), null);
+    }
+
+    private void validateManifestedAssetDirectory(
+        String folderName,
+        String labelPrefix,
+        Set<String> allowedExtensions,
+        Set<String> expectedExactNamesOrNull
+    ) {
+        Path dir = assetsRoot.resolve(folderName);
+        if (!Files.isDirectory(dir)) {
+            warnings.add("Missing " + labelPrefix + " directory: " + dir);
+            return;
+        }
+
+        Path indexPath = dir.resolve("index.json");
+        if (!Files.exists(indexPath)) {
+            errors.add("Missing " + labelPrefix + " index: " + indexPath);
+            return;
+        }
+
+        JsonValue root;
+        try {
+            root = new JsonReader().parse(Files.readString(indexPath));
+        } catch (IOException e) {
+            errors.add("Failed to read " + labelPrefix + " index: " + indexPath + " (" + e.getMessage() + ")");
+            return;
+        }
+
+        if (!root.isArray()) {
+            errors.add(labelPrefix + " index must be a JSON array: " + indexPath);
+            return;
+        }
+
+        Set<String> seen = new HashSet<>();
+
+        for (JsonValue entry = root.child; entry != null; entry = entry.next) {
+            if (!entry.isString()) {
+                errors.add("Invalid " + labelPrefix + " index entry (not a string): " + entry + " in " + indexPath);
+                continue;
+            }
+
+            String value = entry.asString();
+            if (value == null || value.isBlank()) {
+                errors.add("Invalid " + labelPrefix + " index entry (blank) in " + indexPath);
+                continue;
+            }
+
+            String normalized = value.replace("\\", "/");
+
+            if (!seen.add(normalized)) {
+                errors.add("Duplicate entry in " + labelPrefix + " index: '" + normalized + "' in " + indexPath);
+                continue;
+            }
+
+            String lower = normalized.toLowerCase(Locale.ROOT);
+            if (!hasAllowedExtension(lower, allowedExtensions)) {
+                errors.add("Invalid file type in " + labelPrefix + " index: '" + normalized +
+                    "' (allowed: " + allowedExtensions + ") in " + indexPath);
+                continue;
+            }
+
+            Path file = normalized.contains("/")
+                ? assetsRoot.resolve(normalized)
+                : dir.resolve(normalized);
+
+            if (!Files.exists(file)) {
+                errors.add("Missing " + labelPrefix + " file for index entry '" + normalized + "': " + file);
+                continue;
+            }
+            if (Files.isDirectory(file)) {
+                errors.add("Index entry points to a directory (must be a file): '" + normalized + "' -> " + file);
+            }
+
+            if (expectedExactNamesOrNull != null && !expectedExactNamesOrNull.isEmpty()) {
+                String nameOnly = file.getFileName().toString();
+                if (!expectedExactNamesOrNull.contains(nameOnly)) {
+                    warnings.add("Unexpected UI asset in ui/index.json: '" + nameOnly +
+                        "' (expected only " + expectedExactNamesOrNull + ") in " + indexPath);
+                }
+            }
+        }
+
+        if (expectedExactNamesOrNull != null && !expectedExactNamesOrNull.isEmpty()) {
+            for (String required : expectedExactNamesOrNull) {
+                if (!seen.contains(required) && !seen.contains(folderName + "/" + required)) {
+                    errors.add("Missing required entry '" + required + "' in " + indexPath);
+                }
+            }
+        }
+    }
+
+    private boolean hasAllowedExtension(String lowerPath, Set<String> allowedExtensions) {
+        for (String ext : allowedExtensions) {
+            if (lowerPath.endsWith(ext)) return true;
+        }
+        return false;
     }
 
     private void reportSummary() {

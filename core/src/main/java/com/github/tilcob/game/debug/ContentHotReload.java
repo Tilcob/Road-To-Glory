@@ -4,35 +4,36 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.files.FileHandle;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 
 public class ContentHotReload {
     private static final String TAG = ContentHotReload.class.getSimpleName();
 
-    private final ContentReloadService reloadService;
-    private final List<FileHandle> watchRoots;
+    private final List<FileHandle> watchFiles;
     private final float pollIntervalSeconds;
     private float pollTimer = 0f;
-    private long lastKnownTimestamp;
-    private final Deque<Long> recentReloads = new ArrayDeque<>();
-    private final int maxReloadHistory = 5;
+    private long lastTimestamp;
+    private boolean reloadRequested;
+    private boolean reloading;
+    private float cooldownSeconds = 0.35f;
+    private float cooldownTimer = 0f;
 
-    public ContentHotReload(ContentReloadService reloadService, List<FileHandle> watchRoots) {
-        this(reloadService, watchRoots, 1.0f);
+    public ContentHotReload(List<FileHandle> watchFiles) {
+        this(watchFiles, 1.0f);
     }
 
-    public ContentHotReload(ContentReloadService reloadService, List<FileHandle> watchRoots, float pollIntervalSeconds) {
-        this.reloadService = reloadService;
-        this.watchRoots = watchRoots;
+    public ContentHotReload(List<FileHandle> watchFiles, float pollIntervalSeconds) {
+        this.watchFiles = watchFiles;
         this.pollIntervalSeconds = Math.max(0.2f, pollIntervalSeconds);
-        this.lastKnownTimestamp = scanNewestTimestamp();
+        this.lastTimestamp = newestTimestamp();
     }
 
     public void update(float delta) {
+        cooldownTimer = Math.max(0f, cooldownTimer - delta);
+        if (reloading) return;
+
         if (Gdx.input.isKeyJustPressed(Input.Keys.F5)) {
-            triggerReload("Manual (F5)");
+            requestReload("Manual reload (F5)");
             return;
         }
 
@@ -40,62 +41,45 @@ public class ContentHotReload {
         if (pollTimer < pollIntervalSeconds) return;
         pollTimer = 0f;
 
-        long newest = scanNewestTimestamp();
-        if (newest > lastKnownTimestamp) {
-            lastKnownTimestamp = newest;
-            triggerReload("Auto (file changed)");
+        long now = newestTimestamp();
+        if (now > lastTimestamp) {
+            lastTimestamp = now;
+            requestReload("Auto reload (index changed)");
         }
     }
 
-    private void triggerReload(String reason) {
-        long now = System.currentTimeMillis();
-        recentReloads.addLast(now);
-        while (recentReloads.size() > maxReloadHistory) recentReloads.removeFirst();
-        if (recentReloads.size() >= 3) {
-            long first = recentReloads.getFirst();
-            long last = recentReloads.getLast();
-            if (last - first < 250) {
-                return;
-            }
-        }
-
-        try {
-            reloadService.reloadAll();
-            lastKnownTimestamp = scanNewestTimestamp();
-            Gdx.app.log(TAG, "Reload OK: " + reason);
-        } catch (Exception e) {
-            Gdx.app.error(TAG, "Reload FAILED: " + reason, e);
-        }
+    public boolean consumeReloadRequested() {
+        if (!reloadRequested) return false;
+        reloadRequested = false;
+        return true;
     }
 
-    private long scanNewestTimestamp() {
+    public void beginReload() {
+        reloading = true;
+    }
+
+    public void endReload() {
+        reloading = false;
+        cooldownTimer = cooldownSeconds;
+        lastTimestamp = newestTimestamp();
+    }
+
+    private void requestReload(String reason) {
+        if (cooldownTimer > 0f) return;
+        reloadRequested = true;
+        lastTimestamp = newestTimestamp();
+        Gdx.app.log(TAG, reason);
+    }
+
+    private long newestTimestamp() {
         long newest = 0;
-        for (FileHandle root : watchRoots) {
-            newest = Math.max(newest, scan(root));
+        for (FileHandle f : watchFiles) {
+            if (f == null || !f.exists()) continue;
+            try {
+                newest = Math.max(newest, f.lastModified());
+            } catch (Exception ignored) {
+            }
         }
         return newest;
-    }
-
-    private long scan(FileHandle handle) {
-        if (handle == null || !handle.exists()) return 0;
-
-        long best = safeLastModified(handle);
-        if (handle.isDirectory()) {
-            FileHandle[] list = handle.list();
-            if (list != null) {
-                for (FileHandle child : list) {
-                    best = Math.max(best, scan(child));
-                }
-            }
-        }
-        return best;
-    }
-
-    private long safeLastModified(FileHandle handle) {
-        try {
-            return handle.lastModified();
-        } catch (Exception ignored) {
-            return 0;
-        }
     }
 }
