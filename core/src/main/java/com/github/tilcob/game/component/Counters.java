@@ -22,4 +22,8 @@ public class Counters implements Component {
         counters.put(key, next);
         return next;
     }
+
+    public ObjectIntMap<String> getCounters() {
+        return counters;
+    }
 }

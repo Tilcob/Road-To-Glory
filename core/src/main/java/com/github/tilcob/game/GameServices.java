@@ -28,67 +28,43 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class GameServices {
-    private final GameEventBus eventBus;
-    private final ItemEntityRegistry itemEntityRegistry;
-    private final ChestRegistry chestRegistry;
-    private final StateManager stateManager;
-    private final SaveService saveService;
-    private final AssetManager assetManager;
-    private final AudioManager audioManager;
-    private final Map<String, Quest> allQuests;
-    private final Map<String, DialogData> allQuestDialogs;
-    private final Map<String, DialogData> allDialogs;
-    private final Map<String, CutsceneData> allCutscenes;
-    private final QuestYarnRegistry questYarnRegistry;
-    private final DialogRepository dialogRepository;
-    private final CutsceneRepository cutsceneRepository;
-    private final DialogYarnRuntime dialogYarnRuntime;
-    private final CutsceneYarnRuntime cutsceneYarnRuntime;
-    private final QuestYarnRuntime questYarnRuntime;
-    private final QuestManager questManager;
-    private final QuestLifecycleService questLifecycleService;
-    private final QuestRewardService questRewardService;
-    private final InventoryService inventoryService;
-    private final FlowBootstrap flowBootstrap;
+    private GameEventBus eventBus;
+    private ItemEntityRegistry itemEntityRegistry;
+    private ChestRegistry chestRegistry;
+    private StateManager stateManager;
+    private SaveService saveService;
+    private AssetManager assetManager;
+    private AudioManager audioManager;
+    private Map<String, Quest> allQuests;
+    private Map<String, DialogData> allQuestDialogs;
+    private Map<String, DialogData> allDialogs;
+    private Map<String, CutsceneData> allCutscenes;
+    private QuestYarnRegistry questYarnRegistry;
+    private DialogRepository dialogRepository;
+    private CutsceneRepository cutsceneRepository;
+    private DialogYarnRuntime dialogYarnRuntime;
+    private CutsceneYarnRuntime cutsceneYarnRuntime;
+    private QuestYarnRuntime questYarnRuntime;
+    private QuestManager questManager;
+    private QuestLifecycleService questLifecycleService;
+    private QuestRewardService questRewardService;
+    private InventoryService inventoryService;
+    private FlowBootstrap flowBootstrap;
     private EntityLookup entityLookup;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
-        this.eventBus = new GameEventBus();
-        this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
-        this.chestRegistry = new ChestRegistry();
-        this.stateManager = new StateManager(new GameState());
-        SaveManager saveManager = new SaveManager(savePath);
-        this.saveService = new SaveService(saveManager, stateManager, chestRegistry);
-        this.assetManager = new AssetManager(resolver);
-        this.audioManager = new AudioManager(assetManager);
-        this.allQuests = new HashMap<>();
-        this.allQuestDialogs = new HashMap<>();
-        this.allDialogs = new HashMap<>();
-        this.allCutscenes = new HashMap<>();
-        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
-        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
-        this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
-        this.dialogRepository = new DialogRepository(true, "dialogs",
-            Map.of("Shopkeeper", "shopkeeper"));
-        this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
-        YarnRuntime runtime = new YarnRuntime();
-        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor(), flowBootstrap.functions());
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
-        this.questYarnRuntime = new QuestYarnRuntime(
-            runtime, questYarnRegistry, flowBootstrap.commands(),
-            flowBootstrap.executor(), flowBootstrap.functions());
-        this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
-        this.questManager = new QuestManager(questYarnRuntime);
-        this.inventoryService = new InventoryService(eventBus);
+        init(resolver, new SaveManager(savePath));
     }
 
     public GameServices(InternalFileHandleResolver resolver, String saveDirectory, SaveSlot saveSlot) {
+        init(resolver, new SaveManager(saveDirectory, saveSlot));
+    }
+
+    private void init(InternalFileHandleResolver resolver, SaveManager saveManager) {
         this.eventBus = new GameEventBus();
         this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
         this.chestRegistry = new ChestRegistry();
         this.stateManager = new StateManager(new GameState());
-        SaveManager saveManager = new SaveManager(saveDirectory, saveSlot);
         this.saveService = new SaveService(saveManager, stateManager, chestRegistry);
         this.assetManager = new AssetManager(resolver);
         this.audioManager = new AudioManager(assetManager);
@@ -112,6 +88,9 @@ public class GameServices {
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
         this.inventoryService = new InventoryService(eventBus);
+
+        questLifecycleService.setQuestManager(questManager);
+        questLifecycleService.setInventoryService(inventoryService);
     }
 
     public void loadGame() {
