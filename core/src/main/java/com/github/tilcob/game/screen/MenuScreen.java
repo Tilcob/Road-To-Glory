@@ -32,6 +32,7 @@ public class MenuScreen extends ScreenAdapter {
     private SettingsViewModel settingsViewModel;
     private MenuView menuView;
     private SettingsView settingsView;
+    private SettingsOverlayController settingsOverlayController;
 
     public MenuScreen(
         GameServices services,
@@ -68,6 +69,14 @@ public class MenuScreen extends ScreenAdapter {
         menuView = new MenuView(skin, stage, menuViewModel);
         settingsView = new SettingsView(skin, stage, settingsViewModel);
 
+        settingsOverlayController = new SettingsOverlayController(
+            stage,
+            menuView,
+            settingsView,
+            menuView::selectSettings,
+            settingsView::resetSelection
+        );
+
         stage.addActor(menuView);
 
         services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
@@ -91,6 +100,7 @@ public class MenuScreen extends ScreenAdapter {
 
         menuView = null;
         settingsView = null;
+        settingsOverlayController = null;
     }
 
     @Override
@@ -107,13 +117,7 @@ public class MenuScreen extends ScreenAdapter {
             case OPEN_SETTINGS, TOGGLE_SETTINGS -> {
                 boolean willOpen = (e.type() == UiOverlayEvent.Type.OPEN_SETTINGS) || !settingsViewModel.isOpen();
                 if (willOpen) {
-                    if (menuView != null && menuView.getStage() != null) menuView.remove();
-                    if (settingsView != null) settingsView.setVisible(true);
-                    if (settingsView != null && settingsView.getStage() == null) stage.addActor(settingsView);
-                    if (settingsView != null) {
-                        settingsView.toFront();
-                        settingsView.resetSelection();
-                    }
+                    openSettingsOverlay();
                 } else {
                     closeSettingsOverlay();
                 }
@@ -123,11 +127,14 @@ public class MenuScreen extends ScreenAdapter {
     }
 
     private void closeSettingsOverlay() {
-        if (settingsView != null && settingsView.getStage() != null) settingsView.remove();
-        if (menuView != null && menuView.getStage() == null) stage.addActor(menuView);
-        if (menuView != null) {
-            menuView.toFront();
-            menuView.selectSettings();
+        if (settingsOverlayController != null) {
+            settingsOverlayController.closeSettings();
+        }
+    }
+
+    private void openSettingsOverlay() {
+        if (settingsOverlayController != null) {
+            settingsOverlayController.openSettings();
         }
     }
 

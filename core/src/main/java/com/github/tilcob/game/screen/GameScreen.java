@@ -64,6 +64,7 @@ public class GameScreen extends ScreenAdapter {
     private boolean paused;
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
+    private SettingsOverlayController settingsOverlayController;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -125,6 +126,13 @@ public class GameScreen extends ScreenAdapter {
 
         pauseView = new PauseView(skin, stage, pauseViewModel);
         stage.addActor(pauseView);
+        settingsOverlayController = new SettingsOverlayController(
+            stage,
+            pauseView,
+            settingsView,
+            pauseView::selectSettings,
+            settingsView::resetSelection
+        );
         setPaused(false);
         services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
 
@@ -191,13 +199,7 @@ public class GameScreen extends ScreenAdapter {
             case OPEN_SETTINGS, TOGGLE_SETTINGS -> {
                 boolean willOpen = (event.type() == OPEN_SETTINGS) || !settingsViewModel.isOpen();
                 if (willOpen) {
-                    if (pauseView != null && pauseView.getStage() != null) pauseView.remove();
-                    if (settingsView != null) settingsView.setVisible(true);
-                    if (settingsView != null && settingsView.getStage() == null) stage.addActor(settingsView);
-                    if (settingsView != null) {
-                        settingsView.toFront();
-                        settingsView.resetSelection();
-                    }
+                    openSettingsOverlay();
                 } else {
                     closeSettingsOverlay();
                 }
@@ -207,11 +209,14 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void closeSettingsOverlay() {
-        if (settingsView != null && settingsView.getStage() != null) settingsView.remove();
-        if (pauseView != null && pauseView.getStage() == null) stage.addActor(pauseView);
-        if (pauseView != null) {
-            pauseView.toFront();
-            pauseView.selectSettings();
+        if (settingsOverlayController != null) {
+            settingsOverlayController.closeSettings();
+        }
+    }
+
+    private void openSettingsOverlay() {
+        if (settingsOverlayController != null) {
+            settingsOverlayController.openSettings();
         }
     }
 
@@ -323,6 +328,13 @@ public class GameScreen extends ScreenAdapter {
         pauseView = new PauseView(skin, stage, pauseViewModel);
         pauseView.setVisible(paused);
         stage.addActor(pauseView);
+        settingsOverlayController = new SettingsOverlayController(
+            stage,
+            pauseView,
+            settingsView,
+            pauseView::selectSettings,
+            settingsView::resetSelection
+        );
 
         if (Constants.DEBUG) {
             if (debugOverlayView != null) {
