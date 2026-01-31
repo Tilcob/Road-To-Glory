@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Slider;
 import com.github.tilcob.game.audio.AudioManager;
 
 public class UiServices {
@@ -42,26 +41,6 @@ public class UiServices {
         int numOptions = menuContentTable.getChildren().size;
         currentIdx = (currentIdx + 1) % numOptions;
         return selectMenuItem((Group) menuContentTable.getChild(currentIdx));
-    }
-
-    public void moveRight(Group selectedItem) {
-        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
-        switch (menuOption) {
-            case MUSIC_VOLUME, SOUND_VOLUME -> {
-                Slider slider = (Slider) selectedItem.getChild(1);
-                slider.setValue(slider.getValue() + slider.getStepSize());
-            }
-        }
-    }
-
-    public void moveLeft(Group selectedItem) {
-        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
-        switch (menuOption) {
-            case MUSIC_VOLUME, SOUND_VOLUME -> {
-                Slider slider = (Slider) selectedItem.getChild(1);
-                slider.setValue(slider.getValue() - slider.getStepSize());
-            }
-        }
     }
 
     public Group selectMenuItem(Group menuItem) {

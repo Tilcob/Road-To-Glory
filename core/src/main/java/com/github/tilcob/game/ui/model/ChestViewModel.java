@@ -31,7 +31,6 @@ public class ChestViewModel extends ViewModel {
         getEventBus().subscribe(UpdateInventoryEvent.class, this::onPlayerInventoryUpdate);
         getEventBus().subscribe(CloseChestEvent.class, this::onCloseChest);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
-        getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
 
     private void onOpenChest(OpenChestEvent event) {
@@ -133,7 +132,8 @@ public class ChestViewModel extends ViewModel {
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_PLAYER_IN_CHEST, null, playerItems);
     }
 
-    private void onUiEvent(UiEvent event) {
+    @Override
+    protected void onUiEvent(UiEvent event) {
         if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY && open) {
             isPlayerInventoryOpen = !isPlayerInventoryOpen;

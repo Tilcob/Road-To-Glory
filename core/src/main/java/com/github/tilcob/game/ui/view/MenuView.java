@@ -6,7 +6,6 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.ui.MenuOption;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {
@@ -101,11 +100,23 @@ public class MenuView extends View<MenuViewModel> {
     }
 
     public void onRight(Object o) {
-        viewModel.getUiServices().moveRight(selectedItem);
+        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
+        switch (menuOption) {
+            case MUSIC_VOLUME, SOUND_VOLUME -> {
+                Slider slider = (Slider) selectedItem.getChild(1);
+                slider.setValue(slider.getValue() + slider.getStepSize());
+            }
+        }
     }
 
     public void onLeft(Object o) {
-        viewModel.getUiServices().moveLeft(selectedItem);
+        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
+        switch (menuOption) {
+            case MUSIC_VOLUME, SOUND_VOLUME -> {
+                Slider slider = (Slider) selectedItem.getChild(1);
+                slider.setValue(slider.getValue() - slider.getStepSize());
+            }
+        }
     }
 
     public void onSelect(Object o) {
@@ -114,5 +125,12 @@ public class MenuView extends View<MenuViewModel> {
             case START_GAME -> viewModel.startGame();
             case QUIT_GAME -> viewModel.quitGame();
         }
+    }
+
+    private enum MenuOption {
+        START_GAME,
+        MUSIC_VOLUME,
+        SOUND_VOLUME,
+        QUIT_GAME
     }
 }
