@@ -12,6 +12,7 @@ import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.item.ItemModel;
 
 public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();

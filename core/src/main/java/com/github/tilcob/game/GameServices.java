@@ -19,6 +19,7 @@ import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.save.registry.ChestRegistry;
 import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.ui.UiServices;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
@@ -51,6 +52,7 @@ public class GameServices {
     private InventoryService inventoryService;
     private FlowBootstrap flowBootstrap;
     private EntityLookup entityLookup;
+    private UiServices uiServices;
 
     public GameServices(InternalFileHandleResolver resolver, String savePath) {
         init(resolver, new SaveManager(savePath));
@@ -88,6 +90,7 @@ public class GameServices {
         this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
         this.questManager = new QuestManager(questYarnRuntime);
         this.inventoryService = new InventoryService(eventBus);
+        this.uiServices = new UiServices(audioManager);
 
         questLifecycleService.setQuestManager(questManager);
         questLifecycleService.setInventoryService(inventoryService);
@@ -199,5 +202,9 @@ public class GameServices {
 
     public void setEntityLookup(EntityLookup entityLookup) {
         this.entityLookup = entityLookup;
+    }
+
+    public UiServices getUiServices() {
+        return uiServices;
     }
 }

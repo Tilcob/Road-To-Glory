@@ -94,6 +94,7 @@ public class GameScreen extends ScreenAdapter {
 
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
+        services.getUiServices().setSkin(skin);
     }
 
     @Override

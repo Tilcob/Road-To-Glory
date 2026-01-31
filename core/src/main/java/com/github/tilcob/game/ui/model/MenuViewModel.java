@@ -7,15 +7,16 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.screen.GameScreen;
 import com.github.tilcob.game.screen.ScreenNavigator;
+import com.github.tilcob.game.ui.UiServices;
 
 public class MenuViewModel extends ViewModel {
-    private final AudioManager audioManager;
     private final ScreenNavigator screenNavigator;
+    private final UiServices uiServices;
 
-    public MenuViewModel(GameServices services, ScreenNavigator screenNavigator) {
+    public MenuViewModel(GameServices services, ScreenNavigator screenNavigator, UiServices uiServices) {
         super(services);
-        this.audioManager = services.getAudioManager();
         this.screenNavigator = screenNavigator;
+        this.uiServices = uiServices;
 
         getEventBus().subscribe(UiEvent.class, this::onUiEvent);
     }
@@ -52,29 +53,16 @@ public class MenuViewModel extends ViewModel {
         this.propertyChangeSupport.firePropertyChange(Constants.ON_LEFT, null, true);
     }
 
-
-    public float getMusicVolume() {
-        return audioManager.getMusicVolume();
-    }
-
-    public float getSoundVolume() {
-        return audioManager.getSoundVolume();
-    }
-
-    public void setMusicVolume(float volume) {
-        audioManager.setMusicVolume(volume);
-    }
-
-    public void setSoundVolume(float volume) {
-        audioManager.setSoundVolume(volume);
-    }
-
     public void startGame() {
         screenNavigator.setScreen(GameScreen.class);
     }
 
     public void quitGame() {
         Gdx.app.exit();
+    }
+
+    public UiServices getUiServices() {
+        return uiServices;
     }
 
     @Override

@@ -14,7 +14,7 @@ import com.github.tilcob.game.ui.inventory.player.PlayerItemSource;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.ChestViewModel;
-import com.github.tilcob.game.ui.model.ItemModel;
+import com.github.tilcob.game.item.ItemModel;
 
 public class ChestView extends View<ChestViewModel> {
     private Table inventoryRoot;

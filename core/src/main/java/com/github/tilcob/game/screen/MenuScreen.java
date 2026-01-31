@@ -39,6 +39,8 @@ public class MenuScreen extends ScreenAdapter {
         this.screenNavigator = screenNavigator;
         this.idleControllerState = new IdleControllerState();
         this.uiControllerState = new UiControllerState(services.getEventBus());
+
+        services.getUiServices().setSkin(skin);
     }
 
     @Override
@@ -50,7 +52,7 @@ public class MenuScreen extends ScreenAdapter {
     public void show() {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
-        stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator)));
+        stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator, services.getUiServices())));
         services.getAudioManager().playMusic(MusicAsset.MENU);
     }
 
