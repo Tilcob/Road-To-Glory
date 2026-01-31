@@ -29,6 +29,7 @@ import com.github.tilcob.game.system.CameraSystem;
 import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
+import com.github.tilcob.game.ui.GameUiBuilder;
 import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.view.*;
 
@@ -40,6 +41,7 @@ public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
     private final Group gameUiGroup;
+    private final GameUiBuilder gameUiBuilder = new GameUiBuilder();
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
@@ -111,21 +113,22 @@ public class GameScreen extends ScreenAdapter {
         clearAllControllerCommands();
 
         stage.addActor(gameUiGroup);
-        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
-        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
-        settingsView = new SettingsView(skin, stage, settingsViewModel);
+        gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
         if (Constants.DEBUG) {
-            debugOverlayView = new DebugOverlayView(skin, engine, services);
-            stage.addActor(debugOverlayView);
-
             contentReloadService = new ContentReloadService(services);
             contentHotReload = new ContentHotReload(contentReloadService.collectWatchFiles(), 1f);
         }
 
-        pauseView = new PauseView(skin, stage, pauseViewModel);
-        stage.addActor(pauseView);
+        GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
+            stage,
+            buildUiDependencies(),
+            paused,
+            false
+        );
+        pauseView = overlays.pauseView();
+        settingsView = overlays.settingsView();
+        debugOverlayView = overlays.debugOverlayView();
         settingsOverlayController = new SettingsOverlayController(
             stage,
             pauseView,
@@ -311,23 +314,28 @@ public class GameScreen extends ScreenAdapter {
 
     private void rebuildUiAfterHotReload() {
         gameUiGroup.clearChildren();
-        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
-        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
+        gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
         if (settingsView != null) {
             settingsView.remove();
         }
-        settingsView = new SettingsView(skin, stage, settingsViewModel);
-        if (settingsViewModel.isOpen() && paused) {
-            stage.addActor(settingsView);
-        }
         if (pauseView != null) {
             pauseView.remove();
         }
-        pauseView = new PauseView(skin, stage, pauseViewModel);
-        pauseView.setVisible(paused);
-        stage.addActor(pauseView);
+        if (debugOverlayView != null) {
+            debugOverlayView.remove();
+        }
+
+        boolean showSettings = settingsViewModel.isOpen() && paused;
+        GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
+            stage,
+            buildUiDependencies(),
+            paused,
+            showSettings
+        );
+        pauseView = overlays.pauseView();
+        settingsView = overlays.settingsView();
+        debugOverlayView = overlays.debugOverlayView();
         settingsOverlayController = new SettingsOverlayController(
             stage,
             pauseView,
@@ -335,14 +343,21 @@ public class GameScreen extends ScreenAdapter {
             pauseView::selectSettings,
             settingsView::resetSelection
         );
+    }
 
-        if (Constants.DEBUG) {
-            if (debugOverlayView != null) {
-                debugOverlayView.remove();
-            }
-            debugOverlayView = new DebugOverlayView(skin, engine, services);
-            stage.addActor(debugOverlayView);
-        }
+    private GameUiBuilder.UiDependencies buildUiDependencies() {
+        return new GameUiBuilder.UiDependencies(
+            stage,
+            skin,
+            gameViewModel,
+            inventoryViewModel,
+            chestViewModel,
+            pauseViewModel,
+            settingsViewModel,
+            engine,
+            services,
+            Constants.DEBUG
+        );
     }
 
     private void clearAllControllerCommands() {
