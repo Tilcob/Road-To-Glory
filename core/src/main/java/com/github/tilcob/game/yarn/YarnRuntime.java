@@ -1,6 +1,5 @@
 package com.github.tilcob.game.yarn;
 
-import com.badlogic.gdx.Application;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.flow.CommandCall;
 

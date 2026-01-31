@@ -25,7 +25,6 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.MapEntity;
-import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
 

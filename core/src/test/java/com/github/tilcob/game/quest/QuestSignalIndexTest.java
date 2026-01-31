@@ -1,6 +1,5 @@
 package com.github.tilcob.game.quest;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.github.tilcob.game.test.HeadlessGdxTest;
 import com.github.tilcob.game.yarn.QuestScriptStore;

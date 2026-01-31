@@ -12,6 +12,7 @@ import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.entity.EngineEntityLookup;
 import com.github.tilcob.game.entity.EntityIdService;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.inventory.InventoryService;
@@ -22,7 +23,6 @@ import com.github.tilcob.game.ui.model.ChestViewModel;
 import com.github.tilcob.game.ui.model.GameViewModel;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 import com.github.tilcob.game.ui.model.PauseViewModel;
-import com.github.tilcob.game.entity.EngineEntityLookup;
 
 public class GameScreenModule {
     private final GameServices services;
