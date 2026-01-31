@@ -38,6 +38,7 @@ import com.github.tilcob.game.ui.overlay.UiOverlayManager;
 import com.github.tilcob.game.ui.view.DebugOverlayView;
 import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
+import com.github.tilcob.game.world.GameWorldLoader;
 
 import java.util.function.Consumer;
 
@@ -62,7 +63,6 @@ public class GameScreen extends ScreenAdapter {
     private SettingsViewModel settingsViewModel;
     private Skin skin;
     private InputManager inputManager;
-    private Entity player;
     private ActiveEntityReference activeEntityReference;
     private PauseView pauseView;
     private SettingsView settingsView;
@@ -71,6 +71,7 @@ public class GameScreen extends ScreenAdapter {
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
     private UiOverlayManager uiOverlayManager;
+    private GameWorldLoader worldLoader;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -97,6 +98,16 @@ public class GameScreen extends ScreenAdapter {
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
+        this.worldLoader = new GameWorldLoader(new GameWorldLoader.Dependencies(
+            services,
+            engine,
+            tiledManager,
+            tiledAshleyConfigurator,
+            audioManager,
+            physicWorld,
+            uiViewport,
+            activeEntityReference
+        ));
 
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
@@ -146,47 +157,8 @@ public class GameScreen extends ScreenAdapter {
         uiOverlayManager.show();
         uiOverlayManager.setPaused(false);
 
-        Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
-        Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
-        Consumer<TiledMap> audioConsumer = audioManager::setMap;
-
-        tiledManager.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer).andThen(audioConsumer));
-        tiledManager.setLoadObjectConsumer(tiledAshleyConfigurator::onLoadObject);
-        tiledManager.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
-        tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
-
-        createPlayer();
-        loadQuest();
-    }
-
-    private void loadQuest() {
-        QuestLoader loader = new QuestLoader(new QuestFactory(services.getQuestYarnRegistry()));
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        services.getStateManager().loadQuests(questLog, loader);
-    }
-
-    private void createPlayer() {
-        player = PlayerFactory.create(engine, services.getAssetManager(), physicWorld);
-        activeEntityReference.set(player);
-        loadMap();
-
-        if (services.getStateManager().getGameState().getPlayerState() != null) {
-            PlayerStateApplier.apply(services.getStateManager().getGameState().getPlayerState(), player);
-        } else {
-            Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
-            Physic.MAPPER.get(player).getBody().setTransform(tiledManager.getSpawnPoint(), 0);
-        }
-        services.getStateManager().loadDialogFlags(DialogFlags.MAPPER.get(player));
-        services.getStateManager().loadCounters(Counters.MAPPER.get(player));
-        services.getStateManager().setPlayerState(player);
-        services.getEventBus().fire(new UpdateInventoryEvent(player));
-    }
-
-    private void loadMap() {
-        MapAsset mapToLoad = services.getStateManager().getGameState().getCurrentMap();
-        if (mapToLoad == null) mapToLoad = MapAsset.MAIN;
-        tiledManager.setMap(tiledManager.loadMap(mapToLoad));
-        services.getEventBus().fire(new MapChangeEvent(tiledManager.getCurrentMapAsset().name().toLowerCase()));
+        worldLoader.initializeWorld();
+        worldLoader.loadState();
     }
 
     @Override
@@ -226,6 +198,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void autosave(AutosaveEvent event) {
+        Entity player = getPlayer();
         if (player == null) return;
         services.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
         services.getStateManager().saveDialogFlags(DialogFlags.MAPPER.get(player));
@@ -254,6 +227,8 @@ public class GameScreen extends ScreenAdapter {
 
     private void performHotReload() {
         if (contentReloadService == null || contentHotReload == null) return;
+        Entity player = getPlayer();
+        if (player == null) return;
         contentHotReload.beginReload();
         try {
             var playerPos = Transform.MAPPER.get(player).getPosition().cpy();
@@ -312,6 +287,11 @@ public class GameScreen extends ScreenAdapter {
         );
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);
+    }
+
+    private Entity getPlayer() {
+        if (worldLoader == null) return null;
+        return worldLoader.getPlayer();
     }
 
     private GameUiBuilder.UiDependencies buildUiDependencies() {
