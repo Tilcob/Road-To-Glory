@@ -3,6 +3,7 @@ package com.github.tilcob.game.ui;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
@@ -28,7 +29,14 @@ public class UiServices {
 
         int numOptions = menuContentTable.getChildren().size;
         currentIdx = currentIdx == 0 ? numOptions - 1 : currentIdx - 1;
-        return selectMenuItem((Group) menuContentTable.getChild(currentIdx));
+
+        for (int i = 0; i < numOptions; i++) {
+            int idx = (currentIdx - i + numOptions) % numOptions;
+            if (menuContentTable.getChild(idx) instanceof Group g) {
+                return selectMenuItem(g);
+            }
+        }
+        return selectedItem;
     }
 
     public Group moveDown(Group selectedItem) {
@@ -40,7 +48,14 @@ public class UiServices {
 
         int numOptions = menuContentTable.getChildren().size;
         currentIdx = (currentIdx + 1) % numOptions;
-        return selectMenuItem((Group) menuContentTable.getChild(currentIdx));
+
+        for (int i = 0; i < numOptions; i++) {
+            int idx = (currentIdx - i + numOptions) % numOptions;
+            if (menuContentTable.getChild(idx) instanceof Group g) {
+                return selectMenuItem(g);
+            }
+        }
+        return selectedItem;
     }
 
     public Group selectMenuItem(Group menuItem) {
@@ -88,9 +103,11 @@ public class UiServices {
     public void setSkin(Skin skin) {
         this.skin = skin;
         selectionImage = new Image(skin, "selection");
+        this.selectionImage.setTouchable(Touchable.disabled);
     }
 
     public void setSelectionImage(String image) {
         this.selectionImage = new Image(skin, image);
+        this.selectionImage.setTouchable(Touchable.disabled);
     }
 }

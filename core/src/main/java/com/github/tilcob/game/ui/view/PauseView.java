@@ -1,18 +1,17 @@
 package com.github.tilcob.game.ui.view;
 
-import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class PauseView extends View<PauseViewModel> {
     private Group selectedItem;
+    private boolean overlaySubscribed = false;
 
     public PauseView(Skin skin, Stage stage, PauseViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -44,6 +43,12 @@ public class PauseView extends View<PauseViewModel> {
         onClick(resumeButton, viewModel::resumeGame);
         onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().moveDown(selectedItem));
 
+        TextButton settingsButton = new TextButton("Settings", skin);
+        settingsButton.setName(PauseOption.SETTINGS.name());
+        buttonTable.add(settingsButton).width(180f).padTop(10f).row();
+        onClick(settingsButton, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
+        onEnter(settingsButton, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
+
         TextButton quitButton = new TextButton("Quit to Menu", skin);
         quitButton.setName(PauseOption.QUIT.name());
         buttonTable.add(quitButton).width(180f).padTop(10f).row();
@@ -74,6 +79,7 @@ public class PauseView extends View<PauseViewModel> {
         switch (option) {
             case RESUME -> viewModel.resumeGame();
             case QUIT -> viewModel.quitToMenu();
+            case SETTINGS -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS));
         }
     }
 
@@ -84,8 +90,16 @@ public class PauseView extends View<PauseViewModel> {
         }
     }
 
+    public void selectSettings() {
+        Group settingsItem = findActor(PauseOption.SETTINGS.name());
+        if (settingsItem != null) {
+            selectedItem = viewModel.getUiServices().selectMenuItem(settingsItem);
+        }
+    }
+
     private enum PauseOption {
         RESUME,
-        QUIT
+        QUIT,
+        SETTINGS,
     }
 }

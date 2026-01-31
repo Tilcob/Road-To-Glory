@@ -6,6 +6,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemCategory;
+import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
@@ -15,7 +16,6 @@ import com.github.tilcob.game.ui.inventory.player.PlayerItemSource;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
-import com.github.tilcob.game.item.ItemModel;
 
 import java.util.EnumMap;
 

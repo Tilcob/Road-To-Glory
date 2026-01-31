@@ -2,17 +2,22 @@ package com.github.tilcob.game.screen;
 
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.UiControllerState;
 import com.github.tilcob.game.ui.model.MenuViewModel;
+import com.github.tilcob.game.ui.model.SettingsViewModel;
 import com.github.tilcob.game.ui.view.MenuView;
+import com.github.tilcob.game.ui.view.SettingsView;
 
 public class MenuScreen extends ScreenAdapter {
     private final GameServices services;
@@ -23,10 +28,14 @@ public class MenuScreen extends ScreenAdapter {
     private final ScreenNavigator screenNavigator;
     private final IdleControllerState idleControllerState;
     private final UiControllerState uiControllerState;
+    private MenuViewModel menuViewModel;
+    private SettingsViewModel settingsViewModel;
+    private MenuView menuView;
+    private SettingsView settingsView;
 
     public MenuScreen(
         GameServices services,
-        com.badlogic.gdx.graphics.g2d.Batch batch,
+        Batch batch,
         InputManager inputManager,
         Viewport uiViewport,
         ScreenNavigator screenNavigator
@@ -52,13 +61,36 @@ public class MenuScreen extends ScreenAdapter {
     public void show() {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
-        stage.addActor(new MenuView(skin, stage, new MenuViewModel(services, screenNavigator, services.getUiServices())));
+
+        menuViewModel = new MenuViewModel(services, screenNavigator);
+        settingsViewModel = new SettingsViewModel(services);
+
+        menuView = new MenuView(skin, stage, menuViewModel);
+        settingsView = new SettingsView(skin, stage, settingsViewModel);
+
+        stage.addActor(menuView);
+
+        services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
         services.getAudioManager().playMusic(MusicAsset.MENU);
+        services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
     }
 
     @Override
     public void hide() {
+        services.getEventBus().unsubscribe(UiOverlayEvent.class, this::onOverlayEvent);
         this.stage.clear();
+
+        if (menuViewModel != null) {
+            menuViewModel.dispose();
+            menuViewModel = null;
+        }
+        if (settingsViewModel != null) {
+            settingsViewModel.dispose();
+            settingsViewModel = null;
+        }
+
+        menuView = null;
+        settingsView = null;
     }
 
     @Override
@@ -67,6 +99,36 @@ public class MenuScreen extends ScreenAdapter {
         stage.getBatch().setColor(Color.WHITE);
         stage.act(delta);
         stage.draw();
+    }
+
+    private void onOverlayEvent(UiOverlayEvent e) {
+        if (e == null) return;
+        switch (e.type()) {
+            case OPEN_SETTINGS, TOGGLE_SETTINGS -> {
+                boolean willOpen = (e.type() == UiOverlayEvent.Type.OPEN_SETTINGS) || !settingsViewModel.isOpen();
+                if (willOpen) {
+                    if (menuView != null && menuView.getStage() != null) menuView.remove();
+                    if (settingsView != null) settingsView.setVisible(true);
+                    if (settingsView != null && settingsView.getStage() == null) stage.addActor(settingsView);
+                    if (settingsView != null) {
+                        settingsView.toFront();
+                        settingsView.resetSelection();
+                    }
+                } else {
+                    closeSettingsOverlay();
+                }
+            }
+            case CLOSE_SETTINGS -> closeSettingsOverlay();
+        }
+    }
+
+    private void closeSettingsOverlay() {
+        if (settingsView != null && settingsView.getStage() != null) settingsView.remove();
+        if (menuView != null && menuView.getStage() == null) stage.addActor(menuView);
+        if (menuView != null) {
+            menuView.toFront();
+            menuView.selectSettings();
+        }
     }
 
     @Override

@@ -13,6 +13,7 @@ public abstract class ViewModel {
     protected final GameServices services;
     protected final PropertyChangeSupport propertyChangeSupport;
     protected final GameEventBus gameEventBus;
+    private boolean active = true;
 
     public ViewModel(GameServices services) {
         this.services = services;
@@ -35,6 +36,7 @@ public abstract class ViewModel {
     }
 
     protected void onUiEvent(UiEvent event) {
+        if (!active) return;
         if (event.action() == UiEvent.Action.RELEASE) return;
 
         switch (event.command()) {
@@ -43,6 +45,7 @@ public abstract class ViewModel {
             case UP -> onUp();
             case DOWN -> onDown();
             case SELECT -> onSelect();
+            case CANCEL -> onCancel();
         }
     }
 
@@ -67,6 +70,10 @@ public abstract class ViewModel {
         this.propertyChangeSupport.firePropertyChange(Constants.ON_LEFT, null, true);
     }
 
+    protected void onCancel() {
+        this.propertyChangeSupport.firePropertyChange(Constants.ON_CANCEL, null, true);
+    }
+
     public GameEventBus getEventBus() {
         return gameEventBus;
     }
@@ -74,6 +81,10 @@ public abstract class ViewModel {
     public UiServices getUiServices() {
         return services.getUiServices();
     }
+
+    public void setActive(boolean active) { this.active = active; }
+
+    public boolean isActive() { return active; }
 
     public void dispose() {
         gameEventBus.unsubscribe(UiEvent.class, this::onUiEvent);

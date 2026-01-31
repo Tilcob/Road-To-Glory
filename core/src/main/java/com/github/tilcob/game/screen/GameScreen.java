@@ -19,10 +19,7 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.debug.ContentHotReload;
 import com.github.tilcob.game.debug.ContentReloadService;
-import com.github.tilcob.game.event.AutosaveEvent;
-import com.github.tilcob.game.event.MapChangeEvent;
-import com.github.tilcob.game.event.PauseEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -32,13 +29,12 @@ import com.github.tilcob.game.system.CameraSystem;
 import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
-import com.github.tilcob.game.ui.model.ChestViewModel;
-import com.github.tilcob.game.ui.model.GameViewModel;
-import com.github.tilcob.game.ui.model.InventoryViewModel;
-import com.github.tilcob.game.ui.model.PauseViewModel;
+import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.view.*;
 
 import java.util.function.Consumer;
+
+import static com.github.tilcob.game.event.UiOverlayEvent.Type.*;
 
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
@@ -57,11 +53,13 @@ public class GameScreen extends ScreenAdapter {
     private InventoryViewModel inventoryViewModel;
     private ChestViewModel chestViewModel;
     private PauseViewModel pauseViewModel;
+    private SettingsViewModel settingsViewModel;
     private Skin skin;
     private InputManager inputManager;
     private Entity player;
     private ActiveEntityReference activeEntityReference;
     private PauseView pauseView;
+    private SettingsView settingsView;
     private DebugOverlayView debugOverlayView;
     private boolean paused;
     private ContentReloadService contentReloadService;
@@ -88,6 +86,7 @@ public class GameScreen extends ScreenAdapter {
         this.inventoryViewModel = dependencies.inventoryViewModel();
         this.chestViewModel = dependencies.chestViewModel();
         this.pauseViewModel = dependencies.pauseViewModel();
+        this.settingsViewModel = dependencies.settingsViewModel();
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
@@ -108,11 +107,14 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState, uiControllerState);
+        clearAllControllerCommands();
 
         stage.addActor(gameUiGroup);
         gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
         gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
         gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
+        settingsView = new SettingsView(skin, stage, settingsViewModel);
+
         if (Constants.DEBUG) {
             debugOverlayView = new DebugOverlayView(skin, engine, services);
             stage.addActor(debugOverlayView);
@@ -122,10 +124,9 @@ public class GameScreen extends ScreenAdapter {
         }
 
         pauseView = new PauseView(skin, stage, pauseViewModel);
-        pauseView.setVisible(false);
         stage.addActor(pauseView);
-        paused = false;
-        services.getEventBus().fire(new PauseEvent(PauseEvent.Action.RESUME));
+        setPaused(false);
+        services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
@@ -138,6 +139,7 @@ public class GameScreen extends ScreenAdapter {
 
         createPlayer();
         loadQuest();
+        services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
     }
 
     private void loadQuest() {
@@ -174,6 +176,43 @@ public class GameScreen extends ScreenAdapter {
     public void hide() {
         engine.removeAllEntities();
         stage.clear();
+        services.getEventBus().unsubscribe(UiOverlayEvent.class, this::onOverlayEvent);
+
+        if (settingsViewModel != null) {
+            settingsViewModel.dispose();
+            settingsViewModel = null;
+        }
+    }
+
+    private void onOverlayEvent(UiOverlayEvent event) {
+        if (event == null || !paused) return;
+
+        switch (event.type()) {
+            case OPEN_SETTINGS, TOGGLE_SETTINGS -> {
+                boolean willOpen = (event.type() == OPEN_SETTINGS) || !settingsViewModel.isOpen();
+                if (willOpen) {
+                    if (pauseView != null && pauseView.getStage() != null) pauseView.remove();
+                    if (settingsView != null) settingsView.setVisible(true);
+                    if (settingsView != null && settingsView.getStage() == null) stage.addActor(settingsView);
+                    if (settingsView != null) {
+                        settingsView.toFront();
+                        settingsView.resetSelection();
+                    }
+                } else {
+                    closeSettingsOverlay();
+                }
+            }
+            case CLOSE_SETTINGS -> closeSettingsOverlay();
+        }
+    }
+
+    private void closeSettingsOverlay() {
+        if (settingsView != null && settingsView.getStage() != null) settingsView.remove();
+        if (pauseView != null && pauseView.getStage() == null) stage.addActor(pauseView);
+        if (pauseView != null) {
+            pauseView.toFront();
+            pauseView.selectSettings();
+        }
     }
 
     @Override
@@ -212,21 +251,30 @@ public class GameScreen extends ScreenAdapter {
         if (event == null) return;
         switch (event.action()) {
             case PAUSE -> setPaused(true);
-            case RESUME -> setPaused(false);
+            case RESUME -> {
+                setPaused(false);
+                services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
+            }
             case TOGGLE -> setPaused(!paused);
         }
     }
 
     private void setPaused(boolean paused) {
-        if (this.paused == paused) {
-            return;
-        }
         this.paused = paused;
-        pauseView.setVisible(paused);
-        gameUiGroup.setVisible(!paused);
+
+        if (pauseView != null) {
+            pauseView.setVisible(paused);
+            if (paused) {
+                pauseView.toFront();
+                pauseView.resetSelection();
+            }
+        }
+
+        if (gameUiGroup != null) {
+            gameUiGroup.setVisible(!paused);
+        }
+
         if (paused) {
-            pauseView.toFront();
-            pauseView.resetSelection();
             inputManager.setActiveState(UiControllerState.class);
         } else {
             inputManager.setActiveState(GameControllerState.class);
@@ -262,6 +310,13 @@ public class GameScreen extends ScreenAdapter {
         gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
         gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
 
+        if (settingsView != null) {
+            settingsView.remove();
+        }
+        settingsView = new SettingsView(skin, stage, settingsViewModel);
+        if (settingsViewModel.isOpen() && paused) {
+            stage.addActor(settingsView);
+        }
         if (pauseView != null) {
             pauseView.remove();
         }
@@ -275,6 +330,17 @@ public class GameScreen extends ScreenAdapter {
             }
             debugOverlayView = new DebugOverlayView(skin, engine, services);
             stage.addActor(debugOverlayView);
+        }
+    }
+
+    private void clearAllControllerCommands() {
+        for (var e : engine.getEntitiesFor(com.badlogic.ashley.core.Family.all(Controller.class).get())) {
+            Controller c = Controller.MAPPER.get(e);
+            if (c == null) continue;
+            c.getPressedCommands().clear();
+            c.getReleasedCommands().clear();
+            c.getHeldCommands().clear();
+            c.getCommandBuffer().clear();
         }
     }
 

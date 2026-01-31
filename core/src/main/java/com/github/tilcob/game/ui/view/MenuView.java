@@ -6,14 +6,15 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {
     private Group selectedItem;
+    private boolean overlaySubscribed = false;
 
     public MenuView(Skin skin, Stage stage, MenuViewModel viewModel) {
         super(skin, stage, viewModel);
-
         Image selectionImage = new Image(skin, "selection");
         selectionImage.setTouchable(Touchable.disabled);
 
@@ -50,13 +51,11 @@ public class MenuView extends View<MenuViewModel> {
         onEnter(textButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
         contentTable.row();
 
-        Slider musicSlider = setupVolumesSlider(contentTable, "Music Volume", MenuOption.MUSIC_VOLUME);
-        musicSlider.setValue(viewModel.getUiServices().getMusicVolume());
-        onChange(musicSlider, (slider) -> viewModel.getUiServices().setMusicVolume(slider.getValue()));
-
-        Slider soundSlider = setupVolumesSlider(contentTable, "Sound Volume", MenuOption.SOUND_VOLUME);
-        soundSlider.setValue(viewModel.getUiServices().getSoundVolume());
-        onChange(soundSlider, (slider) -> viewModel.getUiServices().setSoundVolume(slider.getValue()));
+        TextButton settings = new TextButton("Settings", skin);
+        settings.setName(MenuOption.SETTINGS.name());
+        contentTable.add(settings).padTop(10f).row();
+        onClick(settings, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
+        onEnter(settings, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         textButton = new TextButton("Quit Game", skin);
         textButton.setName(MenuOption.QUIT_GAME.name());
@@ -66,28 +65,10 @@ public class MenuView extends View<MenuViewModel> {
         add(contentTable).row();
     }
 
-    private Slider setupVolumesSlider(Table contentTable, String title, MenuOption menuOption) {
-        Table table = new Table();
-        table.setName(menuOption.name());
-
-        Label label = new Label(title, skin, "text_12");
-        label.setColor(skin.getColor("sand"));
-        table.add(label).row();
-
-        Slider slider = new Slider(0f, 1f, .05f, false, skin);
-        table.add(slider);
-        contentTable.add(table).padTop(10.0f).row();
-
-        onEnter(table, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
-        return slider;
-    }
-
     @Override
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.ON_DOWN, Boolean.class, this::onDown);
         viewModel.onPropertyChange(Constants.ON_UP, Boolean.class, this::onUp);
-        viewModel.onPropertyChange(Constants.ON_RIGHT, Boolean.class, this::onRight);
-        viewModel.onPropertyChange(Constants.ON_LEFT, Boolean.class, this::onLeft);
         viewModel.onPropertyChange(Constants.ON_SELECT, Boolean.class, this::onSelect);
     }
 
@@ -99,38 +80,25 @@ public class MenuView extends View<MenuViewModel> {
         selectedItem = viewModel.getUiServices().moveUp(selectedItem);
     }
 
-    public void onRight(Object o) {
-        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
-        switch (menuOption) {
-            case MUSIC_VOLUME, SOUND_VOLUME -> {
-                Slider slider = (Slider) selectedItem.getChild(1);
-                slider.setValue(slider.getValue() + slider.getStepSize());
-            }
-        }
-    }
-
-    public void onLeft(Object o) {
-        MenuOption menuOption = MenuOption.valueOf(selectedItem.getName());
-        switch (menuOption) {
-            case MUSIC_VOLUME, SOUND_VOLUME -> {
-                Slider slider = (Slider) selectedItem.getChild(1);
-                slider.setValue(slider.getValue() - slider.getStepSize());
-            }
-        }
-    }
-
     public void onSelect(Object o) {
         MenuOption menuOption = MenuOption.valueOf(this.selectedItem.getName());
         switch (menuOption) {
             case START_GAME -> viewModel.startGame();
             case QUIT_GAME -> viewModel.quitGame();
+            case SETTINGS -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS));
+        }
+    }
+
+    public void selectSettings() {
+        Group settingsItem = findActor(MenuOption.SETTINGS.name());
+        if (settingsItem != null) {
+            selectedItem = viewModel.getUiServices().selectMenuItem(settingsItem);
         }
     }
 
     private enum MenuOption {
         START_GAME,
-        MUSIC_VOLUME,
-        SOUND_VOLUME,
+        SETTINGS,
         QUIT_GAME
     }
 }

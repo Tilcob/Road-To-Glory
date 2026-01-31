@@ -105,6 +105,8 @@ public class Constants {
     public static final String ON_UP = "onUp";
     public static final String ON_DOWN = "onDown";
     public static final String ON_SELECT = "onSelect";
+    public static final String ON_CANCEL = "onCancel";
+    public static final String OPEN_SETTINGS = "openSettings";
     public static final String ADD_QUESTS = "addQuests";
     public static final String SHOW_DIALOG = "showDialog";
     public static final String HIDE_DIALOG = "hideDialog";
