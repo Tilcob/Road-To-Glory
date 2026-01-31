@@ -168,4 +168,3 @@ Thumbs.db
 
 # Generated asset indexes
 assets/**/index.json
-/assets/tests/
