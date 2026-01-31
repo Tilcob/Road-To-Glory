@@ -5,17 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.github.tilcob.game.GameServices;
-import com.github.tilcob.game.ui.model.ChestViewModel;
-import com.github.tilcob.game.ui.model.GameViewModel;
-import com.github.tilcob.game.ui.model.InventoryViewModel;
-import com.github.tilcob.game.ui.model.PauseViewModel;
-import com.github.tilcob.game.ui.model.SettingsViewModel;
-import com.github.tilcob.game.ui.view.ChestView;
-import com.github.tilcob.game.ui.view.DebugOverlayView;
-import com.github.tilcob.game.ui.view.GameView;
-import com.github.tilcob.game.ui.view.InventoryView;
-import com.github.tilcob.game.ui.view.PauseView;
-import com.github.tilcob.game.ui.view.SettingsView;
+import com.github.tilcob.game.ui.model.*;
+import com.github.tilcob.game.ui.view.*;
 
 public class GameUiBuilder {
     public record UiDependencies(

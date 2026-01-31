@@ -19,7 +19,10 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.debug.ContentHotReload;
 import com.github.tilcob.game.debug.ContentReloadService;
-import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.event.AutosaveEvent;
+import com.github.tilcob.game.event.MapChangeEvent;
+import com.github.tilcob.game.event.PauseEvent;
+import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -31,11 +34,12 @@ import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.GameUiBuilder;
 import com.github.tilcob.game.ui.model.*;
-import com.github.tilcob.game.ui.view.*;
+import com.github.tilcob.game.ui.overlay.UiOverlayManager;
+import com.github.tilcob.game.ui.view.DebugOverlayView;
+import com.github.tilcob.game.ui.view.PauseView;
+import com.github.tilcob.game.ui.view.SettingsView;
 
 import java.util.function.Consumer;
-
-import static com.github.tilcob.game.event.UiOverlayEvent.Type.*;
 
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
@@ -66,7 +70,7 @@ public class GameScreen extends ScreenAdapter {
     private boolean paused;
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
-    private SettingsOverlayController settingsOverlayController;
+    private UiOverlayManager uiOverlayManager;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -129,15 +133,18 @@ public class GameScreen extends ScreenAdapter {
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
-        settingsOverlayController = new SettingsOverlayController(
+        uiOverlayManager = new UiOverlayManager(
             stage,
+            services.getEventBus(),
+            inputManager,
+            gameUiGroup,
             pauseView,
             settingsView,
-            pauseView::selectSettings,
-            settingsView::resetSelection
+            settingsViewModel,
+            true
         );
-        setPaused(false);
-        services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
+        uiOverlayManager.show();
+        uiOverlayManager.setPaused(false);
 
         Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
         Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
@@ -150,7 +157,6 @@ public class GameScreen extends ScreenAdapter {
 
         createPlayer();
         loadQuest();
-        services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
     }
 
     private void loadQuest() {
@@ -187,39 +193,13 @@ public class GameScreen extends ScreenAdapter {
     public void hide() {
         engine.removeAllEntities();
         stage.clear();
-        services.getEventBus().unsubscribe(UiOverlayEvent.class, this::onOverlayEvent);
+        if (uiOverlayManager != null) {
+            uiOverlayManager.hide();
+        }
 
         if (settingsViewModel != null) {
             settingsViewModel.dispose();
             settingsViewModel = null;
-        }
-    }
-
-    private void onOverlayEvent(UiOverlayEvent event) {
-        if (event == null || !paused) return;
-
-        switch (event.type()) {
-            case OPEN_SETTINGS, TOGGLE_SETTINGS -> {
-                boolean willOpen = (event.type() == OPEN_SETTINGS) || !settingsViewModel.isOpen();
-                if (willOpen) {
-                    openSettingsOverlay();
-                } else {
-                    closeSettingsOverlay();
-                }
-            }
-            case CLOSE_SETTINGS -> closeSettingsOverlay();
-        }
-    }
-
-    private void closeSettingsOverlay() {
-        if (settingsOverlayController != null) {
-            settingsOverlayController.closeSettings();
-        }
-    }
-
-    private void openSettingsOverlay() {
-        if (settingsOverlayController != null) {
-            settingsOverlayController.openSettings();
         }
     }
 
@@ -259,10 +239,7 @@ public class GameScreen extends ScreenAdapter {
         if (event == null) return;
         switch (event.action()) {
             case PAUSE -> setPaused(true);
-            case RESUME -> {
-                setPaused(false);
-                services.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
-            }
+            case RESUME -> setPaused(false);
             case TOGGLE -> setPaused(!paused);
         }
     }
@@ -270,22 +247,8 @@ public class GameScreen extends ScreenAdapter {
     private void setPaused(boolean paused) {
         this.paused = paused;
 
-        if (pauseView != null) {
-            pauseView.setVisible(paused);
-            if (paused) {
-                pauseView.toFront();
-                pauseView.resetSelection();
-            }
-        }
-
-        if (gameUiGroup != null) {
-            gameUiGroup.setVisible(!paused);
-        }
-
-        if (paused) {
-            inputManager.setActiveState(UiControllerState.class);
-        } else {
-            inputManager.setActiveState(GameControllerState.class);
+        if (uiOverlayManager != null) {
+            uiOverlayManager.setPaused(paused);
         }
     }
 
@@ -336,13 +299,19 @@ public class GameScreen extends ScreenAdapter {
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
-        settingsOverlayController = new SettingsOverlayController(
+        if (uiOverlayManager != null) uiOverlayManager.hide();
+        uiOverlayManager = new UiOverlayManager(
             stage,
+            settingsViewModel.getEventBus(),
+            inputManager,
+            gameUiGroup,
             pauseView,
             settingsView,
-            pauseView::selectSettings,
-            settingsView::resetSelection
+            settingsViewModel,
+            false
         );
+        uiOverlayManager.show();
+        uiOverlayManager.setPaused(paused);
     }
 
     private GameUiBuilder.UiDependencies buildUiDependencies() {
@@ -380,6 +349,9 @@ public class GameScreen extends ScreenAdapter {
         }
         services.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().unsubscribe(PauseEvent.class, this::togglePause);
+        if (uiOverlayManager != null) {
+            uiOverlayManager.dispose();
+        }
         gameViewModel.dispose();
         pauseViewModel.dispose();
         physicWorld.dispose();

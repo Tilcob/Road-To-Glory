@@ -1,16 +1,16 @@
-package com.github.tilcob.game.screen;
+package com.github.tilcob.game.ui.overlay;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-final class SettingsOverlayController {
+public final class SettingsOverlayController {
     private final Stage stage;
     private final Actor baseView;
     private final Actor settingsView;
     private final Runnable onBaseShown;
     private final Runnable onSettingsShown;
 
-    SettingsOverlayController(
+    public SettingsOverlayController(
         Stage stage,
         Actor baseView,
         Actor settingsView,
@@ -24,7 +24,7 @@ final class SettingsOverlayController {
         this.onSettingsShown = onSettingsShown;
     }
 
-    void openSettings() {
+    public void openSettings() {
         if (baseView != null && baseView.getStage() != null) {
             baseView.remove();
         }
@@ -40,7 +40,7 @@ final class SettingsOverlayController {
         }
     }
 
-    void closeSettings() {
+    public void closeSettings() {
         if (settingsView != null && settingsView.getStage() != null) {
             settingsView.remove();
         }

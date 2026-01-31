@@ -9,13 +9,13 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SkinAsset;
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.input.IdleControllerState;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.UiControllerState;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
+import com.github.tilcob.game.ui.overlay.SettingsOverlayController;
 import com.github.tilcob.game.ui.view.MenuView;
 import com.github.tilcob.game.ui.view.SettingsView;
 
