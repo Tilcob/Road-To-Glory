@@ -71,7 +71,6 @@ public class MenuScreen extends ScreenAdapter {
         settingsView = new SettingsView(skin, stage, settingsViewModel);
 
         settingsOverlayController = new SettingsOverlayController(
-            stage,
             menuView,
             settingsView,
             menuView::selectSettings,
@@ -79,6 +78,8 @@ public class MenuScreen extends ScreenAdapter {
         );
 
         stage.addActor(menuView);
+        stage.addActor(settingsView);
+        settingsView.setVisible(false);
 
         services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
         services.getAudioManager().playMusic(MusicAsset.MENU);

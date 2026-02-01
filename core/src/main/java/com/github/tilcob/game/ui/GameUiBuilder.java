@@ -71,12 +71,8 @@ public class GameUiBuilder {
         );
         DebugOverlayView debugOverlayView = null;
 
-        if (showSettings) {
-            stage.addActor(settingsView);
-        }
-
+        settingsView.setVisible(showSettings);
         pauseView.setVisible(paused);
-        stage.addActor(pauseView);
 
         if (dependencies.debugEnabled()) {
             debugOverlayView = new DebugOverlayView(

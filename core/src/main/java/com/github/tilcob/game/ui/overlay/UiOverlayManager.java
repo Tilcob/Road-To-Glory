@@ -15,6 +15,7 @@ public final class UiOverlayManager {
     private final GameEventBus eventBus;
     private final InputManager inputManager;
     private final Group gameUiGroup;
+    private final Group overlayGroup;
     private final PauseView pauseView;
     private final SettingsViewModel settingsViewModel;
     private final SettingsOverlayController settingsOverlayController;
@@ -34,16 +35,29 @@ public final class UiOverlayManager {
         this.eventBus = eventBus;
         this.inputManager = inputManager;
         this.gameUiGroup = gameUiGroup;
+        this.overlayGroup = new Group();
         this.pauseView = pauseView;
         this.settingsViewModel = settingsViewModel;
         this.settingsOverlayController = new SettingsOverlayController(
-            stage,
             pauseView,
             settingsView,
-            pauseView::selectSettings,
+            pauseView::resetSelection,
             settingsView::resetSelection
         );
         this.closeSettingsOnShow = closeSettingsOnShow;
+
+        if (stage != null) {
+            stage.addActor(overlayGroup);
+        }
+        if (pauseView != null) {
+            pauseView.remove();
+            overlayGroup.addActor(pauseView);
+        }
+        if (settingsView != null) {
+            settingsView.remove();
+            settingsView.setVisible(settingsViewModel != null && settingsViewModel.isOpen());
+            overlayGroup.addActor(settingsView);
+        }
     }
 
     public void show() {
@@ -55,6 +69,7 @@ public final class UiOverlayManager {
 
     public void hide() {
         eventBus.unsubscribe(UiOverlayEvent.class, this::onOverlayEvent);
+        overlayGroup.remove();
     }
 
     public void setPaused(boolean paused) {
@@ -65,6 +80,11 @@ public final class UiOverlayManager {
         if (paused) {
             pauseView.toFront();
             pauseView.resetSelection();
+            if (settingsViewModel != null && settingsViewModel.isOpen()) {
+                openSettingsOverlay();
+            } else {
+                closeSettingsOverlay();
+            }
         }
 
         if (gameUiGroup != null) {
@@ -74,6 +94,7 @@ public final class UiOverlayManager {
         if (paused) {
             inputManager.setActiveState(UiControllerState.class);
         } else {
+            closeSettingsOverlay();
             inputManager.setActiveState(GameControllerState.class);
             if (wasPaused) {
                 eventBus.fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
