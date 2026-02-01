@@ -36,7 +36,7 @@ public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
     private final Group gameUiGroup;
-    private final GameUiBuilder gameUiBuilder = new GameUiBuilder();
+    private final GameUiBuilder gameUiBuilder;
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
@@ -68,6 +68,7 @@ public class GameScreen extends ScreenAdapter {
         this.uiViewport = uiViewport;
         this.gameUiGroup = new Group();
         this.gameUiGroup.setSize(uiViewport.getWorldWidth(), uiViewport.getWorldHeight());
+        this.gameUiBuilder = new GameUiBuilder(services);
     }
 
     void initialize(GameScreenModule.Dependencies dependencies) {

@@ -39,6 +39,10 @@ pans or scripted movement completes.
 Item definitions live in `assets/items/index.json`, which is generated from the
 `.json` quest files in `assets/items` and loaded from file name.
 
+### Skill data
+
+Skill tree definitions live in `assets/skills/index.json`, which includes `.json` files defining trees (nodes, XP tables, modifiers). Loaded via `SkillTreeLoader`.
+
 ## Codebase documentation
 
 The core module follows a layered architecture on top of Ashley ECS. The most important packages are documented via
@@ -49,6 +53,7 @@ The core module follows a layered architecture on top of Ashley ECS. The most im
 - `com.github.tilcob.game.ai`: NPC state/behavior configuration and AI state machines.
 - `com.github.tilcob.game.dialog`: Dialog data, selection logic, and Yarn loader integration.
 - `com.github.tilcob.game.quest`: Quest definitions, steps, and rewards.
+- `com.github.tilcob.game.skill`: Skill tree loading, data structures, and progression logic.
 - `com.github.tilcob.game.save`: Save service, registry, and migration helpers.
 - `com.github.tilcob.game.ui`: Scene2D UI views, models, and inventory widgets.
 

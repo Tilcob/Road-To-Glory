@@ -101,7 +101,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                     @Override
                     public void clicked(InputEvent event, float x, float y) {
                         viewModel.unlockNode(node.getId());
-                        refresh(); // Optimistic refresh
+                        refresh();
                     }
                 });
             }

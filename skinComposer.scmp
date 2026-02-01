@@ -12509,13 +12509,13 @@ jsonData: {
 						type: com.badlogic.gdx.scenes.scene2d.utils.Drawable
 						name: background
 						optional: true
-						value: null
+						value: Other_panel_brown
 					}
 					titleFont: {
 						type: com.badlogic.gdx.graphics.g2d.BitmapFont
 						name: titleFont
 						optional: false
-						value: null
+						value: Kenny_Future_10
 					}
 					titleFontColor: {
 						type: com.badlogic.gdx.graphics.Color

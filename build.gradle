@@ -219,8 +219,8 @@ tasks.register("genMapsIndex") {
 
 tasks.register("genSkillIndex") {
   group = "assets"
-  description = "Generates assets/skill/index.json from *.json."
-  doLast genIndex("skill", [".json"])
+  description = "Generates assets/skill-trees/index.json from *.json."
+  doLast genIndex("skill-trees", [".json"])
 }
 
 tasks.register("genAssetIndexes") {

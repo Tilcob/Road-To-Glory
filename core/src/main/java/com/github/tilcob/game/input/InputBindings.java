@@ -29,7 +29,8 @@ public class InputBindings {
         }
         for (Map.Entry<String, String> entry : bindingFile.bindings.entrySet()) {
             Command command = parseCommand(entry.getKey());
-            if (command == null) continue;
+            if (command == null)
+                continue;
             int keycode = parseKeycode(entry.getValue());
             if (keycode != Input.Keys.UNKNOWN) {
                 bindings.put(command, keycode);
@@ -79,6 +80,7 @@ public class InputBindings {
         bindings.put(Command.PAUSE, Input.Keys.ESCAPE);
         bindings.put(Command.INTERACT, Input.Keys.E);
         bindings.put(Command.INVENTORY, Input.Keys.I);
+        bindings.put(Command.SKILLS, Input.Keys.K);
         return bindings;
     }
 

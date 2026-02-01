@@ -9,6 +9,12 @@ import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.view.*;
 
 public class GameUiBuilder {
+    private final GameServices services;
+
+    public GameUiBuilder(GameServices services) {
+        this.services = services;
+    }
+
     public record UiDependencies(
         Stage stage,
         Skin skin,
@@ -56,7 +62,9 @@ public class GameUiBuilder {
         SettingsView settingsView = new SettingsView(
             dependencies.skin(),
             stage,
-            dependencies.settingsViewModel()
+            dependencies.settingsViewModel() != null
+                ? dependencies.settingsViewModel()
+                : new SettingsViewModel(services)
         );
         PauseView pauseView = new PauseView(
             dependencies.skin(),
