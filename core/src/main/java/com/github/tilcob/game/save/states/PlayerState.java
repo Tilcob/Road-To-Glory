@@ -5,6 +5,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.stat.StatType;
 
 import java.util.*;
 
@@ -18,6 +19,7 @@ public class PlayerState {
     private List<ItemSlotState> itemSlots = new ArrayList<>();
     private Map<ItemCategory, EquipmentSlotState> equipmentSlots = new EnumMap<>(ItemCategory.class);
     private Map<String, SkillTreeStateSnapshot> skillTrees = new HashMap<>();
+    private List<StatModifierState> statModifiers = new ArrayList<>();
 
     public PlayerState() { }
 
@@ -60,6 +62,14 @@ public class PlayerState {
 
     public void setSkillTrees(Map<String, SkillTreeStateSnapshot> skillTrees) {
         this.skillTrees = skillTrees;
+    }
+
+    public List<StatModifierState> getStatModifiers() {
+        return statModifiers;
+    }
+
+    public void setStatModifiers(List<StatModifierState> statModifiers) {
+        this.statModifiers = statModifiers;
     }
 
     @JsonIgnore
@@ -197,6 +207,81 @@ public class PlayerState {
 
         public void setSlotIndex(int slotIndex) {
             this.slotIndex = slotIndex;
+        }
+    }
+
+    public static class StatModifierState {
+        private StatType statType;
+        private float additive;
+        private float multiplier;
+        private String source;
+        private Float durationSeconds;
+        private Long expireTimeEpochMs;
+
+        public StatModifierState() { }
+
+        public StatModifierState(
+            StatType statType,
+            float additive,
+            float multiplier,
+            String source,
+            Float durationSeconds,
+            Long expireTimeEpochMs
+        ) {
+            this.statType = statType;
+            this.additive = additive;
+            this.multiplier = multiplier;
+            this.source = source;
+            this.durationSeconds = durationSeconds;
+            this.expireTimeEpochMs = expireTimeEpochMs;
+        }
+
+        public StatType getStatType() {
+            return statType;
+        }
+
+        public void setStatType(StatType statType) {
+            this.statType = statType;
+        }
+
+        public float getAdditive() {
+            return additive;
+        }
+
+        public void setAdditive(float additive) {
+            this.additive = additive;
+        }
+
+        public float getMultiplier() {
+            return multiplier;
+        }
+
+        public void setMultiplier(float multiplier) {
+            this.multiplier = multiplier;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        public Float getDurationSeconds() {
+            return durationSeconds;
+        }
+
+        public void setDurationSeconds(Float durationSeconds) {
+            this.durationSeconds = durationSeconds;
+        }
+
+        public Long getExpireTimeEpochMs() {
+            return expireTimeEpochMs;
+        }
+
+        public void setExpireTimeEpochMs(Long expireTimeEpochMs) {
+            this.expireTimeEpochMs = expireTimeEpochMs;
         }
     }
 }

@@ -9,6 +9,7 @@ import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.save.states.PlayerState;
 import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.save.states.SkillTreeStateSnapshot;
+import com.github.tilcob.game.stat.StatModifier;
 
 public class PlayerStateApplier {
     public static void apply(PlayerState state, Entity player, InventoryService inventoryService) {
@@ -18,6 +19,7 @@ public class PlayerStateApplier {
         Physic physic = Physic.MAPPER.get(player);
         Equipment equipment = Equipment.MAPPER.get(player);
         Skill skill = Skill.MAPPER.get(player);
+        StatModifierComponent statModifiers = StatModifierComponent.MAPPER.get(player);
 
         if (transform == null || life == null || inventory == null) return;
 
@@ -79,6 +81,25 @@ public class PlayerStateApplier {
                     treeState.addUnlockedNode(nodeId);
                 }
                 skill.getTrees().put(entry.getKey(), treeState);
+            }
+        }
+
+        if (state.getStatModifiers() != null) {
+            if (statModifiers == null) {
+                statModifiers = new StatModifierComponent();
+                player.add(statModifiers);
+            }
+            statModifiers.getModifiers().clear();
+            for (PlayerState.StatModifierState modifierState : state.getStatModifiers()) {
+                if (modifierState == null) continue;
+                statModifiers.addModifier(new StatModifier(
+                    modifierState.getStatType(),
+                    modifierState.getAdditive(),
+                    modifierState.getMultiplier(),
+                    modifierState.getSource(),
+                    modifierState.getDurationSeconds(),
+                    modifierState.getExpireTimeEpochMs()
+                ));
             }
         }
     }

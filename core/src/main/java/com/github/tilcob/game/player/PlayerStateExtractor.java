@@ -14,6 +14,7 @@ public class PlayerStateExtractor {
         Inventory inventory = Inventory.MAPPER.get(entity);
         Equipment equipment = Equipment.MAPPER.get(entity);
         Skill skill = Skill.MAPPER.get(entity);
+        StatModifierComponent statModifiers = StatModifierComponent.MAPPER.get(entity);
         PlayerState state = new PlayerState();
 
         if (transform == null || life == null || inventory == null) return state;
@@ -54,6 +55,20 @@ public class PlayerStateExtractor {
                 snapshot.setSkillPoints(entry.getValue().getSkillPoints());
                 snapshot.setUnlockedNodes(entry.getValue().getUnlockedNodes());
                 state.getSkillTrees().put(entry.getKey(), snapshot);
+            }
+        }
+
+        if (statModifiers != null && statModifiers.getModifiers() != null) {
+            for (var modifier : statModifiers.getModifiers()) {
+                if (modifier == null) continue;
+                state.getStatModifiers().add(new PlayerState.StatModifierState(
+                    modifier.getStatType(),
+                    modifier.getAdditive(),
+                    modifier.getMultiplier(),
+                    modifier.getSource(),
+                    modifier.getDurationSeconds(),
+                    modifier.getExpireTimeEpochMs()
+                ));
             }
         }
 

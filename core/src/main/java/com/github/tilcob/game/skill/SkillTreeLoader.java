@@ -16,6 +16,7 @@ public class SkillTreeLoader {
     private static final String TAG = SkillTreeLoader.class.getSimpleName();
 
     public static void loadAll() {
+        if (!DEFINITIONS.isEmpty()) Gdx.app.log(TAG, "Reloading skill trees.");
         DEFINITIONS.clear();
         FileHandle dir = Gdx.files.internal("skill-trees");
         if (!dir.exists()) {
