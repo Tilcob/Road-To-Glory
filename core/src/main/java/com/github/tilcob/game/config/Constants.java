@@ -3,12 +3,14 @@ package com.github.tilcob.game.config;
 import com.badlogic.gdx.math.Vector2;
 
 public class Constants {
-    private Constants() {}
+    private Constants() {
+    }
 
     public static final boolean DEBUG = Boolean.parseBoolean(System.getProperty("game.debug", "false"));
 
     // Window
-    // 16 units wide and 9 units high. 1 unit ~ 1 Tile (32px * 32px || 16px * 16px || ...)
+    // 16 units wide and 9 units high. 1 unit ~ 1 Tile (32px * 32px || 16px * 16px
+    // || ...)
     public static final float WIDTH = 16f;
     public static final float HEIGHT = 9f;
     public static final int WINDOW_FACTOR = 100;
@@ -32,7 +34,6 @@ public class Constants {
     public static final String GROUND_LAYER = "ground";
     public static final String BACKGROUND_LAYER = "background";
     public static final String FORE_LAYER = "foreground";
-
 
     public static final String ENVIRONMENT = "environment";
 
@@ -79,13 +80,12 @@ public class Constants {
     public static final String TILE_WIDTH = "tilewidth";
     public static final String TILE_HEIGHT = "tileheight";
     public static final String MUSIC = "music";
-    public static final String TYPE = "type";   // That's the class (Klasse) field in Tiled
+    public static final String TYPE = "type"; // That's the class (Klasse) field in Tiled
     public static final String TRIGGER_CLASS = "Trigger";
-
 
     // Box2D / Physics constants
     public static final Vector2 GRAVITY = Vector2.Zero;
-    public static final Vector2 DEFAULT_PHYSIC_SCALING = new Vector2(1f,1f);
+    public static final Vector2 DEFAULT_PHYSIC_SCALING = new Vector2(1f, 1f);
     public static final int MAX_NUM_OF_VERTICES = 8; // must be in between 3 and 8
     public static final float AGGRO_RANGE = 5f; // 5 tiles range
     public static final float ENEMY_ATTACK_RANGE = 0.75f;
@@ -98,6 +98,7 @@ public class Constants {
     public static final String LIFE_POINTS_PC = "lifePoints";
     public static final String MAX_LIFE_PC = "maxLife";
     public static final String PLAYER_DAMAGE_PC = "playerDamage";
+    public static final String INVENTORY_FULL = "inventoryFull";
     public static final String OPEN_INVENTORY = "openInventory";
     public static final String ADD_ITEMS_TO_INVENTORY = "addItems";
     public static final String ON_LEFT = "onLeft";

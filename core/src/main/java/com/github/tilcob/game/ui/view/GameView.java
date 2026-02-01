@@ -147,6 +147,8 @@ public class GameView extends View<GameViewModel> {
         viewModel.onPropertyChange(Constants.HIDE_DIALOG_CHOICES, Boolean.class, value -> hideChoices());
         viewModel.onPropertyChange(Constants.SHOW_REWARD_DIALOG, RewardDisplay.class, this::showRewardDialog);
         viewModel.onPropertyChange(Constants.HIDE_REWARD_DIALOG, Boolean.class, value -> hideRewardDialog());
+        viewModel.onPropertyChange(Constants.INVENTORY_FULL, Boolean.class,
+                value -> showNotification("Inventory full!"));
     }
 
     private void showDialog(DialogDisplay display) {
@@ -237,28 +239,49 @@ public class GameView extends View<GameViewModel> {
         }
     }
 
+    private void showNotification(String message) {
+        TextraLabel label = new TypingLabel(message, skin);
+        label.setPosition(
+                stage.getViewport().getWorldWidth() / 2f - label.getPrefWidth() / 2f,
+                stage.getViewport().getWorldHeight() * 0.8f);
+        stage.addActor(label);
+        label.addAction(Actions.sequence(
+                Actions.moveBy(0, 50, 1f),
+                Actions.fadeOut(1f),
+                Actions.removeActor()));
+    }
+
     private void showDamage(Map.Entry<Vector2, Integer> damageAndPosition) {
-        final Vector2 position = damageAndPosition.getKey();
-        int damage = damageAndPosition.getValue();
-
-        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RED}" + damage, skin);
-        stage.addActor(textraLabel);
-
-        textraLabel.addAction(
-            Actions.parallel(
-                Actions.sequence(Actions.delay(1.25f), Actions.removeActor()),
-                Actions.forever(Actions.run(() -> {
-                    Vector2 stageCoords = toStageCoords(position);
-                    textraLabel.setPosition(stageCoords.x, stageCoords.y);
-                }))
-            )
-        );
+        new DamageIndicator(damageAndPosition.getKey(), damageAndPosition.getValue()).show();
     }
 
     private Vector2 toStageCoords(Vector2 gamePosition) {
         Vector2 resultPos = viewModel.toScreenCoords(gamePosition);
         stage.getViewport().unproject(resultPos);
-        resultPos.y = stage.getViewport().getWorldHeight() -  resultPos.y;
+        resultPos.y = stage.getViewport().getWorldHeight() - resultPos.y;
         return resultPos;
+    }
+
+    private class DamageIndicator {
+        private final Vector2 position;
+        private final TextraLabel label;
+
+        DamageIndicator(Vector2 position, int damage) {
+            this.position = position;
+            this.label = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RED}" + damage, skin);
+        }
+
+        void show() {
+            stage.addActor(label);
+            label.addAction(
+                    Actions.parallel(
+                            Actions.sequence(Actions.delay(1.25f), Actions.removeActor()),
+                            Actions.forever(Actions.run(this::updatePosition))));
+        }
+
+        private void updatePosition() {
+            Vector2 stageCoords = toStageCoords(position);
+            label.setPosition(stageCoords.x, stageCoords.y);
+        }
     }
 }

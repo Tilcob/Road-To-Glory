@@ -40,15 +40,16 @@ public abstract class ViewModel {
         if (event.action() == UiEvent.Action.RELEASE) return;
 
         switch (event.command()) {
-            case LEFT ->  onLeft();
-            case RIGHT ->  onRight();
+            case LEFT -> onLeft();
+            case RIGHT -> onRight();
             case UP -> onUp();
             case DOWN -> onDown();
             case SELECT -> onSelect();
             case CANCEL -> onCancel();
+            default -> {
+            }
         }
     }
-
 
     protected void onSelect() {
         this.propertyChangeSupport.firePropertyChange(Constants.ON_SELECT, null, true);
@@ -82,9 +83,13 @@ public abstract class ViewModel {
         return services.getUiServices();
     }
 
-    public void setActive(boolean active) { this.active = active; }
+    public void setActive(boolean active) {
+        this.active = active;
+    }
 
-    public boolean isActive() { return active; }
+    public boolean isActive() {
+        return active;
+    }
 
     public void dispose() {
         gameEventBus.unsubscribe(UiEvent.class, this::onUiEvent);

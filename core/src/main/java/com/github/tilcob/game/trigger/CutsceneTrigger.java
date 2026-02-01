@@ -13,13 +13,13 @@ public class CutsceneTrigger implements TriggerHandler {
     }
 
     @Override
-    public void execute(Entity trigger, Entity triggeringEntity) {
+    public void onEnter(Entity trigger, Entity triggeringEntity) {
         CutsceneReference reference = CutsceneReference.MAPPER.get(trigger);
         if (reference == null) return;
         eventBus.fire(new CutsceneRequestedEvent(triggeringEntity, reference.getCutsceneId()));
     }
 
     @Override
-    public void exit(Entity trigger, Entity triggeringEntity) {
+    public void onExit(Entity trigger, Entity triggeringEntity) {
     }
 }

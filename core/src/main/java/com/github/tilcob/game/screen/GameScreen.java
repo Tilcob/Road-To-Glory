@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,14 +21,7 @@ import com.github.tilcob.game.debug.ContentReloadService;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.PauseEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.*;
-import com.github.tilcob.game.player.PlayerFactory;
-import com.github.tilcob.game.player.PlayerStateApplier;
-import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestLoader;
-import com.github.tilcob.game.system.CameraSystem;
-import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.GameUiBuilder;
@@ -39,8 +31,6 @@ import com.github.tilcob.game.ui.view.DebugOverlayView;
 import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
 import com.github.tilcob.game.world.GameWorldLoader;
-
-import java.util.function.Consumer;
 
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
@@ -99,15 +89,14 @@ public class GameScreen extends ScreenAdapter {
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
         this.worldLoader = new GameWorldLoader(new GameWorldLoader.Dependencies(
-            services,
-            engine,
-            tiledManager,
-            tiledAshleyConfigurator,
-            audioManager,
-            physicWorld,
-            uiViewport,
-            activeEntityReference
-        ));
+                services,
+                engine,
+                tiledManager,
+                tiledAshleyConfigurator,
+                audioManager,
+                physicWorld,
+                uiViewport,
+                activeEntityReference));
 
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
@@ -124,7 +113,8 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
         inputManager.setInputProcessors(stage);
-        inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState, uiControllerState);
+        inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState,
+                uiControllerState);
         clearAllControllerCommands();
 
         stage.addActor(gameUiGroup);
@@ -136,24 +126,22 @@ public class GameScreen extends ScreenAdapter {
         }
 
         GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
-            stage,
-            buildUiDependencies(),
-            paused,
-            false
-        );
+                stage,
+                buildUiDependencies(),
+                paused,
+                false);
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
         uiOverlayManager = new UiOverlayManager(
-            stage,
-            services.getEventBus(),
-            inputManager,
-            gameUiGroup,
-            pauseView,
-            settingsView,
-            settingsViewModel,
-            true
-        );
+                stage,
+                services.getEventBus(),
+                inputManager,
+                gameUiGroup,
+                pauseView,
+                settingsView,
+                settingsViewModel,
+                true);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(false);
 
@@ -266,25 +254,24 @@ public class GameScreen extends ScreenAdapter {
 
         boolean showSettings = settingsViewModel.isOpen() && paused;
         GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
-            stage,
-            buildUiDependencies(),
-            paused,
-            showSettings
-        );
+                stage,
+                buildUiDependencies(),
+                paused,
+                showSettings);
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
-        if (uiOverlayManager != null) uiOverlayManager.hide();
+        if (uiOverlayManager != null)
+            uiOverlayManager.hide();
         uiOverlayManager = new UiOverlayManager(
-            stage,
-            settingsViewModel.getEventBus(),
-            inputManager,
-            gameUiGroup,
-            pauseView,
-            settingsView,
-            settingsViewModel,
-            false
-        );
+                stage,
+                settingsViewModel.getEventBus(),
+                inputManager,
+                gameUiGroup,
+                pauseView,
+                settingsView,
+                settingsViewModel,
+                false);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);
     }
@@ -296,17 +283,16 @@ public class GameScreen extends ScreenAdapter {
 
     private GameUiBuilder.UiDependencies buildUiDependencies() {
         return new GameUiBuilder.UiDependencies(
-            stage,
-            skin,
-            gameViewModel,
-            inventoryViewModel,
-            chestViewModel,
-            pauseViewModel,
-            settingsViewModel,
-            engine,
-            services,
-            Constants.DEBUG
-        );
+                stage,
+                skin,
+                gameViewModel,
+                inventoryViewModel,
+                chestViewModel,
+                pauseViewModel,
+                settingsViewModel,
+                engine,
+                services,
+                Constants.DEBUG);
     }
 
     private void clearAllControllerCommands() {
@@ -329,6 +315,7 @@ public class GameScreen extends ScreenAdapter {
         }
         services.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().unsubscribe(PauseEvent.class, this::togglePause);
+        if (audioManager != null) audioManager.dispose();
         if (uiOverlayManager != null) {
             uiOverlayManager.dispose();
         }

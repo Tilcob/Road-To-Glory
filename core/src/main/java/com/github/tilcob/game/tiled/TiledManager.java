@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
@@ -123,11 +124,22 @@ public class TiledManager {
                 || object instanceof EllipseMapObject
                 || object instanceof PolygonMapObject
                 || object instanceof PolylineMapObject) {
-                String typeStr = object.getProperties().get(Constants.TRIGGER_TYPE, "", String.class);
-                loadTriggerConsumer.accept(Trigger.Type.valueOf(typeStr), object);
+                String typeStr = object.getProperties().get(Constants.TRIGGER_TYPE, Trigger.Type.UNDEFINED.name(), String.class);
+                Trigger.Type type = castTriggerType(typeStr);
+                loadTriggerConsumer.accept(type, object);
             } else {
                 throw new GdxRuntimeException("Unsupported trigger object: " + object);
             }
+        }
+    }
+
+    private Trigger.Type castTriggerType(String type) {
+        try {
+            return Trigger.Type.valueOf(type);
+        }  catch (IllegalArgumentException e) {
+            Gdx.app.error("TiledManager", "Invalid trigger type: " + type);
+            if (Constants.DEBUG) throw new GdxRuntimeException("Invalid trigger type: " + type);
+            return Trigger.Type.UNDEFINED;
         }
     }
 

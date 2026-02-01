@@ -2,6 +2,7 @@ package com.github.tilcob.game.tiled;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -405,7 +406,10 @@ public class TiledAshleyConfigurator {
     }
 
     private void createTrigger(Entity entity, Trigger.Type type, MapProperties properties, Tiled tile) {
-        if (type == Trigger.Type.UNDEFINED) return;
+        if (type == Trigger.Type.UNDEFINED) {
+            Gdx.app.error("TiledAshleyConfigurator", "Undefined trigger type: " + type);
+            return;
+        }
         entity.add(new Trigger(type));
         String questId = properties.get(Constants.QUEST_ID, "", String.class);
         if (!questId.isBlank()) entity.add(new Quest(questId));

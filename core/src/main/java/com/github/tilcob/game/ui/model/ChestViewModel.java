@@ -4,27 +4,26 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Chest;
-import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
-import com.github.tilcob.game.item.ItemDefinition;
-import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemModel;
+import com.github.tilcob.game.ui.UiModelFactory;
 
 public class ChestViewModel extends ViewModel {
     private final Array<ItemModel> chestItems = new Array<>();
     private final Array<ItemModel> playerItems = new Array<>();
+    private final UiModelFactory uiModelFactory;
     private boolean open = false;
     private boolean paused = false;
     private boolean isPlayerInventoryOpen = false;
     private Entity currentChest;
     private Entity currentPlayer;
 
-    public ChestViewModel(GameServices services) {
+    public ChestViewModel(GameServices services, UiModelFactory uiModelFactory) {
         super(services);
+        this.uiModelFactory = uiModelFactory;
 
         getEventBus().subscribe(OpenChestEvent.class, this::onOpenChest);
         getEventBus().subscribe(UpdateChestInventoryEvent.class, this::onChestInventoryUpdate);
@@ -93,17 +92,8 @@ public class ChestViewModel extends ViewModel {
         if (chest == null) return;
         Array<String> contents = chest.getContents();
         for (int i = 0; i < contents.size; i++) {
-            String itemId = ItemDefinitionRegistry.resolveId(contents.get(i));
-            ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
-            chestItems.add(new ItemModel(
-                -1,
-                definition.category(),
-                definition.name(),
-                definition.icon(),
-                i,
-                false,
-                1
-            ));
+            ItemModel model = uiModelFactory.createItemModel(contents.get(i), i);
+            chestItems.add(model);
         }
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_CHEST, null, chestItems);
     }
@@ -114,20 +104,10 @@ public class ChestViewModel extends ViewModel {
         Inventory inventory = Inventory.MAPPER.get(currentPlayer);
         if (inventory == null) return;
         for (Entity itemEntity : inventory.getItems()) {
-            Item item = Item.MAPPER.get(itemEntity);
-            Id idComp = Id.MAPPER.get(itemEntity);
-            if (idComp == null) continue;
-
-            ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
-            playerItems.add(new ItemModel(
-                idComp.getId(),
-                definition.category(),
-                definition.name(),
-                definition.icon(),
-                item.getSlotIndex(),
-                item.isEquipped(),
-                item.getCount()
-            ));
+            ItemModel model = uiModelFactory.createItemModel(itemEntity);
+            if (model != null) {
+                playerItems.add(model);
+            }
         }
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_PLAYER_IN_CHEST, null, playerItems);
     }

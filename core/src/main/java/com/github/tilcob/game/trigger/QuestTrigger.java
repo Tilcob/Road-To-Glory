@@ -13,14 +13,14 @@ public class QuestTrigger implements TriggerHandler{
     }
 
     @Override
-    public void execute(Entity trigger, Entity triggeringEntity) {
+    public void onEnter(Entity trigger, Entity triggeringEntity) {
         Quest quest = Quest.MAPPER.get(trigger);
         if (quest == null || quest.getQuestId().isBlank()) return;
         eventBus.fire(new AddQuestEvent(triggeringEntity, quest.getQuestId()));
     }
 
     @Override
-    public void exit(Entity trigger, Entity triggeringEntity) {
+    public void onExit(Entity trigger, Entity triggeringEntity) {
 
     }
 }
