@@ -4,12 +4,13 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.config.Constants;
 
-public class AudioManager {
+public class AudioManager implements Disposable {
     private final AssetManager assetManager;
     private Music currentMusic;
     private MusicAsset currentMusicAsset;
@@ -25,7 +26,8 @@ public class AudioManager {
     }
 
     public void playMusic(MusicAsset musicAsset) {
-        if (this.currentMusicAsset == musicAsset) return;
+        if (this.currentMusicAsset == musicAsset)
+            return;
 
         if (this.currentMusic != null) {
             this.currentMusic.stop();
@@ -66,9 +68,20 @@ public class AudioManager {
     public void setMap(TiledMap tiledMap) {
         String musicAssetStr = tiledMap.getProperties().get(Constants.MUSIC, "", String.class);
 
-        if (musicAssetStr.isBlank()) return;
+        if (musicAssetStr.isBlank())
+            return;
 
         MusicAsset musicAsset = MusicAsset.valueOf(musicAssetStr);
         playMusic(musicAsset);
+    }
+
+    @Override
+    public void dispose() {
+        assetManager.dispose();
+        if (currentMusic != null) {
+            currentMusic.dispose();
+            currentMusic = null;
+        }
+        currentMusicAsset = null;
     }
 }

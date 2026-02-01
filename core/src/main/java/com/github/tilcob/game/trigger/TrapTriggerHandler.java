@@ -17,7 +17,7 @@ public class TrapTriggerHandler implements TriggerHandler {
     }
 
     @Override
-    public void execute(Entity trap, Entity triggeringEntity) {
+    public void onEnter(Entity trap, Entity triggeringEntity) {
         Animation2D animation2D = Animation2D.MAPPER.get(trap);
         animation2D.setSpeed(Constants.DEFAULT_ANIMATION_SPEED);
         animation2D.setPlayMode(Animation.PlayMode.NORMAL);
@@ -35,7 +35,7 @@ public class TrapTriggerHandler implements TriggerHandler {
     }
 
     @Override
-    public void exit(Entity trigger, Entity triggeringEntity) {
+    public void onExit(Entity trigger, Entity triggeringEntity) {
 
     }
 }

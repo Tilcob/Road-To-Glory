@@ -59,9 +59,7 @@ public class PhysicSystem extends IteratingSystem implements EntityListener {
         }
         world.clearForces();
 
-        // interpolation
-
-        float alpha = accumulator / interval; // alpha is between [0,1) for render interpolation
+        float alpha = accumulator / interval;
 
         for (int i = 0; i < getEntities().size(); i++) {
             interpolateEntity(getEntities().get(i), alpha);

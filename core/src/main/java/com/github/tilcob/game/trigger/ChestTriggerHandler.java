@@ -14,7 +14,7 @@ public class ChestTriggerHandler implements TriggerHandler {
     }
 
     @Override
-    public void execute(Entity chest, Entity triggeringEntity) {
+    public void onEnter(Entity chest, Entity triggeringEntity) {
         OpenChestRequest openChestRequest = OpenChestRequest.MAPPER.get(triggeringEntity);
 
         if (openChestRequest == null || openChestRequest.getChest() != null) {
@@ -23,7 +23,7 @@ public class ChestTriggerHandler implements TriggerHandler {
     }
 
     @Override
-    public void exit(Entity trigger, Entity triggeringEntity) {
+    public void onExit(Entity trigger, Entity triggeringEntity) {
         eventBus.fire(new CloseChestEvent(triggeringEntity, Chest.MAPPER.get(trigger)));
         triggeringEntity.remove(OpenChestRequest.class);
     }

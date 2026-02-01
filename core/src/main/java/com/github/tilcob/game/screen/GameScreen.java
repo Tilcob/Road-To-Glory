@@ -99,15 +99,14 @@ public class GameScreen extends ScreenAdapter {
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
         this.worldLoader = new GameWorldLoader(new GameWorldLoader.Dependencies(
-            services,
-            engine,
-            tiledManager,
-            tiledAshleyConfigurator,
-            audioManager,
-            physicWorld,
-            uiViewport,
-            activeEntityReference
-        ));
+                services,
+                engine,
+                tiledManager,
+                tiledAshleyConfigurator,
+                audioManager,
+                physicWorld,
+                uiViewport,
+                activeEntityReference));
 
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
@@ -124,7 +123,8 @@ public class GameScreen extends ScreenAdapter {
     @Override
     public void show() {
         inputManager.setInputProcessors(stage);
-        inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState, uiControllerState);
+        inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState,
+                uiControllerState);
         clearAllControllerCommands();
 
         stage.addActor(gameUiGroup);
@@ -136,24 +136,22 @@ public class GameScreen extends ScreenAdapter {
         }
 
         GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
-            stage,
-            buildUiDependencies(),
-            paused,
-            false
-        );
+                stage,
+                buildUiDependencies(),
+                paused,
+                false);
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
         uiOverlayManager = new UiOverlayManager(
-            stage,
-            services.getEventBus(),
-            inputManager,
-            gameUiGroup,
-            pauseView,
-            settingsView,
-            settingsViewModel,
-            true
-        );
+                stage,
+                services.getEventBus(),
+                inputManager,
+                gameUiGroup,
+                pauseView,
+                settingsView,
+                settingsViewModel,
+                true);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(false);
 
@@ -266,25 +264,24 @@ public class GameScreen extends ScreenAdapter {
 
         boolean showSettings = settingsViewModel.isOpen() && paused;
         GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
-            stage,
-            buildUiDependencies(),
-            paused,
-            showSettings
-        );
+                stage,
+                buildUiDependencies(),
+                paused,
+                showSettings);
         pauseView = overlays.pauseView();
         settingsView = overlays.settingsView();
         debugOverlayView = overlays.debugOverlayView();
-        if (uiOverlayManager != null) uiOverlayManager.hide();
+        if (uiOverlayManager != null)
+            uiOverlayManager.hide();
         uiOverlayManager = new UiOverlayManager(
-            stage,
-            settingsViewModel.getEventBus(),
-            inputManager,
-            gameUiGroup,
-            pauseView,
-            settingsView,
-            settingsViewModel,
-            false
-        );
+                stage,
+                settingsViewModel.getEventBus(),
+                inputManager,
+                gameUiGroup,
+                pauseView,
+                settingsView,
+                settingsViewModel,
+                false);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);
     }
@@ -296,17 +293,16 @@ public class GameScreen extends ScreenAdapter {
 
     private GameUiBuilder.UiDependencies buildUiDependencies() {
         return new GameUiBuilder.UiDependencies(
-            stage,
-            skin,
-            gameViewModel,
-            inventoryViewModel,
-            chestViewModel,
-            pauseViewModel,
-            settingsViewModel,
-            engine,
-            services,
-            Constants.DEBUG
-        );
+                stage,
+                skin,
+                gameViewModel,
+                inventoryViewModel,
+                chestViewModel,
+                pauseViewModel,
+                settingsViewModel,
+                engine,
+                services,
+                Constants.DEBUG);
     }
 
     private void clearAllControllerCommands() {
@@ -329,6 +325,7 @@ public class GameScreen extends ScreenAdapter {
         }
         services.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().unsubscribe(PauseEvent.class, this::togglePause);
+        if (audioManager != null) audioManager.dispose();
         if (uiOverlayManager != null) {
             uiOverlayManager.dispose();
         }

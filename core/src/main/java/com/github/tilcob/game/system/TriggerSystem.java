@@ -57,7 +57,7 @@ public class TriggerSystem extends IteratingSystem implements Disposable {
 
         for (Entity triggeringEntity : trigger.getEntities()) {
             Entity entity = resolveTriggerEntity(triggerEntity);
-            handler.execute(entity, triggeringEntity);
+            handler.onEnter(entity, triggeringEntity);
         }
 
         trigger.getEntities().clear();
@@ -68,7 +68,7 @@ public class TriggerSystem extends IteratingSystem implements Disposable {
         TriggerHandler handler = handlers.get(trigger.getType());
         if (handler == null) return;
         Entity entity = resolveTriggerEntity(event.trigger());
-        handler.exit(entity, event.player());
+        handler.onExit(entity, event.player());
     }
 
     @Override
