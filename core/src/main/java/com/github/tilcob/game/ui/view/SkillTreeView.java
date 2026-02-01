@@ -60,9 +60,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         }
 
         rootTable.setSize(600, 400);
-        rootTable.setPosition(
-            (Constants.WIDTH * Constants.WINDOW_FACTOR - rootTable.getWidth()) / 2,
-            (Constants.HEIGHT * Constants.WINDOW_FACTOR - rootTable.getHeight()) / 2);
+        rootTable.center();
 
         addActor(rootTable);
     }
@@ -80,6 +78,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     private void setSkillTreeVisibility(boolean open) {
         rootTable.setVisible(open);
         if (open) {
+            rootTable.center();
             refresh();
         }
     }
