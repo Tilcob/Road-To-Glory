@@ -99,7 +99,6 @@ public class Constants {
     public static final String MAX_LIFE_PC = "maxLife";
     public static final String PLAYER_DAMAGE_PC = "playerDamage";
     public static final String INVENTORY_FULL = "inventoryFull";
-    public static final String OPEN_INVENTORY = "openInventory";
     public static final String ADD_ITEMS_TO_INVENTORY = "addItems";
     public static final String ON_LEFT = "onLeft";
     public static final String ON_RIGHT = "onRight";
@@ -107,7 +106,6 @@ public class Constants {
     public static final String ON_DOWN = "onDown";
     public static final String ON_SELECT = "onSelect";
     public static final String ON_CANCEL = "onCancel";
-    public static final String OPEN_SETTINGS = "openSettings";
     public static final String ADD_QUESTS = "addQuests";
     public static final String SHOW_DIALOG = "showDialog";
     public static final String HIDE_DIALOG = "hideDialog";
@@ -115,9 +113,13 @@ public class Constants {
     public static final String HIDE_DIALOG_CHOICES = "hideDialogChoices";
     public static final String SHOW_REWARD_DIALOG = "showRewardDialog";
     public static final String HIDE_REWARD_DIALOG = "hideRewardDialog";
-    public static final String OPEN_CHEST_INVENTORY = "openChestInventory";
     public static final String ADD_ITEMS_TO_CHEST = "addItemsToChest";
     public static final String ADD_ITEMS_TO_PLAYER_IN_CHEST = "addItemsToPlayerInChest";
+
+    public static final String OPEN_INVENTORY = "openInventory";
+    public static final String OPEN_CHEST_INVENTORY = "openChestInventory";
+    public static final String OPEN_SKILLS = "openSkills";
+    public static final String OPEN_SETTINGS = "openSettings";
 
     // Player properties
     public static final int PLAYER_ID = 4;
@@ -126,6 +128,5 @@ public class Constants {
     public static final int INVENTORY_COLUMNS = 6;
     public static final String BASE_STAMINA = "stamina";
     public static final String BASE_STRENGTH = "strength";
-    public static final String OPEN_SKILLS = "openSkills";
     public static final String SKILL_TREE_UPDATED = "skillTreeUpdated";
 }

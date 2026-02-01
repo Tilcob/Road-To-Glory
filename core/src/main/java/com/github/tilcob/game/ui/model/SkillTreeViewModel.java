@@ -34,9 +34,7 @@ public class SkillTreeViewModel extends ViewModel {
     }
 
     public void setOpen(boolean open) {
-        if (this.open == open) return;
-        this.open = open;
-        propertyChangeSupport.firePropertyChange(Constants.OPEN_SKILLS, !open, open);
+        this.open = setOpen(open, this.open, Constants.OPEN_SKILLS);
     }
 
     public boolean isOpen() {

@@ -75,6 +75,15 @@ public abstract class ViewModel {
         this.propertyChangeSupport.firePropertyChange(Constants.ON_CANCEL, null, true);
     }
 
+    protected boolean setOpen(boolean open, boolean currentOpen, String propertyName) {
+        if (currentOpen == open) {
+            return currentOpen;
+        }
+        setActive(open);
+        propertyChangeSupport.firePropertyChange(propertyName, currentOpen, open);
+        return open;
+    }
+
     public GameEventBus getEventBus() {
         return gameEventBus;
     }

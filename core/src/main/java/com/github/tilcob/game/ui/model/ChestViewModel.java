@@ -34,12 +34,11 @@ public class ChestViewModel extends ViewModel {
 
     private void onOpenChest(OpenChestEvent event) {
         if (paused || isPlayerInventoryOpen) return;
-        open = true;
         currentChest = event.chestEntity();
         currentPlayer = event.player();
         rebuildChestItems();
         rebuildPlayerItems();
-        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_CHEST_INVENTORY, null, true);
+        open = setOpen(true, open, Constants.OPEN_CHEST_INVENTORY);
     }
 
     private void onChestInventoryUpdate(UpdateChestInventoryEvent event) {
@@ -55,10 +54,9 @@ public class ChestViewModel extends ViewModel {
     private void onCloseChest(CloseChestEvent event) {
         if (!open) return;
         if (event.chest() != null && Chest.MAPPER.get(currentChest) != event.chest()) return;
-        open = false;
         currentChest = null;
         currentPlayer = null;
-        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_CHEST_INVENTORY, true, false);
+        open = setOpen(false, open, Constants.OPEN_CHEST_INVENTORY);
     }
 
     private void onPauseEvent(PauseEvent event) {
@@ -78,11 +76,9 @@ public class ChestViewModel extends ViewModel {
 
     private void closeInventory() {
         if (!open) return;
-        boolean old = true;
-        open = false;
         currentChest = null;
         currentPlayer = null;
-        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_CHEST_INVENTORY, old, false);
+        open = setOpen(false, open, Constants.OPEN_CHEST_INVENTORY);
     }
 
     private void rebuildChestItems() {
