@@ -7,6 +7,8 @@ import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.save.states.PlayerState;
+import com.github.tilcob.game.save.states.SkillTreeState;
+import com.github.tilcob.game.save.states.SkillTreeStateSnapshot;
 
 public class PlayerStateApplier {
     public static void apply(PlayerState state, Entity player, InventoryService inventoryService) {
@@ -15,6 +17,7 @@ public class PlayerStateApplier {
         Inventory inventory = Inventory.MAPPER.get(player);
         Physic physic = Physic.MAPPER.get(player);
         Equipment equipment = Equipment.MAPPER.get(player);
+        Skill skill = Skill.MAPPER.get(player);
 
         if (transform == null || life == null || inventory == null) return;
 
@@ -61,6 +64,21 @@ public class PlayerStateApplier {
                     item.setSlotIndex(-1);
                 }
                 equipment.equip(entry.getKey(), itemEntity);
+            }
+        }
+
+        if (skill != null && state.getSkillTrees() != null) {
+            skill.getTrees().clear();
+            for (var entry : state.getSkillTrees().entrySet()) {
+                SkillTreeStateSnapshot snapshot = entry.getValue();
+                if (entry.getKey() == null || snapshot == null) continue;
+                SkillTreeState treeState = new SkillTreeState();
+                treeState.setCurrentLevel(snapshot.getCurrentLevel());
+                treeState.setSkillPoints(snapshot.getSkillPoints());
+                for (String nodeId : snapshot.getUnlockedNodes()) {
+                    treeState.addUnlockedNode(nodeId);
+                }
+                skill.getTrees().put(entry.getKey(), treeState);
             }
         }
     }

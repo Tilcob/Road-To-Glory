@@ -5,6 +5,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.save.states.PlayerState;
+import com.github.tilcob.game.save.states.SkillTreeStateSnapshot;
 
 public class PlayerStateExtractor {
     public static PlayerState fromEntity(Entity entity) {
@@ -12,6 +13,7 @@ public class PlayerStateExtractor {
         Life life = Life.MAPPER.get(entity);
         Inventory inventory = Inventory.MAPPER.get(entity);
         Equipment equipment = Equipment.MAPPER.get(entity);
+        Skill skill = Skill.MAPPER.get(entity);
         PlayerState state = new PlayerState();
 
         if (transform == null || life == null || inventory == null) return state;
@@ -41,6 +43,17 @@ public class PlayerStateExtractor {
                     item.getItemId(),
                     item.getSlotIndex()
                 ));
+            }
+        }
+
+        if (skill != null && !skill.getTrees().isEmpty()) {
+            for (var entry : skill.getTrees().entrySet()) {
+                if (entry.getKey() == null || entry.getValue() == null) continue;
+                SkillTreeStateSnapshot snapshot = new SkillTreeStateSnapshot();
+                snapshot.setCurrentLevel(entry.getValue().getCurrentLevel());
+                snapshot.setSkillPoints(entry.getValue().getSkillPoints());
+                snapshot.setUnlockedNodes(entry.getValue().getUnlockedNodes());
+                state.getSkillTrees().put(entry.getKey(), snapshot);
             }
         }
 

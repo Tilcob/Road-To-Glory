@@ -6,10 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
-import java.util.ArrayList;
-import java.util.EnumMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class PlayerState {
     private float posX;
@@ -20,6 +17,7 @@ public class PlayerState {
     private List<String> itemsByName = new ArrayList<>();
     private List<ItemSlotState> itemSlots = new ArrayList<>();
     private Map<ItemCategory, EquipmentSlotState> equipmentSlots = new EnumMap<>(ItemCategory.class);
+    private Map<String, SkillTreeStateSnapshot> skillTrees = new HashMap<>();
 
     public PlayerState() { }
 
@@ -54,6 +52,14 @@ public class PlayerState {
 
     public void setEquipmentSlots(Map<ItemCategory, EquipmentSlotState> equipmentSlots) {
         this.equipmentSlots = equipmentSlots;
+    }
+
+    public Map<String, SkillTreeStateSnapshot> getSkillTrees() {
+        return skillTrees;
+    }
+
+    public void setSkillTrees(Map<String, SkillTreeStateSnapshot> skillTrees) {
+        this.skillTrees = skillTrees;
     }
 
     @JsonIgnore
