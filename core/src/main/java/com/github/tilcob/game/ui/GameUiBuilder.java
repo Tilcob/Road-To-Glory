@@ -9,6 +9,12 @@ import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.view.*;
 
 public class GameUiBuilder {
+    private final GameServices services;
+
+    public GameUiBuilder(GameServices services) {
+        this.services = services;
+    }
+
     public record UiDependencies(
         Stage stage,
         Skin skin,
@@ -65,12 +71,8 @@ public class GameUiBuilder {
         );
         DebugOverlayView debugOverlayView = null;
 
-        if (showSettings) {
-            stage.addActor(settingsView);
-        }
-
+        settingsView.setVisible(showSettings);
         pauseView.setVisible(paused);
-        stage.addActor(pauseView);
 
         if (dependencies.debugEnabled()) {
             debugOverlayView = new DebugOverlayView(

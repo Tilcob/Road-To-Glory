@@ -45,7 +45,7 @@ public class MigrationV4 implements Migration {
         java.util.List<String> normalized = new java.util.ArrayList<>();
         for (String raw : rawIds) {
             String resolved = ItemDefinitionRegistry.resolveId(raw);
-            if (ItemDefinitionRegistry.isKnownId(resolved)) {
+            if (!ItemDefinitionRegistry.hasDefinitions() || ItemDefinitionRegistry.isKnownId(resolved)) {
                 normalized.add(resolved);
             }
         }

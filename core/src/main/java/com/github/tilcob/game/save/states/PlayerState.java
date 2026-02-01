@@ -3,10 +3,11 @@ package com.github.tilcob.game.save.states;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.stat.StatType;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 public class PlayerState {
     private float posX;
@@ -15,6 +16,10 @@ public class PlayerState {
     @JsonIgnore
     private List<String> items = new ArrayList<>();
     private List<String> itemsByName = new ArrayList<>();
+    private List<ItemSlotState> itemSlots = new ArrayList<>();
+    private Map<ItemCategory, EquipmentSlotState> equipmentSlots = new EnumMap<>(ItemCategory.class);
+    private Map<String, SkillTreeStateSnapshot> skillTrees = new HashMap<>();
+    private List<StatModifierState> statModifiers = new ArrayList<>();
 
     public PlayerState() { }
 
@@ -35,6 +40,38 @@ public class PlayerState {
         this.itemsByName = itemsByName;
     }
 
+    public List<ItemSlotState> getItemSlots() {
+        return itemSlots;
+    }
+
+    public void setItemSlots(List<ItemSlotState> itemSlots) {
+        this.itemSlots = itemSlots;
+    }
+
+    public Map<ItemCategory, EquipmentSlotState> getEquipmentSlots() {
+        return equipmentSlots;
+    }
+
+    public void setEquipmentSlots(Map<ItemCategory, EquipmentSlotState> equipmentSlots) {
+        this.equipmentSlots = equipmentSlots;
+    }
+
+    public Map<String, SkillTreeStateSnapshot> getSkillTrees() {
+        return skillTrees;
+    }
+
+    public void setSkillTrees(Map<String, SkillTreeStateSnapshot> skillTrees) {
+        this.skillTrees = skillTrees;
+    }
+
+    public List<StatModifierState> getStatModifiers() {
+        return statModifiers;
+    }
+
+    public void setStatModifiers(List<StatModifierState> statModifiers) {
+        this.statModifiers = statModifiers;
+    }
+
     @JsonIgnore
     public List<String> getItems() {
         return items;
@@ -49,8 +86,8 @@ public class PlayerState {
         items.clear();
         List<String> normalized = new ArrayList<>();
         for (String name : itemsByName) {
-            String resolved = ItemDefinitionRegistry.resolveId(name);
-            if (!ItemDefinitionRegistry.isKnownId(resolved)) {
+            String resolved = normalizeItemId(name);
+            if (resolved == null) {
                 Gdx.app.error("PlayerState", "Unknown item id: " + name);
                 continue;
             }
@@ -58,10 +95,196 @@ public class PlayerState {
             normalized.add(resolved);
         }
         itemsByName = normalized;
+
+        if (itemSlots != null) {
+            List<ItemSlotState> normalizedSlots = new ArrayList<>();
+            for (ItemSlotState slotState : itemSlots) {
+                if (slotState == null) continue;
+                String resolved = normalizeItemId(slotState.getItemId());
+                if (resolved == null) {
+                    Gdx.app.error("PlayerState", "Unknown item id in slot: " + slotState.getItemId());
+                    continue;
+                }
+                slotState.setItemId(resolved);
+                normalizedSlots.add(slotState);
+            }
+            itemSlots = normalizedSlots;
+        }
+
+        if (equipmentSlots != null && !equipmentSlots.isEmpty()) {
+            Map<ItemCategory, EquipmentSlotState> normalizedSlots = new EnumMap<>(ItemCategory.class);
+            for (var entry : equipmentSlots.entrySet()) {
+                EquipmentSlotState slotState = entry.getValue();
+                if (slotState == null) continue;
+                String resolved = normalizeItemId(slotState.getItemId());
+                if (resolved == null) {
+                    Gdx.app.error("PlayerState", "Unknown equipment item id: " + slotState.getItemId());
+                    continue;
+                }
+                slotState.setItemId(resolved);
+                normalizedSlots.put(entry.getKey(), slotState);
+            }
+            equipmentSlots = normalizedSlots;
+        }
+    }
+
+    private String normalizeItemId(String name) {
+        if (name == null) {
+            return null;
+        }
+        String resolved = ItemDefinitionRegistry.resolveId(name);
+        if (!ItemDefinitionRegistry.hasDefinitions()) {
+            return resolved;
+        }
+        if (!ItemDefinitionRegistry.isKnownId(resolved)) {
+            return null;
+        }
+        return resolved;
     }
 
     @JsonIgnore
     public Vector2 getPositionAsVector() {
         return new Vector2(posX, posY);
+    }
+
+    public static class ItemSlotState {
+        private String itemId;
+        private int slotIndex;
+        private int count;
+
+        public ItemSlotState() { }
+
+        public ItemSlotState(String itemId, int slotIndex, int count) {
+            this.itemId = itemId;
+            this.slotIndex = slotIndex;
+            this.count = count;
+        }
+
+        public String getItemId() {
+            return itemId;
+        }
+
+        public void setItemId(String itemId) {
+            this.itemId = itemId;
+        }
+
+        public int getSlotIndex() {
+            return slotIndex;
+        }
+
+        public void setSlotIndex(int slotIndex) {
+            this.slotIndex = slotIndex;
+        }
+
+        public int getCount() {
+            return count;
+        }
+
+        public void setCount(int count) {
+            this.count = count;
+        }
+    }
+
+    public static class EquipmentSlotState {
+        private String itemId;
+        private int slotIndex;
+
+        public EquipmentSlotState() { }
+
+        public EquipmentSlotState(String itemId, int slotIndex) {
+            this.itemId = itemId;
+            this.slotIndex = slotIndex;
+        }
+
+        public String getItemId() {
+            return itemId;
+        }
+
+        public void setItemId(String itemId) {
+            this.itemId = itemId;
+        }
+
+        public int getSlotIndex() {
+            return slotIndex;
+        }
+
+        public void setSlotIndex(int slotIndex) {
+            this.slotIndex = slotIndex;
+        }
+    }
+
+    public static class StatModifierState {
+        private StatType statType;
+        private float additive;
+        private float multiplier;
+        private String source;
+        private Float durationSeconds;
+        private Long expireTimeEpochMs;
+
+        public StatModifierState() { }
+
+        public StatModifierState(
+            StatType statType,
+            float additive,
+            float multiplier,
+            String source,
+            Float durationSeconds,
+            Long expireTimeEpochMs
+        ) {
+            this.statType = statType;
+            this.additive = additive;
+            this.multiplier = multiplier;
+            this.source = source;
+            this.durationSeconds = durationSeconds;
+            this.expireTimeEpochMs = expireTimeEpochMs;
+        }
+
+        public StatType getStatType() {
+            return statType;
+        }
+
+        public void setStatType(StatType statType) {
+            this.statType = statType;
+        }
+
+        public float getAdditive() {
+            return additive;
+        }
+
+        public void setAdditive(float additive) {
+            this.additive = additive;
+        }
+
+        public float getMultiplier() {
+            return multiplier;
+        }
+
+        public void setMultiplier(float multiplier) {
+            this.multiplier = multiplier;
+        }
+
+        public String getSource() {
+            return source;
+        }
+
+        public void setSource(String source) {
+            this.source = source;
+        }
+
+        public Float getDurationSeconds() {
+            return durationSeconds;
+        }
+
+        public void setDurationSeconds(Float durationSeconds) {
+            this.durationSeconds = durationSeconds;
+        }
+
+        public Long getExpireTimeEpochMs() {
+            return expireTimeEpochMs;
+        }
+
+        public void setExpireTimeEpochMs(Long expireTimeEpochMs) {
+            this.expireTimeEpochMs = expireTimeEpochMs;
+        }
     }
 }

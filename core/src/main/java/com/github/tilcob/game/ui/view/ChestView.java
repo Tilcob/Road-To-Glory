@@ -34,7 +34,8 @@ public class ChestView extends View<ChestViewModel> {
 
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
-        inventoryRoot.setVisible(false);
+        setRoot(inventoryRoot);
+        setVisibleBound(false);
 
         addActor(inventoryRoot);
 
@@ -131,7 +132,7 @@ public class ChestView extends View<ChestViewModel> {
     }
 
     private void setChestInventoryVisibility(Boolean isVisible) {
-        inventoryRoot.setVisible(isVisible);
+        setVisibleBound(isVisible);
     }
 
     private void clearItems(Stack[][] slots) {

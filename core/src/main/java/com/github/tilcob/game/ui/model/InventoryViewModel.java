@@ -47,22 +47,17 @@ public class InventoryViewModel extends ViewModel {
 
     private void onEntityAddItemEvent(EntityAddItemEvent event) {
         Inventory inventory = Inventory.MAPPER.get(event.entity());
-        if (inventory == null)
-            return;
+        if (inventory == null) return;
         onAddItem(inventory.getItems());
         this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
     }
 
     @Override
     protected void onUiEvent(UiEvent event) {
-        if (event.action() == UiEvent.Action.RELEASE)
-            return;
+        if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY) {
-            if (paused || isChestOpen)
-                return;
-            boolean old = open;
-            open = !open;
-            this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, open);
+            if (paused || isChestOpen) return;
+            open = setOpen(!open, open, Constants.OPEN_INVENTORY);
         }
     }
 
@@ -77,16 +72,14 @@ public class InventoryViewModel extends ViewModel {
 
     private void rebuildInventory(Entity player) {
         Inventory inventory = Inventory.MAPPER.get(player);
-        if (inventory == null)
-            return;
+        if (inventory == null) return;
         items.clear();
         onAddItem(inventory.getItems());
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
     }
 
     private void onPauseEvent(PauseEvent event) {
-        if (event == null)
-            return;
+        if (event == null) return;
         switch (event.action()) {
             case PAUSE -> {
                 paused = true;
@@ -102,11 +95,8 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void closeInventory() {
-        if (!open)
-            return;
-        boolean old = true;
-        open = false;
-        this.propertyChangeSupport.firePropertyChange(Constants.OPEN_INVENTORY, old, false);
+        if (!open) return;
+        open = setOpen(false, open, Constants.OPEN_INVENTORY);
     }
 
     private void openChest(OpenChestEvent event) {

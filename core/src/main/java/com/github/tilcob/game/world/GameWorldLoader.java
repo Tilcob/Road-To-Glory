@@ -10,6 +10,7 @@ import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -62,17 +63,22 @@ public class GameWorldLoader {
         QuestLoader loader = new QuestLoader(new QuestFactory(dependencies.services().getQuestYarnRegistry()));
         QuestLog questLog = QuestLog.MAPPER.get(player);
         dependencies.services().getStateManager().loadQuests(questLog, loader);
+        dependencies.services().getEventBus().fire(new UpdateQuestLogEvent(player));
     }
 
     private void createPlayer() {
-        player = PlayerFactory.create(dependencies.engine(), dependencies.services().getAssetManager(), dependencies.physicWorld());
+        player = PlayerFactory.create(dependencies.engine(),
+            dependencies.services().getAssetManager(), dependencies.physicWorld());
         dependencies.activeEntityReference().set(player);
         loadMap();
     }
 
     private void applyPlayerState() {
         if (dependencies.services().getStateManager().getGameState().getPlayerState() != null) {
-            PlayerStateApplier.apply(dependencies.services().getStateManager().getGameState().getPlayerState(), player);
+            PlayerStateApplier.apply(
+                dependencies.services().getStateManager().getGameState().getPlayerState(),
+                player,
+                dependencies.services.getInventoryService());
         } else {
             Transform.MAPPER.get(player).getPosition().set(dependencies.tiledManager().getSpawnPoint());
             Physic.MAPPER.get(player).getBody().setTransform(dependencies.tiledManager().getSpawnPoint(), 0);

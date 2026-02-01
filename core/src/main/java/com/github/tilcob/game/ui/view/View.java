@@ -1,9 +1,6 @@
 package com.github.tilcob.game.ui.view;
 
-import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.InputEvent;
-import com.badlogic.gdx.scenes.scene2d.InputListener;
-import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -16,6 +13,7 @@ public abstract class View<T extends ViewModel> extends Table {
     protected final Skin skin;
     protected final T viewModel;
     protected InventoryDragAndDrop dragAndDrop;
+    protected Actor root;
 
     public View(Skin skin, Stage stage, T viewModel) {
         super(skin);
@@ -38,6 +36,16 @@ public abstract class View<T extends ViewModel> extends Table {
     protected abstract void setupUI();
 
     protected void setupPropertyChanges() {
+    }
+
+    protected void setRoot(Actor root) {
+        this.root = root;
+    }
+
+    protected void setVisibleBound(boolean visible) {
+        Actor target = root != null ? root : this;
+        target.setVisible(visible);
+        target.setTouchable(visible ? Touchable.enabled : Touchable.disabled);
     }
 
     public static void onClick(Actor actor, OnEventConsumer consumer) {

@@ -24,7 +24,8 @@ public class SettingsView extends View<SettingsViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
-        setVisible(false);
+        setRoot(this);
+        setVisibleBound(false);
 
         Table contentTable = new Table();
         contentTable.setBackground(skin.getDrawable("frame"));
@@ -122,6 +123,10 @@ public class SettingsView extends View<SettingsViewModel> {
         if (first != null) {
             selectedItem = viewModel.getUiServices().selectMenuItem(first);
         }
+    }
+
+    public void setOverlayVisible(boolean visible) {
+        setVisibleBound(visible);
     }
 
     private enum SettingsOption {

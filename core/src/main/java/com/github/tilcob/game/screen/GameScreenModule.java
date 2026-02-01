@@ -15,6 +15,7 @@ import com.github.tilcob.game.entity.EngineEntityLookup;
 import com.github.tilcob.game.entity.EntityIdService;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.inventory.InventoryService;
+import com.github.tilcob.game.skill.SkillTreeLoader;
 import com.github.tilcob.game.system.installers.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -54,6 +55,7 @@ public class GameScreenModule {
                 Engine engine = new Engine();
                 EntityIdService entityIdService = new EntityIdService(engine);
                 services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
+                SkillTreeLoader.loadAll();
                 World physicWorld = new World(Constants.GRAVITY, true);
                 physicWorld.setAutoClearForces(false);
                 TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
@@ -65,6 +67,7 @@ public class GameScreenModule {
                                 tiledManager);
                 IdleControllerState idleControllerState = new IdleControllerState();
                 ActiveEntityReference activeEntityReference = new ActiveEntityReference();
+                services.setActiveEntityReference(activeEntityReference);
                 GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
                 UiControllerState uiControllerState = new UiControllerState(services.getEventBus());
                 Stage stage = new Stage(uiViewport, batch);
@@ -74,6 +77,8 @@ public class GameScreenModule {
                 ChestViewModel chestViewModel = new ChestViewModel(services, uiModelFactory);
                 PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
                 SettingsViewModel settingsViewModel = new SettingsViewModel(services);
+                com.github.tilcob.game.ui.model.SkillTreeViewModel skillTreeViewModel = new com.github.tilcob.game.ui.model.SkillTreeViewModel(
+                                services);
                 Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
                 services.getInventoryService().setSkin(skin);
                 services.getInventoryService().setEngine(engine);
@@ -111,6 +116,8 @@ public class GameScreenModule {
                                 physicWorld,
                                 Constants.DEBUG).install(engine);
 
+                stage.addActor(new com.github.tilcob.game.ui.view.SkillTreeView(skin, stage, skillTreeViewModel));
+
                 return new Dependencies(
                                 engine,
                                 tiledManager,
@@ -125,6 +132,7 @@ public class GameScreenModule {
                                 chestViewModel,
                                 pauseViewModel,
                                 settingsViewModel,
+                                skillTreeViewModel,
                                 skin,
                                 inputManager,
                                 services.getAudioManager(),
@@ -146,6 +154,7 @@ public class GameScreenModule {
                         ChestViewModel chestViewModel,
                         PauseViewModel pauseViewModel,
                         SettingsViewModel settingsViewModel,
+                        com.github.tilcob.game.ui.model.SkillTreeViewModel skillTreeViewModel,
                         Skin skin,
                         InputManager inputManager,
                         AudioManager audioManager,

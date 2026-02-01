@@ -24,12 +24,7 @@ public class SettingsViewModel extends ViewModel {
     }
 
     private void setOpen(boolean value) {
-        if (this.open == value) return;
-
-        boolean old = this.open;
-        this.open = value;
-        setActive(value);
-        propertyChangeSupport.firePropertyChange(Constants.OPEN_SETTINGS, old, value);
+        this.open = setOpen(value, this.open, Constants.OPEN_SETTINGS);
     }
 
     public float getMusicVolume() {

@@ -11,13 +11,14 @@ This directory contains the runtime assets for **Road-To-Glory**. The game loads
 - `cutscenes/`: cutscene scripts (Yarn).
 - `quests/`: quest definitions and `index.json`.
 - `items/`: item definitions.
+- `skills/`: skill tree definitions and `index.json`.
 - `ui/`: UI skins, layouts, and UI assets.
 - `stats/`: stat and balancing data.
 - `tests/`: test/sample data for content.
 
 ## Notes
 
-- `quests/index.json`, `dialogs/index.json` and `items/index.json` are generated from the `.yarn` or `.json` files.
+- `quests/index.json`, `dialogs/index.json`, `items/index.json` and `skills/index.json` are maintained to index content.
 - The game starts with `assets/` as the working directory (for example, via `lwjgl3:run`).
 
 ### Debug / Strict Mode (Dialogs & Quests)

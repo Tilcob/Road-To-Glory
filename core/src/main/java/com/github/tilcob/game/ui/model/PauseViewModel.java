@@ -19,7 +19,8 @@ public class PauseViewModel extends ViewModel {
     }
 
     public void quitToMenu() {
-        getEventBus().fire(new AutosaveEvent(AutosaveEvent.AutosaveReason.MAP_CHANGE));
+        getEventBus().fire(new PauseEvent(PauseEvent.Action.RESUME));
+        services.saveGame();
         screenNavigator.setScreen(MenuScreen.class);
     }
 }

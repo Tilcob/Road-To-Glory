@@ -1,0 +1,39 @@
+{
+  "id": "combat",
+  "name": "Combat",
+  "description": "Master the art of war.",
+  "xpTable": [100, 250, 500, 1000, 2000, 4000],
+  "nodes": [
+    {
+      "id": "basic_strength",
+      "name": "Basic Strength",
+      "description": "Increases strength by 5.",
+      "cost": 1,
+      "requiredLevel": 1,
+      "modifiers": {
+        "STRENGTH": 5
+      }
+    },
+    {
+      "id": "veteran_strength",
+      "name": "Veteran Strength",
+      "description": "Increases strength by 10.",
+      "cost": 2,
+      "requiredLevel": 3,
+      "parentIds": ["basic_strength"],
+      "modifiers": {
+        "STRENGTH": 10
+      }
+    },
+    {
+      "id": "warrior_health",
+      "name": "Warrior's Vitality",
+      "description": "Increases max life by 20.",
+      "cost": 1,
+      "requiredLevel": 1,
+      "modifiers": {
+        "MAX_LIFE": 20
+      }
+    }
+  ]
+}

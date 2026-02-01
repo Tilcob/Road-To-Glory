@@ -11,7 +11,6 @@ import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class PauseView extends View<PauseViewModel> {
     private Group selectedItem;
-    private boolean overlaySubscribed = false;
 
     public PauseView(Skin skin, Stage stage, PauseViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -25,6 +24,7 @@ public class PauseView extends View<PauseViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
+        setRoot(this);
 
         Table contentTable = new Table();
         contentTable.setBackground(skin.getDrawable("frame"));

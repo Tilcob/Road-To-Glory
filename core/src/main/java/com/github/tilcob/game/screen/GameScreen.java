@@ -32,11 +32,13 @@ import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
 import com.github.tilcob.game.world.GameWorldLoader;
 
+import java.util.Objects;
+
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
     private final Group gameUiGroup;
-    private final GameUiBuilder gameUiBuilder = new GameUiBuilder();
+    private final GameUiBuilder gameUiBuilder;
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
@@ -68,6 +70,7 @@ public class GameScreen extends ScreenAdapter {
         this.uiViewport = uiViewport;
         this.gameUiGroup = new Group();
         this.gameUiGroup.setSize(uiViewport.getWorldWidth(), uiViewport.getWorldHeight());
+        this.gameUiBuilder = new GameUiBuilder(services);
     }
 
     void initialize(GameScreenModule.Dependencies dependencies) {
@@ -115,9 +118,12 @@ public class GameScreen extends ScreenAdapter {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState,
                 uiControllerState);
+        setViewModelsActive(true);
         clearAllControllerCommands();
+        paused = false;
 
         stage.addActor(gameUiGroup);
+        gameUiGroup.clearChildren();
         gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
         if (Constants.DEBUG) {
@@ -153,13 +159,11 @@ public class GameScreen extends ScreenAdapter {
     public void hide() {
         engine.removeAllEntities();
         stage.clear();
+        paused = false;
+        setViewModelsActive(true);
+
         if (uiOverlayManager != null) {
             uiOverlayManager.hide();
-        }
-
-        if (settingsViewModel != null) {
-            settingsViewModel.dispose();
-            settingsViewModel = null;
         }
     }
 
@@ -270,7 +274,7 @@ public class GameScreen extends ScreenAdapter {
                 gameUiGroup,
                 pauseView,
                 settingsView,
-                settingsViewModel,
+                Objects.requireNonNull(settingsViewModel, "settingsViewModel"),
                 false);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);
@@ -293,6 +297,24 @@ public class GameScreen extends ScreenAdapter {
                 engine,
                 services,
                 Constants.DEBUG);
+    }
+
+    private void setViewModelsActive(boolean active) {
+        if (gameViewModel != null) {
+            gameViewModel.setActive(active);
+        }
+        if (inventoryViewModel != null) {
+            inventoryViewModel.setActive(active);
+        }
+        if (chestViewModel != null) {
+            chestViewModel.setActive(active);
+        }
+        if (pauseViewModel != null) {
+            pauseViewModel.setActive(active);
+        }
+        if (settingsViewModel != null) {
+            settingsViewModel.setActive(active);
+        }
     }
 
     private void clearAllControllerCommands() {

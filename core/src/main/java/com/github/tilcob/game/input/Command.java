@@ -10,5 +10,6 @@ public enum Command {
     CANCEL,
     INTERACT,
     INVENTORY,
-    SPLIT_STACK
+    SPLIT_STACK,
+    SKILLS
 }

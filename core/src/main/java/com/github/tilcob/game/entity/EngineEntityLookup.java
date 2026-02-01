@@ -17,7 +17,8 @@ public class EngineEntityLookup implements EntityLookup {
     @Override
     public Entity find(String name) {
         Entity entity = service.findNpc(name);
-        if (entity != null) return entity;
+        if (entity != null)
+            return entity;
 
         for (Entity e : engine.getEntitiesFor(Family.all(Npc.class).get())) {
             Npc npc = Npc.MAPPER.get(e);
@@ -26,6 +27,14 @@ public class EngineEntityLookup implements EntityLookup {
             }
         }
 
+        return null;
+    }
+
+    @Override
+    public Entity getPlayer() {
+        for (Entity e : engine.getEntitiesFor(Family.all(com.github.tilcob.game.component.Player.class).get())) {
+            return e;
+        }
         return null;
     }
 }

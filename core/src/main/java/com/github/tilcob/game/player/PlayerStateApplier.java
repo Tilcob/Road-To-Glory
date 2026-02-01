@@ -2,19 +2,24 @@ package com.github.tilcob.game.player;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Life;
-import com.github.tilcob.game.component.Physic;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.inventory.InventoryService;
+import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.save.states.PlayerState;
+import com.github.tilcob.game.save.states.SkillTreeState;
+import com.github.tilcob.game.save.states.SkillTreeStateSnapshot;
+import com.github.tilcob.game.stat.StatModifier;
 
 public class PlayerStateApplier {
-    public static void apply(PlayerState state, Entity player) {
+    public static void apply(PlayerState state, Entity player, InventoryService inventoryService) {
         Transform transform = Transform.MAPPER.get(player);
         Life life = Life.MAPPER.get(player);
         Inventory inventory = Inventory.MAPPER.get(player);
         Physic physic = Physic.MAPPER.get(player);
+        Equipment equipment = Equipment.MAPPER.get(player);
+        Skill skill = Skill.MAPPER.get(player);
+        StatModifierComponent statModifiers = StatModifierComponent.MAPPER.get(player);
 
         if (transform == null || life == null || inventory == null) return;
 
@@ -23,8 +28,97 @@ public class PlayerStateApplier {
         physic.getBody().setTransform(transform.getPosition(), 0);
         life.setLife(state.getLife());
         inventory.getItems().clear();
-        for (var item : state.getItemsByName()) {
-            inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(item));
+        if (inventoryService != null) {
+            inventoryService.setPlayer(player);
         }
+
+        if (state.getItemSlots() != null && !state.getItemSlots().isEmpty() && inventoryService != null) {
+            for (PlayerState.ItemSlotState slotState : state.getItemSlots()) {
+                if (slotState == null) continue;
+                String resolved = ItemDefinitionRegistry.resolveId(slotState.getItemId());
+                if (!ItemDefinitionRegistry.isKnownId(resolved)) continue;
+                Entity itemEntity = inventoryService.spawnItem(resolved, slotState.getSlotIndex(), inventory.nextId());
+                Item item = Item.MAPPER.get(itemEntity);
+                if (item != null && slotState.getCount() > 1) {
+                    item.add(slotState.getCount() - 1);
+                }
+                inventory.add(itemEntity);
+            }
+        } else {
+            for (var item : state.getItemsByName()) {
+                inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(item));
+            }
+        }
+
+        if (equipment != null && state.getEquipmentSlots() != null) {
+            for (ItemCategory category : ItemCategory.values()) {
+                if (equipment.getEquipped(category) != null) {
+                    equipment.unequip(category);
+                }
+            }
+            for (var entry : state.getEquipmentSlots().entrySet()) {
+                PlayerState.EquipmentSlotState slotState = entry.getValue();
+                if (slotState == null) continue;
+                Entity itemEntity = findItemForEquipment(inventory, slotState);
+                if (itemEntity == null) continue;
+                Item item = Item.MAPPER.get(itemEntity);
+                if (item != null) {
+                    item.setSlotIndex(-1);
+                }
+                equipment.equip(entry.getKey(), itemEntity);
+            }
+        }
+
+        if (skill != null && state.getSkillTrees() != null) {
+            skill.getTrees().clear();
+            for (var entry : state.getSkillTrees().entrySet()) {
+                SkillTreeStateSnapshot snapshot = entry.getValue();
+                if (entry.getKey() == null || snapshot == null) continue;
+                SkillTreeState treeState = new SkillTreeState();
+                treeState.setCurrentLevel(snapshot.getCurrentLevel());
+                treeState.setSkillPoints(snapshot.getSkillPoints());
+                for (String nodeId : snapshot.getUnlockedNodes()) {
+                    treeState.addUnlockedNode(nodeId);
+                }
+                skill.getTrees().put(entry.getKey(), treeState);
+            }
+        }
+
+        if (state.getStatModifiers() != null) {
+            if (statModifiers == null) {
+                statModifiers = new StatModifierComponent();
+                player.add(statModifiers);
+            }
+            statModifiers.getModifiers().clear();
+            for (PlayerState.StatModifierState modifierState : state.getStatModifiers()) {
+                if (modifierState == null) continue;
+                statModifiers.addModifier(new StatModifier(
+                    modifierState.getStatType(),
+                    modifierState.getAdditive(),
+                    modifierState.getMultiplier(),
+                    modifierState.getSource(),
+                    modifierState.getDurationSeconds(),
+                    modifierState.getExpireTimeEpochMs()
+                ));
+            }
+        }
+    }
+
+    private static Entity findItemForEquipment(Inventory inventory, PlayerState.EquipmentSlotState slotState) {
+        if (slotState.getSlotIndex() >= 0) {
+            for (Entity entity : inventory.getItems()) {
+                Item item = Item.MAPPER.get(entity);
+                if (item != null && item.getSlotIndex() == slotState.getSlotIndex()) {
+                    return entity;
+                }
+            }
+        }
+        for (Entity entity : inventory.getItems()) {
+            Item item = Item.MAPPER.get(entity);
+            if (item != null && item.getItemId().equals(slotState.getItemId())) {
+                return entity;
+            }
+        }
+        return null;
     }
 }

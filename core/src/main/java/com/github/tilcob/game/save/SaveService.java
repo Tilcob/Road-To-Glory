@@ -39,7 +39,7 @@ public class SaveService {
             stateManager.saveChestRegistryState(chestRegistry.toState());
             saveManager.save(stateManager.getGameState());
             Gdx.app.log("SaveService", "Saved game state to slot " + saveManager.getActiveSlot());
-        } catch (IOException e) {
+        } catch (Exception e) {
             Gdx.app.error("SaveService", "Error saving state: " + e.getMessage());
         }
     }

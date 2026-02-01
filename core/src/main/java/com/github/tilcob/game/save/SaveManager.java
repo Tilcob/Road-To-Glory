@@ -54,11 +54,12 @@ public class SaveManager {
         gameState.setSaveVersion(CURRENT_VERSION);
         validate(gameState);
 
+        saveDirectory.file().mkdirs();
         byte[] stateJson = MAPPER.writerWithDefaultPrettyPrinter().writeValueAsBytes(gameState);
         FileHandle tmp = tmpFileFor(saveFile);
         writeSavZip(tmp, stateJson);
         createBackups();
-        tmp.moveTo(saveFile);
+        replaceSaveFile(tmp);
     }
 
     public GameState load() throws IOException {
@@ -144,6 +145,23 @@ public class SaveManager {
             zipOutputStream.write(stateJson);
             zipOutputStream.closeEntry();
             zipOutputStream.close();
+        }
+    }
+
+    private void replaceSaveFile(FileHandle tmp) throws IOException {
+        if (saveFile.exists() && saveFile.isDirectory()) {
+            throw new IOException("Save path is a directory: " + saveFile.path());
+        }
+        if (saveFile.exists()) {
+            saveFile.delete();
+        }
+        tmp.moveTo(saveFile);
+        if (tmp.exists()) {
+            tmp.copyTo(saveFile);
+            tmp.delete();
+        }
+        if (!saveFile.exists()) {
+            throw new IOException("Failed to finalize save file at: " + saveFile.path());
         }
     }
 

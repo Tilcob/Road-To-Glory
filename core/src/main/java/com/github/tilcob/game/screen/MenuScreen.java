@@ -60,17 +60,17 @@ public class MenuScreen extends ScreenAdapter {
 
     @Override
     public void show() {
-        inputManager.setInputProcessors(stage);
-        inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
-
         menuViewModel = new MenuViewModel(services, screenNavigator);
         settingsViewModel = new SettingsViewModel(services);
+
+        inputManager.setInputProcessors(stage);
+        inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
+        setViewModelsActive(true);
 
         menuView = new MenuView(skin, stage, menuViewModel);
         settingsView = new SettingsView(skin, stage, settingsViewModel);
 
         settingsOverlayController = new SettingsOverlayController(
-            stage,
             menuView,
             settingsView,
             menuView::selectSettings,
@@ -78,6 +78,8 @@ public class MenuScreen extends ScreenAdapter {
         );
 
         stage.addActor(menuView);
+        stage.addActor(settingsView);
+        settingsView.setVisible(false);
 
         services.getEventBus().subscribe(UiOverlayEvent.class, this::onOverlayEvent);
         services.getAudioManager().playMusic(MusicAsset.MENU);
@@ -88,6 +90,7 @@ public class MenuScreen extends ScreenAdapter {
     public void hide() {
         services.getEventBus().unsubscribe(UiOverlayEvent.class, this::onOverlayEvent);
         this.stage.clear();
+        setViewModelsActive(false);
 
         if (menuViewModel != null) {
             menuViewModel.dispose();
@@ -135,6 +138,15 @@ public class MenuScreen extends ScreenAdapter {
     private void openSettingsOverlay() {
         if (settingsOverlayController != null) {
             settingsOverlayController.openSettings();
+        }
+    }
+
+    private void setViewModelsActive(boolean active) {
+        if (menuViewModel != null) {
+            menuViewModel.setActive(active);
+        }
+        if (settingsViewModel != null) {
+            settingsViewModel.setActive(active);
         }
     }
 

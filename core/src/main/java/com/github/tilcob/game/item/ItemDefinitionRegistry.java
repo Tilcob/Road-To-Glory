@@ -58,6 +58,10 @@ public final class ItemDefinitionRegistry {
         return DEFINITIONS.containsKey(id);
     }
 
+    public static boolean hasDefinitions() {
+        return !DEFINITIONS.isEmpty();
+    }
+
     public static String resolveId(String rawId) {
         if (rawId == null) {
             return UNDEFINED_ID;
