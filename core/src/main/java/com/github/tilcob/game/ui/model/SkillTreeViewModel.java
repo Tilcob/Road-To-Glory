@@ -14,9 +14,11 @@ import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 public class SkillTreeViewModel extends ViewModel {
     private boolean open = false;
     private static final String DEFAULT_TREE_ID = "combat";
+    private String activeTreeId;
 
     public SkillTreeViewModel(GameServices services) {
         super(services);
+        activeTreeId = resolveInitialTreeId();
         gameEventBus.subscribe(LevelUpEvent.class, this::onLevelUp);
         gameEventBus.subscribe(SkillUnlockEvent.class, this::onSkillUnlock);
     }
@@ -42,18 +44,22 @@ public class SkillTreeViewModel extends ViewModel {
     }
 
     public SkillTreeDefinition getTreeDefinition() {
-        return SkillTreeLoader.get(DEFAULT_TREE_ID);
+        return SkillTreeLoader.get(activeTreeId);
+    }
+
+    public SkillTreeDefinition getTreeDefinition(String treeId) {
+        return SkillTreeLoader.get(treeId);
     }
 
     public SkillTreeState getTreeState() {
         Skill comp = Skill.MAPPER.get(services.getEntityLookup().getPlayer());
         if (comp == null) return null;
-        return comp.getTreeState(DEFAULT_TREE_ID);
+        return comp.getTreeState(activeTreeId);
     }
 
     public void unlockNode(String nodeId) {
         if (services.getEntityLookup().getPlayer() == null) return;
-        getEventBus().fire(new SkillUnlockEvent(services.getEntityLookup().getPlayer(), DEFAULT_TREE_ID, nodeId));
+        getEventBus().fire(new SkillUnlockEvent(services.getEntityLookup().getPlayer(), activeTreeId, nodeId));
     }
 
     private void onLevelUp(LevelUpEvent event) {
@@ -67,8 +73,31 @@ public class SkillTreeViewModel extends ViewModel {
     }
 
     private boolean isDefaultTreeForPlayer(Object entity, String treeId) {
-        if (!DEFAULT_TREE_ID.equals(treeId)) return false;
+        if (!activeTreeId.equals(treeId)) return false;
         return services.getEntityLookup().getPlayer() == entity;
+    }
+
+    public String getActiveTreeId() {
+        return activeTreeId;
+    }
+
+    public void setActiveTreeId(String treeId) {
+        if (treeId == null || treeId.isBlank() || treeId.equals(activeTreeId)) return;
+        String previousTreeId = activeTreeId;
+        activeTreeId = treeId;
+        propertyChangeSupport.firePropertyChange(Constants.SKILL_TREE_UPDATED, previousTreeId, treeId);
+    }
+
+    public java.util.List<String> getTreeIds() {
+        return SkillTreeLoader.getIds();
+    }
+
+    private String resolveInitialTreeId() {
+        java.util.List<String> treeIds = SkillTreeLoader.getIds();
+        if (!treeIds.isEmpty()) {
+            return treeIds.get(0);
+        }
+        return DEFAULT_TREE_ID;
     }
 
     @Override

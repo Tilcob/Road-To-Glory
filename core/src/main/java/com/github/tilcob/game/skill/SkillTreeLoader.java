@@ -8,16 +8,17 @@ import com.badlogic.gdx.utils.JsonValue;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class SkillTreeLoader {
     private static final Map<String, SkillTreeDefinition> DEFINITIONS = new HashMap<>();
+    private static final List<String> ORDERED_IDS = new ArrayList<>();
     private static final String TAG = SkillTreeLoader.class.getSimpleName();
 
     public static void loadAll() {
         if (!DEFINITIONS.isEmpty()) Gdx.app.log(TAG, "Reloading skill trees.");
         DEFINITIONS.clear();
+        ORDERED_IDS.clear();
         FileHandle dir = Gdx.files.internal("skill-trees");
         if (!dir.exists()) {
             String msg = "Skills directory not found: " + dir.path();
@@ -90,6 +91,7 @@ public class SkillTreeLoader {
                     continue;
                 }
                 DEFINITIONS.put(def.getId(), def);
+                ORDERED_IDS.add(def.getId());
                 Gdx.app.log(TAG, "Loaded skill tree: " + def.getId());
             } catch (Exception e) {
                 String msg = "Failed to load skill tree: " + file.path();
@@ -101,5 +103,9 @@ public class SkillTreeLoader {
 
     public static SkillTreeDefinition get(String id) {
         return DEFINITIONS.get(id);
+    }
+
+    public static List<String> getIds() {
+        return Collections.unmodifiableList(ORDERED_IDS);
     }
 }

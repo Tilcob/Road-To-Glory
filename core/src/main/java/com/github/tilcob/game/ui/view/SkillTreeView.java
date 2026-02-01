@@ -13,6 +13,7 @@ import com.github.tilcob.game.ui.model.SkillTreeViewModel;
 
 public class SkillTreeView extends View<SkillTreeViewModel> {
     private Table rootTable;
+    private Table tabsTable;
     private Label pointsLabel;
     private Table nodesTable;
 
@@ -30,6 +31,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         rootTable.top();
 
         pointsLabel = new Label("Points: 0", skin);
+        tabsTable = new Table();
         nodesTable = new Table();
 
         TextButton closeBtn = new TextButton("Close (K)", skin);
@@ -50,6 +52,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         scrollPane.setFadeScrollBars(false);
 
         rootTable.add(titleRow).expandX().fillX().row();
+        rootTable.add(tabsTable).expandX().fillX().pad(5, 10, 5, 10).row();
         rootTable.add(pointsLabel).pad(10).left().row();
         rootTable.add(scrollPane).expand().fill().pad(10).row();
 
@@ -83,6 +86,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     }
 
     private void refresh() {
+        buildTabs();
         SkillTreeDefinition def = viewModel.getTreeDefinition();
         SkillTreeState state = viewModel.getTreeState();
         if (def == null || state == null)
@@ -125,5 +129,29 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
 
             nodesTable.add(nodeBtn).pad(5).fillX().row();
         }
+    }
+
+    private void buildTabs() {
+        tabsTable.clear();
+        String activeTreeId = viewModel.getActiveTreeId();
+        for (String treeId : viewModel.getTreeIds()) {
+            SkillTreeDefinition treeDefinition = viewModel.getTreeDefinition(treeId);
+            String label = treeDefinition != null && treeDefinition.getName() != null
+                ? treeDefinition.getName()
+                : treeId;
+            TextButton tabButton = new TextButton(label, skin);
+            boolean isActive = treeId.equals(activeTreeId);
+            tabButton.setDisabled(isActive);
+            if (!isActive) {
+                tabButton.addListener(new ClickListener() {
+                    @Override
+                    public void clicked(InputEvent event, float x, float y) {
+                        viewModel.setActiveTreeId(treeId);
+                    }
+                });
+            }
+            tabsTable.add(tabButton).padRight(6);
+        }
+        tabsTable.row();
     }
 }
