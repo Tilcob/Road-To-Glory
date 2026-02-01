@@ -32,11 +32,13 @@ import com.github.tilcob.game.system.CameraSystem;
 import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
-import com.github.tilcob.game.ui.model.ChestViewModel;
-import com.github.tilcob.game.ui.model.GameViewModel;
-import com.github.tilcob.game.ui.model.InventoryViewModel;
-import com.github.tilcob.game.ui.model.PauseViewModel;
-import com.github.tilcob.game.ui.view.*;
+import com.github.tilcob.game.ui.GameUiBuilder;
+import com.github.tilcob.game.ui.model.*;
+import com.github.tilcob.game.ui.overlay.UiOverlayManager;
+import com.github.tilcob.game.ui.view.DebugOverlayView;
+import com.github.tilcob.game.ui.view.PauseView;
+import com.github.tilcob.game.ui.view.SettingsView;
+import com.github.tilcob.game.world.GameWorldLoader;
 
 import java.util.function.Consumer;
 
@@ -44,6 +46,7 @@ public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
     private final Group gameUiGroup;
+    private final GameUiBuilder gameUiBuilder = new GameUiBuilder();
     private Engine engine;
     private TiledManager tiledManager;
     private TiledAshleyConfigurator tiledAshleyConfigurator;
@@ -57,15 +60,18 @@ public class GameScreen extends ScreenAdapter {
     private InventoryViewModel inventoryViewModel;
     private ChestViewModel chestViewModel;
     private PauseViewModel pauseViewModel;
+    private SettingsViewModel settingsViewModel;
     private Skin skin;
     private InputManager inputManager;
-    private Entity player;
     private ActiveEntityReference activeEntityReference;
     private PauseView pauseView;
+    private SettingsView settingsView;
     private DebugOverlayView debugOverlayView;
     private boolean paused;
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
+    private UiOverlayManager uiOverlayManager;
+    private GameWorldLoader worldLoader;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
         this.services = services;
@@ -88,12 +94,24 @@ public class GameScreen extends ScreenAdapter {
         this.inventoryViewModel = dependencies.inventoryViewModel();
         this.chestViewModel = dependencies.chestViewModel();
         this.pauseViewModel = dependencies.pauseViewModel();
+        this.settingsViewModel = dependencies.settingsViewModel();
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
+        this.worldLoader = new GameWorldLoader(new GameWorldLoader.Dependencies(
+            services,
+            engine,
+            tiledManager,
+            tiledAshleyConfigurator,
+            audioManager,
+            physicWorld,
+            uiViewport,
+            activeEntityReference
+        ));
 
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
+        services.getUiServices().setSkin(skin);
     }
 
     @Override
@@ -107,72 +125,54 @@ public class GameScreen extends ScreenAdapter {
     public void show() {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState, uiControllerState);
+        clearAllControllerCommands();
 
         stage.addActor(gameUiGroup);
-        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
-        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
-        if (Constants.DEBUG) {
-            debugOverlayView = new DebugOverlayView(skin, engine, services);
-            stage.addActor(debugOverlayView);
+        gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
+        if (Constants.DEBUG) {
             contentReloadService = new ContentReloadService(services);
             contentHotReload = new ContentHotReload(contentReloadService.collectWatchFiles(), 1f);
         }
 
-        pauseView = new PauseView(skin, stage, pauseViewModel);
-        pauseView.setVisible(false);
-        stage.addActor(pauseView);
-        paused = false;
-        services.getEventBus().fire(new PauseEvent(PauseEvent.Action.RESUME));
+        GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
+            stage,
+            buildUiDependencies(),
+            paused,
+            false
+        );
+        pauseView = overlays.pauseView();
+        settingsView = overlays.settingsView();
+        debugOverlayView = overlays.debugOverlayView();
+        uiOverlayManager = new UiOverlayManager(
+            stage,
+            services.getEventBus(),
+            inputManager,
+            gameUiGroup,
+            pauseView,
+            settingsView,
+            settingsViewModel,
+            true
+        );
+        uiOverlayManager.show();
+        uiOverlayManager.setPaused(false);
 
-        Consumer<TiledMap> renderConsumer = engine.getSystem(RenderSystem.class)::setMap;
-        Consumer<TiledMap> cameraConsumer = engine.getSystem(CameraSystem.class)::setMap;
-        Consumer<TiledMap> audioConsumer = audioManager::setMap;
-
-        tiledManager.setMapChangeConsumer(renderConsumer.andThen(cameraConsumer).andThen(audioConsumer));
-        tiledManager.setLoadObjectConsumer(tiledAshleyConfigurator::onLoadObject);
-        tiledManager.setLoadTileConsumer(tiledAshleyConfigurator::onLoadTile);
-        tiledManager.setLoadTriggerConsumer(tiledAshleyConfigurator::onLoadTrigger);
-
-        createPlayer();
-        loadQuest();
-    }
-
-    private void loadQuest() {
-        QuestLoader loader = new QuestLoader(new QuestFactory(services.getQuestYarnRegistry()));
-        QuestLog questLog = QuestLog.MAPPER.get(player);
-        services.getStateManager().loadQuests(questLog, loader);
-    }
-
-    private void createPlayer() {
-        player = PlayerFactory.create(engine, services.getAssetManager(), physicWorld);
-        activeEntityReference.set(player);
-        loadMap();
-
-        if (services.getStateManager().getGameState().getPlayerState() != null) {
-            PlayerStateApplier.apply(services.getStateManager().getGameState().getPlayerState(), player);
-        } else {
-            Transform.MAPPER.get(player).getPosition().set(tiledManager.getSpawnPoint());
-            Physic.MAPPER.get(player).getBody().setTransform(tiledManager.getSpawnPoint(), 0);
-        }
-        services.getStateManager().loadDialogFlags(DialogFlags.MAPPER.get(player));
-        services.getStateManager().loadCounters(Counters.MAPPER.get(player));
-        services.getStateManager().setPlayerState(player);
-        services.getEventBus().fire(new UpdateInventoryEvent(player));
-    }
-
-    private void loadMap() {
-        MapAsset mapToLoad = services.getStateManager().getGameState().getCurrentMap();
-        if (mapToLoad == null) mapToLoad = MapAsset.MAIN;
-        tiledManager.setMap(tiledManager.loadMap(mapToLoad));
-        services.getEventBus().fire(new MapChangeEvent(tiledManager.getCurrentMapAsset().name().toLowerCase()));
+        worldLoader.initializeWorld();
+        worldLoader.loadState();
     }
 
     @Override
     public void hide() {
         engine.removeAllEntities();
         stage.clear();
+        if (uiOverlayManager != null) {
+            uiOverlayManager.hide();
+        }
+
+        if (settingsViewModel != null) {
+            settingsViewModel.dispose();
+            settingsViewModel = null;
+        }
     }
 
     @Override
@@ -198,6 +198,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void autosave(AutosaveEvent event) {
+        Entity player = getPlayer();
         if (player == null) return;
         services.getStateManager().saveQuests(QuestLog.MAPPER.get(player));
         services.getStateManager().saveDialogFlags(DialogFlags.MAPPER.get(player));
@@ -217,23 +218,17 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void setPaused(boolean paused) {
-        if (this.paused == paused) {
-            return;
-        }
         this.paused = paused;
-        pauseView.setVisible(paused);
-        gameUiGroup.setVisible(!paused);
-        if (paused) {
-            pauseView.toFront();
-            pauseView.resetSelection();
-            inputManager.setActiveState(UiControllerState.class);
-        } else {
-            inputManager.setActiveState(GameControllerState.class);
+
+        if (uiOverlayManager != null) {
+            uiOverlayManager.setPaused(paused);
         }
     }
 
     private void performHotReload() {
         if (contentReloadService == null || contentHotReload == null) return;
+        Entity player = getPlayer();
+        if (player == null) return;
         contentHotReload.beginReload();
         try {
             var playerPos = Transform.MAPPER.get(player).getPosition().cpy();
@@ -257,23 +252,71 @@ public class GameScreen extends ScreenAdapter {
 
     private void rebuildUiAfterHotReload() {
         gameUiGroup.clearChildren();
-        gameUiGroup.addActor(new GameView(skin, stage, gameViewModel));
-        gameUiGroup.addActor(new InventoryView(skin, stage, inventoryViewModel));
-        gameUiGroup.addActor(new ChestView(skin, stage, chestViewModel));
+        gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
+        if (settingsView != null) {
+            settingsView.remove();
+        }
         if (pauseView != null) {
             pauseView.remove();
         }
-        pauseView = new PauseView(skin, stage, pauseViewModel);
-        pauseView.setVisible(paused);
-        stage.addActor(pauseView);
+        if (debugOverlayView != null) {
+            debugOverlayView.remove();
+        }
 
-        if (Constants.DEBUG) {
-            if (debugOverlayView != null) {
-                debugOverlayView.remove();
-            }
-            debugOverlayView = new DebugOverlayView(skin, engine, services);
-            stage.addActor(debugOverlayView);
+        boolean showSettings = settingsViewModel.isOpen() && paused;
+        GameUiBuilder.OverlayViews overlays = gameUiBuilder.buildOverlays(
+            stage,
+            buildUiDependencies(),
+            paused,
+            showSettings
+        );
+        pauseView = overlays.pauseView();
+        settingsView = overlays.settingsView();
+        debugOverlayView = overlays.debugOverlayView();
+        if (uiOverlayManager != null) uiOverlayManager.hide();
+        uiOverlayManager = new UiOverlayManager(
+            stage,
+            settingsViewModel.getEventBus(),
+            inputManager,
+            gameUiGroup,
+            pauseView,
+            settingsView,
+            settingsViewModel,
+            false
+        );
+        uiOverlayManager.show();
+        uiOverlayManager.setPaused(paused);
+    }
+
+    private Entity getPlayer() {
+        if (worldLoader == null) return null;
+        return worldLoader.getPlayer();
+    }
+
+    private GameUiBuilder.UiDependencies buildUiDependencies() {
+        return new GameUiBuilder.UiDependencies(
+            stage,
+            skin,
+            gameViewModel,
+            inventoryViewModel,
+            chestViewModel,
+            pauseViewModel,
+            settingsViewModel,
+            engine,
+            services,
+            Constants.DEBUG
+        );
+    }
+
+    private void clearAllControllerCommands() {
+        for (var e : engine.getEntitiesFor(com.badlogic.ashley.core.Family.all(Controller.class).get())) {
+            Controller c = Controller.MAPPER.get(e);
+            if (c == null) continue;
+            c.getPressedCommands().clear();
+            c.getReleasedCommands().clear();
+            c.getHeldCommands().clear();
+            c.getCommandBuffer().clear();
         }
     }
 
@@ -286,6 +329,9 @@ public class GameScreen extends ScreenAdapter {
         }
         services.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().unsubscribe(PauseEvent.class, this::togglePause);
+        if (uiOverlayManager != null) {
+            uiOverlayManager.dispose();
+        }
         gameViewModel.dispose();
         pauseViewModel.dispose();
         physicWorld.dispose();

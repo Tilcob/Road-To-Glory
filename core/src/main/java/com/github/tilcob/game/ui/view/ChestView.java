@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
 import com.github.tilcob.game.ui.inventory.chest.ChestSlot;
@@ -14,7 +15,6 @@ import com.github.tilcob.game.ui.inventory.player.PlayerItemSource;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.ChestViewModel;
-import com.github.tilcob.game.ui.model.ItemModel;
 
 public class ChestView extends View<ChestViewModel> {
     private Table inventoryRoot;

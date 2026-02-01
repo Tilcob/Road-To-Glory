@@ -1,6 +1,4 @@
-package com.github.tilcob.game.ui.model;
-
-import com.github.tilcob.game.item.ItemCategory;
+package com.github.tilcob.game.item;
 
 public class ItemModel {
     private final int itemEntityId;
