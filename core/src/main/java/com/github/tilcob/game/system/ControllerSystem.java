@@ -55,6 +55,7 @@ public class ControllerSystem extends IteratingSystem {
                 case PAUSE -> eventBus.fire(new PauseEvent(PauseEvent.Action.TOGGLE));
                 case INTERACT -> interact(entity);
                 case INVENTORY -> inventory(entity);
+                case SKILLS -> openSkillTree(entity);
                 default -> {
                 }
             }
@@ -101,5 +102,10 @@ public class ControllerSystem extends IteratingSystem {
 
     private void select(Entity player) {
         eventBus.fire(new CommandEvent(player, Command.SELECT));
+    }
+
+    private void openSkillTree(Entity player) {
+        if (Skill.MAPPER.get(player) == null) return;
+        eventBus.fire(new UiEvent(Command.SKILLS, UiEvent.Action.PRESS));
     }
 }

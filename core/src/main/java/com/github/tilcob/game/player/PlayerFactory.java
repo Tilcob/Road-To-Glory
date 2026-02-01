@@ -60,7 +60,7 @@ public class PlayerFactory {
         entity.add(new Wallet());
         entity.add(new Protection());
         entity.add(new Counters());
-        entity.add(new SkillComponent());
+        entity.add(new Skill());
 
         engine.addEntity(entity);
         return entity;

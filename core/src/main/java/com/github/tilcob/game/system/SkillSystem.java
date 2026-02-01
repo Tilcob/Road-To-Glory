@@ -4,7 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
-import com.github.tilcob.game.component.SkillComponent;
+import com.github.tilcob.game.component.Skill;
 import com.github.tilcob.game.component.SkillTreeState;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.*;
@@ -20,7 +20,7 @@ public class SkillSystem extends IteratingSystem {
     private final GameEventBus eventBus;
 
     public SkillSystem(GameEventBus eventBus) {
-        super(Family.all(SkillComponent.class).get());
+        super(Family.all(Skill.class).get());
         this.eventBus = eventBus;
 
         eventBus.subscribe(XPGainEvent.class, this::onXpGain);
@@ -33,7 +33,7 @@ public class SkillSystem extends IteratingSystem {
     }
 
     private void onXpGain(XPGainEvent event) {
-        SkillComponent skillComp = SkillComponent.MAPPER.get(event.entity());
+        Skill skillComp = Skill.MAPPER.get(event.entity());
         if (skillComp == null)
             return;
 
@@ -63,7 +63,7 @@ public class SkillSystem extends IteratingSystem {
     }
 
     private void onSkillUnlock(SkillUnlockEvent event) {
-        SkillComponent skillComp = SkillComponent.MAPPER.get(event.entity());
+        Skill skillComp = Skill.MAPPER.get(event.entity());
         if (skillComp == null)
             return;
 

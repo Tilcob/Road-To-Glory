@@ -6,8 +6,8 @@ import com.badlogic.ashley.core.ComponentMapper;
 import java.util.HashMap;
 import java.util.Map;
 
-public class SkillComponent implements Component {
-    public static final ComponentMapper<SkillComponent> MAPPER = ComponentMapper.getFor(SkillComponent.class);
+public class Skill implements Component {
+    public static final ComponentMapper<Skill> MAPPER = ComponentMapper.getFor(Skill.class);
 
     private final Map<String, SkillTreeState> trees = new HashMap<>();
 
