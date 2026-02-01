@@ -2,18 +2,16 @@ package com.github.tilcob.game.ui.model;
 
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Dialog;
-import com.github.tilcob.game.component.Npc;
 import com.github.tilcob.game.component.RewardDialogState;
 import com.github.tilcob.game.component.Trigger;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.dialog.DialogChoice;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.ui.UiModelFactory;
 
 import java.util.Map;
 
@@ -27,8 +25,11 @@ public class GameViewModel extends ViewModel {
     private boolean rewardVisible;
     private Entity rewardOwner;
 
-    public GameViewModel(GameServices services, Viewport viewport) {
+    private final UiModelFactory uiModelFactory;
+
+    public GameViewModel(GameServices services, Viewport viewport, UiModelFactory uiModelFactory) {
         super(services);
+        this.uiModelFactory = uiModelFactory;
         this.audioManager = services.getAudioManager();
         this.viewport = viewport;
         this.lifePoints = 0;
@@ -74,31 +75,22 @@ public class GameViewModel extends ViewModel {
             clearRewardOwner();
         }
 
-        String speaker = "NPC";
-        if (event.entity() != null && Npc.MAPPER.get(event.entity()) != null) {
-            speaker = Npc.MAPPER.get(event.entity()).getName();
-        }
         this.propertyChangeSupport.firePropertyChange(
                 Constants.SHOW_DIALOG,
                 null,
-                new DialogDisplay(speaker, event.line()));
+                uiModelFactory.createDialogDisplay(event));
     }
 
     private void onDialogChoices(DialogChoiceEvent event) {
-        Array<String> labels = new Array<>();
-        if (event.choices() != null) {
-            for (DialogChoice choice : event.choices()) {
-                labels.add(choice.text());
-            }
-        }
-        if (labels.isEmpty()) {
+        DialogChoiceDisplay display = uiModelFactory.createDialogChoiceDisplay(event);
+        if (display.choices().isEmpty()) {
             this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG_CHOICES, null, true);
             return;
         }
         this.propertyChangeSupport.firePropertyChange(
                 Constants.SHOW_DIALOG_CHOICES,
                 null,
-                new DialogChoiceDisplay(labels, event.selectedIndex()));
+                display);
     }
 
     private void onDialogFinished(FinishedDialogEvent event) {
@@ -114,14 +106,7 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onRewardGranted(RewardGrantedEvent event) {
-        Array<String> items = new Array<>();
-        for (String itemId : event.reward().items()) {
-            items.add(itemId);
-        }
-        String title = event.questTitle() == null || event.questTitle().isBlank()
-                ? event.questId().replace("_", " ")
-                : event.questTitle();
-        RewardDisplay display = new RewardDisplay(title, event.reward().money(), items);
+        RewardDisplay display = uiModelFactory.createRewardDisplay(event);
         rewardVisible = true;
         rewardOwner = event.player();
         if (rewardOwner != null) {
@@ -131,9 +116,8 @@ public class GameViewModel extends ViewModel {
     }
 
     private void clearRewardOwner() {
-        if (rewardOwner == null) {
+        if (rewardOwner == null)
             return;
-        }
         rewardOwner.remove(RewardDialogState.class);
         rewardOwner = null;
     }
@@ -197,5 +181,7 @@ public class GameViewModel extends ViewModel {
         getEventBus().unsubscribe(ExitTriggerEvent.class, this::onExitTrigger);
         getEventBus().unsubscribe(FinishedDialogEvent.class, this::onDialogFinished);
         getEventBus().unsubscribe(RewardGrantedEvent.class, this::onRewardGranted);
+        getEventBus().unsubscribe(EntityDamagedEvent.class, this::onEntityDamaged);
+        getEventBus().unsubscribe(InventoryFullEvent.class, this::onInventoryFull);
     }
 }

@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -22,14 +21,7 @@ import com.github.tilcob.game.debug.ContentReloadService;
 import com.github.tilcob.game.event.AutosaveEvent;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.PauseEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.input.*;
-import com.github.tilcob.game.player.PlayerFactory;
-import com.github.tilcob.game.player.PlayerStateApplier;
-import com.github.tilcob.game.quest.QuestFactory;
-import com.github.tilcob.game.quest.QuestLoader;
-import com.github.tilcob.game.system.CameraSystem;
-import com.github.tilcob.game.system.RenderSystem;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.GameUiBuilder;
@@ -39,8 +31,6 @@ import com.github.tilcob.game.ui.view.DebugOverlayView;
 import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
 import com.github.tilcob.game.world.GameWorldLoader;
-
-import java.util.function.Consumer;
 
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;

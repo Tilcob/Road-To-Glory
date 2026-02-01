@@ -6,8 +6,8 @@ import com.badlogic.ashley.core.EntityListener;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.physics.box2d.*;
-import com.github.tilcob.game.component.*;
+import com.badlogic.gdx.physics.box2d.World;
+import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.event.GameEventBus;
 
