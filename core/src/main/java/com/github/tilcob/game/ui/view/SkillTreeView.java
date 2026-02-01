@@ -72,13 +72,14 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         if (def == null || state == null)
             return;
 
-        pointsLabel.setText("Level: " + state.getCurrentLevel() + " | Points: " + state.getSkillPoints());
+        int displayLevel = state.getCurrentLevel() + 1;
+        pointsLabel.setText("Level: " + displayLevel + " | Points: " + state.getSkillPoints());
 
         nodesTable.clear();
         for (SkillNodeDefinition node : def.getNodes()) {
             boolean unlocked = state.isUnlocked(node.getId());
             boolean affordable = state.getSkillPoints() >= node.getCost();
-            boolean levelReq = state.getCurrentLevel() >= node.getRequiredLevel();
+            boolean levelReq = displayLevel >= node.getRequiredLevel();
             boolean parentsUnlocked = true;
             if (node.getParentIds() != null) {
                 for (String pid : node.getParentIds()) {

@@ -2,7 +2,7 @@
   "id": "combat",
   "name": "Combat",
   "description": "Master the art of war.",
-  "xpTable": [0, 100, 250, 500, 1000, 2000, 4000],
+  "xpTable": [100, 250, 500, 1000, 2000, 4000],
   "nodes": [
     {
       "id": "basic_strength",

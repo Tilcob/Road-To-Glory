@@ -56,7 +56,7 @@ public class SkillSystem extends IteratingSystem {
         }
 
         if (levelsGained > 0) {
-            eventBus.fire(new LevelUpEvent(entity, treeId, levelsGained, state.getCurrentLevel()));
+            eventBus.fire(new LevelUpEvent(entity, treeId, levelsGained, state.getCurrentLevel() + 1));
         }
     }
 
@@ -76,8 +76,9 @@ public class SkillSystem extends IteratingSystem {
                 .orElse(null);
 
         if (nodeDef == null) return;
+        int displayLevel = state.getCurrentLevel() + 1;
         if (state.getSkillPoints() < nodeDef.getCost()) return;
-        if (state.getCurrentLevel() < nodeDef.getRequiredLevel()) return;
+        if (displayLevel < nodeDef.getRequiredLevel()) return;
 
         if (nodeDef.getParentIds() != null) {
             for (String parentId : nodeDef.getParentIds()) {

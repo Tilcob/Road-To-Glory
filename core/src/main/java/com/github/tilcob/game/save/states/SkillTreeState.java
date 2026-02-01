@@ -4,7 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 public class SkillTreeState {
-    private int currentLevel = 1;
+    private int currentLevel = 0;
     private int currentXp = 0;
     private int skillPoints = 0;
     private Set<String> unlockedNodes = new HashSet<>();
