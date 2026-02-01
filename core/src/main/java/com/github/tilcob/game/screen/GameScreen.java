@@ -116,6 +116,7 @@ public class GameScreen extends ScreenAdapter {
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState,
                 uiControllerState);
+        setViewModelsActive(true);
         clearAllControllerCommands();
         paused = false;
 
@@ -156,6 +157,8 @@ public class GameScreen extends ScreenAdapter {
         engine.removeAllEntities();
         stage.clear();
         paused = false;
+        setViewModelsActive(true);
+
         if (uiOverlayManager != null) {
             uiOverlayManager.hide();
         }
@@ -297,6 +300,24 @@ public class GameScreen extends ScreenAdapter {
                 engine,
                 services,
                 Constants.DEBUG);
+    }
+
+    private void setViewModelsActive(boolean active) {
+        if (gameViewModel != null) {
+            gameViewModel.setActive(active);
+        }
+        if (inventoryViewModel != null) {
+            inventoryViewModel.setActive(active);
+        }
+        if (chestViewModel != null) {
+            chestViewModel.setActive(active);
+        }
+        if (pauseViewModel != null) {
+            pauseViewModel.setActive(active);
+        }
+        if (settingsViewModel != null) {
+            settingsViewModel.setActive(active);
+        }
     }
 
     private void clearAllControllerCommands() {
