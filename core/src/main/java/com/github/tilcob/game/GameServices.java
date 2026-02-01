@@ -1,8 +1,12 @@
 package com.github.tilcob.game;
 
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.audio.AudioManager;
+import com.github.tilcob.game.component.Counters;
+import com.github.tilcob.game.component.DialogFlags;
+import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
@@ -101,6 +105,15 @@ public class GameServices {
     }
 
     public void saveGame() {
+        if (entityLookup != null) {
+            Entity player = entityLookup.getPlayer();
+            if (player != null) {
+                stateManager.saveQuests(QuestLog.MAPPER.get(player));
+                stateManager.saveDialogFlags(DialogFlags.MAPPER.get(player));
+                stateManager.setPlayerState(player);
+                stateManager.saveCounters(Counters.MAPPER.get(player));
+            }
+        }
         saveService.saveGame();
     }
 

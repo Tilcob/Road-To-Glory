@@ -60,7 +60,6 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
             rootTable.setBackground(skin.getDrawable("window"));
         }
 
-        rootTable.setSize(600, 400);
         rootTable.center();
 
         addActor(rootTable);
