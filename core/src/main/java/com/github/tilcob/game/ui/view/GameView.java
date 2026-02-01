@@ -238,27 +238,36 @@ public class GameView extends View<GameViewModel> {
     }
 
     private void showDamage(Map.Entry<Vector2, Integer> damageAndPosition) {
-        final Vector2 position = damageAndPosition.getKey();
-        int damage = damageAndPosition.getValue();
-
-        TextraLabel textraLabel = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RED}" + damage, skin);
-        stage.addActor(textraLabel);
-
-        textraLabel.addAction(
-            Actions.parallel(
-                Actions.sequence(Actions.delay(1.25f), Actions.removeActor()),
-                Actions.forever(Actions.run(() -> {
-                    Vector2 stageCoords = toStageCoords(position);
-                    textraLabel.setPosition(stageCoords.x, stageCoords.y);
-                }))
-            )
-        );
+        new DamageIndicator(damageAndPosition.getKey(), damageAndPosition.getValue()).show();
     }
 
     private Vector2 toStageCoords(Vector2 gamePosition) {
         Vector2 resultPos = viewModel.toScreenCoords(gamePosition);
         stage.getViewport().unproject(resultPos);
-        resultPos.y = stage.getViewport().getWorldHeight() -  resultPos.y;
+        resultPos.y = stage.getViewport().getWorldHeight() - resultPos.y;
         return resultPos;
+    }
+
+    private class DamageIndicator {
+        private final Vector2 position;
+        private final TextraLabel label;
+
+        DamageIndicator(Vector2 position, int damage) {
+            this.position = position;
+            this.label = new TypingLabel("[%50]{JUMP=2.0;0.5;0.9}{RED}" + damage, skin);
+        }
+
+        void show() {
+            stage.addActor(label);
+            label.addAction(
+                    Actions.parallel(
+                            Actions.sequence(Actions.delay(1.25f), Actions.removeActor()),
+                            Actions.forever(Actions.run(this::updatePosition))));
+        }
+
+        private void updatePosition() {
+            Vector2 stageCoords = toStageCoords(position);
+            label.setPosition(stageCoords.x, stageCoords.y);
+        }
     }
 }
