@@ -117,6 +117,7 @@ public class GameScreen extends ScreenAdapter {
         inputManager.configureStates(GameControllerState.class, idleControllerState, gameControllerState,
                 uiControllerState);
         clearAllControllerCommands();
+        paused = false;
 
         stage.addActor(gameUiGroup);
         gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
@@ -154,6 +155,7 @@ public class GameScreen extends ScreenAdapter {
     public void hide() {
         engine.removeAllEntities();
         stage.clear();
+        paused = false;
         if (uiOverlayManager != null) {
             uiOverlayManager.hide();
         }

@@ -133,6 +133,9 @@ public class PlayerState {
             return null;
         }
         String resolved = ItemDefinitionRegistry.resolveId(name);
+        if (!ItemDefinitionRegistry.hasDefinitions()) {
+            return resolved;
+        }
         if (!ItemDefinitionRegistry.isKnownId(resolved)) {
             return null;
         }

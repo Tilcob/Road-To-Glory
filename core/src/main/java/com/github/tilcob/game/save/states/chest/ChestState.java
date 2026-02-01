@@ -41,7 +41,7 @@ public class ChestState {
         List<String> normalized = new ArrayList<>();
         for (String name : contentsByName) {
             String resolved = ItemDefinitionRegistry.resolveId(name);
-            if (!ItemDefinitionRegistry.isKnownId(resolved)) {
+            if (ItemDefinitionRegistry.hasDefinitions() && !ItemDefinitionRegistry.isKnownId(resolved)) {
                 Gdx.app.error("ChestState", "Unknown item id: " + name);
                 continue;
             }
