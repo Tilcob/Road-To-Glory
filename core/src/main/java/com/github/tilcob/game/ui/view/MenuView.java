@@ -11,7 +11,6 @@ import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {
     private Group selectedItem;
-    private boolean overlaySubscribed = false;
 
     public MenuView(Skin skin, Stage stage, MenuViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -25,6 +24,7 @@ public class MenuView extends View<MenuViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
+        setRoot(this);
 
         Image image = new Image(skin, "banner");
         add(image).row();

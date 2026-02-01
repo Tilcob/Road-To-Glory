@@ -55,6 +55,7 @@ public class GameView extends View<GameViewModel> {
     protected void setupUI() {
         align(Align.topLeft);
         setFillParent(true);
+        setRoot(this);
 
         HorizontalGroup horizontalGroup = new HorizontalGroup();
         horizontalGroup.setName("lifeGroup");

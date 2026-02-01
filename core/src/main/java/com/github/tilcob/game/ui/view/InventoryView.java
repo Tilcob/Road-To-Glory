@@ -39,7 +39,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
-        inventoryRoot.setVisible(false);
+        setRoot(inventoryRoot);
+        setVisibleBound(false);
 
         addActor(inventoryRoot);
 
@@ -193,7 +194,7 @@ public class InventoryView extends View<InventoryViewModel> {
     }
 
     private void setInventoryVisibility(boolean isVisible) {
-        inventoryRoot.setVisible(isVisible);
+        setVisibleBound(isVisible);
     }
 
     private Stack buildEquipmentSlot(ItemCategory category, EquipmentSlot slot) {

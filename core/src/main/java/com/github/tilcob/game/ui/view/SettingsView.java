@@ -24,7 +24,8 @@ public class SettingsView extends View<SettingsViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
-        setVisible(false);
+        setRoot(this);
+        setVisibleBound(false);
 
         Table contentTable = new Table();
         contentTable.setBackground(skin.getDrawable("frame"));

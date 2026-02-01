@@ -27,7 +27,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
 
         rootTable = new Table();
         rootTable.background(skin.getDrawable("Other_panel_brown"));
-        rootTable.setVisible(false);
+        setRoot(rootTable);
+        setVisibleBound(false);
         rootTable.top();
 
         pointsLabel = new Label("Points: 0", skin);
@@ -73,7 +74,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     }
 
     private void setSkillTreeVisibility(boolean open) {
-        rootTable.setVisible(open);
+        setVisibleBound(open);
         if (open) {
             resizeRootTable();
             centerRootTable();
