@@ -17,6 +17,7 @@ import com.github.tilcob.game.entity.EntityIdService;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.system.*;
+import com.github.tilcob.game.system.installers.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.model.*;
@@ -30,13 +31,12 @@ public class GameScreenModule {
     private final ScreenNavigator screenNavigator;
 
     public GameScreenModule(
-        GameServices services,
-        Batch batch,
-        OrthographicCamera camera,
-        Viewport viewport,
-        InputManager inputManager,
-        ScreenNavigator screenNavigator
-    ) {
+            GameServices services,
+            Batch batch,
+            OrthographicCamera camera,
+            Viewport viewport,
+            InputManager inputManager,
+            ScreenNavigator screenNavigator) {
         this.services = services;
         this.batch = batch;
         this.camera = camera;
@@ -59,12 +59,11 @@ public class GameScreenModule {
         physicWorld.setAutoClearForces(false);
         TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
         TiledAshleyConfigurator tiledAshleyConfigurator = new TiledAshleyConfigurator(
-            engine,
-            services.getAssetManager(),
-            physicWorld,
-            services.getChestRegistry(),
-            tiledManager
-        );
+                engine,
+                services.getAssetManager(),
+                physicWorld,
+                services.getChestRegistry(),
+                tiledManager);
         IdleControllerState idleControllerState = new IdleControllerState();
         ActiveEntityReference activeEntityReference = new ActiveEntityReference();
         GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
@@ -79,156 +78,78 @@ public class GameScreenModule {
         services.getInventoryService().setSkin(skin);
         services.getInventoryService().setEngine(engine);
 
-        // Input
-        engine.addSystem(withPriority(
-            new ControllerSystem(services.getEventBus()),
-            SystemOrder.INPUT
-        ));
-
-        // AI
-        engine.addSystem(withPriority(new FsmSystem(), SystemOrder.AI));
-        engine.addSystem(withPriority(new AiSystem(), SystemOrder.AI));
-        engine.addSystem(withPriority(new MoveIntentSystem(), SystemOrder.AI));
-        engine.addSystem(withPriority(new NpcPathfindingSystem(), SystemOrder.AI));
-
-        // Physics
-        engine.addSystem(withPriority(new PhysicMoveSystem(), SystemOrder.PHYSICS));
-        engine.addSystem(withPriority(new FacingSystem(), SystemOrder.PHYSICS));
-        engine.addSystem(withPriority(
-            new PhysicSystem(physicWorld, Constants.FIXED_INTERVAL, services.getEventBus()),
-            SystemOrder.PHYSICS
-        ));
-
-        // Combat
-        engine.addSystem(withPriority(
-            new AttackSystem(physicWorld, services.getAudioManager(), services.getEventBus()),
-            SystemOrder.COMBAT
-        ));
-        engine.addSystem(withPriority(
-            new DamageSystem(gameViewModel, services.getQuestManager(), services.getEventBus()),
-            SystemOrder.COMBAT
-        ));
-        engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
-        engine.addSystem(withPriority(new GameOverSystem(screenNavigator, services.getEventBus()), SystemOrder.COMBAT));
-        engine.addSystem(withPriority(
-            new TriggerSystem(services.getAudioManager(), services.getEventBus()),
-            SystemOrder.COMBAT
-        ));
-
-        // Gameplay & UI
-        engine.addSystem(withPriority(
-            new MapChangeSystem(tiledManager, services.getEventBus(), services.getStateManager()),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(
-            new InventorySystem(services.getEventBus(), services.getQuestManager(), services.getInventoryService()),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(new EquipmentSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new EquipmentStatModifierSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StatModifierDurationSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new LevelUpSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StatRecalcSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-            new ChestSystem(services.getInventoryService(), services.getEventBus(), services.getQuestManager()),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new QuestSystem(
-            services.getEventBus(), services.getQuestLifecycleService()),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new RewardSystem(services.getEventBus(), services.getQuestRewardService()),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-            new QuestRewardSchedulerSystem(
+        // Installers
+        new InputSystemsInstaller(services.getEventBus()).install(engine);
+        new AiSystemsInstaller().install(engine);
+        new PhysicsSystemsInstaller(physicWorld, services.getEventBus()).install(engine);
+        new CombatSystemsInstaller(
+                physicWorld,
+                services.getAudioManager(),
                 services.getEventBus(),
-                services.getQuestLifecycleService()
-            ),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(new DialogSessionSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StartDialogSystem(services.getEventBus()), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new DialogConsequenceSystem(
-                services.getEventBus(),
+                gameViewModel,
                 services.getQuestManager(),
-                services.getQuestLifecycleService()
-            ),
-            SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-            new DialogQuestBridgeSystem(
+                screenNavigator).install(engine);
+        new GameplaySystemsInstaller(
+                tiledManager,
                 services.getEventBus(),
-                services.getQuestManager()
-            ),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(
-            new DialogSystem(services.getEventBus(), services.getAllDialogs(), services.getDialogYarnRuntime()),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(
-            new CutsceneSystem(services.getEventBus(), services.getAllCutscenes(), services.getCutsceneYarnRuntime()),
-            SystemOrder.GAMEPLAY
-        ));
-        engine.addSystem(withPriority(
-            new YarnScopeCleanupSystem(services.getDialogYarnRuntime(), services.getQuestYarnRuntime()),
-            SystemOrder.GAMEPLAY));
+                services.getStateManager(),
+                services.getQuestManager(),
+                services.getInventoryService(),
+                services.getQuestLifecycleService(),
+                services.getQuestRewardService(),
+                services.getDialogYarnRuntime(),
+                services.getCutsceneYarnRuntime(),
+                services.getQuestYarnRuntime(),
+                services.getAllDialogs(),
+                services.getAllCutscenes()).install(engine);
 
-        // Render
-        engine.addSystem(withPriority(new AnimationSystem(services.getAssetManager()), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new CameraSystem(camera), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new ScreenFadeSystem(batch, viewport, camera), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new CameraPanSystem(camera), SystemOrder.RENDER));
-        if (Constants.DEBUG) {
-            engine.addSystem(withPriority(
-                new PhysicDebugRenderSystem(physicWorld, camera),
-                SystemOrder.DEBUG_RENDER
-            ));
-        }
+        new RenderSystemsInstaller(
+                batch,
+                viewport,
+                camera,
+                services.getAssetManager(),
+                physicWorld,
+                Constants.DEBUG).install(engine);
 
         return new Dependencies(
-            engine,
-            tiledManager,
-            tiledAshleyConfigurator,
-            idleControllerState,
-            gameControllerState,
-            uiControllerState,
-            physicWorld,
-            stage,
-            gameViewModel,
-            inventoryViewModel,
-            chestViewModel,
-            pauseViewModel,
-            settingsViewModel,
-            skin,
-            inputManager,
-            services.getAudioManager(),
-            activeEntityReference,
-            services.getInventoryService()
-        );
-    }
-
-    public static <T extends EntitySystem> T withPriority(T system, SystemOrder order) {
-        system.priority = order.priority();
-        return system;
+                engine,
+                tiledManager,
+                tiledAshleyConfigurator,
+                idleControllerState,
+                gameControllerState,
+                uiControllerState,
+                physicWorld,
+                stage,
+                gameViewModel,
+                inventoryViewModel,
+                chestViewModel,
+                pauseViewModel,
+                settingsViewModel,
+                skin,
+                inputManager,
+                services.getAudioManager(),
+                activeEntityReference,
+                services.getInventoryService());
     }
 
     public record Dependencies(
-        Engine engine,
-        TiledManager tiledManager,
-        TiledAshleyConfigurator tiledAshleyConfigurator,
-        IdleControllerState idleControllerState,
-        GameControllerState gameControllerState,
-        UiControllerState uiControllerState,
-        World physicWorld,
-        Stage stage,
-        GameViewModel gameViewModel,
-        InventoryViewModel inventoryViewModel,
-        ChestViewModel chestViewModel,
-        PauseViewModel pauseViewModel,
-        SettingsViewModel settingsViewModel,
-        Skin skin,
-        InputManager inputManager,
-        AudioManager audioManager,
-        ActiveEntityReference activeEntityReference,
-        InventoryService inventoryService
-    ) {}
+            Engine engine,
+            TiledManager tiledManager,
+            TiledAshleyConfigurator tiledAshleyConfigurator,
+            IdleControllerState idleControllerState,
+            GameControllerState gameControllerState,
+            UiControllerState uiControllerState,
+            World physicWorld,
+            Stage stage,
+            GameViewModel gameViewModel,
+            InventoryViewModel inventoryViewModel,
+            ChestViewModel chestViewModel,
+            PauseViewModel pauseViewModel,
+            SettingsViewModel settingsViewModel,
+            Skin skin,
+            InputManager inputManager,
+            AudioManager audioManager,
+            ActiveEntityReference activeEntityReference,
+            InventoryService inventoryService) {
+    }
 }
