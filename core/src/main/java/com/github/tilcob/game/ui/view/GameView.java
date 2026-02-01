@@ -147,6 +147,8 @@ public class GameView extends View<GameViewModel> {
         viewModel.onPropertyChange(Constants.HIDE_DIALOG_CHOICES, Boolean.class, value -> hideChoices());
         viewModel.onPropertyChange(Constants.SHOW_REWARD_DIALOG, RewardDisplay.class, this::showRewardDialog);
         viewModel.onPropertyChange(Constants.HIDE_REWARD_DIALOG, Boolean.class, value -> hideRewardDialog());
+        viewModel.onPropertyChange(Constants.INVENTORY_FULL, Boolean.class,
+                value -> showNotification("Inventory full!"));
     }
 
     private void showDialog(DialogDisplay display) {
@@ -235,6 +237,18 @@ public class GameView extends View<GameViewModel> {
             maxLife -= 4;
             lifePoints -= 4;
         }
+    }
+
+    private void showNotification(String message) {
+        TextraLabel label = new TypingLabel(message, skin);
+        label.setPosition(
+                stage.getViewport().getWorldWidth() / 2f - label.getPrefWidth() / 2f,
+                stage.getViewport().getWorldHeight() * 0.8f);
+        stage.addActor(label);
+        label.addAction(Actions.sequence(
+                Actions.moveBy(0, 50, 1f),
+                Actions.fadeOut(1f),
+                Actions.removeActor()));
     }
 
     private void showDamage(Map.Entry<Vector2, Integer> damageAndPosition) {

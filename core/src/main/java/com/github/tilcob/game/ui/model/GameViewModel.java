@@ -44,6 +44,27 @@ public class GameViewModel extends ViewModel {
         getEventBus().subscribe(ExitTriggerEvent.class, this::onExitTrigger);
         getEventBus().subscribe(FinishedDialogEvent.class, this::onDialogFinished);
         getEventBus().subscribe(RewardGrantedEvent.class, this::onRewardGranted);
+        getEventBus().subscribe(EntityDamagedEvent.class, this::onEntityDamaged);
+        getEventBus().subscribe(InventoryFullEvent.class, this::onInventoryFull);
+    }
+
+    private void onEntityDamaged(EntityDamagedEvent event) {
+        boolean isPlayer = com.github.tilcob.game.component.Player.MAPPER.has(event.entity());
+        if (!isPlayer)
+            return;
+
+        com.github.tilcob.game.component.Transform transform = com.github.tilcob.game.component.Transform.MAPPER
+                .get(event.entity());
+        if (transform == null)
+            return;
+
+        float x = transform.getPosition().x + transform.getSize().x * .5f;
+        float y = transform.getPosition().y;
+        playerDamage((int) event.damage(), x, y);
+    }
+
+    private void onInventoryFull(InventoryFullEvent event) {
+        propertyChangeSupport.firePropertyChange(Constants.INVENTORY_FULL, null, true);
     }
 
     private void onDialog(DialogEvent event) {
@@ -58,10 +79,9 @@ public class GameViewModel extends ViewModel {
             speaker = Npc.MAPPER.get(event.entity()).getName();
         }
         this.propertyChangeSupport.firePropertyChange(
-            Constants.SHOW_DIALOG,
-            null,
-            new DialogDisplay(speaker, event.line())
-        );
+                Constants.SHOW_DIALOG,
+                null,
+                new DialogDisplay(speaker, event.line()));
     }
 
     private void onDialogChoices(DialogChoiceEvent event) {
@@ -76,10 +96,9 @@ public class GameViewModel extends ViewModel {
             return;
         }
         this.propertyChangeSupport.firePropertyChange(
-            Constants.SHOW_DIALOG_CHOICES,
-            null,
-            new DialogChoiceDisplay(labels, event.selectedIndex())
-        );
+                Constants.SHOW_DIALOG_CHOICES,
+                null,
+                new DialogChoiceDisplay(labels, event.selectedIndex()));
     }
 
     private void onDialogFinished(FinishedDialogEvent event) {
@@ -87,7 +106,8 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onDialogAdvance(DialogAdvanceEvent event) {
-        if (!rewardVisible) return;
+        if (!rewardVisible)
+            return;
         rewardVisible = false;
         this.propertyChangeSupport.firePropertyChange(Constants.HIDE_REWARD_DIALOG, null, true);
         clearRewardOwner();
@@ -99,8 +119,8 @@ public class GameViewModel extends ViewModel {
             items.add(itemId);
         }
         String title = event.questTitle() == null || event.questTitle().isBlank()
-            ? event.questId().replace("_", " ")
-            : event.questTitle();
+                ? event.questId().replace("_", " ")
+                : event.questTitle();
         RewardDisplay display = new RewardDisplay(title, event.reward().money(), items);
         rewardVisible = true;
         rewardOwner = event.player();
@@ -118,7 +138,7 @@ public class GameViewModel extends ViewModel {
         rewardOwner = null;
     }
 
-    public void playerDamage(int amount, float x, float y) {
+    private void playerDamage(int amount, float x, float y) {
         Vector2 position = new Vector2(x, y);
         this.playerDamage = Map.entry(position, amount);
         this.propertyChangeSupport.firePropertyChange(Constants.PLAYER_DAMAGE_PC, null, this.playerDamage);
@@ -126,8 +146,10 @@ public class GameViewModel extends ViewModel {
 
     private void onExitTrigger(ExitTriggerEvent event) {
         Trigger trigger = Trigger.MAPPER.get(event.trigger());
-        if (trigger != null && trigger.getType() != Trigger.Type.DIALOG) return;
-        if (trigger == null && Dialog.MAPPER.get(event.trigger()) == null) return;
+        if (trigger != null && trigger.getType() != Trigger.Type.DIALOG)
+            return;
+        if (trigger == null && Dialog.MAPPER.get(event.trigger()) == null)
+            return;
         this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG, null, true);
     }
 

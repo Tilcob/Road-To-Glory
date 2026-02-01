@@ -5,22 +5,20 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.EntityDamagedEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.GameOverEvent;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.quest.QuestManager;
-import com.github.tilcob.game.ui.model.GameViewModel;
 
 import java.util.Locale;
 
 public class DamageSystem extends IteratingSystem {
-    private final GameViewModel viewModel;
     private final QuestManager questManager;
     private final GameEventBus eventBus;
 
-    public DamageSystem(GameViewModel viewModel, QuestManager questManager, GameEventBus eventBus) {
+    public DamageSystem(QuestManager questManager, GameEventBus eventBus) {
         super(Family.all(Damaged.class).get());
-        this.viewModel = viewModel;
         this.questManager = questManager;
         this.eventBus = eventBus;
     }
@@ -58,9 +56,10 @@ public class DamageSystem extends IteratingSystem {
 
         Transform transform = Transform.MAPPER.get(entity);
         if (transform != null && dealtDamage > 0f) {
-            float x = transform.getPosition().x + transform.getSize().x * .5f;
-            float y = transform.getPosition().y;
-            viewModel.playerDamage((int) dealtDamage, x, y);
+            boolean isPlayer = Player.MAPPER.get(entity) != null;
+            if (isPlayer) {
+                eventBus.fire(new EntityDamagedEvent(entity, dealtDamage));
+            }
         }
     }
 
