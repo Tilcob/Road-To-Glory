@@ -14,6 +14,7 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.entity.EntityLookup;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.flow.FlowBootstrap;
+import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemEntityRegistry;
 import com.github.tilcob.game.quest.*;
@@ -55,6 +56,7 @@ public class GameServices {
     private QuestRewardService questRewardService;
     private InventoryService inventoryService;
     private FlowBootstrap flowBootstrap;
+    private ActiveEntityReference activeEntityReference;
     private EntityLookup entityLookup;
     private UiServices uiServices;
 
@@ -105,14 +107,18 @@ public class GameServices {
     }
 
     public void saveGame() {
-        if (entityLookup != null) {
-            Entity player = entityLookup.getPlayer();
-            if (player != null) {
-                stateManager.saveQuests(QuestLog.MAPPER.get(player));
-                stateManager.saveDialogFlags(DialogFlags.MAPPER.get(player));
-                stateManager.setPlayerState(player);
-                stateManager.saveCounters(Counters.MAPPER.get(player));
-            }
+        Entity player = null;
+        if (activeEntityReference != null) {
+            player = activeEntityReference.get();
+        }
+        if (player == null && entityLookup != null) {
+            player = entityLookup.getPlayer();
+        }
+        if (player != null) {
+            stateManager.saveQuests(QuestLog.MAPPER.get(player));
+            stateManager.saveDialogFlags(DialogFlags.MAPPER.get(player));
+            stateManager.setPlayerState(player);
+            stateManager.saveCounters(Counters.MAPPER.get(player));
         }
         saveService.saveGame();
     }
@@ -219,5 +225,13 @@ public class GameServices {
 
     public UiServices getUiServices() {
         return uiServices;
+    }
+
+    public ActiveEntityReference getActiveEntityReference() {
+        return activeEntityReference;
+    }
+
+    public void setActiveEntityReference(ActiveEntityReference activeEntityReference) {
+        this.activeEntityReference = activeEntityReference;
     }
 }

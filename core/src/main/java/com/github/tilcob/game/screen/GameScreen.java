@@ -243,6 +243,7 @@ public class GameScreen extends ScreenAdapter {
         gameUiGroup.clearChildren();
         gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
+        if (settingsViewModel == null) settingsViewModel = new SettingsViewModel(services);
         if (settingsView != null) {
             settingsView.remove();
         }

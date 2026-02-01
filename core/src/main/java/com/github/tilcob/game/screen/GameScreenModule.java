@@ -67,6 +67,7 @@ public class GameScreenModule {
                                 tiledManager);
                 IdleControllerState idleControllerState = new IdleControllerState();
                 ActiveEntityReference activeEntityReference = new ActiveEntityReference();
+                services.setActiveEntityReference(activeEntityReference);
                 GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
                 UiControllerState uiControllerState = new UiControllerState(services.getEventBus());
                 Stage stage = new Stage(uiViewport, batch);
