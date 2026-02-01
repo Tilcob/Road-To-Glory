@@ -2,7 +2,7 @@ package com.github.tilcob.game.ui.model;
 
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.component.SkillTreeState;
+import com.github.tilcob.game.skill.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.SkillUnlockEvent;
 import com.github.tilcob.game.event.UiEvent;
@@ -29,8 +29,7 @@ public class SkillTreeViewModel extends ViewModel {
     }
 
     public void setOpen(boolean open) {
-        if (this.open == open)
-            return;
+        if (this.open == open) return;
         this.open = open;
         propertyChangeSupport.firePropertyChange(Constants.OPEN_SKILLS, !open, open);
     }
@@ -50,6 +49,7 @@ public class SkillTreeViewModel extends ViewModel {
     }
 
     public void unlockNode(String nodeId) {
+        if (services.getEntityLookup().getPlayer() == null) return;
         getEventBus().fire(new SkillUnlockEvent(services.getEntityLookup().getPlayer(), DEFAULT_TREE_ID, nodeId));
     }
 }

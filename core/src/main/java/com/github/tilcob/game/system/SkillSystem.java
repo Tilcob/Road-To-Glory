@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.component.SkillTreeState;
+import com.github.tilcob.game.skill.SkillTreeState;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.skill.SkillTreeLoader;
@@ -34,12 +34,10 @@ public class SkillSystem extends IteratingSystem {
 
     private void onXpGain(XPGainEvent event) {
         Skill skillComp = Skill.MAPPER.get(event.entity());
-        if (skillComp == null)
-            return;
+        if (skillComp == null) return;
 
         SkillTreeDefinition def = SkillTreeLoader.get(event.treeId());
-        if (def == null)
-            return;
+        if (def == null || def.getXpTable() == null) return;
 
         SkillTreeState state = skillComp.getTreeState(event.treeId());
         state.setCurrentXp(state.getCurrentXp() + event.amount());
@@ -64,13 +62,11 @@ public class SkillSystem extends IteratingSystem {
 
     private void onSkillUnlock(SkillUnlockEvent event) {
         Skill skillComp = Skill.MAPPER.get(event.entity());
-        if (skillComp == null)
-            return;
+        if (skillComp == null) return;
 
-        SkillTreeState state = skillComp.getTreeState(event.treeId());
         SkillTreeDefinition treeDef = SkillTreeLoader.get(event.treeId());
-        if (treeDef == null)
-            return;
+        if (treeDef == null || treeDef.getNodes() == null) return;
+        SkillTreeState state = skillComp.getTreeState(event.treeId());
 
         if (state.isUnlocked(event.nodeId())) return;
 
@@ -98,12 +94,10 @@ public class SkillSystem extends IteratingSystem {
     }
 
     private void applyModifiers(Entity entity, SkillNodeDefinition nodeDef) {
-        if (nodeDef.getModifiers() == null || nodeDef.getModifiers().isEmpty())
-            return;
+        if (nodeDef.getModifiers() == null || nodeDef.getModifiers().isEmpty()) return;
 
         StatModifierComponent modifierComp = StatModifierComponent.MAPPER.get(entity);
-        if (modifierComp == null)
-            return;
+        if (modifierComp == null) return;
 
         for (Map.Entry<StatType, Float> entry : nodeDef.getModifiers().entrySet()) {
             String source = "skill:" + nodeDef.getId();

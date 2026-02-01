@@ -1,4 +1,4 @@
-package com.github.tilcob.game.component;
+package com.github.tilcob.game.skill;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -34,7 +34,7 @@ public class SkillTreeState {
     }
 
     public Set<String> getUnlockedNodes() {
-        return unlockedNodes;
+        return Set.copyOf(unlockedNodes);
     }
 
     public void addUnlockedNode(String nodeId) {

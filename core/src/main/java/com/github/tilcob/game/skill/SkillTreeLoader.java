@@ -16,6 +16,7 @@ public class SkillTreeLoader {
     private static final String TAG = SkillTreeLoader.class.getSimpleName();
 
     public static void loadAll() {
+        DEFINITIONS.clear();
         FileHandle dir = Gdx.files.internal("skill-trees");
         if (!dir.exists()) {
             String msg = "Skills directory not found: " + dir.path();
@@ -61,6 +62,25 @@ public class SkillTreeLoader {
 
             try {
                 SkillTreeDefinition def = json.fromJson(SkillTreeDefinition.class, file);
+
+                if (def == null || def.getId() == null || def.getId().isBlank()) {
+                    String msg = "Skill tree must define a non-empty id: " + file.path();
+                    if (Constants.DEBUG) throw new IllegalArgumentException(msg);
+                    Gdx.app.error(TAG, msg);
+                    continue;
+                }
+                if (def.getXpTable() == null) {
+                    String msg = "Skill tree missing xpTable: " + file.path();
+                    if (Constants.DEBUG) throw new IllegalArgumentException(msg);
+                    Gdx.app.error(TAG, msg);
+                    continue;
+                }
+                if (def.getNodes() == null) {
+                    String msg = "Skill tree missing nodes list: " + file.path();
+                    if (Constants.DEBUG) throw new IllegalArgumentException(msg);
+                    Gdx.app.error(TAG, msg);
+                    continue;
+                }
 
                 if (DEFINITIONS.containsKey(def.getId())) {
                     String msg = "Duplicate skill tree id '" + def.getId() + "' in " + file.path();
