@@ -24,7 +24,6 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
-        setVisible(false);
 
         rootTable = new Table();
         rootTable.setVisible(false);
