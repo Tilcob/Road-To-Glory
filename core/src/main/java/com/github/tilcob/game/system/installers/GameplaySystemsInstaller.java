@@ -18,92 +18,93 @@ import com.github.tilcob.game.yarn.QuestYarnRuntime;
 import java.util.Map;
 
 public class GameplaySystemsInstaller implements SystemInstaller {
-    private final TiledManager tiledManager;
-    private final GameEventBus eventBus;
-    private final StateManager stateManager;
-    private final QuestManager questManager;
-    private final InventoryService inventoryService;
-    private final QuestLifecycleService questLifecycleService;
-    private final QuestRewardService questRewardService;
-    private final DialogYarnRuntime dialogYarnRuntime;
-    private final CutsceneYarnRuntime cutsceneYarnRuntime;
-    private final QuestYarnRuntime questYarnRuntime;
-    private final Map<String, DialogData> allDialogs;
-    private final Map<String, CutsceneData> allCutscenes;
+        private final TiledManager tiledManager;
+        private final GameEventBus eventBus;
+        private final StateManager stateManager;
+        private final QuestManager questManager;
+        private final InventoryService inventoryService;
+        private final QuestLifecycleService questLifecycleService;
+        private final QuestRewardService questRewardService;
+        private final DialogYarnRuntime dialogYarnRuntime;
+        private final CutsceneYarnRuntime cutsceneYarnRuntime;
+        private final QuestYarnRuntime questYarnRuntime;
+        private final Map<String, DialogData> allDialogs;
+        private final Map<String, CutsceneData> allCutscenes;
 
-    public GameplaySystemsInstaller(
-            TiledManager tiledManager,
-            GameEventBus eventBus,
-            StateManager stateManager,
-            QuestManager questManager,
-            InventoryService inventoryService,
-            QuestLifecycleService questLifecycleService,
-            QuestRewardService questRewardService,
-            DialogYarnRuntime dialogYarnRuntime,
-            CutsceneYarnRuntime cutsceneYarnRuntime,
-            QuestYarnRuntime questYarnRuntime,
-            Map<String, DialogData> allDialogs,
-            Map<String, CutsceneData> allCutscenes) {
-        this.tiledManager = tiledManager;
-        this.eventBus = eventBus;
-        this.stateManager = stateManager;
-        this.questManager = questManager;
-        this.inventoryService = inventoryService;
-        this.questLifecycleService = questLifecycleService;
-        this.questRewardService = questRewardService;
-        this.dialogYarnRuntime = dialogYarnRuntime;
-        this.cutsceneYarnRuntime = cutsceneYarnRuntime;
-        this.questYarnRuntime = questYarnRuntime;
-        this.allDialogs = allDialogs;
-        this.allCutscenes = allCutscenes;
-    }
+        public GameplaySystemsInstaller(
+                        TiledManager tiledManager,
+                        GameEventBus eventBus,
+                        StateManager stateManager,
+                        QuestManager questManager,
+                        InventoryService inventoryService,
+                        QuestLifecycleService questLifecycleService,
+                        QuestRewardService questRewardService,
+                        DialogYarnRuntime dialogYarnRuntime,
+                        CutsceneYarnRuntime cutsceneYarnRuntime,
+                        QuestYarnRuntime questYarnRuntime,
+                        Map<String, DialogData> allDialogs,
+                        Map<String, CutsceneData> allCutscenes) {
+                this.tiledManager = tiledManager;
+                this.eventBus = eventBus;
+                this.stateManager = stateManager;
+                this.questManager = questManager;
+                this.inventoryService = inventoryService;
+                this.questLifecycleService = questLifecycleService;
+                this.questRewardService = questRewardService;
+                this.dialogYarnRuntime = dialogYarnRuntime;
+                this.cutsceneYarnRuntime = cutsceneYarnRuntime;
+                this.questYarnRuntime = questYarnRuntime;
+                this.allDialogs = allDialogs;
+                this.allCutscenes = allCutscenes;
+        }
 
-    @Override
-    public void install(Engine engine) {
-        engine.addSystem(withPriority(
-                new MapChangeSystem(tiledManager, eventBus, stateManager),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new InventorySystem(eventBus, questManager, inventoryService),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new EquipmentSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new EquipmentStatModifierSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StatModifierDurationSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new LevelUpSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StatRecalcSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new ChestSystem(inventoryService, eventBus, questManager),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new QuestSystem(
-                eventBus, questLifecycleService),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new RewardSystem(eventBus, questRewardService),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new QuestRewardSchedulerSystem(
-                        eventBus,
-                        questLifecycleService),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new DialogSessionSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new StartDialogSystem(eventBus), SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(new DialogConsequenceSystem(
-                eventBus,
-                questManager,
-                questLifecycleService),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new DialogQuestBridgeSystem(
-                        eventBus,
-                        questManager),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new DialogSystem(eventBus, allDialogs, dialogYarnRuntime),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new CutsceneSystem(eventBus, allCutscenes, cutsceneYarnRuntime),
-                SystemOrder.GAMEPLAY));
-        engine.addSystem(withPriority(
-                new YarnScopeCleanupSystem(dialogYarnRuntime, questYarnRuntime),
-                SystemOrder.GAMEPLAY));
-    }
+        @Override
+        public void install(Engine engine) {
+                engine.addSystem(withPriority(
+                                new MapChangeSystem(tiledManager, eventBus, stateManager),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new InventorySystem(eventBus, questManager, inventoryService),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new SkillSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new EquipmentSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new EquipmentStatModifierSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new StatModifierDurationSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new LevelUpSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new StatRecalcSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new ChestSystem(inventoryService, eventBus, questManager),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new QuestSystem(
+                                eventBus, questLifecycleService),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new RewardSystem(eventBus, questRewardService),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new QuestRewardSchedulerSystem(
+                                                eventBus,
+                                                questLifecycleService),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new DialogSessionSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new StartDialogSystem(eventBus), SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(new DialogConsequenceSystem(
+                                eventBus,
+                                questManager,
+                                questLifecycleService),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new DialogQuestBridgeSystem(
+                                                eventBus,
+                                                questManager),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new DialogSystem(eventBus, allDialogs, dialogYarnRuntime),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new CutsceneSystem(eventBus, allCutscenes, cutsceneYarnRuntime),
+                                SystemOrder.GAMEPLAY));
+                engine.addSystem(withPriority(
+                                new YarnScopeCleanupSystem(dialogYarnRuntime, questYarnRuntime),
+                                SystemOrder.GAMEPLAY));
+        }
 }

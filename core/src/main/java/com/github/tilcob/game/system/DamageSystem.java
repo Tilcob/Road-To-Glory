@@ -8,6 +8,7 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.EntityDamagedEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.GameOverEvent;
+import com.github.tilcob.game.event.XPGainEvent;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.quest.QuestManager;
 
@@ -45,6 +46,7 @@ public class DamageSystem extends IteratingSystem {
                     if (player != null) {
                         incrementCounter(player, killCounterKey(npc.getName()), 1);
                         questManager.signal(resolvePlayer(), "kill", npc.getName(), 1);
+                        eventBus.fire(new XPGainEvent(player, "combat", 50));
                     }
                 }
                 getEngine().removeEntity(entity);

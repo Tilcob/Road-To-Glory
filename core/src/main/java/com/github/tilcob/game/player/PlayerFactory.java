@@ -32,12 +32,11 @@ public class PlayerFactory {
         entity.add(new Graphic(Color.WHITE.cpy(), region));
 
         entity.add(new Transform(
-            new Vector2().scl(Constants.UNIT_SCALE),
-            1,
-            new Vector2(region.getRegionWidth(),region.getRegionHeight()).scl(Constants.UNIT_SCALE),
-            new Vector2(1,1),
-            0
-        ));
+                new Vector2().scl(Constants.UNIT_SCALE),
+                1,
+                new Vector2(region.getRegionWidth(), region.getRegionHeight()).scl(Constants.UNIT_SCALE),
+                new Vector2(1, 1),
+                0));
 
         entity.add(new Player());
         entity.add(new EntityId(EntityIdGenerator.next()));
@@ -61,6 +60,7 @@ public class PlayerFactory {
         entity.add(new Wallet());
         entity.add(new Protection());
         entity.add(new Counters());
+        entity.add(new SkillComponent());
 
         engine.addEntity(entity);
         return entity;
@@ -78,7 +78,8 @@ public class PlayerFactory {
 
     private static void addEntityAttack(TiledMapTile tile, Entity entity) {
         float damage = tile.getProperties().get(Constants.DAMAGE, 0f, Float.class);
-        if (damage == 0) return;
+        if (damage == 0)
+            return;
         float windup = tile.getProperties().get(Constants.ATTACK_WINDUP, Constants.DEFAULT_DAMAGE_DELAY, Float.class);
         float cooldown = tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
         String soundAssetStr = tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
@@ -97,8 +98,10 @@ public class PlayerFactory {
         entity.add(new Life(life, lifeRegeneration));
     }
 
-    private static void addEntityPhysic(MapObjects mapObjects, BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity, World world) {
-        if (mapObjects.getCount() == 0) return;
+    private static void addEntityPhysic(MapObjects mapObjects, BodyDef.BodyType bodyType, Vector2 relativeTo,
+            Entity entity, World world) {
+        if (mapObjects.getCount() == 0)
+            return;
 
         Transform transform = Transform.MAPPER.get(entity);
         Vector2 position = transform.getPosition();
@@ -109,17 +112,19 @@ public class PlayerFactory {
 
     }
 
-    private static Body createBody(MapObjects mapObjects, Vector2 position, Vector2 scaling, BodyDef.BodyType bodyType, Vector2 relativeTo, Entity entity, World world) {
+    private static Body createBody(MapObjects mapObjects, Vector2 position, Vector2 scaling, BodyDef.BodyType bodyType,
+            Vector2 relativeTo, Entity entity, World world) {
         BodyDef bodyDef = new BodyDef();
         bodyDef.type = bodyType;
         bodyDef.position.set(position);
         bodyDef.fixedRotation = true;
 
         Body body = world.createBody(bodyDef);
-        body.setUserData(entity );
+        body.setUserData(entity);
         for (MapObject object : mapObjects) {
             FixtureDef fixtureDef = TiledPhysics.fixtureDefOf(object, scaling, relativeTo);
-            if (fixtureDef == null) continue;
+            if (fixtureDef == null)
+                continue;
             Fixture fixture = body.createFixture(fixtureDef);
             fixture.setUserData(object.getName());
             fixtureDef.shape.dispose();
@@ -135,7 +140,8 @@ public class PlayerFactory {
 
         String typeStr = tile.getProperties().get(Constants.ANIMATION, "", String.class);
         Animation2D.AnimationType type = Animation2D.AnimationType.valueOf(typeStr);
-        float speed = tile.getProperties().get(Constants.ANIMATION_SPEED, Constants.DEFAULT_ANIMATION_SPEED, Float.class);
+        float speed = tile.getProperties().get(Constants.ANIMATION_SPEED, Constants.DEFAULT_ANIMATION_SPEED,
+                Float.class);
 
         entity.add(new Animation2D(atlasAsset, atlasKey, type, Animation.PlayMode.LOOP, speed));
     }
@@ -146,7 +152,8 @@ public class PlayerFactory {
         String atlasKey = textureData.getFileHandle().nameWithoutExtension();
         TextureAtlas.AtlasRegion region = textureAtlas.findRegion(atlasKey + "/" + atlasKey);
 
-        if  (region != null) return region;
+        if (region != null)
+            return region;
 
         return tile.getTextureRegion();
     }

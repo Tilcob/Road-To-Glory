@@ -44,28 +44,29 @@ public class LevelUpSystem extends EntitySystem implements Disposable {
             entity.add(modifiers);
         }
 
-        int totalLevels = event.newLevel() > 0 ? Math.max(0, event.newLevel() - 1) : event.levelsGained();
-        modifiers.removeModifiersBySourcePrefix(LEVEL_UP_SOURCE_PREFIX);
-        if (totalLevels > 0) {
-            String source = LEVEL_UP_SOURCE_PREFIX + totalLevels;
-            modifiers.addModifier(new StatModifier(StatType.ATTACK, ATTACK_PER_LEVEL * totalLevels, 0f, source));
-            modifiers.addModifier(new StatModifier(StatType.DAMAGE, DAMAGE_PER_LEVEL * totalLevels, 0f, source));
-            modifiers.addModifier(new StatModifier(StatType.MAX_LIFE, MAX_LIFE_PER_LEVEL * totalLevels, 0f, source));
-        }
-
         if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
             Gdx.app.debug(
-                "LevelUpSystem",
-                "Applied level-up modifiers for entity. levelsGained="
-                    + event.levelsGained()
-                    + ", newLevel="
-                    + event.newLevel()
-                    + ", totalLevels="
-                    + totalLevels
-            );
+                    "LevelUpSystem",
+                    "Applied level-up modifiers for entity. levelsGained="
+                            + event.levelsGained()
+                            + ", newLevel="
+                            + event.newLevel()
+                            + ", treeId="
+                            + event.treeId());
         }
 
-        eventBus.fire(new StatRecalcEvent(entity));
+        if ("base".equals(event.treeId())) {
+            int totalLevels = event.newLevel() > 0 ? Math.max(0, event.newLevel() - 1) : event.levelsGained();
+            modifiers.removeModifiersBySourcePrefix(LEVEL_UP_SOURCE_PREFIX);
+            if (totalLevels > 0) {
+                String source = LEVEL_UP_SOURCE_PREFIX + totalLevels;
+                modifiers.addModifier(new StatModifier(StatType.ATTACK, ATTACK_PER_LEVEL * totalLevels, 0f, source));
+                modifiers.addModifier(new StatModifier(StatType.DAMAGE, DAMAGE_PER_LEVEL * totalLevels, 0f, source));
+                modifiers
+                        .addModifier(new StatModifier(StatType.MAX_LIFE, MAX_LIFE_PER_LEVEL * totalLevels, 0f, source));
+            }
+            eventBus.fire(new StatRecalcEvent(entity));
+        }
     }
 
     @Override
