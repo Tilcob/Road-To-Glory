@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.overlay;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.github.tilcob.game.ui.view.SettingsView;
 
 public final class SettingsOverlayController {
     private final Actor baseView;
@@ -26,7 +27,11 @@ public final class SettingsOverlayController {
             baseView.setVisible(false);
         }
         if (settingsView != null) {
-            settingsView.setVisible(true);
+            if (settingsView instanceof SettingsView view) {
+                view.setOverlayVisible(true);
+            } else {
+                settingsView.setVisible(true);
+            }
             settingsView.toFront();
             if (onSettingsShown != null) {
                 onSettingsShown.run();
@@ -36,7 +41,11 @@ public final class SettingsOverlayController {
 
     public void closeSettings() {
         if (settingsView != null) {
-            settingsView.setVisible(false);
+            if (settingsView instanceof SettingsView view) {
+                view.setOverlayVisible(false);
+            } else {
+                settingsView.setVisible(false);
+            }
         }
         if (baseView != null) {
             baseView.setVisible(true);

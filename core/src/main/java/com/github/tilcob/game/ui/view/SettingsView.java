@@ -125,6 +125,10 @@ public class SettingsView extends View<SettingsViewModel> {
         }
     }
 
+    public void setOverlayVisible(boolean visible) {
+        setVisibleBound(visible);
+    }
+
     private enum SettingsOption {
         MUSIC_VOLUME,
         SOUND_VOLUME,

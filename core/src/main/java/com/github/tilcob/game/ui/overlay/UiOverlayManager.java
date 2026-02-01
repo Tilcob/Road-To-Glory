@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.overlay;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.input.GameControllerState;
@@ -15,7 +16,7 @@ public final class UiOverlayManager {
     private final GameEventBus eventBus;
     private final InputManager inputManager;
     private final Group gameUiGroup;
-    private final Group overlayGroup;
+    private final WidgetGroup overlayGroup;
     private final PauseView pauseView;
     private final SettingsViewModel settingsViewModel;
     private final SettingsOverlayController settingsOverlayController;
@@ -35,7 +36,8 @@ public final class UiOverlayManager {
         this.eventBus = eventBus;
         this.inputManager = inputManager;
         this.gameUiGroup = gameUiGroup;
-        this.overlayGroup = new Group();
+        this.overlayGroup = new WidgetGroup();
+        this.overlayGroup.setFillParent(true);
         this.pauseView = pauseView;
         this.settingsViewModel = settingsViewModel;
         this.settingsOverlayController = new SettingsOverlayController(
@@ -49,15 +51,11 @@ public final class UiOverlayManager {
         if (stage != null) {
             stage.addActor(overlayGroup);
         }
-        if (pauseView != null) {
-            pauseView.remove();
-            overlayGroup.addActor(pauseView);
-        }
-        if (settingsView != null) {
-            settingsView.remove();
-            settingsView.setVisible(settingsViewModel != null && settingsViewModel.isOpen());
-            overlayGroup.addActor(settingsView);
-        }
+        pauseView.remove();
+        overlayGroup.addActor(pauseView);
+        settingsView.remove();
+        settingsView.setVisible(settingsViewModel != null && settingsViewModel.isOpen());
+        overlayGroup.addActor(settingsView);
     }
 
     public void show() {
@@ -95,6 +93,7 @@ public final class UiOverlayManager {
             inputManager.setActiveState(UiControllerState.class);
         } else {
             closeSettingsOverlay();
+            pauseView.setVisible(false);
             inputManager.setActiveState(GameControllerState.class);
             if (wasPaused) {
                 eventBus.fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
