@@ -5,7 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.skill.SkillTreeState;
+import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.skill.SkillTreeLoader;

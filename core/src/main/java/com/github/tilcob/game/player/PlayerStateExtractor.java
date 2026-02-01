@@ -1,10 +1,9 @@
 package com.github.tilcob.game.player;
 
 import com.badlogic.ashley.core.Entity;
-import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
-import com.github.tilcob.game.component.Life;
-import com.github.tilcob.game.component.Transform;
+import com.badlogic.gdx.utils.ObjectMap;
+import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.save.states.PlayerState;
 
 public class PlayerStateExtractor {
@@ -12,6 +11,7 @@ public class PlayerStateExtractor {
         Transform transform = Transform.MAPPER.get(entity);
         Life life = Life.MAPPER.get(entity);
         Inventory inventory = Inventory.MAPPER.get(entity);
+        Equipment equipment = Equipment.MAPPER.get(entity);
         PlayerState state = new PlayerState();
 
         if (transform == null || life == null || inventory == null) return state;
@@ -25,7 +25,25 @@ public class PlayerStateExtractor {
             for (int i = 0; i < item.getCount(); i++) {
                 state.getItemsByName().add(item.getItemId());
             }
+            state.getItemSlots().add(new PlayerState.ItemSlotState(
+                item.getItemId(),
+                item.getSlotIndex(),
+                item.getCount()
+            ));
         }
+
+        if (equipment != null) {
+            ObjectMap<ItemCategory, Entity> equipped = equipment.getEquippedSlots();
+            for (ObjectMap.Entry<ItemCategory, Entity> entry : equipped.entries()) {
+                Item item = Item.MAPPER.get(entry.value);
+                if (item == null) continue;
+                state.getEquipmentSlots().put(entry.key, new PlayerState.EquipmentSlotState(
+                    item.getItemId(),
+                    item.getSlotIndex()
+                ));
+            }
+        }
+
         return state;
     }
 }

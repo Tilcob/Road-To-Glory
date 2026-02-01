@@ -65,14 +65,18 @@ public class GameWorldLoader {
     }
 
     private void createPlayer() {
-        player = PlayerFactory.create(dependencies.engine(), dependencies.services().getAssetManager(), dependencies.physicWorld());
+        player = PlayerFactory.create(dependencies.engine(),
+            dependencies.services().getAssetManager(), dependencies.physicWorld());
         dependencies.activeEntityReference().set(player);
         loadMap();
     }
 
     private void applyPlayerState() {
         if (dependencies.services().getStateManager().getGameState().getPlayerState() != null) {
-            PlayerStateApplier.apply(dependencies.services().getStateManager().getGameState().getPlayerState(), player);
+            PlayerStateApplier.apply(
+                dependencies.services().getStateManager().getGameState().getPlayerState(),
+                player,
+                dependencies.services.getInventoryService());
         } else {
             Transform.MAPPER.get(player).getPosition().set(dependencies.tiledManager().getSpawnPoint());
             Physic.MAPPER.get(player).getBody().setTransform(dependencies.tiledManager().getSpawnPoint(), 0);

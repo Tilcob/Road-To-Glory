@@ -1,4 +1,4 @@
-package com.github.tilcob.game.skill;
+package com.github.tilcob.game.save.states;
 
 import java.util.HashSet;
 import java.util.Set;

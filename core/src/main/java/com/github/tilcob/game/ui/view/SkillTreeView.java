@@ -8,7 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Window;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.github.tilcob.game.skill.SkillTreeState;
+import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.skill.data.SkillNodeDefinition;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;

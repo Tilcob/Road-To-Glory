@@ -2,7 +2,7 @@ package com.github.tilcob.game.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
-import com.github.tilcob.game.skill.SkillTreeState;
+import com.github.tilcob.game.save.states.SkillTreeState;
 
 import java.util.HashMap;
 import java.util.Map;
