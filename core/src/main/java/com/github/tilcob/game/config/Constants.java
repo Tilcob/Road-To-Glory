@@ -126,4 +126,5 @@ public class Constants {
     public static final int INVENTORY_COLUMNS = 6;
     public static final String BASE_STAMINA = "stamina";
     public static final String BASE_STRENGTH = "strength";
+    public static final String OPEN_SKILLS = "openSkills";
 }

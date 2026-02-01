@@ -217,13 +217,19 @@ tasks.register("genMapsIndex") {
   doLast genIndex("maps", [".tmx"])
 }
 
+tasks.register("genSkillIndex") {
+  group = "assets"
+  description = "Generates assets/skill/index.json from *.json."
+  doLast genIndex("skill", [".json"])
+}
+
 tasks.register("genAssetIndexes") {
   group = "assets"
   description = "Generates quest + dialog + items + cutscenes index files."
   dependsOn(
     "genQuestIndex", "genDialogIndex", "genItemIndex",
     "genQuestTestIndex", "genCutsceneIndex", "genGraphicsIndex",
-    "genAudioIndex", "genUiIndex", "genMapsIndex"
+    "genAudioIndex", "genUiIndex", "genMapsIndex", "genSkillIndex"
   )
 }
 
