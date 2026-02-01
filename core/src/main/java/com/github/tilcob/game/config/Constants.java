@@ -127,4 +127,5 @@ public class Constants {
     public static final String BASE_STAMINA = "stamina";
     public static final String BASE_STRENGTH = "strength";
     public static final String OPEN_SKILLS = "openSkills";
+    public static final String SKILL_TREE_UPDATED = "skillTreeUpdated";
 }

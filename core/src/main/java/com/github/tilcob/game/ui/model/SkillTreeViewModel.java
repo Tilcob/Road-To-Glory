@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.model;
 
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Skill;
+import com.github.tilcob.game.event.LevelUpEvent;
 import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.SkillUnlockEvent;
@@ -16,6 +17,8 @@ public class SkillTreeViewModel extends ViewModel {
 
     public SkillTreeViewModel(GameServices services) {
         super(services);
+        gameEventBus.subscribe(LevelUpEvent.class, this::onLevelUp);
+        gameEventBus.subscribe(SkillUnlockEvent.class, this::onSkillUnlock);
     }
 
     @Override
@@ -51,5 +54,27 @@ public class SkillTreeViewModel extends ViewModel {
     public void unlockNode(String nodeId) {
         if (services.getEntityLookup().getPlayer() == null) return;
         getEventBus().fire(new SkillUnlockEvent(services.getEntityLookup().getPlayer(), DEFAULT_TREE_ID, nodeId));
+    }
+
+    private void onLevelUp(LevelUpEvent event) {
+        if (!isDefaultTreeForPlayer(event.entity(), event.treeId())) return;
+        propertyChangeSupport.firePropertyChange(Constants.SKILL_TREE_UPDATED, null, true);
+    }
+
+    private void onSkillUnlock(SkillUnlockEvent event) {
+        if (!isDefaultTreeForPlayer(event.entity(), event.treeId())) return;
+        propertyChangeSupport.firePropertyChange(Constants.SKILL_TREE_UPDATED, null, true);
+    }
+
+    private boolean isDefaultTreeForPlayer(Object entity, String treeId) {
+        if (!DEFAULT_TREE_ID.equals(treeId)) return false;
+        return services.getEntityLookup().getPlayer() == entity;
+    }
+
+    @Override
+    public void dispose() {
+        super.dispose();
+        gameEventBus.unsubscribe(LevelUpEvent.class, this::onLevelUp);
+        gameEventBus.unsubscribe(SkillUnlockEvent.class, this::onSkillUnlock);
     }
 }

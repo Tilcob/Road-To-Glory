@@ -2,12 +2,9 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.ui.Label;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.scenes.scene2d.ui.Table;
-import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.scenes.scene2d.ui.Window;
+import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.skill.data.SkillNodeDefinition;
@@ -15,7 +12,7 @@ import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 import com.github.tilcob.game.ui.model.SkillTreeViewModel;
 
 public class SkillTreeView extends View<SkillTreeViewModel> {
-    private Window window;
+    private Table rootTable;
     private Label pointsLabel;
     private Table nodesTable;
 
@@ -25,18 +22,16 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
 
     @Override
     protected void setupUI() {
-        window = new Window("Skills", skin);
-        window.getTitleLabel().setAlignment(1);
-        window.setMovable(false);
-        window.setVisible(false);
+        setFillParent(true);
+        setVisible(false);
+
+        rootTable = new Table();
+        rootTable.setVisible(false);
+        rootTable.top();
 
         pointsLabel = new Label("Points: 0", skin);
         nodesTable = new Table();
 
-        window.add(pointsLabel).pad(10).row();
-        window.add(nodesTable).expand().fill().row();
-
-        // Close button
         TextButton closeBtn = new TextButton("Close (K)", skin);
         closeBtn.addListener(new ClickListener() {
             @Override
@@ -44,23 +39,44 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                 viewModel.setOpen(false);
             }
         });
-        window.add(closeBtn).pad(10);
+        Label titleLabel = new Label("Skills", skin);
+        titleLabel.setAlignment(1);
 
-        window.setSize(600, 400); // Fixed size for now
-        window.setPosition(
-                (Constants.WIDTH * Constants.WINDOW_FACTOR - window.getWidth()) / 2,
-                (Constants.HEIGHT * Constants.WINDOW_FACTOR - window.getHeight()) / 2);
+        Table titleRow = new Table();
+        titleRow.add(titleLabel).expandX().left().pad(10);
+        titleRow.add(closeBtn).pad(10);
 
-        addActor(window);
+        ScrollPane scrollPane = new ScrollPane(nodesTable, skin);
+        scrollPane.setFadeScrollBars(false);
+
+        rootTable.add(titleRow).expandX().fillX().row();
+        rootTable.add(pointsLabel).pad(10).left().row();
+        rootTable.add(scrollPane).expand().fill().pad(10).row();
+
+        if (skin.has("window", Drawable.class)) {
+            rootTable.setBackground(skin.getDrawable("window"));
+        }
+
+        rootTable.setSize(600, 400);
+        rootTable.setPosition(
+            (Constants.WIDTH * Constants.WINDOW_FACTOR - rootTable.getWidth()) / 2,
+            (Constants.HEIGHT * Constants.WINDOW_FACTOR - rootTable.getHeight()) / 2);
+
+        addActor(rootTable);
     }
 
     @Override
     protected void setupPropertyChanges() {
         viewModel.onPropertyChange(Constants.OPEN_SKILLS, Boolean.class, this::setSkillTreeVisibility);
+        viewModel.onPropertyChange(Constants.SKILL_TREE_UPDATED, Boolean.class, updated -> {
+            if (viewModel.isOpen()) {
+                refresh();
+            }
+        });
     }
 
     private void setSkillTreeVisibility(boolean open) {
-        window.setVisible(open);
+        rootTable.setVisible(open);
         if (open) {
             refresh();
         }
