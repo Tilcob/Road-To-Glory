@@ -32,6 +32,8 @@ import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
 import com.github.tilcob.game.world.GameWorldLoader;
 
+import java.util.Objects;
+
 public class GameScreen extends ScreenAdapter {
     private final GameServices services;
     private final Viewport uiViewport;
@@ -121,6 +123,7 @@ public class GameScreen extends ScreenAdapter {
         paused = false;
 
         stage.addActor(gameUiGroup);
+        gameUiGroup.clearChildren();
         gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
         if (Constants.DEBUG) {
@@ -161,11 +164,6 @@ public class GameScreen extends ScreenAdapter {
 
         if (uiOverlayManager != null) {
             uiOverlayManager.hide();
-        }
-
-        if (settingsViewModel != null) {
-            settingsViewModel.dispose();
-            settingsViewModel = null;
         }
     }
 
@@ -248,7 +246,6 @@ public class GameScreen extends ScreenAdapter {
         gameUiGroup.clearChildren();
         gameUiBuilder.buildGameUi(gameUiGroup, buildUiDependencies());
 
-        if (settingsViewModel == null) settingsViewModel = new SettingsViewModel(services);
         if (settingsView != null) {
             settingsView.remove();
         }
@@ -277,7 +274,7 @@ public class GameScreen extends ScreenAdapter {
                 gameUiGroup,
                 pauseView,
                 settingsView,
-                settingsViewModel,
+                Objects.requireNonNull(settingsViewModel, "settingsViewModel"),
                 false);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);

@@ -10,6 +10,7 @@ import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.MapChangeEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.player.PlayerFactory;
 import com.github.tilcob.game.player.PlayerStateApplier;
@@ -62,6 +63,7 @@ public class GameWorldLoader {
         QuestLoader loader = new QuestLoader(new QuestFactory(dependencies.services().getQuestYarnRegistry()));
         QuestLog questLog = QuestLog.MAPPER.get(player);
         dependencies.services().getStateManager().loadQuests(questLog, loader);
+        dependencies.services().getEventBus().fire(new UpdateQuestLogEvent(player));
     }
 
     private void createPlayer() {

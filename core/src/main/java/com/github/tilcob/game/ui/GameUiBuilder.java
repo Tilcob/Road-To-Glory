@@ -62,9 +62,7 @@ public class GameUiBuilder {
         SettingsView settingsView = new SettingsView(
             dependencies.skin(),
             stage,
-            dependencies.settingsViewModel() != null
-                ? dependencies.settingsViewModel()
-                : new SettingsViewModel(services)
+            dependencies.settingsViewModel()
         );
         PauseView pauseView = new PauseView(
             dependencies.skin(),
