@@ -26,6 +26,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         setFillParent(true);
 
         rootTable = new Table();
+        rootTable.background(skin.getDrawable("Other_panel_brown"));
         rootTable.setVisible(false);
         rootTable.top();
 
