@@ -56,11 +56,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         rootTable.add(pointsLabel).pad(10).left().row();
         rootTable.add(scrollPane).expand().fill().pad(10).row();
 
-        if (skin.has("window", Drawable.class)) {
-            rootTable.setBackground(skin.getDrawable("window"));
-        }
-
-        rootTable.center();
+        resizeRootTable();
+        centerRootTable();
 
         addActor(rootTable);
     }
@@ -78,9 +75,25 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     private void setSkillTreeVisibility(boolean open) {
         rootTable.setVisible(open);
         if (open) {
-            rootTable.center();
+            resizeRootTable();
+            centerRootTable();
             refresh();
         }
+    }
+
+    private void resizeRootTable() {
+        float padding = 40f;
+        float maxWidth = Math.max(200f, stage.getWidth() - padding);
+        float maxHeight = Math.max(200f, stage.getHeight() - padding);
+        float width = Math.min(600f, maxWidth);
+        float height = Math.min(400f, maxHeight);
+        rootTable.setSize(width, height);
+    }
+
+    private void centerRootTable() {
+        float x = (stage.getWidth() - rootTable.getWidth()) / 2f;
+        float y = (stage.getHeight() - rootTable.getHeight()) / 2f;
+        rootTable.setPosition(x, y);
     }
 
     private void refresh() {
