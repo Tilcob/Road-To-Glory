@@ -264,6 +264,17 @@ project(":lwjgl3") {
   }
 }
 
+subprojects {
+  plugins.withType(JavaPlugin).tap {
+    configureEach {
+      java {
+        toolchain {
+          languageVersion = JavaLanguageVersion.of(17)
+        }
+      }
+    }
+  }
+}
 
 
 eclipse.project.name = 'Road To Glory' + '-parent'
