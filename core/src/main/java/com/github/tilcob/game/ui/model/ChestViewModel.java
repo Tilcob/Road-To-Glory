@@ -14,13 +14,12 @@ import com.github.tilcob.game.ui.UiModelFactory;
 public class ChestViewModel extends ViewModel {
     private final Array<ItemModel> chestItems = new Array<>();
     private final Array<ItemModel> playerItems = new Array<>();
+    private final UiModelFactory uiModelFactory;
     private boolean open = false;
     private boolean paused = false;
     private boolean isPlayerInventoryOpen = false;
     private Entity currentChest;
     private Entity currentPlayer;
-
-    private final UiModelFactory uiModelFactory;
 
     public ChestViewModel(GameServices services, UiModelFactory uiModelFactory) {
         super(services);
@@ -34,8 +33,7 @@ public class ChestViewModel extends ViewModel {
     }
 
     private void onOpenChest(OpenChestEvent event) {
-        if (paused || isPlayerInventoryOpen)
-            return;
+        if (paused || isPlayerInventoryOpen) return;
         open = true;
         currentChest = event.chestEntity();
         currentPlayer = event.player();
@@ -45,22 +43,18 @@ public class ChestViewModel extends ViewModel {
     }
 
     private void onChestInventoryUpdate(UpdateChestInventoryEvent event) {
-        if (!open || event.player() != currentPlayer)
-            return;
+        if (!open || event.player() != currentPlayer) return;
         rebuildChestItems();
     }
 
     private void onPlayerInventoryUpdate(UpdateInventoryEvent event) {
-        if (!open || event.player() != currentPlayer)
-            return;
+        if (!open || event.player() != currentPlayer) return;
         rebuildPlayerItems();
     }
 
     private void onCloseChest(CloseChestEvent event) {
-        if (!open)
-            return;
-        if (event.chest() != null && Chest.MAPPER.get(currentChest) != event.chest())
-            return;
+        if (!open) return;
+        if (event.chest() != null && Chest.MAPPER.get(currentChest) != event.chest()) return;
         open = false;
         currentChest = null;
         currentPlayer = null;
@@ -68,8 +62,7 @@ public class ChestViewModel extends ViewModel {
     }
 
     private void onPauseEvent(PauseEvent event) {
-        if (event == null)
-            return;
+        if (event == null) return;
         switch (event.action()) {
             case PAUSE -> {
                 paused = true;
@@ -78,15 +71,13 @@ public class ChestViewModel extends ViewModel {
             case RESUME -> paused = false;
             case TOGGLE -> {
                 paused = !paused;
-                if (paused)
-                    closeInventory();
+                if (paused) closeInventory();
             }
         }
     }
 
     private void closeInventory() {
-        if (!open)
-            return;
+        if (!open) return;
         boolean old = true;
         open = false;
         currentChest = null;
@@ -96,11 +87,9 @@ public class ChestViewModel extends ViewModel {
 
     private void rebuildChestItems() {
         chestItems.clear();
-        if (currentChest == null)
-            return;
+        if (currentChest == null) return;
         Chest chest = Chest.MAPPER.get(currentChest);
-        if (chest == null)
-            return;
+        if (chest == null) return;
         Array<String> contents = chest.getContents();
         for (int i = 0; i < contents.size; i++) {
             ItemModel model = uiModelFactory.createItemModel(contents.get(i), i);
@@ -111,11 +100,9 @@ public class ChestViewModel extends ViewModel {
 
     private void rebuildPlayerItems() {
         playerItems.clear();
-        if (currentPlayer == null)
-            return;
+        if (currentPlayer == null) return;
         Inventory inventory = Inventory.MAPPER.get(currentPlayer);
-        if (inventory == null)
-            return;
+        if (inventory == null) return;
         for (Entity itemEntity : inventory.getItems()) {
             ItemModel model = uiModelFactory.createItemModel(itemEntity);
             if (model != null) {
@@ -127,8 +114,7 @@ public class ChestViewModel extends ViewModel {
 
     @Override
     protected void onUiEvent(UiEvent event) {
-        if (event.action() == UiEvent.Action.RELEASE)
-            return;
+        if (event.action() == UiEvent.Action.RELEASE) return;
         if (event.command() == Command.INVENTORY && open) {
             isPlayerInventoryOpen = !isPlayerInventoryOpen;
         }

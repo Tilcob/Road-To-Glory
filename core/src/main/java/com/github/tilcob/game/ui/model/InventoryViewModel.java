@@ -26,7 +26,6 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(UpdateInventoryEvent.class, this::updateInventory);
         getEventBus().subscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
-        getEventBus().subscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().subscribe(OpenChestEvent.class, this::openChest);
@@ -85,10 +84,6 @@ public class InventoryViewModel extends ViewModel {
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
     }
 
-    private void onFullInventory(InventoryFullEvent inventoryFullEvent) {
-
-    }
-
     private void onPauseEvent(PauseEvent event) {
         if (event == null)
             return;
@@ -127,7 +122,6 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
         getEventBus().unsubscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
-        getEventBus().unsubscribe(InventoryFullEvent.class, this::onFullInventory);
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
         getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().unsubscribe(OpenChestEvent.class, this::openChest);

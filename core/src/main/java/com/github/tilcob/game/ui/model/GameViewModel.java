@@ -6,9 +6,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.Dialog;
-import com.github.tilcob.game.component.RewardDialogState;
-import com.github.tilcob.game.component.Trigger;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.ui.UiModelFactory;
@@ -50,14 +48,11 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onEntityDamaged(EntityDamagedEvent event) {
-        boolean isPlayer = com.github.tilcob.game.component.Player.MAPPER.has(event.entity());
-        if (!isPlayer)
-            return;
+        boolean isPlayer = Player.MAPPER.has(event.entity());
+        if (!isPlayer) return;
 
-        com.github.tilcob.game.component.Transform transform = com.github.tilcob.game.component.Transform.MAPPER
-                .get(event.entity());
-        if (transform == null)
-            return;
+        Transform transform = Transform.MAPPER.get(event.entity());
+        if (transform == null) return;
 
         float x = transform.getPosition().x + transform.getSize().x * .5f;
         float y = transform.getPosition().y;
@@ -75,10 +70,7 @@ public class GameViewModel extends ViewModel {
             clearRewardOwner();
         }
 
-        this.propertyChangeSupport.firePropertyChange(
-                Constants.SHOW_DIALOG,
-                null,
-                uiModelFactory.createDialogDisplay(event));
+        this.propertyChangeSupport.firePropertyChange(Constants.SHOW_DIALOG, null, uiModelFactory.createDialogDisplay(event));
     }
 
     private void onDialogChoices(DialogChoiceEvent event) {
@@ -98,8 +90,7 @@ public class GameViewModel extends ViewModel {
     }
 
     private void onDialogAdvance(DialogAdvanceEvent event) {
-        if (!rewardVisible)
-            return;
+        if (!rewardVisible) return;
         rewardVisible = false;
         this.propertyChangeSupport.firePropertyChange(Constants.HIDE_REWARD_DIALOG, null, true);
         clearRewardOwner();
@@ -116,8 +107,7 @@ public class GameViewModel extends ViewModel {
     }
 
     private void clearRewardOwner() {
-        if (rewardOwner == null)
-            return;
+        if (rewardOwner == null) return;
         rewardOwner.remove(RewardDialogState.class);
         rewardOwner = null;
     }
@@ -130,10 +120,8 @@ public class GameViewModel extends ViewModel {
 
     private void onExitTrigger(ExitTriggerEvent event) {
         Trigger trigger = Trigger.MAPPER.get(event.trigger());
-        if (trigger != null && trigger.getType() != Trigger.Type.DIALOG)
-            return;
-        if (trigger == null && Dialog.MAPPER.get(event.trigger()) == null)
-            return;
+        if (trigger != null && trigger.getType() != Trigger.Type.DIALOG) return;
+        if (trigger == null && Dialog.MAPPER.get(event.trigger()) == null) return;
         this.propertyChangeSupport.firePropertyChange(Constants.HIDE_DIALOG, null, true);
     }
 
