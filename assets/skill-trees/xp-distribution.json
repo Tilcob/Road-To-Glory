@@ -1,0 +1,15 @@
+{
+    "combat": {
+        "combat": 0.7,
+        "vitality": 0.2,
+        "agility": 0.1
+    },
+    "quest": {
+        "base": 0.6,
+        "vitality": 0.4
+    },
+    "crafting": {
+        "crafting": 0.8,
+        "base": 0.2
+    }
+}

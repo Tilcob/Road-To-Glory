@@ -186,6 +186,7 @@ def genIndex = { String dirPath, List<String> exts ->
       .collect { it.name }
       .findAll { n -> exts.any { n.toLowerCase().endsWith(it) } }
       .findAll { it != "index.json" }
+      .findAll { it != "xp-distribution.json" }
       .sort()
 
     outFile.text = JsonOutput.prettyPrint(JsonOutput.toJson(names)) + "\n"
