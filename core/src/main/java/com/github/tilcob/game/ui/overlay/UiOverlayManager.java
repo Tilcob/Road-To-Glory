@@ -8,6 +8,7 @@ import com.github.tilcob.game.event.UiOverlayEvent;
 import com.github.tilcob.game.input.GameControllerState;
 import com.github.tilcob.game.input.InputManager;
 import com.github.tilcob.game.input.UiControllerState;
+import com.github.tilcob.game.ui.model.PauseViewModel;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
 import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
@@ -18,6 +19,7 @@ public final class UiOverlayManager {
     private final Group gameUiGroup;
     private final WidgetGroup overlayGroup;
     private final PauseView pauseView;
+    private final PauseViewModel pauseViewModel;
     private final SettingsViewModel settingsViewModel;
     private final SettingsOverlayController settingsOverlayController;
     private final boolean closeSettingsOnShow;
@@ -29,6 +31,7 @@ public final class UiOverlayManager {
         InputManager inputManager,
         Group gameUiGroup,
         PauseView pauseView,
+        PauseViewModel pauseViewModel,
         SettingsView settingsView,
         SettingsViewModel settingsViewModel,
         boolean closeSettingsOnShow
@@ -39,6 +42,7 @@ public final class UiOverlayManager {
         this.overlayGroup = new WidgetGroup();
         this.overlayGroup.setFillParent(true);
         this.pauseView = pauseView;
+        this.pauseViewModel = pauseViewModel;
         this.settingsViewModel = settingsViewModel;
         this.settingsOverlayController = new SettingsOverlayController(
             pauseView,
@@ -83,6 +87,9 @@ public final class UiOverlayManager {
             } else {
                 closeSettingsOverlay();
             }
+            if (settingsViewModel != null) {
+                settingsViewModel.setActive(settingsViewModel.isOpen());
+            }
         }
 
         if (gameUiGroup != null) {
@@ -97,6 +104,9 @@ public final class UiOverlayManager {
             inputManager.setActiveState(GameControllerState.class);
             if (wasPaused) {
                 eventBus.fire(new UiOverlayEvent(UiOverlayEvent.Type.CLOSE_SETTINGS));
+            }
+            if (settingsViewModel != null) {
+                settingsViewModel.setActive(false);
             }
         }
     }
@@ -124,9 +134,15 @@ public final class UiOverlayManager {
 
     private void closeSettingsOverlay() {
         settingsOverlayController.closeSettings();
+        if (pauseViewModel != null) {
+            pauseViewModel.setActive(true);
+        }
     }
 
     private void openSettingsOverlay() {
         settingsOverlayController.openSettings();
+        if (pauseViewModel != null) {
+            pauseViewModel.setActive(false);
+        }
     }
 }

@@ -145,6 +145,7 @@ public class GameScreen extends ScreenAdapter {
                 inputManager,
                 gameUiGroup,
                 pauseView,
+                pauseViewModel,
                 settingsView,
                 settingsViewModel,
                 true);
@@ -273,6 +274,7 @@ public class GameScreen extends ScreenAdapter {
                 inputManager,
                 gameUiGroup,
                 pauseView,
+                pauseViewModel,
                 settingsView,
                 Objects.requireNonNull(settingsViewModel, "settingsViewModel"),
                 false);

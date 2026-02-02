@@ -10,8 +10,8 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                4,
-                3
+                3,
+                4
             ],
             "scale": 2,
             "selectedLayer": 3,
@@ -25,11 +25,11 @@
                 3,
                 5
             ],
-            "scale": 1.5,
+            "scale": 1,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 256,
-                "y": 190.33333333333331
+                "x": 158.5,
+                "y": 263.5
             }
         },
         "objects.tsx": {
@@ -71,9 +71,9 @@
     "property.type": "bool",
     "recentFiles": [
         "terrain.tsx",
-        "player.tmx",
         "objects.tsx",
         "house.tmx",
-        "main.tmx"
+        "main.tmx",
+        "player.tmx"
     ]
 }
