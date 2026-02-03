@@ -46,9 +46,20 @@ public class InputBindings {
         if (command == null || keycode == Input.Keys.UNKNOWN) {
             return;
         }
+        for (Map.Entry<Command, Set<Integer>> entry : commandBindings.entrySet()) {
+            if (entry.getKey() != command) {
+                entry.getValue().remove(keycode);
+            }
+        }
         Set<Integer> keycodes = new LinkedHashSet<>();
         keycodes.add(keycode);
         commandBindings.put(command, keycodes);
+        rebuildKeyMapping();
+    }
+
+    public void resetToDefaults() {
+        commandBindings.clear();
+        commandBindings.putAll(defaultCommandBindings());
         rebuildKeyMapping();
     }
 

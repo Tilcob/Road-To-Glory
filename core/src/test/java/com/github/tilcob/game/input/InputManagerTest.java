@@ -1,5 +1,6 @@
 package com.github.tilcob.game.input;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import org.junit.jupiter.api.Test;
 
@@ -43,6 +44,19 @@ class InputManagerTest {
         device.press(Command.UP);
 
         assertEquals(List.of(Command.UP), stateA.pressedCommands);
+    }
+
+    @Test
+    void listensForSingleKeyPress() {
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        InputManager inputManager = new InputManager(multiplexer);
+        List<Integer> captured = new ArrayList<>();
+
+        inputManager.listenForNextKey(captured::add);
+        multiplexer.keyDown(Input.Keys.F);
+        multiplexer.keyDown(Input.Keys.G);
+
+        assertEquals(List.of(Input.Keys.F), captured);
     }
 
     @Test

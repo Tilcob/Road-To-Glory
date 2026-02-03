@@ -45,13 +45,13 @@ public class GdxGame extends Game implements ScreenNavigator {
         }
         DebugLogBuffer.install(Gdx.app, 20);
 
-        inputMultiplexer = new InputMultiplexer();
-        InputManager inputManager = new InputManager(inputMultiplexer);
-        Gdx.input.setInputProcessor(inputMultiplexer);
         InputBindingsStorage bindingsStorage = new InputBindingsStorage(
             ContentPaths.INPUT_BINDINGS_DEFAULT,
             ContentPaths.INPUT_BINDINGS_LOCAL);
         InputBindings bindings = bindingsStorage.load();
+        inputMultiplexer = new InputMultiplexer();
+        InputManager inputManager = new InputManager(inputMultiplexer, bindings, bindingsStorage);
+        Gdx.input.setInputProcessor(inputMultiplexer);
         inputManager.addDevice(new KeyboardInputDevice(bindings));
 
         services = new GameServices(new InternalFileHandleResolver(),

@@ -6,9 +6,16 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
 
+import java.util.EnumMap;
+import java.util.Map;
+
 public class SettingsView extends View<SettingsViewModel> {
+    private final Map<Command, TextButton> keybindButtons = new EnumMap<>(Command.class);
+    private Label keybindStatusLabel;
+    private Command listeningCommand;
     private Group selectedItem;
 
     public SettingsView(Skin skin, Stage stage, SettingsViewModel viewModel) {
@@ -46,6 +53,8 @@ public class SettingsView extends View<SettingsViewModel> {
         soundSlider.setValue(viewModel.getSoundVolume());
         onChange(soundSlider, s -> viewModel.setSoundVolume(s.getValue()));
 
+        setupKeybindingsSection(optionsTable);
+
         Table backTable = new Table();
         backTable.setName(SettingsOption.BACK.name());
         TextButton back = new TextButton("Back", skin);
@@ -58,6 +67,46 @@ public class SettingsView extends View<SettingsViewModel> {
         add(contentTable).expand().center();
         align(Align.center);
     }
+
+    private void setupKeybindingsSection(Table optionsTable) {
+        Label header = new Label("Keybindings", skin, "text_12");
+        header.setColor(skin.getColor("sand"));
+        optionsTable.add(header).padTop(20f).row();
+
+        for (Command command : viewModel.getBindableCommands()) {
+            Table row = new Table();
+            row.setName(keybindOptionName(command));
+
+            Label label = new Label(formatCommandName(command), skin, "text_12");
+            label.setColor(skin.getColor("sand"));
+            row.add(label).left().padRight(12f);
+
+            TextButton button = new TextButton(viewModel.getBindingLabel(command), skin);
+            button.getLabel().setAlignment(Align.center);
+            row.add(button).width(220f);
+            keybindButtons.put(command, button);
+
+            onClick(button, () -> viewModel.startListening(command));
+            onEnter(row, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
+
+            optionsTable.add(row).padTop(6f).row();
+        }
+
+        keybindStatusLabel = new Label("", skin, "text_12");
+        keybindStatusLabel.setColor(skin.getColor("sand"));
+        keybindStatusLabel.setAlignment(Align.center);
+
+        TextButton resetButton = new TextButton("Reset to defaults", skin);
+        Table resetRow = new Table();
+        resetRow.setName(SettingsOption.RESET_KEYBINDS.name());
+        resetRow.add(resetButton).width(220f);
+        onClick(resetButton, viewModel::resetToDefaults);
+        onEnter(resetRow, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
+
+        optionsTable.add(keybindStatusLabel).padTop(6f).row();
+        optionsTable.add(resetRow).padTop(8f).row();
+    }
+
 
     private Slider setupVolumesSlider(Table contentTable, String title, SettingsOption option) {
         Table table = new Table();
@@ -84,6 +133,9 @@ public class SettingsView extends View<SettingsViewModel> {
         viewModel.onPropertyChange(Constants.ON_LEFT, Boolean.class, this::onLeft);
         viewModel.onPropertyChange(Constants.ON_SELECT, Boolean.class, this::onSelect);
         viewModel.onPropertyChange(Constants.ON_CANCEL, Boolean.class, (ignored) -> viewModel.close());
+        viewModel.onPropertyChange(Constants.KEYBIND_LISTENING, Command.class, this::onListeningChanged);
+        viewModel.onPropertyChange(Constants.KEYBIND_SAVED, Integer.class, this::onKeybindSaved);
+        viewModel.onPropertyChange(Constants.KEYBIND_CONFLICT, String.class, this::onKeybindConflict);
     }
 
     private void onDown(Object o) {
@@ -95,7 +147,12 @@ public class SettingsView extends View<SettingsViewModel> {
     }
 
     private void onRight(Object ignored) {
-        SettingsOption opt = SettingsOption.valueOf(selectedItem.getName());
+        if (selectedItem == null) return;
+        String name = selectedItem.getName();
+        if (parseKeybindCommand(name) != null) {
+            return;
+        }
+        SettingsOption opt = SettingsOption.valueOf(name);
         if (opt == SettingsOption.MUSIC_VOLUME || opt == SettingsOption.SOUND_VOLUME) {
             Slider slider = (Slider) selectedItem.getChild(1);
             slider.setValue(slider.getValue() + slider.getStepSize());
@@ -103,7 +160,12 @@ public class SettingsView extends View<SettingsViewModel> {
     }
 
     private void onLeft(Object ignored) {
-        SettingsOption opt = SettingsOption.valueOf(selectedItem.getName());
+        if (selectedItem == null) return;
+        String name = selectedItem.getName();
+        if (parseKeybindCommand(name) != null) {
+            return;
+        }
+        SettingsOption opt = SettingsOption.valueOf(name);
         if (opt == SettingsOption.MUSIC_VOLUME || opt == SettingsOption.SOUND_VOLUME) {
             Slider slider = (Slider) selectedItem.getChild(1);
             slider.setValue(slider.getValue() - slider.getStepSize());
@@ -112,9 +174,17 @@ public class SettingsView extends View<SettingsViewModel> {
 
     private void onSelect(Object ignored) {
         if (selectedItem == null) return;
+        Command command = parseKeybindCommand(selectedItem.getName());
+        if (command != null) {
+            viewModel.startListening(command);
+            return;
+        }
         SettingsOption opt = SettingsOption.valueOf(selectedItem.getName());
-        if (opt == SettingsOption.BACK) {
-            viewModel.close();
+        switch (opt) {
+            case BACK -> viewModel.close();
+            case RESET_KEYBINDS -> viewModel.resetToDefaults();
+            default -> {
+            }
         }
     }
 
@@ -129,9 +199,69 @@ public class SettingsView extends View<SettingsViewModel> {
         setVisibleBound(visible);
     }
 
+    private void onListeningChanged(Command command) {
+        listeningCommand = command;
+        for (Map.Entry<Command, TextButton> entry : keybindButtons.entrySet()) {
+            if (entry.getKey() == listeningCommand) {
+                entry.getValue().setText("Press a key...");
+            } else {
+                entry.getValue().setText(viewModel.getBindingLabel(entry.getKey()));
+            }
+        }
+        if (listeningCommand != null) {
+            keybindStatusLabel.setText("Press a key...");
+        } else {
+            keybindStatusLabel.setText("");
+        }
+    }
+
+    private void onKeybindSaved(Integer keycode) {
+        for (Map.Entry<Command, TextButton> entry : keybindButtons.entrySet()) {
+            entry.getValue().setText(viewModel.getBindingLabel(entry.getKey()));
+        }
+        if (keycode != null) {
+            keybindStatusLabel.setText("Keybinding updated.");
+        } else if (listeningCommand == null) {
+            keybindStatusLabel.setText("");
+        }
+    }
+
+    private void onKeybindConflict(String message) {
+        if (message == null || message.isBlank()) {
+            if (listeningCommand != null) {
+                keybindStatusLabel.setText("Press a key...");
+            } else {
+                keybindStatusLabel.setText("");
+            }
+        } else {
+            keybindStatusLabel.setText(message);
+        }
+    }
+
+    private String formatCommandName(Command command) {
+        String name = command.name().toLowerCase().replace('_', ' ');
+        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
+    }
+
+    private String keybindOptionName(Command command) {
+        return "KEYBIND_" + command.name();
+    }
+
+    private Command parseKeybindCommand(String name) {
+        if (name == null || !name.startsWith("KEYBIND_")) {
+            return null;
+        }
+        try {
+            return Command.valueOf(name.substring("KEYBIND_".length()));
+        } catch (IllegalArgumentException ex) {
+            return null;
+        }
+    }
+
     private enum SettingsOption {
         MUSIC_VOLUME,
         SOUND_VOLUME,
+        RESET_KEYBINDS,
         BACK
     }
 }
