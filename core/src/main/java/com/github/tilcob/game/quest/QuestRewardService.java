@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.Wallet;
+import com.github.tilcob.game.event.ExpGainRequestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
@@ -26,7 +27,8 @@ public class QuestRewardService {
         QuestReward reward = quest.getReward();
         applyMoney(player, reward);
         applyItems(player, reward);
-        if (reward.money() > 0 || !reward.items().isEmpty()) {
+        applyExp(player, reward);
+        if (reward.money() > 0 || reward.exp() > 0 || !reward.items().isEmpty()) {
             eventBus.fire(new RewardGrantedEvent(player, quest.getQuestId(), quest.getTitle(), reward));
         }
         eventBus.fire(new UpdateQuestLogEvent(player));
@@ -61,5 +63,10 @@ public class QuestRewardService {
         for (var itemId : reward.items()) {
             inventory.getItemsToAdd().add(ItemDefinitionRegistry.resolveId(itemId));
         }
+    }
+
+    private void applyExp(Entity player, QuestReward reward) {
+        if (reward.exp() <= 0) return;
+        eventBus.fire(new ExpGainRequestEvent(player, "quest", "quest", 1f, reward.exp()));
     }
 }

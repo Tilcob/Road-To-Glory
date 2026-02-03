@@ -74,6 +74,6 @@ public class UiModelFactory {
         String title = event.questTitle() == null || event.questTitle().isBlank()
                 ? event.questId().replace("_", " ")
                 : event.questTitle();
-        return new RewardDisplay(title, event.reward().money(), items);
+        return new RewardDisplay(title, event.reward().money(), event.reward().exp(), items);
     }
 }

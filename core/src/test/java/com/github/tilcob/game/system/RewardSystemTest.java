@@ -34,7 +34,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(15, List.of("sword"));
+        QuestReward reward = new QuestReward(15, 0, List.of("sword"));
         Quest quest = new Quest("Reward_Quest", "Reward Quest", "Reward test", reward, 1);
         questLog.add(quest);
 
@@ -64,7 +64,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(10, List.of("boots"));
+        QuestReward reward = new QuestReward(10, 0, List.of("boots"));
         Quest quest = new Quest("Incomplete_Quest", "Incomplete Quest", "Not done", reward, 1);
         questLog.add(quest);
 
@@ -88,7 +88,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(0, List.of());
+        QuestReward reward = new QuestReward(0, 0, List.of());
         Quest quest = new Quest("Empty_Quest", "Empty Quest", "Nothing", reward);
         quest.setCurrentStep(quest.getTotalStages());
         quest.setRewardClaimed(true);
@@ -118,7 +118,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(0, List.of());
+        QuestReward reward = new QuestReward(0, 0, List.of());
         Quest quest = new Quest("claim_update_test", "Claim Quest", "Claim", reward, 1);
         quest.setCurrentStep(quest.getTotalStages());
         questLog.add(quest);
@@ -145,7 +145,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        QuestReward reward = new QuestReward(12, List.of("ring"));
+        QuestReward reward = new QuestReward(12, 0, List.of("ring"));
         Quest quest = new Quest("giver_reward_test", "Giver Quest", "Talk to the giver", reward, 1);
         quest.setCurrentStep(1);
         questLog.add(quest);

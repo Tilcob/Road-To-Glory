@@ -30,6 +30,7 @@ public class GameView extends View<GameViewModel> {
     private final Table rewardContainer;
     private final TextraLabel rewardTitleLabel;
     private final TextraLabel rewardGoldLabel;
+    private final TextraLabel rewardExpLabel;
     private final VerticalGroup rewardItems;
     private final TextraLabel rewardHintLabel;
 
@@ -45,6 +46,7 @@ public class GameView extends View<GameViewModel> {
         this.rewardContainer = findActor("rewardContainer");
         this.rewardTitleLabel = findActor("rewardTitle");
         this.rewardGoldLabel = findActor("rewardGold");
+        this.rewardExpLabel = findActor("rewardExp");
         this.rewardItems = findActor("rewardItems");
         this.rewardHintLabel = findActor("rewardHint");
 
@@ -118,6 +120,10 @@ public class GameView extends View<GameViewModel> {
         rewardGold.setName("rewardGold");
         rewardGold.setColor(skin.getColor("BLACK"));
 
+        TextraLabel rewardExp = new TextraLabel("", skin, "text_10");
+        rewardExp.setName("rewardExp");
+        rewardExp.setColor(skin.getColor("BLACK"));
+
         VerticalGroup rewardItemsGroup = new VerticalGroup();
         rewardItemsGroup.setName("rewardItems");
         rewardItemsGroup.align(Align.left);
@@ -129,6 +135,7 @@ public class GameView extends View<GameViewModel> {
 
         rewardBox.add(rewardTitle).center().row();
         rewardBox.add(rewardGold).center().padTop(4f).row();
+        rewardBox.add(rewardExp).center().padTop(2f).row();
         rewardBox.add(rewardItemsGroup).expand().center().padTop(4f).row();
         rewardBox.add(rewardHint).right().padTop(6f).row();
 
@@ -185,6 +192,7 @@ public class GameView extends View<GameViewModel> {
         rewardContainer.setVisible(true);
         rewardTitleLabel.setText(display.title());
         rewardGoldLabel.setText(display.money() > 0 ? "Money: " + display.money() : "");
+        rewardExpLabel.setText(display.exp() > 0 ? "EXP: " + display.exp() : "");
         rewardItems.clearChildren();
         if (display.items() != null) {
             for (String item : display.items()) {
@@ -199,6 +207,7 @@ public class GameView extends View<GameViewModel> {
     private void hideRewardDialog() {
         rewardContainer.setVisible(false);
         rewardTitleLabel.setText("");
+        rewardExpLabel.setText("");
         rewardGoldLabel.setText("");
         rewardItems.clearChildren();
     }

@@ -35,7 +35,7 @@ public class QuestFactory {
         List<String> items = new ArrayList<>();
         if (reward.items() != null) reward.items().forEach(
             item -> items.add(ItemDefinitionRegistry.resolveId(item)));
-        return new QuestReward(reward.money(), items);
+        return new QuestReward(reward.money(), reward.exp(), items);
     }
 
     public Quest create(String questId) {
