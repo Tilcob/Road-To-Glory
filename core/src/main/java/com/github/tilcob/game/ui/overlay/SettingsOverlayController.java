@@ -1,7 +1,6 @@
 package com.github.tilcob.game.ui.overlay;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.github.tilcob.game.ui.view.SettingsView;
 
 public final class SettingsOverlayController {

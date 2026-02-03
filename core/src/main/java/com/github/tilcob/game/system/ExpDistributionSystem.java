@@ -2,9 +2,9 @@ package com.github.tilcob.game.system;
 
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.utils.Disposable;
-import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.ExpGainEvent;
 import com.github.tilcob.game.event.ExpGainRequestEvent;
+import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.skill.ExpDistributionLoader;
 
 import java.util.Map;

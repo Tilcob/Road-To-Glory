@@ -6,7 +6,10 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.event.EntityDamagedEvent;
+import com.github.tilcob.game.event.ExpGainRequestEvent;
+import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.GameOverEvent;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.quest.QuestManager;
 

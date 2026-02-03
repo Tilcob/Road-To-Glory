@@ -5,9 +5,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.skill.data.SkillNodeDefinition;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 import com.github.tilcob.game.ui.model.SkillTreeViewModel;
@@ -94,8 +93,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         buildTabs();
         SkillTreeDefinition def = viewModel.getTreeDefinition();
         SkillTreeState state = viewModel.getTreeState();
-        if (def == null || state == null)
-            return;
+        if (def == null || state == null) return;
 
         int displayLevel = state.getCurrentLevel() + 1;
         int sharedPoints = viewModel.getSharedSkillPoints();
