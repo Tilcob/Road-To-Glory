@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
@@ -12,6 +13,8 @@ import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 import com.github.tilcob.game.ui.model.SkillTreeViewModel;
 
 public class SkillTreeView extends View<SkillTreeViewModel> {
+    private static final float PANEL_PADDING = 12f;
+
     private Table rootTable;
     private Table tabsTable;
     private Label pointsLabel;
@@ -27,6 +30,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
 
         rootTable = new Table();
         rootTable.background(skin.getDrawable("Other_panel_brown"));
+        rootTable.pad(PANEL_PADDING);
         setRoot(rootTable);
         setVisibleBound(false);
         rootTable.top();
@@ -46,16 +50,18 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         titleLabel.setAlignment(1);
 
         Table titleRow = new Table();
-        titleRow.add(titleLabel).expandX().left().pad(10);
-        titleRow.add(closeBtn).pad(10);
+        titleRow.add(titleLabel).expandX().left().pad(6);
+        titleRow.add(pointsLabel).expandX().center().pad(6);
+        titleRow.add(closeBtn).right().pad(6);
 
         ScrollPane scrollPane = new ScrollPane(nodesTable, skin);
         scrollPane.setFadeScrollBars(false);
+        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setOverscroll(false, false);
 
         rootTable.add(titleRow).expandX().fillX().row();
-        rootTable.add(tabsTable).expandX().fillX().pad(5, 10, 5, 10).row();
-        rootTable.add(pointsLabel).pad(10).left().row();
-        rootTable.add(scrollPane).expand().fill().pad(10).row();
+        rootTable.add(tabsTable).expandX().fillX().pad(6, 0, 6, 0).row();
+        rootTable.add(scrollPane).expand().fill().pad(6).row();
 
         resizeRootTable();
         centerRootTable();
@@ -86,8 +92,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         float padding = 40f;
         float maxWidth = Math.max(200f, stage.getWidth() - padding);
         float maxHeight = Math.max(200f, stage.getHeight() - padding);
-        float width = Math.min(600f, maxWidth);
-        float height = Math.min(400f, maxHeight);
+        float width = Math.min(720f, maxWidth);
+        float height = Math.min(460f, maxHeight);
         rootTable.setSize(width, height);
     }
 
@@ -109,6 +115,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         pointsLabel.setText("Level: " + displayLevel + " | Points: " + sharedPoints);
 
         nodesTable.clear();
+        nodesTable.defaults().expandX().fillX().pad(6);
         for (SkillNodeDefinition node : def.getNodes()) {
             boolean unlocked = state.isUnlocked(node.getId());
             boolean affordable = sharedPoints >= node.getCost();
@@ -123,24 +130,43 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                 }
             }
 
-            String status = unlocked ? "[UNLOCKED]"
-                    : (affordable && levelReq && parentsUnlocked ? "[UNLOCK]" : "[LOCKED]");
-            String text = node.getName() + "\n" + node.getDescription() + "\nCost: " + node.getCost() + " " + status;
+            boolean canUnlock = !unlocked && affordable && levelReq && parentsUnlocked;
+            String status = unlocked ? "Unlocked"
+                : (canUnlock ? "Ready" : "Locked");
+            String requirements = "Cost: " + node.getCost()
+                + " | Required Level: " + node.getRequiredLevel()
+                + " | Status: " + status;
 
-            TextButton nodeBtn = new TextButton(text, skin);
-            nodeBtn.setDisabled(!(!unlocked && affordable && levelReq && parentsUnlocked));
+            Table nodeRow = new Table();
+            nodeRow.background(skin.getDrawable("Other_panel_brown"));
+            nodeRow.pad(8);
 
-            if (!unlocked && affordable && levelReq && parentsUnlocked) {
-                nodeBtn.addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        viewModel.unlockNode(node.getId());
-                        refresh();
-                    }
-                });
-            }
+            Label nameLabel = new Label(node.getName(), skin);
+            Label descLabel = new Label(node.getDescription(), skin);
+            Label reqLabel = new Label(requirements, skin);
 
-            nodesTable.add(nodeBtn).pad(5).fillX().row();
+            Table textColumn = new Table();
+            textColumn.add(nameLabel).left().row();
+            textColumn.add(descLabel).left().padTop(4).row();
+            textColumn.add(reqLabel).left().padTop(4).row();
+
+            String buttonText = unlocked ? "Unlocked" : (canUnlock ? "Unlock" : "Locked");
+            TextButton actionButton = new TextButton(buttonText, skin);
+            actionButton.setDisabled(!canUnlock);
+            actionButton.setTouchable(canUnlock ? Touchable.enabled : Touchable.disabled);
+
+            actionButton.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (!canUnlock) return;
+                    viewModel.unlockNode(node.getId());
+                    refresh();
+                }
+            });
+
+            nodeRow.add(textColumn).expandX().fillX().left().padRight(10);
+            nodeRow.add(actionButton).right();
+            nodesTable.add(nodeRow).row();
         }
     }
 
@@ -163,7 +189,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                     }
                 });
             }
-            tabsTable.add(tabButton).padRight(6);
+            tabsTable.add(tabButton).padRight(6).height(32);
         }
         tabsTable.row();
     }
