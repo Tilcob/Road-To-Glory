@@ -8,6 +8,8 @@ reward_item: sword
 reward_timing: giver
 step: talk Npc-2
 step: collect helmet 1
+step_journal: Talk to Npc-2
+step_journal: Get the missing helmet
 title: q_welcome_to_town_start
 position: -178,-155
 ---

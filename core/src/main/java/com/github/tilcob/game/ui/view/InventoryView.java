@@ -459,7 +459,7 @@ public class InventoryView extends View<InventoryViewModel> {
         if (quest == null) {
             Label emptyLabel = new Label("Select a quest to see its steps.", skin, "text_08");
             emptyLabel.setColor(skin.getColor("BLACK"));
-            questSteps.add(emptyLabel).left().row();
+            questSteps.add(emptyLabel).left().expandX().fillX().row();
             return;
         }
 
@@ -471,13 +471,13 @@ public class InventoryView extends View<InventoryViewModel> {
         Label titleLabel = new Label(questTitle, skin, "text_10");
         titleLabel.setColor(skin.getColor("BLACK"));
         titleLabel.setWrap(true);
-        questSteps.add(titleLabel).left().row();
+        questSteps.add(titleLabel).left().expandX().fillX().row();
 
         if (quest.getDescription() != null && !quest.getDescription().isBlank()) {
             Label descLabel = new Label(quest.getDescription(), skin, "text_08");
             descLabel.setColor(skin.getColor("BLACK"));
             descLabel.setWrap(true);
-            questSteps.add(descLabel).left().padTop(4.0f).row();
+            questSteps.add(descLabel).left().expandX().fillX().padTop(4.0f).row();
         }
 
         List<String> journals = quest.getStepJournals();
