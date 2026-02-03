@@ -22,14 +22,14 @@
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                3,
-                5
+                5,
+                3
             ],
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 221.25,
-                "y": 130.25
+                "x": 264,
+                "y": 159.75
             }
         },
         "objects.tsx": {

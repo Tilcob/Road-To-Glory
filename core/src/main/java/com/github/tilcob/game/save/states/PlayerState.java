@@ -19,6 +19,7 @@ public class PlayerState {
     private List<ItemSlotState> itemSlots = new ArrayList<>();
     private Map<ItemCategory, EquipmentSlotState> equipmentSlots = new EnumMap<>(ItemCategory.class);
     private Map<String, SkillTreeStateSnapshot> skillTrees = new HashMap<>();
+    private int sharedSkillPoints = 0;
     private List<StatModifierState> statModifiers = new ArrayList<>();
 
     public PlayerState() { }
@@ -62,6 +63,14 @@ public class PlayerState {
 
     public void setSkillTrees(Map<String, SkillTreeStateSnapshot> skillTrees) {
         this.skillTrees = skillTrees;
+    }
+
+    public int getSharedSkillPoints() {
+        return sharedSkillPoints;
+    }
+
+    public void setSharedSkillPoints(int sharedSkillPoints) {
+        this.sharedSkillPoints = sharedSkillPoints;
     }
 
     public List<StatModifierState> getStatModifiers() {

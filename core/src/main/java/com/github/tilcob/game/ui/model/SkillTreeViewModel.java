@@ -55,6 +55,12 @@ public class SkillTreeViewModel extends ViewModel {
         return comp.getTreeState(activeTreeId);
     }
 
+    public int getSharedSkillPoints() {
+        Skill comp = Skill.MAPPER.get(services.getEntityLookup().getPlayer());
+        if (comp == null) return 0;
+        return comp.getSharedSkillPoints();
+    }
+
     public void unlockNode(String nodeId) {
         if (services.getEntityLookup().getPlayer() == null) return;
         getEventBus().fire(new SkillUnlockEvent(services.getEntityLookup().getPlayer(), activeTreeId, nodeId));

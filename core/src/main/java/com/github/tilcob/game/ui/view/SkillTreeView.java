@@ -105,12 +105,13 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
             return;
 
         int displayLevel = state.getCurrentLevel() + 1;
-        pointsLabel.setText("Level: " + displayLevel + " | Points: " + state.getSkillPoints());
+        int sharedPoints = viewModel.getSharedSkillPoints();
+        pointsLabel.setText("Level: " + displayLevel + " | Points: " + sharedPoints);
 
         nodesTable.clear();
         for (SkillNodeDefinition node : def.getNodes()) {
             boolean unlocked = state.isUnlocked(node.getId());
-            boolean affordable = state.getSkillPoints() >= node.getCost();
+            boolean affordable = sharedPoints >= node.getCost();
             boolean levelReq = displayLevel >= node.getRequiredLevel();
             boolean parentsUnlocked = true;
             if (node.getParentIds() != null) {

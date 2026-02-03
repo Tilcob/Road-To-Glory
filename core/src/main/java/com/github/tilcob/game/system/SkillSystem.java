@@ -42,16 +42,18 @@ public class SkillSystem extends IteratingSystem {
         SkillTreeState state = skillComp.getTreeState(event.treeId());
         state.setCurrentXp(state.getCurrentXp() + event.amount());
 
-        checkLevelUp(event.entity(), event.treeId(), state, def);
+        checkLevelUp(event.entity(), event.treeId(), skillComp, state, def);
     }
 
-    private void checkLevelUp(Entity entity, String treeId, SkillTreeState state, SkillTreeDefinition def) {
+    private void checkLevelUp(Entity entity, String treeId, Skill skill, SkillTreeState state, SkillTreeDefinition def) {
         int[] xpTable = def.getXpTable();
         int levelsGained = 0;
 
         while (state.getCurrentLevel() < xpTable.length && state.getCurrentXp() >= xpTable[state.getCurrentLevel()]) {
             state.setCurrentLevel(state.getCurrentLevel() + 1);
-            state.setSkillPoints(state.getSkillPoints() + 1); // 1 point per level
+            if (skill != null) {
+                skill.addSharedSkillPoints(1);
+            }
             levelsGained++;
         }
 
@@ -77,7 +79,7 @@ public class SkillSystem extends IteratingSystem {
 
         if (nodeDef == null) return;
         int displayLevel = state.getCurrentLevel() + 1;
-        if (state.getSkillPoints() < nodeDef.getCost()) return;
+        if (skillComp.getSharedSkillPoints() < nodeDef.getCost()) return;
         if (displayLevel < nodeDef.getRequiredLevel()) return;
 
         if (nodeDef.getParentIds() != null) {
@@ -86,7 +88,7 @@ public class SkillSystem extends IteratingSystem {
             }
         }
 
-        state.setSkillPoints(state.getSkillPoints() - nodeDef.getCost());
+        if (!skillComp.spendSharedSkillPoints(nodeDef.getCost())) return;
         state.addUnlockedNode(event.nodeId());
 
         applyModifiers(event.entity(), nodeDef);
