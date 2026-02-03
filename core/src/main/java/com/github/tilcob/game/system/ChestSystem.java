@@ -139,21 +139,8 @@ public class ChestSystem extends IteratingSystem implements Disposable {
 
     private void onMoveChestItem(DragAndDropChestEvent event) {
         if (openChestEntity == null || openPlayer == null) return;
-        if (event.fromIdx() == event.toIdx()) return;
         Chest chest = Chest.MAPPER.get(openChestEntity);
-        if (chest == null) return;
-
-        Array<String> contents = chest.getContents();
-        int fromIdx = event.fromIdx();
-        int toIdx = event.toIdx();
-        if (fromIdx < 0 || fromIdx >= contents.size) return;
-        if (toIdx < 0 || toIdx >= contents.size) return;
-
-        String fromItem = contents.get(fromIdx);
-        String toItem = contents.get(toIdx);
-        contents.set(fromIdx, toItem);
-        contents.set(toIdx, fromItem);
-        chest.setContents(contents);
+        if (!inventoryService.moveChestContents(chest, event.fromIdx(), event.toIdx())) return;
         eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
     }
 

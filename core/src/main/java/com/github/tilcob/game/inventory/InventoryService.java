@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.GameEventBus;
@@ -76,6 +77,22 @@ public class InventoryService {
             return i;
         }
         return -1;
+    }
+
+    public boolean moveChestContents(Chest chest, int fromIdx, int toIdx) {
+        if (chest == null) return false;
+        if (fromIdx == toIdx) return false;
+
+        Array<String> contents = chest.getContents();
+        if (fromIdx < 0 || fromIdx >= contents.size) return false;
+        if (toIdx < 0 || toIdx >= contents.size) return false;
+
+        String fromItem = contents.get(fromIdx);
+        String toItem = contents.get(toIdx);
+        contents.set(fromIdx, toItem);
+        contents.set(toIdx, fromItem);
+        chest.setContents(contents);
+        return true;
     }
 
     public void moveEntity(int toIndex, int fromIndex) {
