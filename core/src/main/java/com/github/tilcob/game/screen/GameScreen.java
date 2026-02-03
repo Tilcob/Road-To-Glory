@@ -337,15 +337,7 @@ public class GameScreen extends ScreenAdapter {
     }
 
     private void setSkillTreeOverlayState(boolean open) {
-        if (gameUiGroup != null) {
-            gameUiGroup.setTouchable(open ? Touchable.disabled : Touchable.enabled);
-        }
-        if (uiOverlayManager != null) {
-            uiOverlayManager.setOverlayInputEnabled(!open);
-        }
-        if (open && skillTreeView != null) {
-            skillTreeView.toFront();
-        }
+        if (open && skillTreeView != null) skillTreeView.toFront();
     }
 
     private void clearAllControllerCommands() {
