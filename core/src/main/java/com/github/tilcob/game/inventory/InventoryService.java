@@ -146,11 +146,13 @@ public class InventoryService {
 
         if (tryStack(equippedEntity, from, toEntity, inventory)) {
             eventBus.fire(new UpdateInventoryEvent(player));
+            eventBus.fire(new UpdateEquipmentEvent(player));
             return;
         }
 
         swapOrMove(from, toEntity, from.getSlotIndex(), toIndex);
         eventBus.fire(new UpdateInventoryEvent(player));
+        eventBus.fire(new UpdateEquipmentEvent(player));
     }
 
     public void splitStack(int slotIndex) {
