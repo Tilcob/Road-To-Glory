@@ -17,6 +17,7 @@ public class SettingsView extends View<SettingsViewModel> {
     private Label keybindStatusLabel;
     private Command listeningCommand;
     private Group selectedItem;
+    private Table keybindingsTable;
 
     public SettingsView(Skin skin, Stage stage, SettingsViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -86,9 +87,18 @@ public class SettingsView extends View<SettingsViewModel> {
     }
 
     private void setupKeybindingsSection(Table optionsTable) {
+        if (keybindingsTable != null) {
+            keybindingsTable.remove();
+            keybindingsTable.clear();
+        }
+        keybindButtons.clear();
+
+        keybindingsTable = new Table();
+        keybindingsTable.top();
+
         Label header = new Label("Keybindings", skin, "text_12");
         header.setColor(skin.getColor("sand"));
-        optionsTable.add(header).padTop(20f).row();
+        keybindingsTable.add(header).padTop(20f).row();
 
         for (Command command : viewModel.getBindableCommands()) {
             Table row = new Table();
@@ -106,7 +116,7 @@ public class SettingsView extends View<SettingsViewModel> {
             onClick(button, () -> viewModel.startListening(command));
             onEnter(row, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
-            optionsTable.add(row).padTop(6f).row();
+            keybindingsTable.add(row).padTop(6f).growX().row();
         }
 
         keybindStatusLabel = new Label("", skin, "text_12");
@@ -120,8 +130,10 @@ public class SettingsView extends View<SettingsViewModel> {
         onClick(resetButton, viewModel::resetToDefaults);
         onEnter(resetRow, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
-        optionsTable.add(keybindStatusLabel).padTop(6f).row();
-        optionsTable.add(resetRow).padTop(8f).row();
+        keybindingsTable.add(keybindStatusLabel).padTop(6f).row();
+        keybindingsTable.add(resetRow).padTop(8f).row();
+
+        optionsTable.add(keybindingsTable).growX().row();
     }
 
 
