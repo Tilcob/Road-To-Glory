@@ -358,7 +358,7 @@ public class InventoryView extends View<InventoryViewModel> {
         label.setColor(skin.getColor("BLACK"));
         label.setWrap(true);
         Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
-        image.setVisible(quest.isCompleted());
+        image.setVisible(quest.isRewardClaimed());
         row.add(label).left().expandX().fillX();
         row.add(image).right().padLeft(4.0f);
 
@@ -480,15 +480,18 @@ public class InventoryView extends View<InventoryViewModel> {
             questSteps.add(descLabel).left().expandX().fillX().padTop(4.0f).row();
         }
 
+        Label stepsHeader = new Label("Steps:", skin, "text_08");
+        stepsHeader.setColor(skin.getColor("BLACK"));
+        questSteps.add(stepsHeader).left().expandX().fillX().padTop(6.0f).row();
+
         List<String> journals = quest.getStepJournals();
         if (journals == null || journals.isEmpty()) {
             Label emptySteps = new Label("No steps available.", skin, "text_08");
             emptySteps.setColor(skin.getColor("BLACK"));
-            questSteps.add(emptySteps).left().padTop(6.0f).row();
+            questSteps.add(emptySteps).left().padLeft(12.0f).padTop(4.0f).row();
             return;
         }
 
-        questSteps.add().padTop(6.0f).row();
         int currentStep = quest.getCurrentStep();
         for (int i = 0; i < journals.size(); i++) {
             String stepText = journals.get(i);
@@ -507,7 +510,7 @@ public class InventoryView extends View<InventoryViewModel> {
                 Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
                 stepRow.add(image).right().padLeft(4.0f);
             }
-            questSteps.add(stepRow).expandX().fillX().padBottom(4.0f).row();
+            questSteps.add(stepRow).expandX().fillX().padLeft(12.0f).padBottom(4.0f).row();
         }
     }
 
