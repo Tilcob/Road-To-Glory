@@ -77,7 +77,7 @@ public class SettingsView extends View<SettingsViewModel> {
         backTable.setName(SettingsOption.BACK.name());
         TextButton back = new TextButton("Back", skin);
         backTable.add(back).width(180f);
-        optionsTable.add(backTable).padTop(15f).row();
+        contentTable.add(backTable).padTop(15f).row();
 
         onClick(back, viewModel::close);
         onEnter(back, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
