@@ -171,6 +171,6 @@ public class InputBindings {
     }
 
     public static class BindingFile {
-        public Map<String, Object> bindings = new HashMap<>();
+        public HashMap<String, Object> bindings = new HashMap<>();
     }
 }

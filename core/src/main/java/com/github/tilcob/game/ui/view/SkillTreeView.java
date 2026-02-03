@@ -14,6 +14,7 @@ import com.github.tilcob.game.ui.model.SkillTreeViewModel;
 
 public class SkillTreeView extends View<SkillTreeViewModel> {
     private static final float PANEL_PADDING = 12f;
+    private static final float TEXT_COLUMN_MAX_WIDTH = 320f;
 
     private Table rootTable;
     private Table tabsTable;
@@ -37,7 +38,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         setVisibleBound(false);
         rootTable.top();
 
-        pointsLabel = new Label("Points: 0", skin);
+        pointsLabel = new Label("Points: 0", skin, "text_10");
+        pointsLabel.setColor(skin.getColor("BLACK"));
         tabsTable = new Table();
         nodesTable = new Table();
 
@@ -48,8 +50,9 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                 viewModel.setOpen(false);
             }
         });
-        Label titleLabel = new Label("Skills", skin);
+        Label titleLabel = new Label("Skills", skin, "text_10");
         titleLabel.setAlignment(1);
+        titleLabel.setColor(skin.getColor("BLACK"));
 
         Table titleRow = new Table();
         titleRow.add(titleLabel).expandX().left().pad(6);
@@ -124,14 +127,21 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
             nodeRow.background(skin.getDrawable("Other_panel_brown"));
             nodeRow.pad(8);
 
-            Label nameLabel = new Label(node.getName(), skin);
-            Label descLabel = new Label(node.getDescription(), skin);
-            Label reqLabel = new Label(requirements, skin);
+            Label nameLabel = new Label(node.getName(), skin, "text_10");
+            nameLabel.setColor(skin.getColor("BLACK"));
+            Label descLabel = new Label(node.getDescription(), skin, "text_10");
+            descLabel.setColor(skin.getColor("BLACK"));
+            Label reqLabel = new Label(requirements, skin, "text_10");
+            reqLabel.setColor(skin.getColor("BLACK"));
+            nameLabel.setWrap(true);
+            descLabel.setWrap(true);
+            reqLabel.setWrap(true);
 
             Table textColumn = new Table();
-            textColumn.add(nameLabel).left().row();
-            textColumn.add(descLabel).left().padTop(4).row();
-            textColumn.add(reqLabel).left().padTop(4).row();
+            textColumn.defaults().left().growX().maxWidth(TEXT_COLUMN_MAX_WIDTH);
+            textColumn.add(nameLabel).row();
+            textColumn.add(descLabel).padTop(4).row();
+            textColumn.add(reqLabel).padTop(4).row();
 
             String buttonText = unlocked ? "Unlocked" : (canUnlock ? "Unlock" : "Locked");
             TextButton actionButton = new TextButton(buttonText, skin);
@@ -147,7 +157,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
                 }
             });
 
-            nodeRow.add(textColumn).expandX().fillX().left().padRight(10);
+            nodeRow.add(textColumn).expandX().fillX().left().padRight(10).maxWidth(TEXT_COLUMN_MAX_WIDTH);
             nodeRow.add(actionButton).right();
             nodesTable.add(nodeRow).row();
         }

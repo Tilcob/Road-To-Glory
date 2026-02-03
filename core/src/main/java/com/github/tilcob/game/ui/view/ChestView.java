@@ -1,11 +1,15 @@
 package com.github.tilcob.game.ui.view;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.TransferChestToPlayerAutoEvent;
 import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
@@ -110,6 +114,7 @@ public class ChestView extends View<ChestViewModel> {
 
             ChestSlot slot = chestSlots[row][col];
             Image itemImage = renderItemInSlot(item, slot);
+            addQuickTransferListener(itemImage, item.getSlotIdx());
             dragAndDrop.addSource(new ChestItemSource(itemImage, item.getSlotIdx()));
         }
     }
@@ -169,5 +174,21 @@ public class ChestView extends View<ChestViewModel> {
             playerSlot.getCountTable().toFront();
         }
         return itemImage;
+    }
+
+    private void addQuickTransferListener(Image itemImage, int slotIndex) {
+        itemImage.addListener(new ClickListener() {
+            @Override
+            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
+                if (!isShiftPressed()) return;
+                event.stop();
+                viewModel.getEventBus().fire(new TransferChestToPlayerAutoEvent(slotIndex));
+            }
+        });
+    }
+
+    private boolean isShiftPressed() {
+        return Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
+            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
     }
 }

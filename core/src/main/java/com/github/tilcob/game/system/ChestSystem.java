@@ -33,6 +33,7 @@ public class ChestSystem extends IteratingSystem implements Disposable {
         eventBus.subscribe(CloseChestEvent.class, this::close);
         eventBus.subscribe(TransferChestToPlayerEvent.class, this::transferChestToPlayer);
         eventBus.subscribe(TransferPlayerToChestEvent.class, this::transferPlayerToChest);
+        eventBus.subscribe(TransferChestToPlayerAutoEvent.class, this::transferChestToPlayerAuto);
         eventBus.subscribe(CommandEvent.class, this::onCommand);
     }
 
@@ -122,18 +123,32 @@ public class ChestSystem extends IteratingSystem implements Disposable {
     }
 
     private void transferChestToPlayer(TransferChestToPlayerEvent event) {
+        transferChestToPlayer(event.fromIndex(), event.toIndex());
+    }
+
+    private void transferChestToPlayerAuto(TransferChestToPlayerAutoEvent event) {
+        if (openChestEntity == null || openPlayer == null) return;
+        Inventory inventory = Inventory.MAPPER.get(openPlayer);
+        if (inventory == null) return;
+        inventoryService.setPlayer(openPlayer);
+        int emptySlot = inventoryService.emptySlotIndex(inventory);
+        if (emptySlot == -1) return;
+        transferChestToPlayer(event.fromIndex(), emptySlot);
+    }
+
+    private void transferChestToPlayer(int fromIndex, int toIndex) {
         if (openChestEntity == null || openPlayer == null) return;
         Chest chest = Chest.MAPPER.get(openChestEntity);
         Inventory inventory = Inventory.MAPPER.get(openPlayer);
         if (chest == null || inventory == null) return;
 
         Array<String> contents = chest.getContents();
-        if (event.fromIndex() < 0 || event.fromIndex() >= contents.size) return;
+        if (fromIndex < 0 || fromIndex >= contents.size) return;
 
-        String itemId = ItemDefinitionRegistry.resolveId(contents.get(event.fromIndex()));
-        if (event.toIndex() < 0 || event.toIndex() >= Constants.INVENTORY_CAPACITY) return;
+        String itemId = ItemDefinitionRegistry.resolveId(contents.get(fromIndex));
+        if (toIndex < 0 || toIndex >= Constants.INVENTORY_CAPACITY) return;
         inventoryService.setPlayer(openPlayer);
-        Entity targetEntity = inventoryService.findItemAtSlot(inventory, event.toIndex());
+        Entity targetEntity = inventoryService.findItemAtSlot(inventory, toIndex);
         if (targetEntity != null) {
             Item targetItem = Item.MAPPER.get(targetEntity);
             if (targetItem == null) return;
@@ -141,7 +156,7 @@ public class ChestSystem extends IteratingSystem implements Disposable {
                 ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
                 if (definition.isStackable() && targetItem.getCount() < definition.maxStack()) {
                     targetItem.add(1);
-                    contents.removeIndex(event.fromIndex());
+                    contents.removeIndex(fromIndex);
                     chest.setContents(contents);
 
                     questManager.signal(openPlayer, "collect", itemId, 1);
@@ -151,9 +166,9 @@ public class ChestSystem extends IteratingSystem implements Disposable {
             }
             return;
         }
-        Entity newItem = inventoryService.spawnItem(itemId, event.toIndex(), inventory.nextId());
+        Entity newItem = inventoryService.spawnItem(itemId, toIndex, inventory.nextId());
         inventory.add(newItem);
-        contents.removeIndex(event.fromIndex());
+        contents.removeIndex(fromIndex);
         chest.setContents(contents);
 
         questManager.signal(openPlayer, "collect", itemId, 1);
@@ -165,6 +180,7 @@ public class ChestSystem extends IteratingSystem implements Disposable {
     public void dispose() {
         eventBus.unsubscribe(CloseChestEvent.class, this::close);
         eventBus.unsubscribe(TransferChestToPlayerEvent.class, this::transferChestToPlayer);
+        eventBus.unsubscribe(TransferChestToPlayerAutoEvent.class, this::transferChestToPlayerAuto);
         eventBus.unsubscribe(TransferPlayerToChestEvent.class, this::transferPlayerToChest);
         eventBus.unsubscribe(CommandEvent.class, this::onCommand);
     }
