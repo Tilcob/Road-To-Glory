@@ -1,7 +1,5 @@
 package com.github.tilcob.game.ui.view;
 
-import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.Input;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -10,6 +8,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.TransferChestToPlayerAutoEvent;
+import com.github.tilcob.game.input.InputService;
 import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
@@ -180,15 +179,10 @@ public class ChestView extends View<ChestViewModel> {
         itemImage.addListener(new ClickListener() {
             @Override
             public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                if (!isShiftPressed()) return;
+                if (!InputService.isShiftPressed()) return;
                 event.stop();
                 viewModel.getEventBus().fire(new TransferChestToPlayerAutoEvent(slotIndex));
             }
         });
-    }
-
-    private boolean isShiftPressed() {
-        return Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
-            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
     }
 }
