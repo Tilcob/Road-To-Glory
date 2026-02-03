@@ -13,7 +13,7 @@ import java.util.EnumMap;
 import java.util.Map;
 
 public class SettingsView extends View<SettingsViewModel> {
-    private final Map<Command, TextButton> keybindButtons = new EnumMap<>(Command.class);
+    private Map<Command, TextButton> keybindButtons;
     private Label keybindStatusLabel;
     private Command listeningCommand;
     private Group selectedItem;
@@ -43,7 +43,20 @@ public class SettingsView extends View<SettingsViewModel> {
         contentTable.add(title).padBottom(15f).row();
 
         Table optionsTable = new Table();
-        contentTable.add(optionsTable).row();
+        optionsTable.top();
+        ScrollPane scrollPane = new ScrollPane(optionsTable, skin);
+        scrollPane.setScrollingDisabled(true, false);
+        scrollPane.setFadeScrollBars(false);
+        scrollPane.setOverscroll(false, false);
+        scrollPane.setForceScroll(false, true);
+        scrollPane.setScrollbarsOnTop(true);
+        scrollPane.setFlickScroll(true);
+        scrollPane.setSmoothScrolling(true);
+        float scrollHeight = 260f;
+        if (stage != null && stage.getViewport() != null) {
+            scrollHeight = Math.max(200f, stage.getViewport().getWorldHeight() - 160f);
+        }
+        contentTable.add(scrollPane).height(scrollHeight).width(520f).row();
 
         Slider musicSlider = setupVolumesSlider(optionsTable, "Music Volume", SettingsOption.MUSIC_VOLUME);
         musicSlider.setValue(viewModel.getMusicVolume());
@@ -53,6 +66,10 @@ public class SettingsView extends View<SettingsViewModel> {
         soundSlider.setValue(viewModel.getSoundVolume());
         onChange(soundSlider, s -> viewModel.setSoundVolume(s.getValue()));
 
+        if (keybindButtons == null) {
+            keybindButtons = new EnumMap<>(Command.class);
+        }
+        setupKeybindingsSection(optionsTable);
         setupKeybindingsSection(optionsTable);
 
         Table backTable = new Table();

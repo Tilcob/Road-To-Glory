@@ -74,14 +74,30 @@ public class SettingsViewModel extends ViewModel {
     }
 
     public List<Command> getBindableCommands() {
-        Map<Command, Set<Integer>> commandBindings = bindings.getCommandBindings();
-        return new ArrayList<>(commandBindings.keySet());
+        Map<Command, java.util.Set<Integer>> commandBindings = bindings.getCommandBindings();
+        List<Command> preferredOrder = List.of(
+            Command.UP,
+            Command.DOWN,
+            Command.LEFT,
+            Command.RIGHT,
+            Command.SELECT,
+            Command.PAUSE,
+            Command.INTERACT,
+            Command.INVENTORY,
+            Command.SKILLS
+        );
+        List<Command> commands = new ArrayList<>();
+        for (Command command : preferredOrder) {
+            if (commandBindings.containsKey(command)) {
+                commands.add(command);
+            }
+        }
+        return commands;
     }
 
     public String getBindingLabel(Command command) {
-        if (command == null) {
-            return "";
-        }
+        if (command == null) return "";
+
         Map<Command, java.util.Set<Integer>> commandBindings = bindings.getCommandBindings();
         java.util.Set<Integer> keys = commandBindings.get(command);
         if (keys == null || keys.isEmpty()) {
@@ -89,7 +105,7 @@ public class SettingsViewModel extends ViewModel {
         }
         StringBuilder builder = new StringBuilder();
         for (int keycode : keys) {
-            if (builder.length() > 0) {
+            if (!builder.isEmpty()) {
                 builder.append(" / ");
             }
             builder.append(Input.Keys.toString(keycode));
@@ -106,9 +122,8 @@ public class SettingsViewModel extends ViewModel {
     }
 
     public void startListening(Command command) {
-        if (command == null || inputManager == null) {
-            return;
-        }
+        if (command == null || inputManager == null) return;
+
         listeningCommand = command;
         pendingConflictKey = null;
         conflictMessage = null;
@@ -119,17 +134,15 @@ public class SettingsViewModel extends ViewModel {
 
     public void resetToDefaults() {
         bindings.resetToDefaults();
-        if (inputManager != null) {
-            inputManager.saveBindings();
-        }
+        if (inputManager != null) inputManager.saveBindings();
+
         propertyChangeSupport.firePropertyChange(Constants.KEYBIND_SAVED, null, null);
     }
 
     private void handleKeyCapture(int keycode) {
         propertyChangeSupport.firePropertyChange(Constants.KEYBIND_KEY_CAPTURED, null, keycode);
-        if (listeningCommand == null) {
-            return;
-        }
+        if (listeningCommand == null) return;
+
         if (pendingConflictKey != null) {
             if (pendingConflictKey == keycode) {
                 applyBinding(keycode);
