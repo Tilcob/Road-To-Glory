@@ -9,6 +9,7 @@ import com.badlogic.gdx.utils.ObjectMap;
 import com.github.tilcob.game.ai.Messages;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.config.ContentPaths;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandCall;
@@ -242,7 +243,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
         while (navigator.hasLines()) {
             ScriptEvent event = navigator.currentLine();
             CommandCall.SourcePos sourcePos = new CommandCall.SourcePos(
-                "dialogs",
+                ContentPaths.DIALOGS_SOURCE,
                 session.getCurrentNodeId(),
                 session.getLineIndex()
             );

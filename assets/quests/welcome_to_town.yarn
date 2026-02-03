@@ -3,6 +3,7 @@ displayName: Welcome to Town
 journalText: Get to know the locals and settle in.
 startNode: q_welcome_to_town_start
 reward_money: 50
+reward_exp: 100
 reward_item: sword
 reward_timing: giver
 step: talk Npc-2

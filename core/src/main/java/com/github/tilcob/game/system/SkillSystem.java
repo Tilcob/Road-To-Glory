@@ -14,8 +14,6 @@ import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 import com.github.tilcob.game.stat.StatModifier;
 import com.github.tilcob.game.stat.StatType;
 
-import java.util.Map;
-
 public class SkillSystem extends IteratingSystem {
     private final GameEventBus eventBus;
 

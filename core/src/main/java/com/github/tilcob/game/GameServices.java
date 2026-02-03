@@ -7,6 +7,7 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.Counters;
 import com.github.tilcob.game.component.DialogFlags;
 import com.github.tilcob.game.component.QuestLog;
+import com.github.tilcob.game.config.ContentPaths;
 import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.dialog.DialogData;
@@ -80,12 +81,12 @@ public class GameServices {
         this.allQuestDialogs = new HashMap<>();
         this.allDialogs = new HashMap<>();
         this.allCutscenes = new HashMap<>();
-        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
+        this.questYarnRegistry = new QuestYarnRegistry(ContentPaths.QUESTS_INDEX);
         this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
         this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
-        this.dialogRepository = new DialogRepository(true, "dialogs",
+        this.dialogRepository = new DialogRepository(true, ContentPaths.DIALOGS_DIR,
             Map.of("Shopkeeper", "shopkeeper"));
-        this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
+        this.cutsceneRepository = new CutsceneRepository(true, ContentPaths.CUTSCENES_DIR);
         this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
         YarnRuntime runtime = new YarnRuntime();
         this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor(), flowBootstrap.functions());

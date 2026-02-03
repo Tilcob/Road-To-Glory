@@ -3,19 +3,14 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.Chest;
 import com.github.tilcob.game.component.Inventory;
-import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.OpenChestRequest;
-import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.entity.TransferPlayerToChestAutoEvent;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.inventory.InventoryService;
-import com.github.tilcob.game.item.ItemDefinition;
-import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.quest.QuestManager;
 
 public class ChestSystem extends IteratingSystem implements Disposable {
