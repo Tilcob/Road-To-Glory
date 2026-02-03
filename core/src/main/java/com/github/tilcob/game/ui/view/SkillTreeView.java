@@ -27,7 +27,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
-        setTouchable(Touchable.enabled);
+        setTouchable(Touchable.disabled);
+        setVisible(false);
 
         rootTable = new Table();
         rootTable.background(skin.getDrawable("Other_panel_brown"));
@@ -82,6 +83,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     }
 
     private void setSkillTreeVisibility(boolean open) {
+        setVisible(open);
         setVisibleBound(open);
         setTouchable(open ? Touchable.enabled : Touchable.disabled);
         if (rootTable != null) {
