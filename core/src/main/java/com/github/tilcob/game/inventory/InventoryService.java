@@ -9,13 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.ItemCreatedEvent;
-import com.github.tilcob.game.event.ItemRemovedEvent;
-import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
+import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.stat.StatType;
 
 public class InventoryService {
@@ -305,5 +303,79 @@ public class InventoryService {
             case UP -> new Vector2(0f, 1f);
             case DOWN -> new Vector2(0f, -1f);
         };
+    }
+
+    public void transferPlayerToChest(int fromIndex, Entity openChestEntity, Entity openPlayer) {
+        if (openChestEntity == null || openPlayer == null) return;
+        Chest chest = Chest.MAPPER.get(openChestEntity);
+        Inventory inventory = Inventory.MAPPER.get(openPlayer);
+        if (chest == null || inventory == null) return;
+
+        setPlayer(openPlayer);
+        Entity itemEntity = findItemAtSlot(inventory, fromIndex);
+        if (itemEntity == null) return;
+
+        Item item = Item.MAPPER.get(itemEntity);
+        if (item == null) return;
+
+        Array<String> contents = chest.getContents();
+        int available = Constants.INVENTORY_CAPACITY - contents.size;
+        if (available <= 0) return;
+
+        int moveCount = Math.min(available, item.getCount());
+        for (int i = 0; i < moveCount; i++) {
+            contents.add(item.getItemId());
+        }
+
+        if (moveCount >= item.getCount()) {
+            inventory.remove(itemEntity);
+            removeItem(itemEntity);
+        } else {
+            item.remove(moveCount);
+        }
+
+        chest.setContents(contents);
+        eventBus.fire(new UpdateInventoryEvent(openPlayer));
+        eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
+    }
+
+    public void transferChestToPlayer(int fromIndex, int toIndex, Entity openChestEntity, Entity openPlayer, QuestManager questManager) {
+        if (openChestEntity == null || openPlayer == null) return;
+        Chest chest = Chest.MAPPER.get(openChestEntity);
+        Inventory inventory = Inventory.MAPPER.get(openPlayer);
+        if (chest == null || inventory == null) return;
+
+        Array<String> contents = chest.getContents();
+        if (fromIndex < 0 || fromIndex >= contents.size) return;
+
+        String itemId = ItemDefinitionRegistry.resolveId(contents.get(fromIndex));
+        if (toIndex < 0 || toIndex >= Constants.INVENTORY_CAPACITY) return;
+        setPlayer(openPlayer);
+        Entity targetEntity = findItemAtSlot(inventory, toIndex);
+        if (targetEntity != null) {
+            Item targetItem = Item.MAPPER.get(targetEntity);
+            if (targetItem == null) return;
+            if (targetItem.getItemId().equals(itemId)) {
+                ItemDefinition definition = ItemDefinitionRegistry.get(itemId);
+                if (definition.isStackable() && targetItem.getCount() < definition.maxStack()) {
+                    targetItem.add(1);
+                    contents.removeIndex(fromIndex);
+                    chest.setContents(contents);
+
+                    questManager.signal(openPlayer, "collect", itemId, 1);
+                    eventBus.fire(new UpdateInventoryEvent(openPlayer));
+                    eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
+                }
+            }
+            return;
+        }
+        Entity newItem = spawnItem(itemId, toIndex, inventory.nextId());
+        inventory.add(newItem);
+        contents.removeIndex(fromIndex);
+        chest.setContents(contents);
+
+        questManager.signal(openPlayer, "collect", itemId, 1);
+        eventBus.fire(new UpdateInventoryEvent(openPlayer));
+        eventBus.fire(new UpdateChestInventoryEvent(openPlayer, openChestEntity));
     }
 }
