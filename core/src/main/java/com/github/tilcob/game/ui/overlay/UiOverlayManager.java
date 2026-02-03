@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.overlay;
 
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.WidgetGroup;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UiOverlayEvent;
@@ -109,6 +110,10 @@ public final class UiOverlayManager {
                 settingsViewModel.setActive(false);
             }
         }
+    }
+
+    public void setOverlayInputEnabled(boolean enabled) {
+        overlayGroup.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
     }
 
     public void dispose() {

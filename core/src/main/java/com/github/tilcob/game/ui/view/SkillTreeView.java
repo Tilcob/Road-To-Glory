@@ -85,6 +85,7 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     private void setSkillTreeVisibility(boolean open) {
         setVisibleBound(open);
         if (open) {
+            toFront();
             refresh();
         }
     }

@@ -22,6 +22,7 @@ import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.UiModelFactory;
 import com.github.tilcob.game.ui.model.*;
+import com.github.tilcob.game.ui.view.SkillTreeView;
 
 public class GameScreenModule {
         private final GameServices services;
@@ -118,8 +119,7 @@ public class GameScreenModule {
                                 physicWorld,
                                 Constants.DEBUG).install(engine);
 
-                stage.addActor(new com.github.tilcob.game.ui.view.SkillTreeView(skin, stage, skillTreeViewModel));
-
+                SkillTreeView skillTreeView = new SkillTreeView(skin, stage, skillTreeViewModel);
                 return new Dependencies(
                                 engine,
                                 tiledManager,
@@ -135,6 +135,7 @@ public class GameScreenModule {
                                 pauseViewModel,
                                 settingsViewModel,
                                 skillTreeViewModel,
+                                skillTreeView,
                                 skin,
                                 inputManager,
                                 services.getAudioManager(),
@@ -156,7 +157,8 @@ public class GameScreenModule {
                         ChestViewModel chestViewModel,
                         PauseViewModel pauseViewModel,
                         SettingsViewModel settingsViewModel,
-                        com.github.tilcob.game.ui.model.SkillTreeViewModel skillTreeViewModel,
+                        SkillTreeViewModel skillTreeViewModel,
+                        SkillTreeView skillTreeView,
                         Skin skin,
                         InputManager inputManager,
                         AudioManager audioManager,

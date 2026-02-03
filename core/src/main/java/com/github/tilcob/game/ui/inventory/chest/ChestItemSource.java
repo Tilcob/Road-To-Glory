@@ -18,16 +18,10 @@ public class ChestItemSource extends DragAndDrop.Source {
 
     @Override
     public DragAndDrop.Payload dragStart(InputEvent event, float x, float y, int pointer) {
-
         DragAndDrop.Payload payload = new DragAndDrop.Payload();
         payload.setObject(this);
         payload.setDragActor(new Image(image.getDrawable()));
         return payload;
-    }
-
-    private boolean isShiftPressed() {
-        return Gdx.input.isKeyPressed(Input.Keys.SHIFT_LEFT)
-            || Gdx.input.isKeyPressed(Input.Keys.SHIFT_RIGHT);
     }
 
     public Image getImage() {
