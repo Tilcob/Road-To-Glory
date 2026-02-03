@@ -9,6 +9,7 @@ Road-To-Glory is a LibGDX-based RPG with a modular architecture split between sh
 - `assets`: Runtime assets bundled with the game.
 - `assets_raw`: Source assets before processing/export.
 - `utils`: Utility scripts and tooling (content validation, index generation).
+- `docs`: Consolidated documentation for modules, assets, and game systems.
 - `skinComposer.scmp`: Skin composer project file used for UI skin assets.
 
 ## Content pipeline
@@ -60,6 +61,8 @@ The core module follows a layered architecture on top of Ashley ECS. The most im
 
 When introducing new packages or major gameplay features, follow the same pattern by adding or extending
 `package-info.java` descriptions so the high-level intent stays discoverable.
+
+Additional module, asset, and ECS system documentation lives in the top-level `docs/` folder.
 
 ## Debug / Strict Mode (Yarn)
 
