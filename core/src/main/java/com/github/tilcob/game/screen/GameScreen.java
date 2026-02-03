@@ -8,6 +8,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -30,6 +31,7 @@ import com.github.tilcob.game.ui.overlay.UiOverlayManager;
 import com.github.tilcob.game.ui.view.DebugOverlayView;
 import com.github.tilcob.game.ui.view.PauseView;
 import com.github.tilcob.game.ui.view.SettingsView;
+import com.github.tilcob.game.ui.view.SkillTreeView;
 import com.github.tilcob.game.world.GameWorldLoader;
 
 import java.util.Objects;
@@ -53,12 +55,14 @@ public class GameScreen extends ScreenAdapter {
     private ChestViewModel chestViewModel;
     private PauseViewModel pauseViewModel;
     private SettingsViewModel settingsViewModel;
+    private SkillTreeViewModel skillTreeViewModel;
     private Skin skin;
     private InputManager inputManager;
     private ActiveEntityReference activeEntityReference;
     private PauseView pauseView;
     private SettingsView settingsView;
     private DebugOverlayView debugOverlayView;
+    private SkillTreeView skillTreeView;
     private boolean paused;
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
@@ -88,9 +92,11 @@ public class GameScreen extends ScreenAdapter {
         this.chestViewModel = dependencies.chestViewModel();
         this.pauseViewModel = dependencies.pauseViewModel();
         this.settingsViewModel = dependencies.settingsViewModel();
+        this.skillTreeViewModel = dependencies.skillTreeViewModel();
         this.skin = dependencies.skin();
         this.inputManager = dependencies.inputManager();
         this.activeEntityReference = dependencies.activeEntityReference();
+        this.skillTreeView = dependencies.skillTreeView();
         this.worldLoader = new GameWorldLoader(new GameWorldLoader.Dependencies(
                 services,
                 engine,
@@ -104,6 +110,9 @@ public class GameScreen extends ScreenAdapter {
         services.getEventBus().subscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().subscribe(PauseEvent.class, this::togglePause);
         services.getUiServices().setSkin(skin);
+        if (skillTreeViewModel != null) {
+            skillTreeViewModel.onPropertyChange(Constants.OPEN_SKILLS, Boolean.class, this::setSkillTreeOverlayState);
+        }
     }
 
     @Override
@@ -145,11 +154,17 @@ public class GameScreen extends ScreenAdapter {
                 inputManager,
                 gameUiGroup,
                 pauseView,
+                pauseViewModel,
                 settingsView,
                 settingsViewModel,
                 true);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(false);
+
+        if (skillTreeView != null) {
+            stage.addActor(skillTreeView);
+            skillTreeView.toFront();
+        }
 
         worldLoader.initializeWorld();
         worldLoader.loadState();
@@ -273,11 +288,15 @@ public class GameScreen extends ScreenAdapter {
                 inputManager,
                 gameUiGroup,
                 pauseView,
+                pauseViewModel,
                 settingsView,
                 Objects.requireNonNull(settingsViewModel, "settingsViewModel"),
                 false);
         uiOverlayManager.show();
         uiOverlayManager.setPaused(paused);
+        if (skillTreeView != null) {
+            skillTreeView.toFront();
+        }
     }
 
     private Entity getPlayer() {
@@ -315,6 +334,10 @@ public class GameScreen extends ScreenAdapter {
         if (settingsViewModel != null) {
             settingsViewModel.setActive(active);
         }
+    }
+
+    private void setSkillTreeOverlayState(boolean open) {
+        if (open && skillTreeView != null) skillTreeView.toFront();
     }
 
     private void clearAllControllerCommands() {

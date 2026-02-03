@@ -48,6 +48,7 @@ public class PlayerStateExtractor {
         }
 
         if (skill != null && !skill.getTrees().isEmpty()) {
+            state.setSharedSkillPoints(skill.getSharedSkillPoints());
             for (var entry : skill.getTrees().entrySet()) {
                 if (entry.getKey() == null || entry.getValue() == null) continue;
                 SkillTreeStateSnapshot snapshot = new SkillTreeStateSnapshot();

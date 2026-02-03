@@ -49,10 +49,12 @@ public class YarnQuestParser {
         }
 
         int rewardMoney = parseRewardMoney(headers, questFile);
+        int rewardExp = parseRewardExp(headers, questFile);
         List<String> rewardItems = parseRewardItems(headers);
         RewardTiming rewardTiming = parseRewardTiming(headers, questFile);
         QuestDefinition.RewardDefinition reward = new QuestDefinition.RewardDefinition(
             rewardMoney,
+            rewardExp,
             List.copyOf(rewardItems)
         );
 
@@ -195,6 +197,14 @@ public class YarnQuestParser {
 
     private int parseRewardMoney(Map<String, List<String>> headers, FileHandle questFile) {
         String value = getFirst(headers, "reward_money");
+        if (value == null || value.isBlank()) {
+            return 0;
+        }
+        return parseInt(value, questFile);
+    }
+
+    private int parseRewardExp(Map<String, List<String>> headers, FileHandle questFile) {
+        String value = getFirst(headers, "reward_exp");
         if (value == null || value.isBlank()) {
             return 0;
         }

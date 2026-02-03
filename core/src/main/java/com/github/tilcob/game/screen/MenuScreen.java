@@ -65,7 +65,8 @@ public class MenuScreen extends ScreenAdapter {
 
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);
-        setViewModelsActive(true);
+        setMenuActive(true);
+        setSettingsActive(false);
 
         menuView = new MenuView(skin, stage, menuViewModel);
         settingsView = new SettingsView(skin, stage, settingsViewModel);
@@ -124,8 +125,12 @@ public class MenuScreen extends ScreenAdapter {
                 } else {
                     closeSettingsOverlay();
                 }
+                setMenuActive(!willOpen);
             }
-            case CLOSE_SETTINGS -> closeSettingsOverlay();
+            case CLOSE_SETTINGS -> {
+                closeSettingsOverlay();
+                setMenuActive(true);
+            }
         }
     }
 
@@ -145,6 +150,18 @@ public class MenuScreen extends ScreenAdapter {
         if (menuViewModel != null) {
             menuViewModel.setActive(active);
         }
+        if (settingsViewModel != null) {
+            settingsViewModel.setActive(active);
+        }
+    }
+
+    private void setMenuActive(boolean active) {
+        if (menuViewModel != null) {
+            menuViewModel.setActive(active);
+        }
+    }
+
+    private void setSettingsActive(boolean active) {
         if (settingsViewModel != null) {
             settingsViewModel.setActive(active);
         }

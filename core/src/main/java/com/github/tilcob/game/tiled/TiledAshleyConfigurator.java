@@ -88,6 +88,7 @@ public class TiledAshleyConfigurator {
         String npcTypeStr = properties.containsKey(Constants.NPC_TYPE)
             ? properties.get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class)
             : tile.getProperties().get(Constants.NPC_TYPE, NpcType.UNDEFINED.name(), String.class);
+        float expMultiplier = properties.get(Constants.EXP_MULTIPLIER, 1.0f, Float.class);
         String name = object.getName();
         boolean canWander = properties.get(Constants.CAN_WANDER, false, Boolean.class);
         if (name == null) return;
@@ -104,10 +105,9 @@ public class TiledAshleyConfigurator {
         entity.add(new AggroMemory());
         entity.add(new Equipment());
         entity.add(new StatModifierComponent());
+        if (NpcType.valueOf(npcTypeStr) == NpcType.ENEMY && expMultiplier > 1) entity.add(new ExpMultiplier(expMultiplier));
         Transform transform = Transform.MAPPER.get(entity);
-        if (transform != null) {
-            entity.add(new SpawnPoint(transform.getPosition()));
-        }
+        if (transform != null) entity.add(new SpawnPoint(transform.getPosition()));
         addPatrolRoute(object, entity);
     }
 

@@ -14,6 +14,6 @@ public record QuestDefinition(
     public record StepDefinition(String type, String npc, String itemId, int amount, String enemy, String journalText) {
     }
 
-    public record RewardDefinition(int money, List<String> items) {
+    public record RewardDefinition(int money, int exp, List<String> items) {
     }
 }

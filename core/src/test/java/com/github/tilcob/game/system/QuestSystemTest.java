@@ -47,7 +47,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         player.add(new QuestLog());
         engine.addEntity(player);
 
-        Quest quest = new Quest("TestQuest", "Test Quest", "Test", new QuestReward(0, List.of()), 1);
+        Quest quest = new Quest("TestQuest", "Test Quest", "Test", new QuestReward(0, 0, List.of()), 1);
         quest.setCurrentStep(1);
         QuestLog.MAPPER.get(player).add(quest);
 
@@ -128,7 +128,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        Quest quest = new Quest("stage_test", "Stage Quest", "Stage", new QuestReward(0, List.of()), 2);
+        Quest quest = new Quest("stage_test", "Stage Quest", "Stage", new QuestReward(0, 0, List.of()), 2);
         questLog.add(quest);
 
         AtomicInteger updateCount = new AtomicInteger();
@@ -153,7 +153,7 @@ class QuestSystemTest extends HeadlessGdxTest {
         QuestLog questLog = new QuestLog();
         player.add(questLog);
 
-        Quest quest = new Quest("complete_test", "Complete Quest", "Complete", new QuestReward(0, List.of()), 1);
+        Quest quest = new Quest("complete_test", "Complete Quest", "Complete", new QuestReward(0, 0, List.of()), 1);
         questLog.add(quest);
 
         AtomicInteger updateCount = new AtomicInteger();

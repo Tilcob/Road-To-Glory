@@ -1,13 +1,13 @@
 {
     "bindings": {
-        "UP": "W",
-        "DOWN": "S",
-        "LEFT": "A",
-        "RIGHT": "D",
-        "SELECT": "SPACEBAR",
-        "PAUSE": "ESC",
-        "INTERACT": "E",
-        "INVENTORY": "I",
-        "SKILLS": "K"
+        "UP": ["W", "UP"],
+        "DOWN": ["S", "DOWN"],
+        "LEFT": ["A", "LEFT"],
+        "RIGHT": ["D", "RIGHT"],
+        "SELECT": ["SPACEBAR", "ENTER"],
+        "PAUSE": ["ESC", "P"],
+        "INTERACT": ["E", "F"],
+        "INVENTORY": ["I", "TAB"],
+        "SKILLS": ["K", "L"]
     }
 }

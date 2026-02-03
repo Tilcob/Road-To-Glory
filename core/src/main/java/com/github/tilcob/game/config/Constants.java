@@ -27,6 +27,7 @@ public class Constants {
     public static final float AGGRO_FORGET_TIME = 2.5f;
     public static final float LEASH_RANGE = 6f;
     public static final float PATROL_WAIT_TIME = 1.5f;
+    public static final int BASE_EXP = 50;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -73,6 +74,7 @@ public class Constants {
     public static final String PATROL_LOOP = "patrolLoop";
     public static final String PATROL_WAIT = "patrolWait";
     public static final String CAN_WANDER = "canWander";
+    public static final String EXP_MULTIPLIER = "expMultiplier";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";

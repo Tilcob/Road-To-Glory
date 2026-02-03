@@ -71,6 +71,7 @@ public class PlayerStateApplier {
 
         if (skill != null && state.getSkillTrees() != null) {
             skill.getTrees().clear();
+            int sharedPoints = state.getSharedSkillPoints();
             for (var entry : state.getSkillTrees().entrySet()) {
                 SkillTreeStateSnapshot snapshot = entry.getValue();
                 if (entry.getKey() == null || snapshot == null) continue;
@@ -81,7 +82,11 @@ public class PlayerStateApplier {
                     treeState.addUnlockedNode(nodeId);
                 }
                 skill.getTrees().put(entry.getKey(), treeState);
+                if (sharedPoints == 0 && snapshot.getSkillPoints() > 0) {
+                    sharedPoints += snapshot.getSkillPoints();
+                }
             }
+            skill.setSharedSkillPoints(sharedPoints);
         }
 
         if (state.getStatModifiers() != null) {

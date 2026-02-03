@@ -5,9 +5,9 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.skill.SkillTreeLoader;
 import com.github.tilcob.game.skill.data.SkillNodeDefinition;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;
@@ -23,7 +23,7 @@ public class SkillSystem extends IteratingSystem {
         super(Family.all(Skill.class).get());
         this.eventBus = eventBus;
 
-        eventBus.subscribe(XPGainEvent.class, this::onXpGain);
+        eventBus.subscribe(ExpGainEvent.class, this::onXpGain);
         eventBus.subscribe(SkillUnlockEvent.class, this::onSkillUnlock);
     }
 
@@ -32,7 +32,7 @@ public class SkillSystem extends IteratingSystem {
         // Nothing to process per frame currently
     }
 
-    private void onXpGain(XPGainEvent event) {
+    private void onXpGain(ExpGainEvent event) {
         Skill skillComp = Skill.MAPPER.get(event.entity());
         if (skillComp == null) return;
 
@@ -42,16 +42,18 @@ public class SkillSystem extends IteratingSystem {
         SkillTreeState state = skillComp.getTreeState(event.treeId());
         state.setCurrentXp(state.getCurrentXp() + event.amount());
 
-        checkLevelUp(event.entity(), event.treeId(), state, def);
+        checkLevelUp(event.entity(), event.treeId(), skillComp, state, def);
     }
 
-    private void checkLevelUp(Entity entity, String treeId, SkillTreeState state, SkillTreeDefinition def) {
+    private void checkLevelUp(Entity entity, String treeId, Skill skill, SkillTreeState state, SkillTreeDefinition def) {
         int[] xpTable = def.getXpTable();
         int levelsGained = 0;
 
         while (state.getCurrentLevel() < xpTable.length && state.getCurrentXp() >= xpTable[state.getCurrentLevel()]) {
             state.setCurrentLevel(state.getCurrentLevel() + 1);
-            state.setSkillPoints(state.getSkillPoints() + 1); // 1 point per level
+            if (skill != null) {
+                skill.addSharedSkillPoints(1);
+            }
             levelsGained++;
         }
 
@@ -77,7 +79,7 @@ public class SkillSystem extends IteratingSystem {
 
         if (nodeDef == null) return;
         int displayLevel = state.getCurrentLevel() + 1;
-        if (state.getSkillPoints() < nodeDef.getCost()) return;
+        if (skillComp.getSharedSkillPoints() < nodeDef.getCost()) return;
         if (displayLevel < nodeDef.getRequiredLevel()) return;
 
         if (nodeDef.getParentIds() != null) {
@@ -86,7 +88,7 @@ public class SkillSystem extends IteratingSystem {
             }
         }
 
-        state.setSkillPoints(state.getSkillPoints() - nodeDef.getCost());
+        if (!skillComp.spendSharedSkillPoints(nodeDef.getCost())) return;
         state.addUnlockedNode(event.nodeId());
 
         applyModifiers(event.entity(), nodeDef);
@@ -100,9 +102,23 @@ public class SkillSystem extends IteratingSystem {
         StatModifierComponent modifierComp = StatModifierComponent.MAPPER.get(entity);
         if (modifierComp == null) return;
 
-        for (Map.Entry<StatType, Float> entry : nodeDef.getModifiers().entrySet()) {
+        for (var entry : nodeDef.getModifiers().entrySet()) {
+            String statKey = entry.getKey();
+            if (statKey == null) {
+                Gdx.app.error("SkillSystem", "Null stat type key in skill node '" + nodeDef.getId() + "'.");
+                continue;
+            }
+            StatType statType = StatType.fromId(statKey);
+            if (statType == null) {
+                try {
+                    statType = StatType.valueOf(statKey);
+                } catch (IllegalArgumentException ex) {
+                    Gdx.app.error("SkillSystem", "Unknown stat type '" + statKey + "' in skill node '" + nodeDef.getId() + "'.");
+                    continue;
+                }
+            }
             String source = "skill:" + nodeDef.getId();
-            modifierComp.addModifier(new StatModifier(entry.getKey(), entry.getValue(), 0f, source));
+            modifierComp.addModifier(new StatModifier(statType, entry.getValue(), 0f, source));
         }
 
         eventBus.fire(new StatRecalcEvent(entity));

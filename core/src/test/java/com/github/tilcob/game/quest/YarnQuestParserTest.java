@@ -21,6 +21,7 @@ class YarnQuestParserTest extends HeadlessGdxTest {
             journalText: Verify dot headers.
             startNode: q_reward_headers_start
             reward_money: 25
+            reward_exp: 40
             reward_item: sword
             reward_items: shield, potion
             reward_timing: giver
@@ -39,6 +40,7 @@ class YarnQuestParserTest extends HeadlessGdxTest {
         assertNotNull(definition);
         assertEquals("reward_headers", definition.questId());
         assertEquals(25, definition.reward().money());
+        assertEquals(40, definition.reward().exp());
         assertEquals(RewardTiming.GIVER, definition.rewardTiming());
         assertTrue(definition.reward().items().contains("sword"));
         assertTrue(definition.reward().items().contains("shield"));

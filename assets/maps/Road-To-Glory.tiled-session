@@ -10,8 +10,8 @@
     "fileStates": {
         "house.tmx": {
             "expandedObjectLayers": [
-                4,
-                3
+                3,
+                4
             ],
             "scale": 2,
             "selectedLayer": 3,
@@ -22,14 +22,14 @@
         },
         "main.tmx": {
             "expandedObjectLayers": [
-                3,
-                5
+                5,
+                3
             ],
-            "scale": 1.5,
+            "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 256,
-                "y": 190.33333333333331
+                "x": 264,
+                "y": 159.75
             }
         },
         "objects.tsx": {
@@ -68,12 +68,12 @@
         "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "bool",
+    "property.type": "float",
     "recentFiles": [
         "terrain.tsx",
-        "player.tmx",
         "objects.tsx",
         "house.tmx",
-        "main.tmx"
+        "main.tmx",
+        "player.tmx"
     ]
 }

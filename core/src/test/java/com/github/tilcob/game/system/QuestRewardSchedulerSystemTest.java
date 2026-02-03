@@ -93,7 +93,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
         player.add(questLog);
-        QuestReward reward = new QuestReward(0, List.of());
+        QuestReward reward = new QuestReward(0, 0, List.of());
         Quest quest = new Quest("giver_reward_test", "Giver Reward", "Reward after dialog", reward, 1);
         quest.setCurrentStep(quest.getTotalStages());
         questLog.add(quest);
@@ -125,7 +125,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
         player.add(questLog);
-        QuestReward reward = new QuestReward(12, List.of());
+        QuestReward reward = new QuestReward(12, 0, List.of());
         Quest quest = new Quest("giver_reward_test", "Giver Reward", "Reward after dialog", reward, 1);
         quest.setCurrentStep(quest.getTotalStages());
         questLog.add(quest);
@@ -167,7 +167,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
         player.add(questLog);
-        QuestReward reward = new QuestReward(8, List.of());
+        QuestReward reward = new QuestReward(8, 0, List.of());
         Quest quest = new Quest("completion_reward_test", "Completion Reward", "Reward on completion", reward, 1);
         quest.setCurrentStep(quest.getTotalStages());
         questLog.add(quest);
@@ -204,7 +204,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
         player.add(questLog);
-        QuestReward reward = new QuestReward(6, List.of());
+        QuestReward reward = new QuestReward(6, 0, List.of());
         Quest quest = new Quest("auto_reward_test", "Auto Reward", "Reward on completion", reward, 1);
         quest.setCurrentStep(quest.getTotalStages());
         questLog.add(quest);

@@ -1,6 +1,7 @@
 package com.github.tilcob.game.ui.inventory.chest;
 
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.github.tilcob.game.event.DragAndDropChestEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.TransferPlayerToChestEvent;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
@@ -32,6 +33,8 @@ public class ChestSlotTarget extends DragAndDrop.Target {
             eventBus.fire(new TransferPlayerToChestEvent(playerItemSource.getFromIdx(), toIdx));
         } else if (payloadObject instanceof EquipmentItemSource equipmentItemSource) {
             eventBus.fire(new TransferPlayerToChestEvent(equipmentItemSource.getFromIdx(), toIdx));
+        } else if (payloadObject instanceof ChestItemSource chestItemSource) {
+            eventBus.fire(new DragAndDropChestEvent(chestItemSource.getFromIdx(), toIdx));
         }
     }
 }

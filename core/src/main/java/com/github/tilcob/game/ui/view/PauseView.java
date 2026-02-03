@@ -86,7 +86,7 @@ public class PauseView extends View<PauseViewModel> {
     public void resetSelection() {
         Group resumeItem = findActor(PauseOption.RESUME.name());
         if (resumeItem != null) {
-            viewModel.getUiServices().selectMenuItem(resumeItem);
+            selectedItem = viewModel.getUiServices().selectMenuItem(resumeItem);
         }
     }
 

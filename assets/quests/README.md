@@ -27,6 +27,7 @@ Innside the quest file headers (before the first `---`):
   (one per step, in order).
 - Rewards are optional and defined via:
     - `reward_money:`
+    - `reward_exp:`
     - `reward_item:`
     - `reward_items:`
 - Reward timing is optional via `reward_timing:`
@@ -50,6 +51,7 @@ to quests, not dialog effects.
 Supported fields:
 
 - `reward_money`: currency amount added to the player's wallet.
+- `reward_exp`: experience amount granted on quest completion (uses the `quest` XP distribution).
 - `reward_item`: item definition IDs (for example, `sword`). Repeat the line per item.
 - `reward_items`: comma-separated item definition IDs.
 - `reward_timing`: when rewards are delivered. Use `giver`, `completion`, or `auto` (defaults to `giver`).
@@ -92,6 +94,7 @@ displayName: Welcome to Town
 journalText: Get to know the locals and settle in.
 startNode: q_welcome_to_town_start
 reward_money: 50
+reward_exp: 40
 reward_item: sword
 reward_timing: giver
 step: talk Npc-2
@@ -122,6 +125,7 @@ displayName: Gather Supplies
 journalText: Stock up before the next journey.
 startNode: q_gather_supplies_start
 reward_money: 30
+reward_exp: 15
 reward_item: bread
 reward_timing: completion
 step: talk Shopkeeper

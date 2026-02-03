@@ -2,12 +2,12 @@ package com.github.tilcob.game.ui.model;
 
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.event.LevelUpEvent;
-import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.LevelUpEvent;
 import com.github.tilcob.game.event.SkillUnlockEvent;
 import com.github.tilcob.game.event.UiEvent;
 import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.skill.SkillTreeLoader;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 
@@ -53,6 +53,12 @@ public class SkillTreeViewModel extends ViewModel {
         Skill comp = Skill.MAPPER.get(services.getEntityLookup().getPlayer());
         if (comp == null) return null;
         return comp.getTreeState(activeTreeId);
+    }
+
+    public int getSharedSkillPoints() {
+        Skill comp = Skill.MAPPER.get(services.getEntityLookup().getPlayer());
+        if (comp == null) return 0;
+        return comp.getSharedSkillPoints();
     }
 
     public void unlockNode(String nodeId) {
