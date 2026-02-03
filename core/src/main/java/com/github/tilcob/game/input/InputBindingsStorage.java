@@ -41,6 +41,7 @@ public class InputBindingsStorage {
             InputBindings.BindingFile data = json.fromJson(InputBindings.BindingFile.class, file);
             return InputBindings.fromBindingFile(data);
         } catch (Exception ex) {
+            Gdx.app.error("InputBindingsStorage", ex.getMessage());
             return InputBindings.defaultBindings();
         }
     }

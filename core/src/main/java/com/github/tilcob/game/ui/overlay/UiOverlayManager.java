@@ -20,10 +20,12 @@ public final class UiOverlayManager {
     private final Group gameUiGroup;
     private final WidgetGroup overlayGroup;
     private final PauseView pauseView;
+    private final SettingsView settingsView;
     private final PauseViewModel pauseViewModel;
     private final SettingsViewModel settingsViewModel;
     private final SettingsOverlayController settingsOverlayController;
     private final boolean closeSettingsOnShow;
+    private boolean overlayInputEnabled = true;
     private boolean paused;
 
     public UiOverlayManager(
@@ -44,6 +46,7 @@ public final class UiOverlayManager {
         this.overlayGroup.setFillParent(true);
         this.pauseView = pauseView;
         this.pauseViewModel = pauseViewModel;
+        this.settingsView = settingsView;
         this.settingsViewModel = settingsViewModel;
         this.settingsOverlayController = new SettingsOverlayController(
             pauseView,
@@ -61,6 +64,7 @@ public final class UiOverlayManager {
         settingsView.remove();
         settingsView.setVisible(settingsViewModel != null && settingsViewModel.isOpen());
         overlayGroup.addActor(settingsView);
+        updateOverlayInputState();
     }
 
     public void show() {
@@ -110,10 +114,12 @@ public final class UiOverlayManager {
                 settingsViewModel.setActive(false);
             }
         }
+        updateOverlayInputState();
     }
 
     public void setOverlayInputEnabled(boolean enabled) {
-        overlayGroup.setTouchable(enabled ? Touchable.enabled : Touchable.disabled);
+        overlayInputEnabled = enabled;
+        updateOverlayInputState();
     }
 
     public void dispose() {
@@ -142,6 +148,7 @@ public final class UiOverlayManager {
         if (pauseViewModel != null) {
             pauseViewModel.setActive(true);
         }
+        updateOverlayInputState();
     }
 
     private void openSettingsOverlay() {
@@ -149,5 +156,14 @@ public final class UiOverlayManager {
         if (pauseViewModel != null) {
             pauseViewModel.setActive(false);
         }
+        updateOverlayInputState();
+    }
+
+    private void updateOverlayInputState() {
+        boolean hasVisibleOverlay = pauseView.isVisible()
+            || (settingsView != null && settingsView.isVisible());
+        overlayGroup.setTouchable(
+            overlayInputEnabled && hasVisibleOverlay ? Touchable.childrenOnly : Touchable.disabled
+        );
     }
 }
