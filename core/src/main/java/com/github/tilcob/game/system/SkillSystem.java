@@ -102,9 +102,23 @@ public class SkillSystem extends IteratingSystem {
         StatModifierComponent modifierComp = StatModifierComponent.MAPPER.get(entity);
         if (modifierComp == null) return;
 
-        for (Map.Entry<StatType, Float> entry : nodeDef.getModifiers().entrySet()) {
+        for (var entry : nodeDef.getModifiers().entrySet()) {
+            String statKey = entry.getKey();
+            if (statKey == null) {
+                Gdx.app.error("SkillSystem", "Null stat type key in skill node '" + nodeDef.getId() + "'.");
+                continue;
+            }
+            StatType statType = StatType.fromId(statKey);
+            if (statType == null) {
+                try {
+                    statType = StatType.valueOf(statKey);
+                } catch (IllegalArgumentException ex) {
+                    Gdx.app.error("SkillSystem", "Unknown stat type '" + statKey + "' in skill node '" + nodeDef.getId() + "'.");
+                    continue;
+                }
+            }
             String source = "skill:" + nodeDef.getId();
-            modifierComp.addModifier(new StatModifier(entry.getKey(), entry.getValue(), 0f, source));
+            modifierComp.addModifier(new StatModifier(statType, entry.getValue(), 0f, source));
         }
 
         eventBus.fire(new StatRecalcEvent(entity));

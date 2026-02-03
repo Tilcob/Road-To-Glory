@@ -3,6 +3,7 @@ package com.github.tilcob.game.skill.data;
 import com.github.tilcob.game.stat.StatType;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class SkillNodeDefinition {
     private String id;
@@ -11,7 +12,7 @@ public class SkillNodeDefinition {
     private int cost;
     private int requiredLevel;
     private String[] parentIds;
-    private HashMap<StatType, Float> modifiers;
+    private Map<String, Float> modifiers;
 
     public String getId() {
         return id;
@@ -37,7 +38,7 @@ public class SkillNodeDefinition {
         return parentIds;
     }
 
-    public HashMap<StatType, Float> getModifiers() {
+    public Map<String, Float> getModifiers() {
         return modifiers;
     }
 }
