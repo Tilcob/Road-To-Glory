@@ -2,6 +2,7 @@ package com.github.tilcob.game.ui.view;
 
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Scaling;
@@ -9,6 +10,7 @@ import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.quest.Quest;
+import com.github.tilcob.game.stat.StatType;
 import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlot;
@@ -18,17 +20,26 @@ import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 
+import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
 
 public class InventoryView extends View<InventoryViewModel> {
-    private Table inventoryRoot;
+    private Table inventoryContent;
+    private Table questContent;
+    private TextButton inventoryTabButton;
+    private TextButton questTabButton;
     private PlayerSlot[][] slots;
     private EnumMap<ItemCategory, EquipmentSlot> equipmentSlots;
     private Table questLog;
+    private Table questSteps;
     private Label itemDetailsLabel;
-    private ShiftClickHandler shiftClickHandler;
+    private Table statsTable;
     private ShiftClickListener shiftClickListener;
     private final IntSet occupiedPlayerSlots = new IntSet();
+    private final Array<Quest> quests = new Array<>();
+    private Quest selectedQuest;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -40,95 +51,52 @@ public class InventoryView extends View<InventoryViewModel> {
         slots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         equipmentSlots = new EnumMap<>(ItemCategory.class);
         dragAndDrop = new InventoryDragAndDrop();
-        shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
+        ShiftClickHandler shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
         shiftClickListener = new ShiftClickListener(shiftClickHandler, buildShiftClickContext());
 
-        inventoryRoot = new Table();
+        Table inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
         setRoot(inventoryRoot);
         setVisibleBound(false);
 
         addActor(inventoryRoot);
 
-        Table table1 = new Table();
-        table1.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label label = new Label("Inventory", skin, "text_12");
-        label.setColor(skin.getColor("BLACK"));
-        table1.add(label).row();
-        Table contentTable = new Table();
-
-        for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
-            for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
-                int index = i * Constants.INVENTORY_COLUMNS + j;
-                PlayerSlot slot = new PlayerSlot(index, skin, viewModel.getEventBus());
-                this.slots[i][j] = slot;
-                contentTable.add(slot).size(35,35);
-            }
-            contentTable.row();
-        }
-        table1.add(contentTable).pad(5.0f);
-
-        Table equipmentTable = new Table();
-        equipmentTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label equipmentLabel = new Label("Equipment", skin, "text_12");
-        equipmentLabel.setColor(skin.getColor("BLACK"));
-        equipmentTable.add(equipmentLabel).row();
-        Table equipmentGrid = new Table();
-        ItemCategory[] equipmentCategories = {
-            ItemCategory.HELMET,
-            ItemCategory.ARMOR,
-            ItemCategory.WEAPON,
-            ItemCategory.SHIELD,
-            ItemCategory.BOOTS,
-            ItemCategory.NECKLACE,
-            ItemCategory.BRACELET,
-            ItemCategory.RING
-        };
-        int columns = 4;
-        for (int i = 0; i < equipmentCategories.length; i++) {
-            ItemCategory category = equipmentCategories[i];
-            EquipmentSlot equipmentSlot = new EquipmentSlot(skin, viewModel.getEventBus());
-            equipmentSlots.put(category, equipmentSlot);
-            equipmentGrid.add(buildEquipmentSlot(category, equipmentSlot)).size(35, 35).pad(2.0f);
-            if ((i + 1) % columns == 0) {
-                equipmentGrid.row();
-            }
-        }
-        equipmentTable.add(equipmentGrid).pad(5.0f);
-
-        Table scrollTable = new Table();
-        scrollTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label questLabel = new Label("Quest Log", skin, "text_12");
-        questLabel.setColor(skin.getColor("BLACK"));
-        scrollTable.add(questLabel).row();
-
-        questLog = new Table();
-        ScrollPane scrollPane = new ScrollPane(questLog, skin);
-        scrollPane.setHeight(inventoryRoot.getHeight());
-        scrollPane.setScrollingDisabled(true, false);
-        scrollTable.add(scrollPane);
-
-        Table detailsTable = new Table();
-        detailsTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label detailsHeader = new Label("Item Details", skin, "text_12");
-        detailsHeader.setColor(skin.getColor("BLACK"));
-        detailsTable.add(detailsHeader).left().row();
-
-        itemDetailsLabel = new Label("Hover an item to see details.", skin, "text_08");
-        itemDetailsLabel.setColor(skin.getColor("BLACK"));
-        itemDetailsLabel.setWrap(true);
-        detailsTable.add(itemDetailsLabel).left().width(280).pad(4.0f);
-
         Table panelRoot = new Table();
-        panelRoot.defaults().pad(5.0f);
+        panelRoot.setBackground(skin.getDrawable("Other_panel_brown"));
+        panelRoot.pad(10.0f);
+        panelRoot.top();
 
-        panelRoot.add(table1).top();
-        panelRoot.add(equipmentTable).top();
-        panelRoot.add(scrollTable).top().row();
-        panelRoot.add(detailsTable).colspan(3).left();
+        Table tabsTable = new Table();
+        inventoryTabButton = new TextButton("Inventory", skin);
+        questTabButton = new TextButton("Quests", skin);
+        inventoryTabButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                setActiveTab(InventoryTab.INVENTORY);
+            }
+        });
+        questTabButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                setActiveTab(InventoryTab.QUESTS);
+            }
+        });
+        tabsTable.add(inventoryTabButton).padRight(6).height(32);
+        tabsTable.add(questTabButton).height(32);
+
+        Stack contentStack = new Stack();
+        inventoryContent = buildInventoryContent();
+        questContent = buildQuestContent();
+        contentStack.add(inventoryContent);
+        contentStack.add(questContent);
+
+        panelRoot.add(tabsTable).left().row();
+        panelRoot.add(contentStack).expand().fill().padTop(6.0f);
 
         inventoryRoot.clearChildren();
         inventoryRoot.add(panelRoot).center();
+
+        setActiveTab(InventoryTab.INVENTORY);
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
@@ -148,22 +116,25 @@ public class InventoryView extends View<InventoryViewModel> {
         viewModel.onPropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, Array.class, this::updatePlayerItems);
         viewModel.onPropertyChange(Constants.OPEN_INVENTORY, Boolean.class, this::setInventoryVisibility);
         viewModel.onPropertyChange(Constants.ADD_QUESTS, Array.class, this::updateQuests);
+        viewModel.onPropertyChange(Constants.UPDATE_STATS, Map.class, this::updateStats);
     }
 
     private void updateQuests(Array<Quest> quests) {
-        questLog.clear();
-        for (Quest quest : quests) {
-            String questTitle = quest.getTitle();
-            if (questTitle == null || questTitle.isBlank()) {
-                questTitle = quest.getQuestId().replace("_", " ");
-            }
-            Label label = new Label(questTitle, skin, "text_08");
-            label.setColor(skin.getColor("BLACK"));
-            Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
-            image.setVisible(quest.isCompleted());
-            questLog.add(label);
-            questLog.add(image).row();
+        this.quests.clear();
+        if (quests != null) {
+            this.quests.addAll(quests);
         }
+        Quest preserved = null;
+        if (selectedQuest != null) {
+            for (Quest quest : this.quests) {
+                if (quest.getQuestId().equals(selectedQuest.getQuestId())) {
+                    preserved = quest;
+                    break;
+                }
+            }
+        }
+        selectedQuest = preserved;
+        rebuildQuestList();
     }
 
     private void updatePlayerItems(Array<ItemModel> array) {
@@ -207,6 +178,200 @@ public class InventoryView extends View<InventoryViewModel> {
         setVisibleBound(isVisible);
     }
 
+    private void setActiveTab(InventoryTab tab) {
+        boolean isInventory = tab == InventoryTab.INVENTORY;
+        inventoryTabButton.setDisabled(isInventory);
+        questTabButton.setDisabled(!isInventory);
+        inventoryContent.setVisible(isInventory);
+        inventoryContent.setTouchable(isInventory ? Touchable.enabled : Touchable.disabled);
+        questContent.setVisible(!isInventory);
+        questContent.setTouchable(!isInventory ? Touchable.enabled : Touchable.disabled);
+    }
+
+    private Table buildInventoryContent() {
+        Table table1 = new Table();
+        table1.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label label = new Label("Inventory", skin, "text_12");
+        label.setColor(skin.getColor("BLACK"));
+        table1.add(label).row();
+        Table contentTable = new Table();
+
+        for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
+            for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
+                int index = i * Constants.INVENTORY_COLUMNS + j;
+                PlayerSlot slot = new PlayerSlot(index, skin, viewModel.getEventBus());
+                this.slots[i][j] = slot;
+                contentTable.add(slot).size(35, 35);
+            }
+            contentTable.row();
+        }
+        table1.add(contentTable).pad(5.0f);
+
+        Table equipmentTable = new Table();
+        equipmentTable.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label equipmentLabel = new Label("Equipment", skin, "text_12");
+        equipmentLabel.setColor(skin.getColor("BLACK"));
+        equipmentTable.add(equipmentLabel).row();
+        Table equipmentGrid = new Table();
+        ItemCategory[] equipmentCategories = {
+            ItemCategory.HELMET,
+            ItemCategory.ARMOR,
+            ItemCategory.WEAPON,
+            ItemCategory.SHIELD,
+            ItemCategory.BOOTS,
+            ItemCategory.NECKLACE,
+            ItemCategory.BRACELET,
+            ItemCategory.RING
+        };
+        int columns = 4;
+        for (int i = 0; i < equipmentCategories.length; i++) {
+            ItemCategory category = equipmentCategories[i];
+            EquipmentSlot equipmentSlot = new EquipmentSlot(skin, viewModel.getEventBus());
+            equipmentSlots.put(category, equipmentSlot);
+            equipmentGrid.add(buildEquipmentSlot(category, equipmentSlot)).size(35, 35).pad(2.0f);
+            if ((i + 1) % columns == 0) {
+                equipmentGrid.row();
+            }
+        }
+        equipmentTable.add(equipmentGrid).pad(5.0f);
+
+        Table detailsTable = new Table();
+        detailsTable.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label detailsHeader = new Label("Item Details", skin, "text_12");
+        detailsHeader.setColor(skin.getColor("BLACK"));
+        detailsTable.add(detailsHeader).left().row();
+
+        itemDetailsLabel = new Label("Hover an item to see details.", skin, "text_08");
+        itemDetailsLabel.setColor(skin.getColor("BLACK"));
+        itemDetailsLabel.setWrap(true);
+        detailsTable.add(itemDetailsLabel).left().width(280).pad(4.0f);
+
+        Table statsPanel = new Table();
+        statsPanel.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label statsHeader = new Label("Stats", skin, "text_12");
+        statsHeader.setColor(skin.getColor("BLACK"));
+        statsPanel.add(statsHeader).left().row();
+
+        statsTable = new Table();
+        statsTable.defaults().left().padBottom(2.0f);
+        statsPanel.add(statsTable).left().pad(4.0f);
+
+        Table leftColumn = new Table();
+        leftColumn.add(table1).left().row();
+        leftColumn.add(detailsTable).left().padTop(6.0f);
+
+        Table rightColumn = new Table();
+        rightColumn.add(equipmentTable).left().row();
+        rightColumn.add(statsPanel).left().padTop(6.0f);
+
+        Table content = new Table();
+        content.defaults().pad(6.0f);
+        content.add(leftColumn).top();
+        content.add(rightColumn).top();
+
+        return content;
+    }
+
+    private Table buildQuestContent() {
+        Table questListPanel = new Table();
+        questListPanel.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label questLabel = new Label("Quests", skin, "text_12");
+        questLabel.setColor(skin.getColor("BLACK"));
+        questListPanel.add(questLabel).left().row();
+
+        questLog = new Table();
+        ScrollPane questScrollPane = new ScrollPane(questLog, skin);
+        questScrollPane.setFadeScrollBars(false);
+        questScrollPane.setScrollingDisabled(true, false);
+        questScrollPane.setOverscroll(false, false);
+        questListPanel.add(questScrollPane).expand().fill().padTop(4.0f);
+
+        Table questStepsPanel = new Table();
+        questStepsPanel.setBackground(skin.getDrawable("Other_panel_brown"));
+        Label stepsLabel = new Label("Quest Steps", skin, "text_12");
+        stepsLabel.setColor(skin.getColor("BLACK"));
+        questStepsPanel.add(stepsLabel).left().row();
+
+        questSteps = new Table();
+        ScrollPane stepsScrollPane = new ScrollPane(questSteps, skin);
+        stepsScrollPane.setFadeScrollBars(false);
+        stepsScrollPane.setScrollingDisabled(true, false);
+        stepsScrollPane.setOverscroll(false, false);
+        questStepsPanel.add(stepsScrollPane).expand().fill().padTop(4.0f);
+
+        Table content = new Table();
+        content.defaults().pad(6.0f);
+        content.add(questListPanel).top().expandY().fillY().width(260);
+        content.add(questStepsPanel).top().expand().fill();
+        return content;
+    }
+
+    private void rebuildQuestList() {
+        questLog.clear();
+        if (quests.isEmpty()) {
+            Label emptyLabel = new Label("No quests available.", skin, "text_08");
+            emptyLabel.setColor(skin.getColor("BLACK"));
+            questLog.add(emptyLabel).left().row();
+            updateQuestSteps(null);
+            return;
+        }
+
+        List<Quest> incomplete = new ArrayList<>();
+        List<Quest> completed = new ArrayList<>();
+
+        for (Quest quest : quests) {
+            if (quest.isCompleted()) {
+                completed.add(quest);
+            } else {
+                incomplete.add(quest);
+            }
+        }
+        Quest defaultQuest = selectedQuest;
+        for (Quest quest : incomplete) {
+            buildQuestRow(quest);
+            if (defaultQuest == null) {
+                defaultQuest = quest;
+            }
+        }
+        for (Quest quest : completed) {
+            buildQuestRow(quest);
+            if (defaultQuest == null) {
+                defaultQuest = quest;
+            }
+        }
+        if (defaultQuest != null) {
+            setSelectedQuest(defaultQuest);
+        } else {
+            updateQuestSteps(null);
+        }
+    }
+
+    private void buildQuestRow(Quest quest) {
+        Table row = new Table();
+        row.setTouchable(Touchable.enabled);
+        row.pad(4.0f);
+        String questTitle = quest.getTitle();
+        if (questTitle == null || questTitle.isBlank()) {
+            questTitle = quest.getQuestId().replace("_", " ");
+        }
+        Label label = new Label(questTitle, skin, "text_08");
+        label.setColor(skin.getColor("BLACK"));
+        label.setWrap(true);
+        Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
+        image.setVisible(quest.isCompleted());
+        row.add(label).left().expandX().fillX();
+        row.add(image).right().padLeft(4.0f);
+
+        row.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                setSelectedQuest(quest);
+            }
+        });
+
+        questLog.add(row).expandX().fillX().row();
+    }
+
     private Stack buildEquipmentSlot(ItemCategory category, EquipmentSlot slot) {
         Stack stack = new Stack();
         stack.add(slot);
@@ -247,6 +412,102 @@ public class InventoryView extends View<InventoryViewModel> {
     private void clearItemDetails() {
         if (itemDetailsLabel != null) {
             itemDetailsLabel.setText("Hover an item to see details.");
+        }
+    }
+
+    private void updateStats(Map<StatType, Float> stats) {
+        if (statsTable == null) return;
+        statsTable.clear();
+        if (stats == null || stats.isEmpty()) {
+            Label emptyLabel = new Label("No stats available.", skin, "text_08");
+            emptyLabel.setColor(skin.getColor("BLACK"));
+            statsTable.add(emptyLabel).left().row();
+            return;
+        }
+        for (StatType type : StatType.values()) {
+            Float value = stats.get(type);
+            if (value == null) continue;
+            String name = formatStatName(type);
+            Label statLabel = new Label(name + ": " + String.format("%.0f", value), skin, "text_08");
+            statLabel.setColor(skin.getColor("BLACK"));
+            statsTable.add(statLabel).left().row();
+        }
+    }
+
+    private String formatStatName(StatType type) {
+        String raw = type.getId().replace("_", " ");
+        String[] parts = raw.split(" ");
+        StringBuilder builder = new StringBuilder();
+        for (String part : parts) {
+            if (part.isBlank()) continue;
+            if (!builder.isEmpty()) builder.append(' ');
+            builder.append(Character.toUpperCase(part.charAt(0)));
+            if (part.length() > 1) {
+                builder.append(part.substring(1));
+            }
+        }
+        return builder.toString();
+    }
+
+    private void setSelectedQuest(Quest quest) {
+        selectedQuest = quest;
+        updateQuestSteps(quest);
+    }
+
+    private void updateQuestSteps(Quest quest) {
+        questSteps.clear();
+        if (quest == null) {
+            Label emptyLabel = new Label("Select a quest to see its steps.", skin, "text_08");
+            emptyLabel.setColor(skin.getColor("BLACK"));
+            questSteps.add(emptyLabel).left().row();
+            return;
+        }
+
+        String questTitle = quest.getTitle();
+        if (questTitle == null || questTitle.isBlank()) {
+            questTitle = quest.getQuestId().replace("_", " ");
+        }
+
+        Label titleLabel = new Label(questTitle, skin, "text_10");
+        titleLabel.setColor(skin.getColor("BLACK"));
+        titleLabel.setWrap(true);
+        questSteps.add(titleLabel).left().row();
+
+        if (quest.getDescription() != null && !quest.getDescription().isBlank()) {
+            Label descLabel = new Label(quest.getDescription(), skin, "text_08");
+            descLabel.setColor(skin.getColor("BLACK"));
+            descLabel.setWrap(true);
+            questSteps.add(descLabel).left().padTop(4.0f).row();
+        }
+
+        List<String> journals = quest.getStepJournals();
+        if (journals == null || journals.isEmpty()) {
+            Label emptySteps = new Label("No steps available.", skin, "text_08");
+            emptySteps.setColor(skin.getColor("BLACK"));
+            questSteps.add(emptySteps).left().padTop(6.0f).row();
+            return;
+        }
+
+        questSteps.add().padTop(6.0f).row();
+        int currentStep = quest.getCurrentStep();
+        for (int i = 0; i < journals.size(); i++) {
+            String stepText = journals.get(i);
+            if (stepText == null || stepText.isBlank()) {
+                stepText = "Step " + (i + 1);
+            }
+
+            boolean completed = quest.isCompleted() || i < currentStep;
+            Table stepRow = new Table();
+            Label stepLabel = new Label(stepText, skin, "text_08");
+            stepLabel.setColor(skin.getColor("BLACK"));
+            stepLabel.setWrap(true);
+            stepRow.add(stepLabel).left().expandX().fillX();
+
+            if (completed) {
+                Image image = new Image(skin.getDrawable("Green_icon_outline_checkmark"));
+                stepRow.add(image).right().padLeft(4.0f);
+            }
+            questSteps.add(stepRow).expandX().fillX().padBottom(4.0f).row();
         }
     }
 
@@ -317,5 +578,10 @@ public class InventoryView extends View<InventoryViewModel> {
                 return -1;
             }
         };
+    }
+
+    private enum InventoryTab {
+        INVENTORY,
+        QUESTS
     }
 }
