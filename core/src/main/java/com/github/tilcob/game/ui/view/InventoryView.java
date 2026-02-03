@@ -3,12 +3,13 @@ package com.github.tilcob.game.ui.view;
 import com.badlogic.gdx.scenes.scene2d.*;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.IntSet;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
+import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlot;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlotTarget;
@@ -25,6 +26,9 @@ public class InventoryView extends View<InventoryViewModel> {
     private EnumMap<ItemCategory, EquipmentSlot> equipmentSlots;
     private Table questLog;
     private Label itemDetailsLabel;
+    private ShiftClickHandler shiftClickHandler;
+    private ShiftClickListener shiftClickListener;
+    private final IntSet occupiedPlayerSlots = new IntSet();
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -36,6 +40,8 @@ public class InventoryView extends View<InventoryViewModel> {
         slots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         equipmentSlots = new EnumMap<>(ItemCategory.class);
         dragAndDrop = new InventoryDragAndDrop();
+        shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
+        shiftClickListener = new ShiftClickListener(shiftClickHandler, buildShiftClickContext());
 
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
@@ -162,6 +168,7 @@ public class InventoryView extends View<InventoryViewModel> {
 
     private void updatePlayerItems(Array<ItemModel> array) {
         clearItemDetails();
+        occupiedPlayerSlots.clear();
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
             for (int j = 0; j < Constants.INVENTORY_COLUMNS; j++) {
                 clearSlot(slots[i][j]);
@@ -177,6 +184,7 @@ public class InventoryView extends View<InventoryViewModel> {
                 EquipmentSlot equipmentSlot = equipmentSlots.get(item.getCategory());
                 if (equipmentSlot == null) continue;
                 Image itemImage = renderItemInSlot(item, equipmentSlot);
+                attachShiftClick(itemImage, item, SlotContext.EQUIPPED);
                 dragAndDrop.addSource(new EquipmentItemSource(itemImage, item.getSlotIdx(), item.getCategory()));
                 continue;
             }
@@ -188,6 +196,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
             PlayerSlot slot = slots[row][col];
             Image itemImage = renderItemInSlot(item, slot);
+            occupiedPlayerSlots.add(idx);
+            attachShiftClick(itemImage, item, SlotContext.PLAYER_INVENTORY);
 
             dragAndDrop.addSource(new PlayerItemSource(itemImage, item.getSlotIdx()));
         }
@@ -275,5 +285,37 @@ public class InventoryView extends View<InventoryViewModel> {
                          Actor toActor) {
             clearItemDetails();
         }
+    }
+
+    private void attachShiftClick(Image itemImage, ItemModel item, SlotContext slotContext) {
+        itemImage.setUserObject(new ShiftClickPayload(item, slotContext));
+        itemImage.addListener(shiftClickListener);
+    }
+
+    private ShiftClickContext buildShiftClickContext() {
+        return new ShiftClickContext() {
+            @Override
+            public boolean isChestOpen() {
+                return viewModel.isChestOpen();
+            }
+
+            @Override
+            public boolean canEquip(ItemModel item) {
+                if (item == null || item.isEquipped()) {
+                    return false;
+                }
+                return equipmentSlots.containsKey(item.getCategory());
+            }
+
+            @Override
+            public int findEmptyPlayerSlot() {
+                for (int i = 0; i < Constants.INVENTORY_CAPACITY; i++) {
+                    if (!occupiedPlayerSlots.contains(i)) {
+                        return i;
+                    }
+                }
+                return -1;
+            }
+        };
     }
 }

@@ -111,6 +111,10 @@ public class InventoryViewModel extends ViewModel {
         isChestOpen = false;
     }
 
+    public boolean isChestOpen() {
+        return isChestOpen;
+    }
+
     @Override
     public void dispose() {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
