@@ -14,7 +14,7 @@ Road-To-Glory is a LibGDX-based RPG with a modular architecture split between sh
 ## Content pipeline
 
 The game loads structured content that is pre-indexed for fast lookup. Index files are generated from the source content
-and kept in `assets` for runtime loading.
+via Gradle asset tasks and kept in `assets` for runtime loading (they are gitignored).
 
 ### Quest data
 
@@ -37,11 +37,12 @@ pans or scripted movement completes.
 ### Item data
 
 Item definitions live in `assets/items/index.json`, which is generated from the
-`.json` quest files in `assets/items` and loaded from file name.
+`.json` item files in `assets/items` and loaded from file name.
 
 ### Skill data
 
-Skill tree definitions live in `assets/skills/index.json`, which includes `.json` files defining trees (nodes, XP tables, modifiers). Loaded via `SkillTreeLoader`.
+Skill tree definitions live in `assets/skill-trees/index.json`, which includes `.json` files defining trees 
+(nodes, XP tables, modifiers). Loaded via `SkillTreeLoader`.
 
 ## Codebase documentation
 
