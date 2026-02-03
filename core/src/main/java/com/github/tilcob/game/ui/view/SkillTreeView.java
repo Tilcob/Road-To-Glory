@@ -83,6 +83,10 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
 
     private void setSkillTreeVisibility(boolean open) {
         setVisibleBound(open);
+        setTouchable(open ? Touchable.enabled : Touchable.disabled);
+        if (rootTable != null) {
+            rootTable.setTouchable(open ? Touchable.enabled : Touchable.disabled);
+        }
         if (open) {
             toFront();
             refresh();

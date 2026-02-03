@@ -12,7 +12,7 @@ public class SkillNodeDefinition {
     private int cost;
     private int requiredLevel;
     private String[] parentIds;
-    private Map<String, Float> modifiers;
+    private HashMap<String, Float> modifiers = new HashMap<>();
 
     public String getId() {
         return id;
