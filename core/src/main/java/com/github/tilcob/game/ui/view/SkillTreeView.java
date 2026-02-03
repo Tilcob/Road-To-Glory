@@ -27,10 +27,12 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     @Override
     protected void setupUI() {
         setFillParent(true);
+        setTouchable(Touchable.enabled);
 
         rootTable = new Table();
         rootTable.background(skin.getDrawable("Other_panel_brown"));
         rootTable.pad(PANEL_PADDING);
+        rootTable.setTouchable(Touchable.enabled);
         setRoot(rootTable);
         setVisibleBound(false);
         rootTable.top();
@@ -58,15 +60,13 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
         scrollPane.setFadeScrollBars(false);
         scrollPane.setScrollingDisabled(true, false);
         scrollPane.setOverscroll(false, false);
+        scrollPane.setTouchable(Touchable.enabled);
 
         rootTable.add(titleRow).expandX().fillX().row();
         rootTable.add(tabsTable).expandX().fillX().pad(6, 0, 6, 0).row();
         rootTable.add(scrollPane).expand().fill().pad(6).row();
 
-        resizeRootTable();
-        centerRootTable();
-
-        addActor(rootTable);
+        add(rootTable).expand().fill().pad(20);
     }
 
     @Override
@@ -82,25 +82,8 @@ public class SkillTreeView extends View<SkillTreeViewModel> {
     private void setSkillTreeVisibility(boolean open) {
         setVisibleBound(open);
         if (open) {
-            resizeRootTable();
-            centerRootTable();
             refresh();
         }
-    }
-
-    private void resizeRootTable() {
-        float padding = 40f;
-        float maxWidth = Math.max(200f, stage.getWidth() - padding);
-        float maxHeight = Math.max(200f, stage.getHeight() - padding);
-        float width = Math.min(720f, maxWidth);
-        float height = Math.min(460f, maxHeight);
-        rootTable.setSize(width, height);
-    }
-
-    private void centerRootTable() {
-        float x = (stage.getWidth() - rootTable.getWidth()) / 2f;
-        float y = (stage.getHeight() - rootTable.getHeight()) / 2f;
-        rootTable.setPosition(x, y);
     }
 
     private void refresh() {
