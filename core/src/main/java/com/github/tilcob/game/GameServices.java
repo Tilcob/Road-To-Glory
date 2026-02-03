@@ -22,15 +22,12 @@ import com.github.tilcob.game.save.SaveManager;
 import com.github.tilcob.game.save.SaveService;
 import com.github.tilcob.game.save.SaveSlot;
 import com.github.tilcob.game.save.registry.ChestRegistry;
-import com.github.tilcob.game.save.states.GameState;
 import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.ui.UiServices;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 import com.github.tilcob.game.yarn.QuestYarnRuntime;
-import com.github.tilcob.game.yarn.YarnRuntime;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class GameServices {
@@ -69,37 +66,34 @@ public class GameServices {
     }
 
     private void init(InternalFileHandleResolver resolver, SaveManager saveManager) {
-        this.eventBus = new GameEventBus();
-        this.itemEntityRegistry = new ItemEntityRegistry(eventBus);
-        this.chestRegistry = new ChestRegistry();
-        this.stateManager = new StateManager(new GameState());
-        this.saveService = new SaveService(saveManager, stateManager, chestRegistry);
-        this.assetManager = new AssetManager(resolver);
-        this.audioManager = new AudioManager(assetManager);
-        this.allQuests = new HashMap<>();
-        this.allQuestDialogs = new HashMap<>();
-        this.allDialogs = new HashMap<>();
-        this.allCutscenes = new HashMap<>();
-        this.questYarnRegistry = new QuestYarnRegistry("quests/index.json");
-        this.questLifecycleService = new QuestLifecycleService(eventBus, questYarnRegistry, allDialogs);
-        this.questRewardService = new QuestRewardService(eventBus, questYarnRegistry);
-        this.dialogRepository = new DialogRepository(true, "dialogs",
-            Map.of("Shopkeeper", "shopkeeper"));
-        this.cutsceneRepository = new CutsceneRepository(true, "cutscenes");
-        this.flowBootstrap = FlowBootstrap.create(eventBus, questLifecycleService, audioManager, this::getEntityLookup);
-        YarnRuntime runtime = new YarnRuntime();
-        this.dialogYarnRuntime = new DialogYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor(), flowBootstrap.functions());
-        this.cutsceneYarnRuntime = new CutsceneYarnRuntime(runtime, flowBootstrap.commands(), flowBootstrap.executor());
-        this.questYarnRuntime = new QuestYarnRuntime(
-            runtime, questYarnRegistry, flowBootstrap.commands(),
-            flowBootstrap.executor(), flowBootstrap.functions());
-        this.questLifecycleService.setQuestYarnRuntime(questYarnRuntime);
-        this.questManager = new QuestManager(questYarnRuntime);
-        this.inventoryService = new InventoryService(eventBus);
-        this.uiServices = new UiServices(audioManager);
-
-        questLifecycleService.setQuestManager(questManager);
-        questLifecycleService.setInventoryService(inventoryService);
+        GameServicesBuilder.Components components = new GameServicesBuilder(
+            resolver,
+            saveManager,
+            this::getEntityLookup
+        ).build();
+        this.eventBus = components.eventBus();
+        this.itemEntityRegistry = components.itemEntityRegistry();
+        this.chestRegistry = components.chestRegistry();
+        this.stateManager = components.stateManager();
+        this.saveService = components.saveService();
+        this.assetManager = components.assetManager();
+        this.audioManager = components.audioManager();
+        this.allQuests = components.allQuests();
+        this.allQuestDialogs = components.allQuestDialogs();
+        this.allDialogs = components.allDialogs();
+        this.allCutscenes = components.allCutscenes();
+        this.questYarnRegistry = components.questYarnRegistry();
+        this.dialogRepository = components.dialogRepository();
+        this.cutsceneRepository = components.cutsceneRepository();
+        this.dialogYarnRuntime = components.dialogYarnRuntime();
+        this.cutsceneYarnRuntime = components.cutsceneYarnRuntime();
+        this.questYarnRuntime = components.questYarnRuntime();
+        this.questManager = components.questManager();
+        this.questLifecycleService = components.questLifecycleService();
+        this.questRewardService = components.questRewardService();
+        this.inventoryService = components.inventoryService();
+        this.flowBootstrap = components.flowBootstrap();
+        this.uiServices = components.uiServices();
     }
 
     public void loadGame() {

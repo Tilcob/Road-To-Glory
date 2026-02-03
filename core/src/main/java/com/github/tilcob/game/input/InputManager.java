@@ -1,5 +1,7 @@
 package com.github.tilcob.game.input;
 
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputAdapter;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 
@@ -7,6 +9,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.IntConsumer;
 
 /**
  * Central input routing for the game.
@@ -22,16 +25,29 @@ public class InputManager implements InputDeviceListener {
     private final List<InputDevice> devices;
     private final List<InputProcessor> externalProcessors;
     private final List<InputProcessor> deviceProcessors;
+    private final List<InputProcessor> modalProcessors;
+    private final InputBindings bindings;
+    private final InputBindingsStorage bindingsStorage;
     private final boolean[] commandState;
     private ControllerState activeState;
+    private InputProcessor listeningProcessor;
 
     public InputManager(InputMultiplexer inputMultiplexer) {
+        this(inputMultiplexer, null, null);
+    }
+
+    public InputManager(InputMultiplexer inputMultiplexer,
+                        InputBindings bindings,
+                        InputBindingsStorage bindingsStorage) {
         this.inputMultiplexer = inputMultiplexer;
         this.stateCache = new HashMap<>();
         this.devices = new ArrayList<>();
         this.externalProcessors = new ArrayList<>();
         this.deviceProcessors = new ArrayList<>();
+        this.modalProcessors = new ArrayList<>();
         this.commandState = new boolean[Command.values().length];
+        this.bindings = bindings;
+        this.bindingsStorage = bindingsStorage;
     }
 
     public void addDevice(InputDevice device) {
@@ -95,11 +111,53 @@ public class InputManager implements InputDeviceListener {
 
     private void rebuildProcessors() {
         inputMultiplexer.clear();
+        for (InputProcessor processor : modalProcessors) {
+            inputMultiplexer.addProcessor(processor);
+        }
         for (InputProcessor processor : deviceProcessors) {
             inputMultiplexer.addProcessor(processor);
         }
         for (InputProcessor processor : externalProcessors) {
             inputMultiplexer.addProcessor(processor);
+        }
+    }
+
+    public void listenForNextKey(IntConsumer listener) {
+        if (listener == null) {
+            return;
+        }
+        stopListeningForKey();
+        listeningProcessor = new InputAdapter() {
+            @Override
+            public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.UNKNOWN) {
+                    return false;
+                }
+                listener.accept(keycode);
+                stopListeningForKey();
+                return true;
+            }
+        };
+        modalProcessors.add(listeningProcessor);
+        rebuildProcessors();
+    }
+
+    public void stopListeningForKey() {
+        if (listeningProcessor == null) {
+            return;
+        }
+        modalProcessors.remove(listeningProcessor);
+        listeningProcessor = null;
+        rebuildProcessors();
+    }
+
+    public InputBindings getBindings() {
+        return bindings;
+    }
+
+    public void saveBindings() {
+        if (bindingsStorage != null && bindings != null) {
+            bindingsStorage.save(bindings);
         }
     }
 

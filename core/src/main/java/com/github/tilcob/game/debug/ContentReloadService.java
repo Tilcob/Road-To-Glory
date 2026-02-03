@@ -3,6 +3,7 @@ package com.github.tilcob.game.debug;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.github.tilcob.game.GameServices;
+import com.github.tilcob.game.config.ContentPaths;
 import com.github.tilcob.game.cutscene.CutsceneData;
 import com.github.tilcob.game.cutscene.YarnCutsceneLoader;
 import com.github.tilcob.game.dialog.DialogData;
@@ -121,12 +122,12 @@ public class ContentReloadService {
 
     public List<FileHandle> collectWatchFiles() {
         return List.of(
-            Gdx.files.internal("items/index.json"),
-            Gdx.files.internal("quests/index.json"),
-            Gdx.files.internal("dialogs/index.json"),
-            Gdx.files.internal("cutscenes/index.json"),
-            Gdx.files.internal("audio/index.json"),
-            Gdx.files.internal("maps/index.json")
+            Gdx.files.internal(ContentPaths.ITEMS_INDEX),
+            Gdx.files.internal(ContentPaths.QUESTS_INDEX),
+            Gdx.files.internal(ContentPaths.DIALOGS_INDEX),
+            Gdx.files.internal(ContentPaths.CUTSCENES_INDEX),
+            Gdx.files.internal(ContentPaths.AUDIO_INDEX),
+            Gdx.files.internal(ContentPaths.MAPS_INDEX)
         );
     }
 }

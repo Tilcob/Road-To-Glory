@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Disposable;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -26,6 +25,7 @@ import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.ui.GameUiBuilder;
+import com.github.tilcob.game.ui.UiViewStateManager;
 import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.overlay.UiOverlayManager;
 import com.github.tilcob.game.ui.view.DebugOverlayView;
@@ -67,6 +67,7 @@ public class GameScreen extends ScreenAdapter {
     private ContentReloadService contentReloadService;
     private ContentHotReload contentHotReload;
     private UiOverlayManager uiOverlayManager;
+    private UiViewStateManager uiViewStateManager;
     private GameWorldLoader worldLoader;
 
     public GameScreen(GameServices services, Viewport uiViewport) {
@@ -112,6 +113,15 @@ public class GameScreen extends ScreenAdapter {
         services.getUiServices().setSkin(skin);
         if (skillTreeViewModel != null) {
             skillTreeViewModel.onPropertyChange(Constants.OPEN_SKILLS, Boolean.class, this::setSkillTreeOverlayState);
+        }
+        if (uiViewStateManager == null) {
+            uiViewStateManager = new UiViewStateManager(
+                services.getEventBus(),
+                inventoryViewModel,
+                chestViewModel,
+                skillTreeViewModel,
+                settingsViewModel
+            );
         }
     }
 
@@ -361,9 +371,8 @@ public class GameScreen extends ScreenAdapter {
         services.getEventBus().unsubscribe(AutosaveEvent.class, this::autosave);
         services.getEventBus().unsubscribe(PauseEvent.class, this::togglePause);
         if (audioManager != null) audioManager.dispose();
-        if (uiOverlayManager != null) {
-            uiOverlayManager.dispose();
-        }
+        if (uiOverlayManager != null) uiOverlayManager.dispose();
+        if (uiViewStateManager != null) uiViewStateManager.dispose();
         gameViewModel.dispose();
         pauseViewModel.dispose();
         physicWorld.dispose();

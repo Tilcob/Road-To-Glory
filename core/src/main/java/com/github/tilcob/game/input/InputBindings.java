@@ -6,6 +6,8 @@ import java.lang.reflect.Array;
 import java.util.*;
 
 public class InputBindings {
+    private static final Map<String, Integer> KEY_ALIASES = createKeyAliases();
+
     private final Map<Command, Set<Integer>> commandBindings;
     private final Map<Integer, Command> keyMapping;
 
@@ -44,9 +46,20 @@ public class InputBindings {
         if (command == null || keycode == Input.Keys.UNKNOWN) {
             return;
         }
+        for (Map.Entry<Command, Set<Integer>> entry : commandBindings.entrySet()) {
+            if (entry.getKey() != command) {
+                entry.getValue().remove(keycode);
+            }
+        }
         Set<Integer> keycodes = new LinkedHashSet<>();
         keycodes.add(keycode);
         commandBindings.put(command, keycodes);
+        rebuildKeyMapping();
+    }
+
+    public void resetToDefaults() {
+        commandBindings.clear();
+        commandBindings.putAll(defaultCommandBindings());
         rebuildKeyMapping();
     }
 
@@ -113,11 +126,9 @@ public class InputBindings {
             return Input.Keys.UNKNOWN;
         }
         String normalized = keyName.trim().toUpperCase();
-        if ("SPACE".equals(normalized) || "SPACEBAR".equals(normalized)) {
-            return Input.Keys.SPACE;
-        }
-        if ("ESC".equals(normalized) || "ESCAPE".equals(normalized)) {
-            return Input.Keys.ESCAPE;
+        Integer alias = KEY_ALIASES.get(normalized);
+        if (alias != null) {
+            return alias;
         }
         try {
             return Input.Keys.valueOf(normalized);
@@ -168,6 +179,69 @@ public class InputBindings {
         Set<Integer> keycodes = new LinkedHashSet<>();
         keycodes.add(keycode);
         return keycodes;
+    }
+
+    private static Map<String, Integer> createKeyAliases() {
+        Map<String, Integer> aliases = new HashMap<>();
+        addAlias(aliases, "SPACE", Input.Keys.SPACE);
+        addAlias(aliases, "SPACEBAR", Input.Keys.SPACE);
+        addAlias(aliases, "ESC", Input.Keys.ESCAPE);
+        addAlias(aliases, "ESCAPE", Input.Keys.ESCAPE);
+        addAlias(aliases, "RETURN", Input.Keys.ENTER);
+        addAlias(aliases, "ENTER", Input.Keys.ENTER);
+        addAlias(aliases, "NUMPAD_ENTER", Input.Keys.NUMPAD_ENTER);
+        addAlias(aliases, "KP_ENTER", Input.Keys.NUMPAD_ENTER);
+        addAlias(aliases, "TAB", Input.Keys.TAB);
+        addAlias(aliases, "BACKSPACE", Input.Keys.BACKSPACE);
+        addAlias(aliases, "BKSP", Input.Keys.BACKSPACE);
+        addAlias(aliases, "DEL", Input.Keys.DEL);
+        addAlias(aliases, "DELETE", Input.Keys.DEL);
+        addAlias(aliases, "INS", Input.Keys.INSERT);
+        addAlias(aliases, "INSERT", Input.Keys.INSERT);
+        addAlias(aliases, "HOME", Input.Keys.HOME);
+        addAlias(aliases, "END", Input.Keys.END);
+        addAlias(aliases, "PGUP", Input.Keys.PAGE_UP);
+        addAlias(aliases, "PAGEUP", Input.Keys.PAGE_UP);
+        addAlias(aliases, "PGDN", Input.Keys.PAGE_DOWN);
+        addAlias(aliases, "PAGEDOWN", Input.Keys.PAGE_DOWN);
+        addAlias(aliases, "UP", Input.Keys.UP);
+        addAlias(aliases, "DOWN", Input.Keys.DOWN);
+        addAlias(aliases, "LEFT", Input.Keys.LEFT);
+        addAlias(aliases, "RIGHT", Input.Keys.RIGHT);
+        addAlias(aliases, "ARROW_UP", Input.Keys.UP);
+        addAlias(aliases, "ARROW_DOWN", Input.Keys.DOWN);
+        addAlias(aliases, "ARROW_LEFT", Input.Keys.LEFT);
+        addAlias(aliases, "ARROW_RIGHT", Input.Keys.RIGHT);
+        addAlias(aliases, "CTRL", Input.Keys.CONTROL_LEFT);
+        addAlias(aliases, "CONTROL", Input.Keys.CONTROL_LEFT);
+        addAlias(aliases, "CTRL_LEFT", Input.Keys.CONTROL_LEFT);
+        addAlias(aliases, "CTRL_RIGHT", Input.Keys.CONTROL_RIGHT);
+        addAlias(aliases, "ALT", Input.Keys.ALT_LEFT);
+        addAlias(aliases, "ALT_LEFT", Input.Keys.ALT_LEFT);
+        addAlias(aliases, "ALT_RIGHT", Input.Keys.ALT_RIGHT);
+        addAlias(aliases, "SHIFT", Input.Keys.SHIFT_LEFT);
+        addAlias(aliases, "SHIFT_LEFT", Input.Keys.SHIFT_LEFT);
+        addAlias(aliases, "SHIFT_RIGHT", Input.Keys.SHIFT_RIGHT);
+        addAlias(aliases, "CMD", Input.Keys.SYM);
+        addAlias(aliases, "COMMAND", Input.Keys.SYM);
+        addAlias(aliases, "META", Input.Keys.SYM);
+        addAlias(aliases, "SUPER", Input.Keys.SYM);
+        addAlias(aliases, "CAPSLOCK", Input.Keys.CAPS_LOCK);
+        addAlias(aliases, "CAPS_LOCK", Input.Keys.CAPS_LOCK);
+        addAlias(aliases, "PRINTSCREEN", Input.Keys.PRINT_SCREEN);
+        addAlias(aliases, "PRINT_SCREEN", Input.Keys.PRINT_SCREEN);
+        addAlias(aliases, "PRTSC", Input.Keys.PRINT_SCREEN);
+        addAlias(aliases, "SCROLLLOCK", Input.Keys.SCROLL_LOCK);
+        addAlias(aliases, "SCROLL_LOCK", Input.Keys.SCROLL_LOCK);
+        addAlias(aliases, "PAUSE", Input.Keys.PAUSE);
+        return Collections.unmodifiableMap(aliases);
+    }
+
+    private static void addAlias(Map<String, Integer> aliases, String name, int keycode) {
+        if (keycode == Input.Keys.UNKNOWN) {
+            return;
+        }
+        aliases.put(name, keycode);
     }
 
     public static class BindingFile {

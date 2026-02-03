@@ -9,12 +9,13 @@ Road-To-Glory is a LibGDX-based RPG with a modular architecture split between sh
 - `assets`: Runtime assets bundled with the game.
 - `assets_raw`: Source assets before processing/export.
 - `utils`: Utility scripts and tooling (content validation, index generation).
+- `docs`: Consolidated documentation for modules, assets, and game systems.
 - `skinComposer.scmp`: Skin composer project file used for UI skin assets.
 
 ## Content pipeline
 
 The game loads structured content that is pre-indexed for fast lookup. Index files are generated from the source content
-and kept in `assets` for runtime loading.
+via Gradle asset tasks and kept in `assets` for runtime loading (they are gitignored).
 
 ### Quest data
 
@@ -37,11 +38,12 @@ pans or scripted movement completes.
 ### Item data
 
 Item definitions live in `assets/items/index.json`, which is generated from the
-`.json` quest files in `assets/items` and loaded from file name.
+`.json` item files in `assets/items` and loaded from file name.
 
 ### Skill data
 
-Skill tree definitions live in `assets/skills/index.json`, which includes `.json` files defining trees (nodes, XP tables, modifiers). Loaded via `SkillTreeLoader`.
+Skill tree definitions live in `assets/skill-trees/index.json`, which includes `.json` files defining trees 
+(nodes, XP tables, modifiers). Loaded via `SkillTreeLoader`.
 
 ## Codebase documentation
 
@@ -59,6 +61,8 @@ The core module follows a layered architecture on top of Ashley ECS. The most im
 
 When introducing new packages or major gameplay features, follow the same pattern by adding or extending
 `package-info.java` descriptions so the high-level intent stays discoverable.
+
+Additional module, asset, and ECS system documentation lives in the top-level `docs/` folder.
 
 ## Debug / Strict Mode (Yarn)
 

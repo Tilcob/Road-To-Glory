@@ -61,7 +61,7 @@ public class MenuScreen extends ScreenAdapter {
     @Override
     public void show() {
         menuViewModel = new MenuViewModel(services, screenNavigator);
-        settingsViewModel = new SettingsViewModel(services);
+        settingsViewModel = new SettingsViewModel(services, inputManager);
 
         inputManager.setInputProcessors(stage);
         inputManager.configureStates(UiControllerState.class, idleControllerState, uiControllerState);

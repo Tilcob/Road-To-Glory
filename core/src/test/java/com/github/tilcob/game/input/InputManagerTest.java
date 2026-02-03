@@ -1,5 +1,6 @@
 package com.github.tilcob.game.input;
 
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import org.junit.jupiter.api.Test;
 
@@ -20,13 +21,13 @@ class InputManagerTest {
         StateB stateB = new StateB();
         inputManager.configureStates(StateA.class, stateA, stateB);
 
-        device.press(Command.UP);
+        device.press();
         assertEquals(List.of(Command.UP), stateA.pressedCommands);
 
         inputManager.setActiveState(StateB.class);
         assertEquals(List.of(Command.UP), stateA.releasedCommands);
 
-        device.press(Command.UP);
+        device.press();
         assertEquals(List.of(Command.UP), stateB.pressedCommands);
     }
 
@@ -39,10 +40,23 @@ class InputManagerTest {
         StateA stateA = new StateA();
         inputManager.configureStates(StateA.class, stateA);
 
-        device.press(Command.UP);
-        device.press(Command.UP);
+        device.press();
+        device.press();
 
         assertEquals(List.of(Command.UP), stateA.pressedCommands);
+    }
+
+    @Test
+    void listensForSingleKeyPress() {
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        InputManager inputManager = new InputManager(multiplexer);
+        List<Integer> captured = new ArrayList<>();
+
+        inputManager.listenForNextKey(captured::add);
+        multiplexer.keyDown(Input.Keys.F);
+        multiplexer.keyDown(Input.Keys.G);
+
+        assertEquals(List.of(Input.Keys.F), captured);
     }
 
     @Test
@@ -54,7 +68,7 @@ class InputManagerTest {
         StateA stateA = new StateA();
         inputManager.configureStates(StateA.class, stateA);
 
-        device.release(Command.DOWN);
+        device.release();
 
         assertTrue(stateA.releasedCommands.isEmpty());
     }
@@ -67,12 +81,12 @@ class InputManagerTest {
             this.listener = listener;
         }
 
-        void press(Command command) {
-            listener.onCommandPressed(command);
+        void press() {
+            listener.onCommandPressed(Command.UP);
         }
 
-        void release(Command command) {
-            listener.onCommandReleased(command);
+        void release() {
+            listener.onCommandReleased(Command.DOWN);
         }
     }
 

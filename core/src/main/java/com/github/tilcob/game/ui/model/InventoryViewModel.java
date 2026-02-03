@@ -5,14 +5,19 @@ import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
+import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.item.ItemModel;
+import com.github.tilcob.game.stat.StatType;
 import com.github.tilcob.game.ui.UiModelFactory;
+
+import java.util.EnumMap;
 
 public class InventoryViewModel extends ViewModel {
     private final Array<ItemModel> items = new Array<>();
+    private final EnumMap<StatType, Float> stats = new EnumMap<>(StatType.class);
     private boolean open = false;
     private boolean paused = false;
     private boolean isChestOpen = false;
@@ -27,6 +32,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
+        getEventBus().subscribe(StatRecalcEvent.class, this::onStatRecalcEvent);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().subscribe(OpenChestEvent.class, this::openChest);
         getEventBus().subscribe(CloseChestEvent.class, this::closeChest);
@@ -50,6 +56,11 @@ public class InventoryViewModel extends ViewModel {
         if (inventory == null) return;
         onAddItem(inventory.getItems());
         this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
+    }
+
+    private void onStatRecalcEvent(StatRecalcEvent event) {
+        if (event == null) return;
+        updateStats(event.entity());
     }
 
     @Override
@@ -76,6 +87,17 @@ public class InventoryViewModel extends ViewModel {
         items.clear();
         onAddItem(inventory.getItems());
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
+        updateStats(player);
+    }
+
+    private void updateStats(Entity player) {
+        StatComponent statComponent = StatComponent.MAPPER.get(player);
+        if (statComponent == null) return;
+        stats.clear();
+        for (StatType type : StatType.values()) {
+            stats.put(type, statComponent.getFinalStat(type));
+        }
+        propertyChangeSupport.firePropertyChange(Constants.UPDATE_STATS, null, new EnumMap<>(stats));
     }
 
     private void onPauseEvent(PauseEvent event) {
@@ -99,6 +121,10 @@ public class InventoryViewModel extends ViewModel {
         open = setOpen(false, open, Constants.OPEN_INVENTORY);
     }
 
+    public void close() {
+        closeInventory();
+    }
+
     private void openChest(OpenChestEvent event) {
         isChestOpen = true;
     }
@@ -107,12 +133,17 @@ public class InventoryViewModel extends ViewModel {
         isChestOpen = false;
     }
 
+    public boolean isChestOpen() {
+        return isChestOpen;
+    }
+
     @Override
     public void dispose() {
         getEventBus().unsubscribe(UpdateInventoryEvent.class, this::updateInventory);
         getEventBus().unsubscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
+        getEventBus().unsubscribe(StatRecalcEvent.class, this::onStatRecalcEvent);
         getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().unsubscribe(OpenChestEvent.class, this::openChest);
         getEventBus().unsubscribe(CloseChestEvent.class, this::closeChest);

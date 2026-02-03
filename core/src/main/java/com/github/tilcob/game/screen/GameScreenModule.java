@@ -79,7 +79,7 @@ public class GameScreenModule {
                 InventoryViewModel inventoryViewModel = new InventoryViewModel(services, uiModelFactory);
                 ChestViewModel chestViewModel = new ChestViewModel(services, uiModelFactory);
                 PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
-                SettingsViewModel settingsViewModel = new SettingsViewModel(services);
+                SettingsViewModel settingsViewModel = new SettingsViewModel(services, inputManager);
                 com.github.tilcob.game.ui.model.SkillTreeViewModel skillTreeViewModel = new com.github.tilcob.game.ui.model.SkillTreeViewModel(
                                 services);
                 Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);

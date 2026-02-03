@@ -41,7 +41,7 @@ public class PauseView extends View<PauseViewModel> {
         resumeButton.setName(PauseOption.RESUME.name());
         buttonTable.add(resumeButton).width(180f).row();
         onClick(resumeButton, viewModel::resumeGame);
-        onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().moveDown(selectedItem));
+        onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton settingsButton = new TextButton("Settings", skin);
         settingsButton.setName(PauseOption.SETTINGS.name());
@@ -53,7 +53,7 @@ public class PauseView extends View<PauseViewModel> {
         quitButton.setName(PauseOption.QUIT.name());
         buttonTable.add(quitButton).width(180f).padTop(10f).row();
         onClick(quitButton, viewModel::quitToMenu);
-        onEnter(quitButton, (item) -> selectedItem = viewModel.getUiServices().moveDown(selectedItem));
+        onEnter(quitButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         add(contentTable).expand().center();
         align(Align.center);

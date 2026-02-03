@@ -3,15 +3,11 @@ package com.github.tilcob.game.ui.view;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
-import com.github.tilcob.game.entity.TransferPlayerToChestAutoEvent;
-import com.github.tilcob.game.event.TransferChestToPlayerAutoEvent;
-import com.github.tilcob.game.input.InputService;
 import com.github.tilcob.game.item.ItemModel;
-import com.github.tilcob.game.ui.inventory.InventoryDragAndDrop;
+import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
 import com.github.tilcob.game.ui.inventory.chest.ChestSlot;
 import com.github.tilcob.game.ui.inventory.chest.ChestSlotTarget;
@@ -24,6 +20,8 @@ public class ChestView extends View<ChestViewModel> {
     private Table inventoryRoot;
     private ChestSlot[][] chestSlots;
     private PlayerSlot[][] playerSlots;
+    private ShiftClickHandler shiftClickHandler;
+    private ShiftClickListener shiftClickListener;
 
     public ChestView(Skin skin, Stage stage, ChestViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -35,6 +33,8 @@ public class ChestView extends View<ChestViewModel> {
         chestSlots = new ChestSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         playerSlots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         dragAndDrop = new InventoryDragAndDrop();
+        shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
+        shiftClickListener = new ShiftClickListener(shiftClickHandler, buildShiftClickContext());
 
         inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
@@ -114,7 +114,7 @@ public class ChestView extends View<ChestViewModel> {
 
             ChestSlot slot = chestSlots[row][col];
             Image itemImage = renderItemInSlot(item, slot);
-            addQuickTransferListener(itemImage, item.getSlotIdx());
+            attachShiftClick(itemImage, item, SlotContext.CHEST);
             dragAndDrop.addSource(new ChestItemSource(itemImage, item.getSlotIdx()));
         }
     }
@@ -132,7 +132,7 @@ public class ChestView extends View<ChestViewModel> {
 
             PlayerSlot slot = playerSlots[row][col];
             Image itemImage = renderItemInSlot(item, slot);
-            addQuickTransferToChestListener(itemImage, item.getSlotIdx());
+            attachShiftClick(itemImage, item, SlotContext.PLAYER_INVENTORY);
             dragAndDrop.addSource(new PlayerItemSource(itemImage, item.getSlotIdx()));
         }
     }
@@ -177,25 +177,27 @@ public class ChestView extends View<ChestViewModel> {
         return itemImage;
     }
 
-    private void addQuickTransferListener(Image itemImage, int slotIndex) {
-        itemImage.addListener(new ClickListener() {
-            @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                if (!InputService.isShiftPressed()) return;
-                event.stop();
-                viewModel.getEventBus().fire(new TransferChestToPlayerAutoEvent(slotIndex));
-            }
-        });
+    private void attachShiftClick(Image itemImage, ItemModel item, SlotContext slotContext) {
+        itemImage.setUserObject(new ShiftClickPayload(item, slotContext));
+        itemImage.addListener(shiftClickListener);
     }
 
-    private void addQuickTransferToChestListener(Image itemImage, int slotIndex) {
-        itemImage.addListener(new ClickListener() {
+    private ShiftClickContext buildShiftClickContext() {
+        return new ShiftClickContext() {
             @Override
-            public void clicked(com.badlogic.gdx.scenes.scene2d.InputEvent event, float x, float y) {
-                if (!InputService.isShiftPressed()) return;
-                event.stop();
-                viewModel.getEventBus().fire(new TransferPlayerToChestAutoEvent(slotIndex));
+            public boolean isChestOpen() {
+                return true;
             }
-        });
+
+            @Override
+            public boolean canEquip(ItemModel item) {
+                return false;
+            }
+
+            @Override
+            public int findEmptyPlayerSlot() {
+                return -1;
+            }
+        };
     }
 }
