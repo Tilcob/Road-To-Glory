@@ -81,6 +81,10 @@ public class ChestViewModel extends ViewModel {
         open = setOpen(false, open, Constants.OPEN_CHEST_INVENTORY);
     }
 
+    public void close() {
+        closeInventory();
+    }
+
     private void rebuildChestItems() {
         chestItems.clear();
         if (currentChest == null) return;

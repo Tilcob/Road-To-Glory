@@ -99,6 +99,10 @@ public class InventoryViewModel extends ViewModel {
         open = setOpen(false, open, Constants.OPEN_INVENTORY);
     }
 
+    public void close() {
+        closeInventory();
+    }
+
     private void openChest(OpenChestEvent event) {
         isChestOpen = true;
     }
