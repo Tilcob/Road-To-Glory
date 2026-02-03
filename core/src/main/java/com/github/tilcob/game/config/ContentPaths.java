@@ -13,4 +13,6 @@ public class ContentPaths {
     public static final String AUDIO_INDEX = "audio/index.json";
     public static final String MAPS_INDEX = "maps/index.json";
     public static final String DIALOGS_SOURCE = "dialogs";
+    public static final String INPUT_BINDINGS_DEFAULT = "assets/input/input_bindings.json";
+    public static final String INPUT_BINDINGS_LOCAL = "input/input_bindings.json";
 }

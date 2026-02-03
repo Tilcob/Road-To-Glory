@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.config.ContentPaths;
 import com.github.tilcob.game.debug.DebugLogBuffer;
 import com.github.tilcob.game.input.InputBindings;
 import com.github.tilcob.game.input.InputBindingsStorage;
@@ -47,8 +48,9 @@ public class GdxGame extends Game implements ScreenNavigator {
         inputMultiplexer = new InputMultiplexer();
         InputManager inputManager = new InputManager(inputMultiplexer);
         Gdx.input.setInputProcessor(inputMultiplexer);
-        InputBindingsStorage bindingsStorage = new InputBindingsStorage("assets/input/input_bindings.json",
-            "assets/input/input_bindings.json");
+        InputBindingsStorage bindingsStorage = new InputBindingsStorage(
+            ContentPaths.INPUT_BINDINGS_DEFAULT,
+            ContentPaths.INPUT_BINDINGS_LOCAL);
         InputBindings bindings = bindingsStorage.load();
         inputManager.addDevice(new KeyboardInputDevice(bindings));
 
