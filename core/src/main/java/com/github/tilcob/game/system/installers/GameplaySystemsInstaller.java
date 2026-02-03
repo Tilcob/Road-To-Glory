@@ -66,7 +66,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
             engine.addSystem(withPriority(
                             new InventorySystem(eventBus, questManager, inventoryService),
                             SystemOrder.GAMEPLAY));
-            engine.addSystem(withPriority(new XpDistributionSystem(eventBus), SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(new ExpDistributionSystem(eventBus), SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(new SkillSystem(eventBus), SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(new EquipmentSystem(eventBus), SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(new EquipmentStatModifierSystem(eventBus), SystemOrder.GAMEPLAY));

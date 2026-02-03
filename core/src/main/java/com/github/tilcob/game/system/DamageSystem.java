@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.npc.NpcType;
 import com.github.tilcob.game.quest.QuestManager;
@@ -44,7 +45,9 @@ public class DamageSystem extends IteratingSystem {
                         incrementCounter(player, killCounterKey(npc.getName()), 1);
                         questManager.signal(resolvePlayer(), "kill", npc.getName(), 1);
                         String npcType = npc.getType() == null ? "unknown" : npc.getType().name().toLowerCase(Locale.ROOT);
-                        eventBus.fire(new XpGainRequestEvent(player, "combat", npcType, 1f, 50));
+                        ExpMultiplier expComp = ExpMultiplier.MAPPER.get(entity);
+                        float expMultiplier = expComp != null ? expComp.getExpMultiplier() : 1f;
+                        eventBus.fire(new ExpGainRequestEvent(player, "combat", npcType, expMultiplier, Constants.BASE_EXP));
                     }
                 }
                 getEngine().removeEntity(entity);

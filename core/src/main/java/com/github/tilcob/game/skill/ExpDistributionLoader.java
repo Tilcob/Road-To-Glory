@@ -10,8 +10,8 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class XpDistributionLoader {
-    private static final String TAG = XpDistributionLoader.class.getSimpleName();
+public class ExpDistributionLoader {
+    private static final String TAG = ExpDistributionLoader.class.getSimpleName();
     private static final String FILE_PATH = "skill-trees/xp-distribution.json";
     private static final Map<String, Map<String, Float>> DISTRIBUTIONS = new LinkedHashMap<>();
 

@@ -3,26 +3,26 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.XPGainEvent;
-import com.github.tilcob.game.event.XpGainRequestEvent;
-import com.github.tilcob.game.skill.XpDistributionLoader;
+import com.github.tilcob.game.event.ExpGainEvent;
+import com.github.tilcob.game.event.ExpGainRequestEvent;
+import com.github.tilcob.game.skill.ExpDistributionLoader;
 
 import java.util.Map;
 
-public class XpDistributionSystem extends EntitySystem implements Disposable {
+public class ExpDistributionSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;
 
-    public XpDistributionSystem(GameEventBus eventBus) {
+    public ExpDistributionSystem(GameEventBus eventBus) {
         this.eventBus = eventBus;
-        eventBus.subscribe(XpGainRequestEvent.class, this::onXpGainRequest);
+        eventBus.subscribe(ExpGainRequestEvent.class, this::onExpGainRequest);
     }
 
-    private void onXpGainRequest(XpGainRequestEvent event) {
+    private void onExpGainRequest(ExpGainRequestEvent event) {
         if (event == null || event.entity() == null) return;
-        Map<String, Float> distribution = XpDistributionLoader.getDistribution(event.source());
+        Map<String, Float> distribution = ExpDistributionLoader.getDistribution(event.source());
         if (distribution == null || distribution.isEmpty()) return;
         if (event.baseXp() <= 0) return;
-        if (!Float.isFinite(event.tileMultiplier()) || event.tileMultiplier() <= 0f) return;
+        if (!Float.isFinite(event.expMultiplier()) || event.expMultiplier() <= 0f) return;
 
         float totalWeight = 0f;
         for (float weight : distribution.values()) {
@@ -30,7 +30,7 @@ public class XpDistributionSystem extends EntitySystem implements Disposable {
         }
         if (totalWeight <= 0f) return;
 
-        int totalXp = Math.max(0, Math.round(event.baseXp() * event.tileMultiplier()));
+        int totalXp = Math.max(0, Math.round(event.baseXp() * event.expMultiplier()));
         if (totalXp == 0) return;
 
         int remaining = totalXp;
@@ -46,12 +46,12 @@ public class XpDistributionSystem extends EntitySystem implements Disposable {
                 amount = remaining;
             }
             if (amount <= 0) continue;
-            eventBus.fire(new XPGainEvent(event.entity(), entry.getKey(), amount));
+            eventBus.fire(new ExpGainEvent(event.entity(), entry.getKey(), amount));
         }
     }
 
     @Override
     public void dispose() {
-        eventBus.unsubscribe(XpGainRequestEvent.class, this::onXpGainRequest);
+        eventBus.unsubscribe(ExpGainRequestEvent.class, this::onExpGainRequest);
     }
 }

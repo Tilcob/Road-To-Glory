@@ -16,7 +16,7 @@ import com.github.tilcob.game.entity.EntityIdService;
 import com.github.tilcob.game.input.*;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.skill.SkillTreeLoader;
-import com.github.tilcob.game.skill.XpDistributionLoader;
+import com.github.tilcob.game.skill.ExpDistributionLoader;
 import com.github.tilcob.game.system.installers.*;
 import com.github.tilcob.game.tiled.TiledAshleyConfigurator;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -57,7 +57,7 @@ public class GameScreenModule {
                 EntityIdService entityIdService = new EntityIdService(engine);
                 services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
                 SkillTreeLoader.loadAll();
-                XpDistributionLoader.loadAll();
+                ExpDistributionLoader.loadAll();
                 World physicWorld = new World(Constants.GRAVITY, true);
                 physicWorld.setAutoClearForces(false);
                 TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);

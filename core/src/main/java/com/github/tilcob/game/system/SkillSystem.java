@@ -23,7 +23,7 @@ public class SkillSystem extends IteratingSystem {
         super(Family.all(Skill.class).get());
         this.eventBus = eventBus;
 
-        eventBus.subscribe(XPGainEvent.class, this::onXpGain);
+        eventBus.subscribe(ExpGainEvent.class, this::onXpGain);
         eventBus.subscribe(SkillUnlockEvent.class, this::onSkillUnlock);
     }
 
@@ -32,7 +32,7 @@ public class SkillSystem extends IteratingSystem {
         // Nothing to process per frame currently
     }
 
-    private void onXpGain(XPGainEvent event) {
+    private void onXpGain(ExpGainEvent event) {
         Skill skillComp = Skill.MAPPER.get(event.entity());
         if (skillComp == null) return;
 
