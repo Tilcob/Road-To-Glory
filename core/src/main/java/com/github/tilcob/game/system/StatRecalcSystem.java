@@ -9,6 +9,7 @@ import com.github.tilcob.game.component.Id;
 import com.github.tilcob.game.component.Player;
 import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.component.StatModifierComponent;
+import com.github.tilcob.game.entity.StatsUpdateEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.StatRecalcEvent;
 import com.github.tilcob.game.stat.StatApplier;
@@ -30,14 +31,9 @@ public class StatRecalcSystem extends EntitySystem implements Disposable {
 
     private void onStatRecalc(StatRecalcEvent event) {
         Entity entity = event.entity();
-        if (entity == null) {
-            return;
-        }
-
+        if (entity == null) return;
         StatComponent stats = StatComponent.MAPPER.get(entity);
-        if (stats == null) {
-            return;
-        }
+        if (stats == null) return;
 
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
         for (StatType type : StatType.values()) {
@@ -46,6 +42,7 @@ public class StatRecalcSystem extends EntitySystem implements Disposable {
             stats.setFinalStat(type, total);
         }
         StatApplier.apply(entity, stats);
+        eventBus.fire(new StatsUpdateEvent(entity));
 
         if (Gdx.app != null && Gdx.app.getLogLevel() >= Application.LOG_DEBUG) {
             logStats(entity, stats, modifiers);

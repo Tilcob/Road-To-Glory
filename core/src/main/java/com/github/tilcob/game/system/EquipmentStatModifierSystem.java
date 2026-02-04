@@ -90,17 +90,12 @@ public class EquipmentStatModifierSystem extends IteratingSystem implements Disp
     }
 
     private void onUpdateEquipment(UpdateEquipmentEvent event) {
-        if (event == null || event.player() == null) {
-            return;
-        }
+        if (event == null || event.player() == null) return;
         Equipment equipment = Equipment.MAPPER.get(event.player());
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(event.player());
-        if (equipment == null || modifiers == null) {
-            return;
-        }
-        if (!equipment.consumeDirty()) {
-            return;
-        }
+        if (equipment == null || modifiers == null) return;
+
+        equipment.consumeDirty();
         recalcModifiers(event.player(), equipment, modifiers);
     }
 

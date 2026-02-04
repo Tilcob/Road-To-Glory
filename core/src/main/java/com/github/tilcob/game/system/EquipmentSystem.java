@@ -7,15 +7,12 @@ import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.Equipment;
 import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.Item;
-import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UpdateEquipmentEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemCategory;
-import com.github.tilcob.game.item.ItemDefinition;
-import com.github.tilcob.game.stat.StatType;
 
 public class EquipmentSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;

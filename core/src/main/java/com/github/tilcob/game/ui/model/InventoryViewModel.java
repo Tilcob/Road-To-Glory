@@ -7,6 +7,7 @@ import com.github.tilcob.game.component.Inventory;
 import com.github.tilcob.game.component.QuestLog;
 import com.github.tilcob.game.component.StatComponent;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.entity.StatsUpdateEvent;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.item.ItemModel;
@@ -33,7 +34,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().subscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().subscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().subscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
-        getEventBus().subscribe(StatRecalcEvent.class, this::onStatRecalcEvent);
+        getEventBus().subscribe(StatsUpdateEvent.class, this::onStatsUpdateEvent);
         getEventBus().subscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().subscribe(OpenChestEvent.class, this::openChest);
         getEventBus().subscribe(CloseChestEvent.class, this::closeChest);
@@ -59,7 +60,7 @@ public class InventoryViewModel extends ViewModel {
         this.propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
     }
 
-    private void onStatRecalcEvent(StatRecalcEvent event) {
+    private void onStatsUpdateEvent(StatsUpdateEvent event) {
         if (event == null || event.entity() == null) return;
         Entity entity = event.entity();
         if (currentPlayer == null) {
@@ -155,7 +156,7 @@ public class InventoryViewModel extends ViewModel {
         getEventBus().unsubscribe(UpdateEquipmentEvent.class, this::updateEquipment);
         getEventBus().unsubscribe(EntityAddItemEvent.class, this::onEntityAddItemEvent);
         getEventBus().unsubscribe(UpdateQuestLogEvent.class, this::onQuestLogEvent);
-        getEventBus().unsubscribe(StatRecalcEvent.class, this::onStatRecalcEvent);
+        getEventBus().unsubscribe(StatsUpdateEvent.class, this::onStatsUpdateEvent);
         getEventBus().unsubscribe(PauseEvent.class, this::onPauseEvent);
         getEventBus().unsubscribe(OpenChestEvent.class, this::openChest);
         getEventBus().unsubscribe(CloseChestEvent.class, this::closeChest);
