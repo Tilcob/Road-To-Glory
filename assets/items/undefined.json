@@ -1,6 +1,7 @@
 {
     "id": "undefined",
     "name": "Undefined",
+    "description": "A placeholder item with no defined traits.",
     "category": "UNDEFINED",
     "maxStack": 1,
     "icon": "ring"

@@ -1,6 +1,7 @@
 {
     "id": "shield",
     "name": "Wooden Shield",
+    "description": "A wooden shield for basic defense.",
     "category": "SHIELD",
     "maxStack": 1,
     "icon": "shield"

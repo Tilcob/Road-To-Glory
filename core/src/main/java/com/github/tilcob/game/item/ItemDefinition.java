@@ -6,19 +6,20 @@ import com.github.tilcob.game.stat.StatType;
 import java.util.List;
 import java.util.Map;
 
-public record ItemDefinition(String id, String name, ItemCategory category, int maxStack, String icon,
+public record ItemDefinition(String id, String name, String description, ItemCategory category, int maxStack, String icon,
                              Map<StatKey, Float> stats, List<ItemStatModifier> statModifiers,
                              Map<StatType, Float> requirements) {
 
-    public ItemDefinition(String id, String name, ItemCategory category, int maxStack, String icon) {
-        this(id, name, category, maxStack, icon, Map.of(), List.of(), Map.of());
+    public ItemDefinition(String id, String name, String description, ItemCategory category, int maxStack, String icon) {
+        this(id, name, description, category, maxStack, icon, Map.of(), List.of(), Map.of());
     }
 
-    public ItemDefinition(String id, String name, ItemCategory category, int maxStack, String icon,
+    public ItemDefinition(String id, String name, String description, ItemCategory category, int maxStack, String icon,
                           Map<StatKey, Float> stats, List<ItemStatModifier> statModifiers,
                           Map<StatType, Float> requirements) {
         this.id = id;
         this.name = name;
+        this.description = description == null ? "" : description;
         this.category = category;
         this.maxStack = maxStack;
         this.icon = icon;

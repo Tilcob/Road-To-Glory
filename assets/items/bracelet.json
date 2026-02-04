@@ -1,6 +1,7 @@
 {
     "id": "bracelet",
     "name": "Bracelet",
+    "description": "A simple bracelet with a faint glow.",
     "category": "BRACELET",
     "maxStack": 1,
     "icon": "bracelet"

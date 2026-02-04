@@ -47,6 +47,7 @@ public final class ItemLoader {
             }
 
             String name = requireString(root, "name", file);
+            String description = optionalString(root, "description");
             String categoryValue = requireString(root, "category", file);
             ItemCategory category = parseCategory(categoryValue, file);
             int maxStack = requireInt(root, "maxStack", file);
@@ -58,7 +59,7 @@ public final class ItemLoader {
             List<ItemStatModifier> statModifiers = parseStatModifiers(root.get("statModifiers"), file);
             Map<StatType, Float> requirements = parseRequirements(root.get("requirements"), file);
 
-            definitions.put(id, new ItemDefinition(id, name, category, maxStack,
+            definitions.put(id, new ItemDefinition(id, name, description, category, maxStack,
                 icon, stats, statModifiers, requirements));
         }
 
@@ -71,6 +72,18 @@ public final class ItemLoader {
             throw new IllegalArgumentException("Missing required field '" + name + "' in " + file.path());
         }
         return value.asString();
+    }
+
+    private static String optionalString(JsonValue root, String name) {
+        JsonValue value = root.get(name);
+        if (value == null || value.isNull()) {
+            return "";
+        }
+        String text = value.asString();
+        if (text == null) {
+            return "";
+        }
+        return text.trim();
     }
 
     private static int requireInt(JsonValue root, String name, FileHandle file) {

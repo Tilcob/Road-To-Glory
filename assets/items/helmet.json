@@ -1,6 +1,7 @@
 {
     "id": "helmet",
     "name": "Helmet",
+    "description": "A reinforced helmet for added protection.",
     "category": "HELMET",
     "maxStack": 1,
     "icon": "helmet",
