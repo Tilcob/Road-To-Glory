@@ -71,7 +71,6 @@ public class SettingsView extends View<SettingsViewModel> {
             keybindButtons = new EnumMap<>(Command.class);
         }
         setupKeybindingsSection(optionsTable);
-        setupKeybindingsSection(optionsTable);
 
         Table backTable = new Table();
         backTable.setName(SettingsOption.BACK.name());

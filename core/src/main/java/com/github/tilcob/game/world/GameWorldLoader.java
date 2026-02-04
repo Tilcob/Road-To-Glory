@@ -9,6 +9,7 @@ import com.github.tilcob.game.GameServices;
 import com.github.tilcob.game.assets.MapAsset;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.MapChangeEvent;
+import com.github.tilcob.game.event.StatRecalcEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
 import com.github.tilcob.game.input.ActiveEntityReference;
@@ -87,6 +88,7 @@ public class GameWorldLoader {
         dependencies.services().getStateManager().loadCounters(Counters.MAPPER.get(player));
         dependencies.services().getStateManager().setPlayerState(player);
         dependencies.services().getEventBus().fire(new UpdateInventoryEvent(player));
+        dependencies.services().getEventBus().fire(new StatRecalcEvent(player));
     }
 
     private void loadMap() {
