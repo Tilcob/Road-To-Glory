@@ -93,6 +93,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                             questManager,
                             questLifecycleService),
                             SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(new OcclusionSystem(), SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                             new DialogQuestBridgeSystem(
                                             eventBus,

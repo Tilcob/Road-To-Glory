@@ -28,6 +28,7 @@ public class Constants {
     public static final float LEASH_RANGE = 6f;
     public static final float PATROL_WAIT_TIME = 1.5f;
     public static final int BASE_EXP = 50;
+    public static final float OCCLUSION_ALPHA = 0.5f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -75,6 +76,7 @@ public class Constants {
     public static final String PATROL_WAIT = "patrolWait";
     public static final String CAN_WANDER = "canWander";
     public static final String EXP_MULTIPLIER = "expMultiplier";
+    public static final String OCCLUDER = "occluder";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";
@@ -82,7 +84,7 @@ public class Constants {
     public static final String TILE_WIDTH = "tilewidth";
     public static final String TILE_HEIGHT = "tileheight";
     public static final String MUSIC = "music";
-    public static final String TYPE = "type"; // That's the class (Klasse) field in Tiled
+    public static final String TYPE = "type"; // That's the class (in German: Klasse) field in Tiled
     public static final String TRIGGER_CLASS = "Trigger";
 
     // Box2D / Physics constants

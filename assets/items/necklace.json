@@ -1,6 +1,7 @@
 {
     "id": "necklace",
     "name": "Necklace",
+    "description": "A necklace that invigorates the wearer.",
     "category": "NECKLACE",
     "maxStack": 1,
     "icon": "necklace",

@@ -375,6 +375,27 @@ public class InventoryView extends View<InventoryViewModel> {
         if (item.getCount() > 1) {
             builder.append(" x").append(item.getCount());
         }
+        String description = item.getDescription();
+        if (description != null && !description.isBlank()) {
+            builder.append("\n").append(description);
+        }
+        Map<StatType, Float> requirements = item.getRequirements();
+        if (requirements != null && !requirements.isEmpty()) {
+            StringBuilder requirementsText = new StringBuilder();
+            for (StatType type : StatType.values()) {
+                Float value = requirements.get(type);
+                if (value == null) continue;
+                if (!requirementsText.isEmpty()) {
+                    requirementsText.append(", ");
+                }
+                requirementsText.append(formatStatName(type))
+                    .append(" ")
+                    .append(String.format("%.0f", value));
+            }
+            if (!requirementsText.isEmpty()) {
+                builder.append("\nRequirements: ").append(requirementsText);
+            }
+        }
         itemDetailsLabel.setText(builder.toString());
     }
 

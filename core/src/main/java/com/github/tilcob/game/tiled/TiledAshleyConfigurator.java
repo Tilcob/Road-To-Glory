@@ -75,12 +75,21 @@ public class TiledAshleyConfigurator {
         addEntityAttack(object, tile, entity);
         addEntityChest(object, entity);
         addEntityNpc(object, tile, entity);
+        addEntityOccluder(object, tile, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new AnimationFsm(entity));
         entity.add(new Tiled(object));
         entity.add(new MapEntity());
 
         engine.addEntity(entity);
+    }
+
+    private void addEntityOccluder(MapObject object, TiledMapTile tile, Entity entity) {
+        String classType = object.getProperties().containsKey(Constants.TYPE)
+            ? object.getProperties().get(Constants.TYPE, "", String.class)
+            : tile.getProperties().get(Constants.TYPE, "", String.class);
+        if (!classType.equals(Constants.PROP)) return;
+        entity.add(new Occluder());
     }
 
     private void addEntityNpc(MapObject object, TiledMapTile tile, Entity entity) {

@@ -1,6 +1,7 @@
 {
     "id": "sword",
     "name": "Iron Sword",
+    "description": "A reliable iron blade for combat.",
     "category": "WEAPON",
     "maxStack": 1,
     "icon": "sword",

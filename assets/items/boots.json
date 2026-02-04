@@ -1,6 +1,7 @@
 {
     "id": "boots",
     "name": "Boots",
+    "description": "Sturdy boots for long journeys.",
     "category": "BOOTS",
     "maxStack": 1,
     "icon": "boots"

@@ -1,6 +1,7 @@
 {
     "id": "armor",
     "name": "Armor",
+    "description": "Protective armor for the torso.",
     "category": "ARMOR",
     "maxStack": 1,
     "icon": "armor",
