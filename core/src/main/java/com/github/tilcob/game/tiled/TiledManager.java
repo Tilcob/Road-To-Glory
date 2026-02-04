@@ -119,7 +119,10 @@ public class TiledManager {
 
         for (MapObject object : layer.getObjects()) {
             String classType = object.getProperties().get(Constants.TYPE, "", String.class);
-            if (!classType.equals(Constants.TRIGGER_CLASS)) throw new GdxRuntimeException("Trigger must have the Trigger class: " + object);
+            if (!classType.equals(Constants.TRIGGER_CLASS)) {
+                Gdx.app.error("TiledManager", "Trigger must have the Trigger class: " + object);
+                if (Constants.DEBUG) throw new GdxRuntimeException("Trigger must have the Trigger class: " + object);
+            }
             if (object instanceof RectangleMapObject
                 || object instanceof EllipseMapObject
                 || object instanceof PolygonMapObject

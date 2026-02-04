@@ -85,9 +85,10 @@ public class TiledAshleyConfigurator {
     }
 
     private void addEntityOccluder(MapObject object, TiledMapTile tile, Entity entity) {
-        String classType = object.getProperties().get(Constants.TYPE, "", String.class);
-        if (classType.equals(Constants.PROP)) return;
-
+        String classType = object.getProperties().containsKey(Constants.TYPE)
+            ? object.getProperties().get(Constants.TYPE, "", String.class)
+            : tile.getProperties().get(Constants.TYPE, "", String.class);
+        if (!classType.equals(Constants.PROP)) return;
         entity.add(new Occluder());
     }
 
