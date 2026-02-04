@@ -7,9 +7,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.ui.component.FrameLayout;
+import com.github.tilcob.game.ui.component.Header;
+import com.github.tilcob.game.ui.component.KeybindingsSection;
+import com.github.tilcob.game.ui.component.VolumeSettings;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 public class SettingsView extends View<SettingsViewModel> {
@@ -17,7 +20,7 @@ public class SettingsView extends View<SettingsViewModel> {
     private Label keybindStatusLabel;
     private Command listeningCommand;
     private Group selectedItem;
-    private Table keybindingsTable;
+    private KeybindingsSection keybindingsSection;
 
     public SettingsView(Skin skin, Stage stage, SettingsViewModel viewModel) {
         super(skin, stage, viewModel);
@@ -35,13 +38,11 @@ public class SettingsView extends View<SettingsViewModel> {
         setRoot(this);
         setVisibleBound(false);
 
-        Table contentTable = new Table();
-        contentTable.setBackground(skin.getDrawable("frame"));
-        contentTable.pad(30f);
+        FrameLayout frameLayout = new FrameLayout(skin, 30f);
+        Table contentTable = frameLayout.getRoot();
 
-        Label title = new Label("Settings", skin, "text_12");
-        title.setColor(skin.getColor("sand"));
-        contentTable.add(title).padBottom(15f).row();
+        Header header = new Header(skin, "Settings");
+        contentTable.add(header.getTable()).padBottom(15f).row();
 
         Table optionsTable = new Table();
         optionsTable.top();
@@ -59,19 +60,41 @@ public class SettingsView extends View<SettingsViewModel> {
         }
         contentTable.add(scrollPane).height(scrollHeight).width(520f).row();
 
-        Slider musicSlider = setupVolumesSlider(optionsTable, "Music Volume", SettingsOption.MUSIC_VOLUME);
+        VolumeSettings volumeSection = new VolumeSettings(skin);
+        VolumeSettings.VolumeSection musicSection = volumeSection.create(
+            optionsTable,
+            "Music Volume",
+            SettingsOption.MUSIC_VOLUME.name(),
+            item -> selectedItem = viewModel.getUiServices().selectMenuItem(item)
+        );
+        Slider musicSlider = musicSection.slider();
         musicSlider.setValue(viewModel.getMusicVolume());
         onChange(musicSlider, s -> viewModel.setMusicVolume(s.getValue()));
 
-        Slider soundSlider = setupVolumesSlider(optionsTable, "Sound Volume", SettingsOption.SOUND_VOLUME);
+        VolumeSettings.VolumeSection soundSection = volumeSection.create(
+            optionsTable,
+            "Sound Volume",
+            SettingsOption.SOUND_VOLUME.name(),
+            item -> selectedItem = viewModel.getUiServices().selectMenuItem(item)
+        );
+        Slider soundSlider = soundSection.slider();
         soundSlider.setValue(viewModel.getSoundVolume());
         onChange(soundSlider, s -> viewModel.setSoundVolume(s.getValue()));
 
-        if (keybindButtons == null) {
-            keybindButtons = new EnumMap<>(Command.class);
+        if (keybindingsSection == null) {
+            keybindingsSection = new KeybindingsSection(skin);
         }
-        setupKeybindingsSection(optionsTable);
-        setupKeybindingsSection(optionsTable);
+        keybindingsSection.build(
+            optionsTable,
+            viewModel.getBindableCommands(),
+            viewModel::getBindingLabel,
+            viewModel::startListening,
+            viewModel::resetToDefaults,
+            item -> selectedItem = viewModel.getUiServices().selectMenuItem(item),
+            SettingsOption.RESET_KEYBINDS.name()
+        );
+        keybindButtons = keybindingsSection.getKeybindButtons();
+        keybindStatusLabel = keybindingsSection.getStatusLabel();
 
         Table backTable = new Table();
         backTable.setName(SettingsOption.BACK.name());
@@ -84,74 +107,6 @@ public class SettingsView extends View<SettingsViewModel> {
 
         add(contentTable).expand().center();
         align(Align.center);
-    }
-
-    private void setupKeybindingsSection(Table optionsTable) {
-        if (keybindingsTable != null) {
-            keybindingsTable.remove();
-            keybindingsTable.clear();
-        }
-        keybindButtons.clear();
-
-        keybindingsTable = new Table();
-        keybindingsTable.top();
-
-        Label header = new Label("Keybindings", skin, "text_12");
-        header.setColor(skin.getColor("sand"));
-        keybindingsTable.add(header).padTop(20f).row();
-
-        for (Command command : viewModel.getBindableCommands()) {
-            Table row = new Table();
-            row.setName(keybindOptionName(command));
-
-            Label label = new Label(formatCommandName(command), skin, "text_12");
-            label.setColor(skin.getColor("sand"));
-            row.add(label).left().padRight(12f);
-
-            TextButton button = new TextButton(viewModel.getBindingLabel(command), skin);
-            button.getLabel().setAlignment(Align.center);
-            row.add(button).width(220f);
-            keybindButtons.put(command, button);
-
-            onClick(button, () -> viewModel.startListening(command));
-            onEnter(row, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
-
-            keybindingsTable.add(row).padTop(6f).growX().row();
-        }
-
-        keybindStatusLabel = new Label("", skin, "text_12");
-        keybindStatusLabel.setColor(skin.getColor("sand"));
-        keybindStatusLabel.setAlignment(Align.center);
-
-        TextButton resetButton = new TextButton("Reset to defaults", skin);
-        Table resetRow = new Table();
-        resetRow.setName(SettingsOption.RESET_KEYBINDS.name());
-        resetRow.add(resetButton).width(220f);
-        onClick(resetButton, viewModel::resetToDefaults);
-        onEnter(resetRow, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
-
-        keybindingsTable.add(keybindStatusLabel).padTop(6f).row();
-        keybindingsTable.add(resetRow).padTop(8f).row();
-
-        optionsTable.add(keybindingsTable).growX().row();
-    }
-
-
-    private Slider setupVolumesSlider(Table contentTable, String title, SettingsOption option) {
-        Table table = new Table();
-        table.setName(option.name());
-
-        Label label = new Label(title, skin, "text_12");
-        label.setColor(skin.getColor("sand"));
-        table.add(label).row();
-
-        Slider slider = new Slider(0f, 1f, .05f, false, skin);
-        table.add(slider);
-
-        contentTable.add(table).padTop(10f).row();
-
-        onEnter(table, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
-        return slider;
     }
 
     @Override
@@ -267,21 +222,12 @@ public class SettingsView extends View<SettingsViewModel> {
         }
     }
 
-    private String formatCommandName(Command command) {
-        String name = command.name().toLowerCase().replace('_', ' ');
-        return Character.toUpperCase(name.charAt(0)) + name.substring(1);
-    }
-
-    private String keybindOptionName(Command command) {
-        return "KEYBIND_" + command.name();
-    }
-
     private Command parseKeybindCommand(String name) {
-        if (name == null || !name.startsWith("KEYBIND_")) {
+        if (name == null || !name.startsWith(KeybindingsSection.KEYBIND_PREFIX)) {
             return null;
         }
         try {
-            return Command.valueOf(name.substring("KEYBIND_".length()));
+            return Command.valueOf(name.substring(KeybindingsSection.KEYBIND_PREFIX.length()));
         } catch (IllegalArgumentException ex) {
             return null;
         }

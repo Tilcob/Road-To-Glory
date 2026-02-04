@@ -11,7 +11,6 @@ import com.github.tilcob.game.input.InputManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 public class SettingsViewModel extends ViewModel {
     private final InputManager inputManager;

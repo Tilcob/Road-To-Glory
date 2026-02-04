@@ -3,10 +3,16 @@ package com.github.tilcob.game.ui.view;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
+import com.github.tilcob.game.ui.component.FrameLayout;
+import com.github.tilcob.game.ui.component.Header;
+import com.github.tilcob.game.ui.component.MenuList;
 import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class PauseView extends View<PauseViewModel> {
@@ -26,32 +32,35 @@ public class PauseView extends View<PauseViewModel> {
         setFillParent(true);
         setRoot(this);
 
-        Table contentTable = new Table();
-        contentTable.setBackground(skin.getDrawable("frame"));
-        contentTable.pad(30f);
+        FrameLayout frameLayout = new FrameLayout(skin, 30f);
+        Table contentTable = frameLayout.getRoot();
 
-        Label title = new Label("Paused", skin, "text_12");
-        title.setColor(skin.getColor("sand"));
-        contentTable.add(title).padBottom(15f).row();
+        Header header = new Header(skin, "Paused");
+        contentTable.add(header.getTable()).padBottom(15f).row();
 
-        Table buttonTable = new Table();
+        MenuList menuList = new MenuList();
+        Table buttonTable = menuList.getRootTable();
+        Table listTable = menuList.getListTable();
         contentTable.add(buttonTable).row();
 
         TextButton resumeButton = new TextButton("Resume", skin);
         resumeButton.setName(PauseOption.RESUME.name());
-        buttonTable.add(resumeButton).width(180f).row();
+        menuList.addItem(resumeButton);
+        listTable.getCell(resumeButton).width(180f);
         onClick(resumeButton, viewModel::resumeGame);
         onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton settingsButton = new TextButton("Settings", skin);
         settingsButton.setName(PauseOption.SETTINGS.name());
-        buttonTable.add(settingsButton).width(180f).padTop(10f).row();
+        menuList.addItem(settingsButton);
+        listTable.getCell(settingsButton).width(180f).padTop(10f);
         onClick(settingsButton, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
         onEnter(settingsButton, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton quitButton = new TextButton("Quit to Menu", skin);
         quitButton.setName(PauseOption.QUIT.name());
-        buttonTable.add(quitButton).width(180f).padTop(10f).row();
+        menuList.addItem(quitButton);
+        listTable.getCell(quitButton).width(180f).padTop(10f);
         onClick(quitButton, viewModel::quitToMenu);
         onEnter(quitButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 

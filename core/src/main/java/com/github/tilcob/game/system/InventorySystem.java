@@ -24,7 +24,6 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         this.inventoryService = inventoryService;
 
         eventBus.subscribe(DragAndDropPlayerEvent.class, this::onMoveEntity);
-        eventBus.subscribe(EquipItemEvent.class, this::onEquipItem);
         eventBus.subscribe(UnequipItemEvent.class, this::onUnequipItem);
         eventBus.subscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.subscribe(SplitStackEvent.class, this::onSplitStack);
@@ -77,10 +76,6 @@ public class InventorySystem extends IteratingSystem implements Disposable {
         inventoryService.moveEntity(event.toIdx(), event.fromIdx());
     }
 
-    private void onEquipItem(EquipItemEvent event) {
-        inventoryService.equipItem(event.category(), event.fromIndex());
-    }
-
     private void onUnequipItem(UnequipItemEvent event) {
         inventoryService.unequipItem(event.category(), event.toIndex());
     }
@@ -92,7 +87,6 @@ public class InventorySystem extends IteratingSystem implements Disposable {
     @Override
     public void dispose() {
         eventBus.unsubscribe(DragAndDropPlayerEvent.class, this::onMoveEntity);
-        eventBus.unsubscribe(EquipItemEvent.class, this::onEquipItem);
         eventBus.unsubscribe(UnequipItemEvent.class, this::onUnequipItem);
         eventBus.unsubscribe(InventoryDropEvent.class, this::onDropItem);
         eventBus.unsubscribe(SplitStackEvent.class, this::onSplitStack);

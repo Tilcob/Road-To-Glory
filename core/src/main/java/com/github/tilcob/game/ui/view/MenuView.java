@@ -7,6 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
+import com.github.tilcob.game.ui.component.FrameLayout;
+import com.github.tilcob.game.ui.component.MenuList;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {
@@ -37,29 +39,30 @@ public class MenuView extends View<MenuViewModel> {
     }
 
     private void setupMenuContent() {
-        Table contentTable = new Table();
-        contentTable.setBackground(skin.getDrawable("frame"));
-        contentTable.padLeft(40.0f);
-        contentTable.padRight(40.0f);
-        contentTable.padTop(25.0f);
-        contentTable.padBottom(20.0f);
+        MenuList menuList = new MenuList();
+        FrameLayout frameLayout = new FrameLayout(skin, 25.0f, 40.0f, 20.0f, 40.0f);
+        Table contentTable = frameLayout.getRoot();
+        Table listTable = menuList.getListTable();
+
+        contentTable.add(menuList.getRootTable()).row();
 
         TextButton textButton = new TextButton("Start Game", skin);
         textButton.setName(MenuOption.START_GAME.name());
-        contentTable.add(textButton);
+        menuList.addItem(textButton);
         onClick(textButton, viewModel::startGame);
         onEnter(textButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
-        contentTable.row();
 
         TextButton settings = new TextButton("Settings", skin);
         settings.setName(MenuOption.SETTINGS.name());
-        contentTable.add(settings).padTop(10f).row();
+        menuList.addItem(settings);
+        listTable.getCell(settings).padTop(10f);
         onClick(settings, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
         onEnter(settings, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         textButton = new TextButton("Quit Game", skin);
         textButton.setName(MenuOption.QUIT_GAME.name());
-        contentTable.add(textButton).padTop(10.0f);
+        menuList.addItem(textButton);
+        listTable.getCell(textButton).padTop(10.0f);
         onClick(textButton, viewModel::quitGame);
         onEnter(textButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
         add(contentTable).row();
