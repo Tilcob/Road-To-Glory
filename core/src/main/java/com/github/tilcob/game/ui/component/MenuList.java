@@ -1,4 +1,4 @@
-package com.github.tilcob.game.ui.components;
+package com.github.tilcob.game.ui.component;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;

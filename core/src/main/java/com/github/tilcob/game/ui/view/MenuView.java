@@ -7,7 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
-import com.github.tilcob.game.ui.components.MenuList;
+import com.github.tilcob.game.ui.component.MenuList;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
 public class MenuView extends View<MenuViewModel> {

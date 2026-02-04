@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.ui.component.Header;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
 
 import java.util.EnumMap;
@@ -39,9 +40,8 @@ public class SettingsView extends View<SettingsViewModel> {
         contentTable.setBackground(skin.getDrawable("frame"));
         contentTable.pad(30f);
 
-        Label title = new Label("Settings", skin, "text_12");
-        title.setColor(skin.getColor("sand"));
-        contentTable.add(title).padBottom(15f).row();
+        Header header = new Header(skin, "Settings");
+        contentTable.add(header.getTable()).padBottom(15f).row();
 
         Table optionsTable = new Table();
         optionsTable.top();

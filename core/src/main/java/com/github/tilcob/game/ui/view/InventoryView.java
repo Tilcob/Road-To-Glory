@@ -36,11 +36,10 @@ public class InventoryView extends View<InventoryViewModel> {
     private Table statsTable;
     private ShiftClickListener shiftClickListener;
     private final IntSet occupiedPlayerSlots = new IntSet();
-    private final QuestPanelController questPanelController;
+    private QuestPanelController questPanelController;
 
     public InventoryView(Skin skin, Stage stage, InventoryViewModel viewModel) {
         super(skin, stage, viewModel);
-        this.questPanelController = new QuestPanelController(skin);
     }
 
     @Override
@@ -51,6 +50,7 @@ public class InventoryView extends View<InventoryViewModel> {
         dragAndDrop = new InventoryDragAndDrop();
         ShiftClickHandler shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
         shiftClickListener = new ShiftClickListener(shiftClickHandler, buildShiftClickContext());
+        questPanelController = new QuestPanelController(skin);
 
         Table inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);

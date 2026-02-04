@@ -7,7 +7,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
-import com.github.tilcob.game.ui.components.MenuList;
+import com.github.tilcob.game.ui.component.Header;
+import com.github.tilcob.game.ui.component.MenuList;
 import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class PauseView extends View<PauseViewModel> {
@@ -31,9 +32,8 @@ public class PauseView extends View<PauseViewModel> {
         contentTable.setBackground(skin.getDrawable("frame"));
         contentTable.pad(30f);
 
-        Label title = new Label("Paused", skin, "text_12");
-        title.setColor(skin.getColor("sand"));
-        contentTable.add(title).padBottom(15f).row();
+        Header header = new Header(skin, "Paused");
+        contentTable.add(header.getTable()).padBottom(15f).row();
 
         MenuList menuList = new MenuList();
         Table buttonTable = menuList.getTable();

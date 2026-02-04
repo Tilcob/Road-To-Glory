@@ -21,6 +21,7 @@ public class InventoryViewModel extends ViewModel {
     private boolean open = false;
     private boolean paused = false;
     private boolean isChestOpen = false;
+    private Entity currentPlayer;
 
     private final UiModelFactory uiModelFactory;
 
@@ -60,7 +61,9 @@ public class InventoryViewModel extends ViewModel {
 
     private void onStatRecalcEvent(StatRecalcEvent event) {
         if (event == null) return;
-        updateStats(event.entity());
+        if (event.entity() != null && event.entity() == currentPlayer) {
+            updateStats(currentPlayer);
+        }
     }
 
     @Override
@@ -84,6 +87,7 @@ public class InventoryViewModel extends ViewModel {
     private void rebuildInventory(Entity player) {
         Inventory inventory = Inventory.MAPPER.get(player);
         if (inventory == null) return;
+        currentPlayer = player;
         items.clear();
         onAddItem(inventory.getItems());
         propertyChangeSupport.firePropertyChange(Constants.ADD_ITEMS_TO_INVENTORY, null, items);
