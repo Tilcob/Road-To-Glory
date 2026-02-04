@@ -2,7 +2,6 @@ package com.github.tilcob.game.item;
 
 import com.github.tilcob.game.stat.StatType;
 
-import java.util.HashMap;
 import java.util.Map;
 
 public class ItemModel {

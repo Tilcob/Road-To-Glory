@@ -10,11 +10,8 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.OverheadIndicator.OverheadIndicatorType;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
+import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestDefinition;
-import com.github.tilcob.game.quest.QuestState;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
-import com.github.tilcob.game.quest.RewardTiming;
 
 import java.util.EnumMap;
 import java.util.Map;
