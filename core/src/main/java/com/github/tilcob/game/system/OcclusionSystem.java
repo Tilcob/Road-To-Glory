@@ -11,7 +11,10 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 
 public class OcclusionSystem extends EntitySystem {
-    private static final float DEFAULT_OCCLUSION_THRESHOLD = .6f;
+    private static final float PLAYER_RECT_WIDTH_SCALE = .75f;
+    private static final float PLAYER_RECT_HEIGHT_SCALE = .6f;
+    private static final float OCCLUDER_HEIGHT_SCALE = .7f;
+    private static final float OCCLUDER_WIDTH_SCALE = .45f;
 
     private ImmutableArray<Entity> occluders;
     private ImmutableArray<Entity> players;
@@ -32,13 +35,13 @@ public class OcclusionSystem extends EntitySystem {
 
         Entity player = players.first();
         Transform playerTransform = Transform.MAPPER.get(player);
-        toRect(playerTransform, tmpPlayerRect);
+        toRect(playerTransform, tmpPlayerRect, PLAYER_RECT_WIDTH_SCALE, PLAYER_RECT_HEIGHT_SCALE);
 
         for (int i = 0; i < occluders.size(); i++) {
             Entity occluder = occluders.get(i);
             Graphic graphic = Graphic.MAPPER.get(occluder);
             Transform transform = Transform.MAPPER.get(occluder);
-            toRect(transform, tmpOccluderRect);
+            toRect(transform, tmpOccluderRect, OCCLUDER_WIDTH_SCALE, OCCLUDER_HEIGHT_SCALE);
 
             if (tmpPlayerRect.overlaps(tmpOccluderRect)
                 && isPlayerBehind(playerTransform, transform)) {
@@ -49,18 +52,22 @@ public class OcclusionSystem extends EntitySystem {
         }
     }
 
-    private void toRect(Transform transform, Rectangle rect) {
+    private void toRect(Transform transform, Rectangle rect, float widthScale, float heightScale) {
         Vector2 position = transform.getPosition();
         Vector2 size = transform.getSize();
         Vector2 scaling = transform.getScaling();
-        rect.set(position.x, position.y, size.x * scaling.x, size.y * scaling.y);
+        float fullWidth = size.x * scaling.x;
+        float fullHeight = size.y * scaling.y;
+        float width = fullWidth * widthScale;
+        float height = fullHeight * heightScale;
+        float x = position.x + (fullWidth - width) * 0.5f;
+        float y = position.y;
+        rect.set(x, y, width, height);
     }
 
     private boolean isPlayerBehind(Transform playerTransform, Transform occluderTransform) {
         float playerY = playerTransform.getPosition().y;
         float occluderY = occluderTransform.getPosition().y;
-        float occluderHeight = occluderTransform.getSize().y * occluderTransform.getScaling().y;
-        float threshold = occluderY + occluderHeight * DEFAULT_OCCLUSION_THRESHOLD;
-        return playerY < threshold;
+        return playerY > occluderY;
     }
 }
