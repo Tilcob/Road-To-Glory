@@ -8,7 +8,7 @@ import com.badlogic.gdx.math.Vector2;
 public class OverheadIndicator implements Component {
     public static final ComponentMapper<OverheadIndicator> MAPPER = ComponentMapper.getFor(OverheadIndicator.class);
 
-    private final OverheadIndicatorType indicatorId;
+    private OverheadIndicatorType indicatorId;
     private final Vector2 offset;
     private float baseScale;
     private Color color;
@@ -26,6 +26,10 @@ public class OverheadIndicator implements Component {
 
     public OverheadIndicatorType getIndicatorId() {
         return indicatorId;
+    }
+
+    public void setIndicatorId(OverheadIndicatorType indicatorId) {
+        this.indicatorId = indicatorId;
     }
 
     public Vector2 getOffset() {
@@ -74,6 +78,7 @@ public class OverheadIndicator implements Component {
 
     public enum OverheadIndicatorType {
         QUEST_AVAILABLE,
+        QUEST_TURNING,
         DANGER,
         ANGRY,
         INFO,

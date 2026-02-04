@@ -108,6 +108,7 @@ public class GameScreenModule {
                                 services.getDialogYarnRuntime(),
                                 services.getCutsceneYarnRuntime(),
                                 services.getQuestYarnRuntime(),
+                                services.getQuestYarnRegistry(),
                                 services.getAllDialogs(),
                                 services.getAllCutscenes()).install(engine);
 

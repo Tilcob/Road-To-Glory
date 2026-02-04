@@ -70,13 +70,12 @@ public class Constants {
     public static final String QUEST_ID = "questId";
     public static final String CUTSCENE_ID = "cutsceneId";
     public static final String NPC_TYPE = "npcType";
-    public static final String DIALOG_REQUEST = "dialog_request";
     public static final String PATROL_POINTS = "patrolPoints";
     public static final String PATROL_LOOP = "patrolLoop";
     public static final String PATROL_WAIT = "patrolWait";
     public static final String CAN_WANDER = "canWander";
     public static final String EXP_MULTIPLIER = "expMultiplier";
-    public static final String OCCLUDER = "occluder";
+    public static final String NPC_ROLE = "npcRole";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";

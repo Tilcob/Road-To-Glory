@@ -103,10 +103,12 @@ public class TiledAshleyConfigurator {
         if (name == null) return;
         if (npcTypeStr.equals(NpcType.UNDEFINED.name()) || name.isBlank()) return;
 
-        entity.add(new Npc(NpcType.valueOf(npcTypeStr), name));
+        NpcType npcType = NpcType.valueOf(npcTypeStr);
+        entity.add(new Npc(npcType, name));
         entity.add(new PlayerReference(null));
         entity.add(new Dialog());
         entity.add(new NpcFsm(entity));
+        addNpcRole(properties, tile, entity, npcType);
         if (canWander) {
             entity.add(new MoveIntent());
             entity.add(new WanderTimer());
@@ -114,10 +116,27 @@ public class TiledAshleyConfigurator {
         entity.add(new AggroMemory());
         entity.add(new Equipment());
         entity.add(new StatModifierComponent());
-        if (NpcType.valueOf(npcTypeStr) == NpcType.ENEMY && expMultiplier > 1) entity.add(new ExpMultiplier(expMultiplier));
+        if (npcType == NpcType.ENEMY && expMultiplier > 1) entity.add(new ExpMultiplier(expMultiplier));
         Transform transform = Transform.MAPPER.get(entity);
         if (transform != null) entity.add(new SpawnPoint(transform.getPosition()));
         addPatrolRoute(object, entity);
+    }
+
+    private void addNpcRole(MapProperties properties, TiledMapTile tile, Entity entity, NpcType npcType) {
+        String roleValue = properties.containsKey(Constants.NPC_ROLE)
+            ? properties.get(Constants.NPC_ROLE, "", String.class)
+            : tile.getProperties().get(Constants.NPC_ROLE, "", String.class);
+        if (roleValue != null && !roleValue.isBlank()) {
+            try {
+                entity.add(new NpcRole(NpcRole.Role.valueOf(roleValue)));
+                return;
+            } catch (IllegalArgumentException ignored) {
+                Gdx.app.error("TiledAshleyConfigurator", "Unknown npcRole: " + roleValue);
+            }
+        }
+        if (npcType == NpcType.ENEMY) {
+            entity.add(new NpcRole(NpcRole.Role.DANGER));
+        }
     }
 
     private void addPatrolRoute(MapObject object, Entity entity) {

@@ -8,6 +8,7 @@ import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.quest.QuestLifecycleService;
 import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.quest.QuestRewardService;
+import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.states.StateManager;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledManager;
@@ -28,6 +29,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
         private final DialogYarnRuntime dialogYarnRuntime;
         private final CutsceneYarnRuntime cutsceneYarnRuntime;
         private final QuestYarnRuntime questYarnRuntime;
+        private final QuestYarnRegistry questYarnRegistry;
         private final Map<String, DialogData> allDialogs;
         private final Map<String, CutsceneData> allCutscenes;
 
@@ -42,6 +44,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                     DialogYarnRuntime dialogYarnRuntime,
                     CutsceneYarnRuntime cutsceneYarnRuntime,
                     QuestYarnRuntime questYarnRuntime,
+                    QuestYarnRegistry questYarnRegistry,
                     Map<String, DialogData> allDialogs,
                     Map<String, CutsceneData> allCutscenes) {
             this.tiledManager = tiledManager;
@@ -54,6 +57,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
             this.dialogYarnRuntime = dialogYarnRuntime;
             this.cutsceneYarnRuntime = cutsceneYarnRuntime;
             this.questYarnRuntime = questYarnRuntime;
+            this.questYarnRegistry = questYarnRegistry;
             this.allDialogs = allDialogs;
             this.allCutscenes = allCutscenes;
         }
@@ -99,6 +103,9 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                                             eventBus,
                                             questManager),
                             SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(
+                new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry),
+                SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                             new DialogSystem(eventBus, allDialogs, dialogYarnRuntime),
                             SystemOrder.GAMEPLAY));
