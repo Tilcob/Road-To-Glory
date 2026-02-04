@@ -21,9 +21,7 @@ import com.github.tilcob.game.ui.inventory.player.PlayerSlot;
 import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.InventoryViewModel;
 
-import java.util.ArrayList;
 import java.util.EnumMap;
-import java.util.List;
 import java.util.Map;
 
 public class InventoryView extends View<InventoryViewModel> {

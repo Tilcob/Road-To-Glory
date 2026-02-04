@@ -13,7 +13,6 @@ import com.github.tilcob.game.ui.component.KeybindingsSection;
 import com.github.tilcob.game.ui.component.VolumeSettings;
 import com.github.tilcob.game.ui.model.SettingsViewModel;
 
-import java.util.EnumMap;
 import java.util.Map;
 
 public class SettingsView extends View<SettingsViewModel> {

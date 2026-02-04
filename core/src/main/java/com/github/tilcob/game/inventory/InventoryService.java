@@ -124,7 +124,14 @@ public class InventoryService {
         if (definition.category() != category) return;
         if (!meetsRequirements(player, definition)) return;
 
-        equipment.equip(category, itemEntity);
+        Entity previous = equipment.equip(category, itemEntity);
+        item.setSlotIndex(-1);
+        if (previous != null) {
+            Item previousItem = Item.MAPPER.get(previous);
+            if (previousItem != null) {
+                previousItem.setSlotIndex(fromIndex);
+            }
+        }
         eventBus.fire(new UpdateInventoryEvent(player));
         eventBus.fire(new UpdateEquipmentEvent(player));
     }
