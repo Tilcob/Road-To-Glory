@@ -37,12 +37,14 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
         if (player == null) return;
         Inventory inventory = Inventory.MAPPER.get(player);
         Equipment equipment = Equipment.MAPPER.get(player);
-        if (inventory == null || equipment == null) return;
+        if (equipment == null) return;
 
         if (event.fromIndex() < 0) {
+            if (inventory == null) return;
             handleUnequip(event.category(), inventory, equipment);
             return;
         }
+        if (inventory == null) return;
 
         Entity itemEntity = findItemAtSlot(inventory, event.fromIndex());
         if (itemEntity == null) return;
