@@ -29,6 +29,7 @@ public class Constants {
     public static final float PATROL_WAIT_TIME = 1.5f;
     public static final int BASE_EXP = 50;
     public static final float OCCLUSION_ALPHA = 0.5f;
+    public static final float DEFAULT_INDICATOR_OFFSET_Y = 6f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -76,6 +77,10 @@ public class Constants {
     public static final String CAN_WANDER = "canWander";
     public static final String EXP_MULTIPLIER = "expMultiplier";
     public static final String NPC_ROLE = "npcRole";
+    public static final String ROLE = "role";
+    public static final String INDICATOR = "indicator";
+    public static final String INDICATOR_BOB = "indicatorBob";
+    public static final String INDICATOR_PULSE = "indicatorPulse";
 
     // Map Properties
     public static final String MAP_WIDTH = "width";

@@ -68,7 +68,7 @@
         "terrain.tsx"
     ],
     "project": "Road-To-Glory.tiled-project",
-    "property.type": "float",
+    "property.type": "NpcRole",
     "recentFiles": [
         "player.tmx",
         "terrain.tsx",

@@ -46,6 +46,7 @@
     <property name="controller" type="bool" value="false"/>
     <property name="hasInventory" type="bool" value="false"/>
     <property name="life" type="int" value="0"/>
+    <property name="npcRole" propertytype="NpcRole" value="QUEST_GIVER"/>
     <property name="npcType" propertytype="NpcType" value="FRIEND"/>
    </properties>
   </object>

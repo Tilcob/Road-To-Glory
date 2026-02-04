@@ -75,6 +75,7 @@ public class TiledAshleyConfigurator {
         addEntityAttack(object, tile, entity);
         addEntityChest(object, entity);
         addEntityNpc(object, tile, entity);
+        addMapIndicatorComponents(object.getProperties(), tile.getProperties(), entity);
         addEntityOccluder(object, tile, entity);
         entity.add(new Facing(Facing.FacingDirection.DOWN));
         entity.add(new AnimationFsm(entity));
@@ -123,9 +124,7 @@ public class TiledAshleyConfigurator {
     }
 
     private void addNpcRole(MapProperties properties, TiledMapTile tile, Entity entity, NpcType npcType) {
-        String roleValue = properties.containsKey(Constants.NPC_ROLE)
-            ? properties.get(Constants.NPC_ROLE, "", String.class)
-            : tile.getProperties().get(Constants.NPC_ROLE, "", String.class);
+        String roleValue = getStringProperty(properties, tile.getProperties(), Constants.NPC_ROLE, Constants.ROLE);
         if (roleValue != null && !roleValue.isBlank()) {
             try {
                 entity.add(new NpcRole(NpcRole.Role.valueOf(roleValue)));
@@ -137,6 +136,69 @@ public class TiledAshleyConfigurator {
         if (npcType == NpcType.ENEMY) {
             entity.add(new NpcRole(NpcRole.Role.DANGER));
         }
+    }
+
+    private void addMapIndicatorComponents(MapProperties properties, MapProperties tileProperties, Entity entity) {
+        boolean hasRoleProperty = hasStringProperty(properties, tileProperties, Constants.NPC_ROLE)
+            || hasStringProperty(properties, tileProperties, Constants.ROLE);
+        if (hasRoleProperty) {
+            addNpcRoleFromProperties(properties, tileProperties, entity);
+        }
+        boolean indicatorAdded = addOverheadIndicatorFromProperties(properties, tileProperties, entity);
+        if (!indicatorAdded && hasRoleProperty && OverheadIndicator.MAPPER.get(entity) == null) {
+            addOverheadIndicator(entity, OverheadIndicator.OverheadIndicatorType.INFO, properties, tileProperties);
+        }
+    }
+
+    private void addNpcRoleFromProperties(MapProperties properties, MapProperties tileProperties, Entity entity) {
+        if (NpcRole.MAPPER.get(entity) != null) return;
+        String roleValue = getStringProperty(properties, tileProperties, Constants.NPC_ROLE, Constants.ROLE);
+        if (roleValue == null || roleValue.isBlank()) return;
+        try {
+            entity.add(new NpcRole(NpcRole.Role.valueOf(roleValue)));
+        } catch (IllegalArgumentException ignored) {
+            Gdx.app.error("TiledAshleyConfigurator", "Unknown npcRole: " + roleValue);
+        }
+    }
+
+    private boolean addOverheadIndicatorFromProperties(MapProperties properties, MapProperties tileProperties, Entity entity) {
+        if (OverheadIndicator.MAPPER.get(entity) != null) return true;
+        String indicatorValue = getStringProperty(properties, tileProperties, Constants.INDICATOR);
+        if (indicatorValue == null || indicatorValue.isBlank()) return false;
+        try {
+            OverheadIndicator.OverheadIndicatorType indicatorType = OverheadIndicator.OverheadIndicatorType.valueOf(indicatorValue);
+            addOverheadIndicator(entity, indicatorType, properties, tileProperties);
+            return true;
+        } catch (IllegalArgumentException ignored) {
+            Gdx.app.error("TiledAshleyConfigurator", "Unknown indicator: " + indicatorValue);
+            return false;
+        }
+    }
+
+    private void addOverheadIndicator(Entity entity,
+                                      OverheadIndicator.OverheadIndicatorType indicatorType,
+                                      MapProperties properties,
+                                      MapProperties tileProperties) {
+        Transform transform = Transform.MAPPER.get(entity);
+        float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
+        if (transform != null) {
+            offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y;
+        }
+        OverheadIndicator indicator = new OverheadIndicator(
+            indicatorType,
+            new Vector2(0f, offsetY),
+            1f,
+            Color.WHITE.cpy(),
+            true
+        );
+
+        Boolean allowBob = getBooleanProperty(properties, tileProperties, Constants.INDICATOR_BOB);
+        if (allowBob != null) indicator.setAllowBob(allowBob);
+        Boolean allowPulse = getBooleanProperty(properties, tileProperties, Constants.INDICATOR_PULSE);
+        if (allowPulse != null) indicator.setAllowPulse(allowPulse);
+
+        entity.add(indicator);
+        entity.add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
     }
 
     private void addPatrolRoute(MapObject object, Entity entity) {
@@ -443,8 +505,43 @@ public class TiledAshleyConfigurator {
         if (!questId.isBlank()) entity.add(new Quest(questId));
         String cutsceneId = properties.get(Constants.CUTSCENE_ID, "", String.class);
         if (!cutsceneId.isBlank()) entity.add(new CutsceneReference(cutsceneId));
+        addMapIndicatorComponents(properties, null, entity);
         entity.add(tile);
         entity.add(new MapEntity());
         engine.addEntity(entity);
+    }
+
+    private String getStringProperty(MapProperties properties, MapProperties tileProperties, String key) {
+        if (properties.containsKey(key)) {
+            return properties.get(key, "", String.class);
+        }
+        if (tileProperties != null && tileProperties.containsKey(key)) {
+            return tileProperties.get(key, "", String.class);
+        }
+        return "";
+    }
+
+    private String getStringProperty(MapProperties properties,
+                                     MapProperties tileProperties,
+                                     String key,
+                                     String fallbackKey) {
+        String value = getStringProperty(properties, tileProperties, key);
+        if (value != null && !value.isBlank()) return value;
+        return getStringProperty(properties, tileProperties, fallbackKey);
+    }
+
+    private boolean hasStringProperty(MapProperties properties, MapProperties tileProperties, String key) {
+        String value = getStringProperty(properties, tileProperties, key);
+        return value != null && !value.isBlank();
+    }
+
+    private Boolean getBooleanProperty(MapProperties properties, MapProperties tileProperties, String key) {
+        if (properties.containsKey(key)) {
+            return properties.get(key, Boolean.class);
+        }
+        if (tileProperties != null && tileProperties.containsKey(key)) {
+            return tileProperties.get(key, Boolean.class);
+        }
+        return null;
     }
 }

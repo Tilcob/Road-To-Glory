@@ -74,6 +74,20 @@
             ]
         },
         {
+            "id": 9,
+            "name": "NpcRole",
+            "storageType": "string",
+            "type": "enum",
+            "values": [
+                "QUEST_GIVER",
+                "MERCHANT",
+                "DANGER",
+                "INFO",
+                "TRAINER"
+            ],
+            "valuesAsFlags": false
+        },
+        {
             "id": 8,
             "name": "NpcType",
             "storageType": "string",
