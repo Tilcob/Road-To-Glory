@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
+import com.github.tilcob.game.ui.components.MenuList;
 import com.github.tilcob.game.ui.model.PauseViewModel;
 
 public class PauseView extends View<PauseViewModel> {
@@ -34,24 +35,28 @@ public class PauseView extends View<PauseViewModel> {
         title.setColor(skin.getColor("sand"));
         contentTable.add(title).padBottom(15f).row();
 
-        Table buttonTable = new Table();
+        MenuList menuList = new MenuList();
+        Table buttonTable = menuList.getTable();
         contentTable.add(buttonTable).row();
 
         TextButton resumeButton = new TextButton("Resume", skin);
         resumeButton.setName(PauseOption.RESUME.name());
-        buttonTable.add(resumeButton).width(180f).row();
+        menuList.addItem(resumeButton);
+        buttonTable.getCell(resumeButton).width(180f);
         onClick(resumeButton, viewModel::resumeGame);
         onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton settingsButton = new TextButton("Settings", skin);
         settingsButton.setName(PauseOption.SETTINGS.name());
-        buttonTable.add(settingsButton).width(180f).padTop(10f).row();
+        menuList.addItem(settingsButton);
+        buttonTable.getCell(settingsButton).width(180f).padTop(10f);
         onClick(settingsButton, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
         onEnter(settingsButton, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton quitButton = new TextButton("Quit to Menu", skin);
         quitButton.setName(PauseOption.QUIT.name());
-        buttonTable.add(quitButton).width(180f).padTop(10f).row();
+        menuList.addItem(quitButton);
+        buttonTable.getCell(quitButton).width(180f).padTop(10f);
         onClick(quitButton, viewModel::quitToMenu);
         onEnter(quitButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
