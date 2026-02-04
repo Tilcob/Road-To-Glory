@@ -39,7 +39,9 @@ public class MenuView extends View<MenuViewModel> {
 
     private void setupMenuContent() {
         MenuList menuList = new MenuList();
-        Table contentTable = menuList.getTable();
+        Table contentTable = menuList.getRootTable();
+        Table listTable = menuList.getListTable();
+
         contentTable.setBackground(skin.getDrawable("frame"));
         contentTable.padLeft(40.0f);
         contentTable.padRight(40.0f);
@@ -55,14 +57,14 @@ public class MenuView extends View<MenuViewModel> {
         TextButton settings = new TextButton("Settings", skin);
         settings.setName(MenuOption.SETTINGS.name());
         menuList.addItem(settings);
-        contentTable.getCell(settings).padTop(10f);
+        listTable.getCell(settings).padTop(10f);
         onClick(settings, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
         onEnter(settings, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         textButton = new TextButton("Quit Game", skin);
         textButton.setName(MenuOption.QUIT_GAME.name());
         menuList.addItem(textButton);
-        contentTable.getCell(textButton).padTop(10.0f);
+        listTable.getCell(textButton).padTop(10.0f);
         onClick(textButton, viewModel::quitGame);
         onEnter(textButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
         add(contentTable).row();

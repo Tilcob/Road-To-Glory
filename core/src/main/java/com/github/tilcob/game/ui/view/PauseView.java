@@ -36,27 +36,28 @@ public class PauseView extends View<PauseViewModel> {
         contentTable.add(header.getTable()).padBottom(15f).row();
 
         MenuList menuList = new MenuList();
-        Table buttonTable = menuList.getTable();
+        Table buttonTable = menuList.getRootTable();
+        Table listTable = menuList.getListTable();
         contentTable.add(buttonTable).row();
 
         TextButton resumeButton = new TextButton("Resume", skin);
         resumeButton.setName(PauseOption.RESUME.name());
         menuList.addItem(resumeButton);
-        buttonTable.getCell(resumeButton).width(180f);
+        listTable.getCell(resumeButton).width(180f);
         onClick(resumeButton, viewModel::resumeGame);
         onEnter(resumeButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton settingsButton = new TextButton("Settings", skin);
         settingsButton.setName(PauseOption.SETTINGS.name());
         menuList.addItem(settingsButton);
-        buttonTable.getCell(settingsButton).width(180f).padTop(10f);
+        listTable.getCell(settingsButton).width(180f).padTop(10f);
         onClick(settingsButton, () -> viewModel.getEventBus().fire(new UiOverlayEvent(UiOverlayEvent.Type.OPEN_SETTINGS)));
         onEnter(settingsButton, item -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 
         TextButton quitButton = new TextButton("Quit to Menu", skin);
         quitButton.setName(PauseOption.QUIT.name());
         menuList.addItem(quitButton);
-        buttonTable.getCell(quitButton).width(180f).padTop(10f);
+        listTable.getCell(quitButton).width(180f).padTop(10f);
         onClick(quitButton, viewModel::quitToMenu);
         onEnter(quitButton, (item) -> selectedItem = viewModel.getUiServices().selectMenuItem(item));
 

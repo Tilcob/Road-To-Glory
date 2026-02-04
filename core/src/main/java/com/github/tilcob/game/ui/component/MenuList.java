@@ -1,29 +1,26 @@
 package com.github.tilcob.game.ui.component;
 
 import com.badlogic.gdx.scenes.scene2d.Actor;
-import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
-import com.badlogic.gdx.utils.Array;
 
 
 public class MenuList {
-    private final Table table;
+    private final Table rootTable;
+    private final Table listTable;
 
     public MenuList() {
-        this.table = new Table();
+        rootTable = new Table();
+        listTable = new Table();
+        rootTable.add(listTable).row();
     }
 
-    public Table getTable() {
-        return table;
+    public Table getRootTable() {
+        return rootTable;
     }
 
-    public Array<Group> getItems() {
-        Array<Group> items = new Array<>();
-        for (Actor actor : table.getChildren()) {
-            if (actor instanceof Group group) items.add(group);
-        }
-        return items;
+    public Table getListTable() {
+        return listTable;
     }
 
     public void addItem(TextButton button) {
@@ -31,6 +28,6 @@ public class MenuList {
     }
 
     public void addItem(Actor item) {
-        table.add(item).row();
+        listTable.add(item).row();
     }
 }
