@@ -5,10 +5,12 @@ import com.badlogic.gdx.files.FileHandle;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.assets.SoundAsset;
+import com.github.tilcob.game.component.OverheadIndicator;
 import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.cutscene.YarnCutsceneLoader;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
+import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemLoader;
@@ -93,6 +95,13 @@ public class GameLoader {
             )
         );
         services.getAssetManager().queue(SkinAsset.DEFAULT);
+        OverheadIndicatorRegistry.clear();
+
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.QUEST_AVAILABLE,
+            AtlasAsset.INDICATORS,
+            "quest_available"
+        );
     }
 
     private void loadFileHandles(
