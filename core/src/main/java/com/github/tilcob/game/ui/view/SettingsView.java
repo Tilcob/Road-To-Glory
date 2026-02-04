@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.ui.component.FrameLayout;
 import com.github.tilcob.game.ui.component.Header;
 import com.github.tilcob.game.ui.component.KeybindingsSection;
 import com.github.tilcob.game.ui.component.VolumeSettings;
@@ -38,9 +39,8 @@ public class SettingsView extends View<SettingsViewModel> {
         setRoot(this);
         setVisibleBound(false);
 
-        Table contentTable = new Table();
-        contentTable.setBackground(skin.getDrawable("frame"));
-        contentTable.pad(30f);
+        FrameLayout frameLayout = new FrameLayout(skin, 30f);
+        Table contentTable = frameLayout.getRoot();
 
         Header header = new Header(skin, "Settings");
         contentTable.add(header.getTable()).padBottom(15f).row();

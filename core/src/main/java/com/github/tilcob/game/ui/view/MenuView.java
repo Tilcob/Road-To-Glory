@@ -7,6 +7,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.utils.Align;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.UiOverlayEvent;
+import com.github.tilcob.game.ui.component.FrameLayout;
 import com.github.tilcob.game.ui.component.MenuList;
 import com.github.tilcob.game.ui.model.MenuViewModel;
 
@@ -39,14 +40,11 @@ public class MenuView extends View<MenuViewModel> {
 
     private void setupMenuContent() {
         MenuList menuList = new MenuList();
-        Table contentTable = menuList.getRootTable();
+        FrameLayout frameLayout = new FrameLayout(skin, 25.0f, 40.0f, 20.0f, 40.0f);
+        Table contentTable = frameLayout.getRoot();
         Table listTable = menuList.getListTable();
 
-        contentTable.setBackground(skin.getDrawable("frame"));
-        contentTable.padLeft(40.0f);
-        contentTable.padRight(40.0f);
-        contentTable.padTop(25.0f);
-        contentTable.padBottom(20.0f);
+        contentTable.add(menuList.getRootTable()).row();
 
         TextButton textButton = new TextButton("Start Game", skin);
         textButton.setName(MenuOption.START_GAME.name());
