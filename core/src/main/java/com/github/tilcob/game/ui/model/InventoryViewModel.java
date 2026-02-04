@@ -60,8 +60,16 @@ public class InventoryViewModel extends ViewModel {
     }
 
     private void onStatRecalcEvent(StatRecalcEvent event) {
-        if (event == null) return;
-        if (event.entity() != null && event.entity() == currentPlayer) {
+        if (event == null || event.entity() == null) return;
+        Entity entity = event.entity();
+        if (currentPlayer == null) {
+            Inventory inventory = Inventory.MAPPER.get(entity);
+            if (inventory == null) {
+                return;
+            }
+            currentPlayer = entity;
+        }
+        if (entity == currentPlayer) {
             updateStats(currentPlayer);
         }
     }

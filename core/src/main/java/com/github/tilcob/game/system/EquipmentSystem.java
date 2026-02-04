@@ -13,6 +13,7 @@ import com.github.tilcob.game.event.EquipItemEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.UpdateEquipmentEvent;
 import com.github.tilcob.game.event.UpdateInventoryEvent;
+import com.github.tilcob.game.inventory.InventoryService;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
@@ -20,11 +21,14 @@ import com.github.tilcob.game.stat.StatType;
 
 public class EquipmentSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
+    private final InventoryService service;
     private Entity player;
 
-    public EquipmentSystem(GameEventBus eventBus) {
+    public EquipmentSystem(GameEventBus eventBus, InventoryService service) {
         super(Family.all(Inventory.class, Equipment.class).get());
         this.eventBus = eventBus;
+        this.service = service;
+
         eventBus.subscribe(EquipItemEvent.class, this::onEquipItem);
     }
 
@@ -46,7 +50,7 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
         }
         if (inventory == null) return;
 
-        Entity itemEntity = findItemAtSlot(inventory, event.fromIndex());
+        Entity itemEntity = service.findItemAtSlot(inventory, event.fromIndex());
         if (itemEntity == null) return;
         Item item = Item.MAPPER.get(itemEntity);
         if (item == null) return;
@@ -81,7 +85,7 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
     private void handleUnequip(ItemCategory category, Inventory inventory, Equipment equipment) {
         Entity equippedItem = equipment.getEquipped(category);
         if (equippedItem == null) return;
-        int emptySlot = emptySlotIndex(inventory);
+        int emptySlot = service.emptySlotIndex(inventory);
         if (emptySlot == -1) return;
 
         equipment.unequip(category);
@@ -91,28 +95,6 @@ public class EquipmentSystem extends IteratingSystem implements Disposable {
         }
         eventBus.fire(new UpdateInventoryEvent(player));
         eventBus.fire(new UpdateEquipmentEvent(player));
-    }
-
-    private int emptySlotIndex(Inventory inventory) {
-        outer:
-        for (int i = 0; i < Constants.INVENTORY_CAPACITY; i++) {
-            for (var item : inventory.getItems()) {
-                if (Item.MAPPER.get(item).getSlotIndex() == i) {
-                    continue outer;
-                }
-            }
-            return i;
-        }
-        return -1;
-    }
-
-    private Entity findItemAtSlot(Inventory inventory, int slot) {
-        for (Entity entity : inventory.getItems()) {
-            if (Item.MAPPER.get(entity).getSlotIndex() == slot) {
-                return entity;
-            }
-        }
-        return null;
     }
 
     @Override

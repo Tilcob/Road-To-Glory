@@ -121,11 +121,12 @@ public class InventoryService {
 
         Item item = Item.MAPPER.get(itemEntity);
         ItemDefinition definition = ItemDefinitionRegistry.get(item.getItemId());
-        if (definition == null || definition.category() != category) return;
+        if (definition.category() != category) return;
         if (!meetsRequirements(player, definition)) return;
 
         equipment.equip(category, itemEntity);
         eventBus.fire(new UpdateInventoryEvent(player));
+        eventBus.fire(new UpdateEquipmentEvent(player));
     }
 
     public void unequipItem(ItemCategory category, int toIndex) {
