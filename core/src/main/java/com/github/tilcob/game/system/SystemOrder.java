@@ -7,6 +7,7 @@ public enum SystemOrder {
     COMBAT(30),
     GAMEPLAY(40),
     RENDER(50),
+    RENDER_OVERLAY(55),
     DEBUG_RENDER(60);
 
     private final int priority;

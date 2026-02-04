@@ -39,7 +39,7 @@ public class RenderSystemsInstaller implements SystemInstaller {
         engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(
             new OverheadIndicatorRenderSystem(assetManager, batch, viewport, camera),
-            SystemOrder.RENDER
+            SystemOrder.RENDER_OVERLAY
         ));
         engine.addSystem(withPriority(new ScreenFadeSystem(batch, viewport, camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(new CameraPanSystem(camera), SystemOrder.RENDER));
