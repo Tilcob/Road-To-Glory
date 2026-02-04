@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Scaling;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.item.ItemModel;
+import com.github.tilcob.game.ui.component.Header;
 import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.inventory.chest.ChestItemSource;
 import com.github.tilcob.game.ui.inventory.chest.ChestSlot;
@@ -43,9 +44,8 @@ public class ChestView extends View<ChestViewModel> {
 
         Table chestTable = new Table();
         chestTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label label = new Label("Chest", skin, "text_12");
-        label.setColor(skin.getColor("BLACK"));
-        chestTable.add(label).row();
+        Header chestHeader = new Header(skin, "Chest");
+        chestTable.add(chestHeader.getTable()).row();
         Table contentTable = new Table();
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
@@ -61,9 +61,8 @@ public class ChestView extends View<ChestViewModel> {
 
         Table playerTable = new Table();
         playerTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label playerLabel = new Label("Inventory", skin, "text_12");
-        playerLabel.setColor(skin.getColor("BLACK"));
-        playerTable.add(playerLabel).row();
+        Header playerHeader = new Header(skin, "Inventory");
+        playerTable.add(playerHeader.getTable()).row();
 
         Table playerContentTable = new Table();
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {

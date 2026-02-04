@@ -11,6 +11,7 @@ import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemModel;
 import com.github.tilcob.game.quest.Quest;
 import com.github.tilcob.game.stat.StatType;
+import com.github.tilcob.game.ui.component.Header;
 import com.github.tilcob.game.ui.inventory.*;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentItemSource;
 import com.github.tilcob.game.ui.inventory.equipment.EquipmentSlot;
@@ -175,9 +176,8 @@ public class InventoryView extends View<InventoryViewModel> {
     private Table buildInventoryContent() {
         Table table1 = new Table();
         table1.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label label = new Label("Inventory", skin, "text_12");
-        label.setColor(skin.getColor("BLACK"));
-        table1.add(label).row();
+        Header inventoryHeader = new Header(skin, "Inventory");
+        table1.add(inventoryHeader.getTable()).row();
         Table contentTable = new Table();
 
         for (int i = 0; i < Constants.INVENTORY_ROWS; i++) {
@@ -193,9 +193,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
         Table equipmentTable = new Table();
         equipmentTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label equipmentLabel = new Label("Equipment", skin, "text_12");
-        equipmentLabel.setColor(skin.getColor("BLACK"));
-        equipmentTable.add(equipmentLabel).row();
+        Header equipmentHeader = new Header(skin, "Equipment");
+        equipmentTable.add(equipmentHeader.getTable()).row();
         Table equipmentGrid = new Table();
         ItemCategory[] equipmentCategories = {
             ItemCategory.HELMET,
@@ -221,9 +220,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
         Table detailsTable = new Table();
         detailsTable.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label detailsHeader = new Label("Item Details", skin, "text_12");
-        detailsHeader.setColor(skin.getColor("BLACK"));
-        detailsTable.add(detailsHeader).left().row();
+        Header detailsHeader = new Header(skin, "Item Details");
+        detailsTable.add(detailsHeader.getTable()).left().row();
 
         itemDetailsLabel = new Label("Hover an item to see details.", skin, "text_08");
         itemDetailsLabel.setColor(skin.getColor("BLACK"));
@@ -232,9 +230,9 @@ public class InventoryView extends View<InventoryViewModel> {
 
         Table statsPanel = new Table();
         statsPanel.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label statsHeader = new Label("Stats", skin, "text_12");
-        statsHeader.setColor(skin.getColor("BLACK"));
-        statsPanel.add(statsHeader).left().row();
+        Header statsHeader = new Header(skin, "Stats");
+        statsPanel.add(statsHeader.getTable()).left().row();
+
 
         statsTable = new Table();
         statsTable.defaults().left().padBottom(2.0f);
@@ -259,9 +257,8 @@ public class InventoryView extends View<InventoryViewModel> {
     private Table buildQuestContent() {
         Table questListPanel = new Table();
         questListPanel.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label questLabel = new Label("Quests", skin, "text_12");
-        questLabel.setColor(skin.getColor("BLACK"));
-        questListPanel.add(questLabel).left().row();
+        Header questHeader = new Header(skin, "Quests");
+        questListPanel.add(questHeader.getTable()).left().row();
 
         Table questLog = new Table();
         ScrollPane questScrollPane = new ScrollPane(questLog, skin);
@@ -272,9 +269,8 @@ public class InventoryView extends View<InventoryViewModel> {
 
         Table questStepsPanel = new Table();
         questStepsPanel.setBackground(skin.getDrawable("Other_panel_brown"));
-        Label stepsLabel = new Label("Quest Steps", skin, "text_12");
-        stepsLabel.setColor(skin.getColor("BLACK"));
-        questStepsPanel.add(stepsLabel).left().row();
+        Header stepsHeader = new Header(skin, "Quest Steps");
+        questStepsPanel.add(stepsHeader.getTable()).left().row();
 
         Table questSteps = new Table();
         ScrollPane stepsScrollPane = new ScrollPane(questSteps, skin);
