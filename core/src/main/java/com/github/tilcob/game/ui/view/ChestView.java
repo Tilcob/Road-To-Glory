@@ -17,10 +17,8 @@ import com.github.tilcob.game.ui.inventory.player.PlayerSlotTarget;
 import com.github.tilcob.game.ui.model.ChestViewModel;
 
 public class ChestView extends View<ChestViewModel> {
-    private Table inventoryRoot;
     private ChestSlot[][] chestSlots;
     private PlayerSlot[][] playerSlots;
-    private ShiftClickHandler shiftClickHandler;
     private ShiftClickListener shiftClickListener;
 
     public ChestView(Skin skin, Stage stage, ChestViewModel viewModel) {
@@ -33,10 +31,10 @@ public class ChestView extends View<ChestViewModel> {
         chestSlots = new ChestSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         playerSlots = new PlayerSlot[Constants.INVENTORY_ROWS][Constants.INVENTORY_COLUMNS];
         dragAndDrop = new InventoryDragAndDrop();
-        shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
+        ShiftClickHandler shiftClickHandler = new ShiftClickHandler(viewModel.getEventBus());
         shiftClickListener = new ShiftClickListener(shiftClickHandler, buildShiftClickContext());
 
-        inventoryRoot = new Table();
+        Table inventoryRoot = new Table();
         inventoryRoot.setFillParent(true);
         setRoot(inventoryRoot);
         setVisibleBound(false);
