@@ -42,6 +42,18 @@ public class InputBindings {
         return keyMapping.get(key);
     }
 
+    public String getPrimaryBindingLabel(Command command) {
+        if (command == null) {
+            return "";
+        }
+        Set<Integer> keys = commandBindings.get(command);
+        if (keys == null || keys.isEmpty()) {
+            return "";
+        }
+        int keycode = keys.iterator().next();
+        return Input.Keys.toString(keycode);
+    }
+
     public void setBinding(Command command, int keycode) {
         if (command == null || keycode == Input.Keys.UNKNOWN) {
             return;

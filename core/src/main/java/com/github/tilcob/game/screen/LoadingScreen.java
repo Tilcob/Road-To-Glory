@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.github.tilcob.game.GameLoader;
 import com.github.tilcob.game.GameServices;
+import com.github.tilcob.game.input.InputBindings;
 
 import java.util.function.Consumer;
 
@@ -12,9 +13,9 @@ public class LoadingScreen extends ScreenAdapter {
     private final GameLoader loader;
     private final Consumer<LoadingScreen> onFinished;
 
-    public LoadingScreen(GameServices services, Consumer<LoadingScreen> onFinished) {
+    public LoadingScreen(GameServices services, Consumer<LoadingScreen> onFinished, InputBindings inputBindings) {
         this.services = services;
-        this.loader = new GameLoader(services);
+        this.loader = new GameLoader(services, inputBindings);
         this.onFinished = onFinished;
     }
 

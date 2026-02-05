@@ -34,7 +34,7 @@ public class ScreenFactory {
     }
 
     public LoadingScreen createLoadingScreen(Consumer<LoadingScreen> onFinished) {
-        return new LoadingScreen(services, onFinished);
+        return new LoadingScreen(services, onFinished, inputManager.getBindings());
     }
 
     public MenuScreen createMenuScreen() {

@@ -14,6 +14,8 @@ import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
 import com.github.tilcob.game.indicator.IndicatorVisualDef;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
+import com.github.tilcob.game.input.Command;
+import com.github.tilcob.game.input.InputBindings;
 import com.github.tilcob.game.item.ItemDefinition;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemLoader;
@@ -34,8 +36,9 @@ public class GameLoader {
     private final QuestYarnRegistry questRegistry;
     private final DialogRepository dialogRepository;
     private final CutsceneRepository cutsceneRepository;
+    private final InputBindings inputBindings;
 
-    public GameLoader(GameServices services) {
+    public GameLoader(GameServices services, InputBindings inputBindings) {
         this.services = services;
         this.questFactory = new QuestFactory(services.getQuestYarnRegistry());
         this.dialogLoader = new YarnDialogLoader();
@@ -43,6 +46,7 @@ public class GameLoader {
         this.questRegistry = services.getQuestYarnRegistry();
         this.dialogRepository = services.getDialogRepository();
         this.cutsceneRepository = services.getCutsceneRepository();
+        this.inputBindings = inputBindings;
     }
 
     public void queueAll() {
@@ -167,10 +171,10 @@ public class GameLoader {
         OverheadIndicatorRegistry.register(
             OverheadIndicator.OverheadIndicatorType.INTERACT_HINT,
             AtlasAsset.INDICATORS,
-            "key_e",
+            "key_" + inputBindings.getPrimaryBindingLabel(Command.INTERACT).toLowerCase(),
             .12f,
             Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.08f, 2.6f, 0.05f, 3.0f)
+            new IndicatorVisualDef(.3f, 0f, 0f, 0.08f, 2.6f, 0.05f, 3.0f)
         );
         OverheadIndicatorRegistry.register(
             OverheadIndicator.OverheadIndicatorType.DANGER,
