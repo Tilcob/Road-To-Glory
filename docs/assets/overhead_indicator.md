@@ -112,6 +112,23 @@ OverheadIndicatorRegistry.register(
 
 This makes the indicator available globally.
 
+### 4.3 Optional frame animation
+
+If an indicator should animate (for example like a walk cycle), register it with frame duration and play mode:
+
+```java
+OverheadIndicatorRegistry.register(
+    OverheadIndicatorType.QUEST_AVAILABLE,
+    AtlasAsset.INDICATORS,
+    "quest_available",
+    0.12f,
+    Animation.PlayMode.LOOP
+);
+```
+
+Use atlas regions like `quest_available_0`, `quest_available_1`, `quest_available_2` ...
+The render system will pick the right frame automatically from `OverheadIndicatorAnimation.time`.
+
 ---
 
 ## 5. Assigning Indicators to Entities
