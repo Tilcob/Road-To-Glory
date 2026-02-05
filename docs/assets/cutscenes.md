@@ -39,7 +39,7 @@ The following commands are available in cutscenes. Use the exact command names s
   `WALK`) with optional `LOOP`/`NORMAL` play mode.
 - `<<play_indicator <entity> <indicatorType>>>`: plays/updates an overhead indicator on an
   entity, even if no role is configured. Valid `indicatorType` values:
-  `QUEST_AVAILABLE`, `QUEST_TURNING`, `DANGER`, `ANGRY`, `INFO`.
+  `QUEST_AVAILABLE`, `QUEST_TURNING`, `DANGER`, `ANGRY`, `INFO`, `TALKING`.
 
 ### Screen fades
 

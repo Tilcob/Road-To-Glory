@@ -182,6 +182,14 @@
             "Parameters": [
                 { "Name": "soundAsset", "Type": "string" }
             ]
+        },
+        {
+            "YarnName": "play_indicator",
+            "Documentation": "",
+            "Parameters": [
+                { "Name": "entity", "Type": "string" },
+                { "Name": "indicatorType", "Type": "string" }
+            ]
         }
     ],
     "Functions": [

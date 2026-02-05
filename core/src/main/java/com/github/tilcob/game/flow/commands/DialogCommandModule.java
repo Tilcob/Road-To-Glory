@@ -1,9 +1,7 @@
 package com.github.tilcob.game.flow.commands;
 
-import com.github.tilcob.game.event.DialogGiveItemEvent;
-import com.github.tilcob.game.event.DialogGiveMoneyEvent;
-import com.github.tilcob.game.event.DialogIncCounterEvent;
-import com.github.tilcob.game.event.DialogSetFlagEvent;
+import com.github.tilcob.game.component.OverheadIndicator;
+import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowAction;
 
@@ -35,5 +33,20 @@ public final class DialogCommandModule {
             int delta = call.arguments().size() >= 2 ? Integer.parseInt(call.arguments().get(1)) : 1;
             return List.of(new FlowAction.EmitEvent(new DialogIncCounterEvent(ctx.player(), counter, delta)));
         });
+
+        registry.register("play_indicator", (call, ctx) -> {
+            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(0));
+            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), ctx.npc(), indicatorType)));
+        });
+    }
+
+    private OverheadIndicator.OverheadIndicatorType parseIndicatorType(String type) {
+        if (type == null || type.isBlank()) return null;
+
+        try {
+            return OverheadIndicator.OverheadIndicatorType.valueOf(type.trim().toUpperCase(java.util.Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 }

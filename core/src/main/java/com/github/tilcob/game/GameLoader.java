@@ -107,8 +107,8 @@ public class GameLoader {
             OverheadIndicator.OverheadIndicatorType.TALKING,
             AtlasAsset.INDICATORS,
             "speech_indicator",
-            .5f,
-            Animation.PlayMode.LOOP
+            .12f,
+            Animation.PlayMode.NORMAL
         );
     }
 

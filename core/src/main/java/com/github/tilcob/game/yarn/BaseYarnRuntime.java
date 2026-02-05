@@ -47,10 +47,14 @@ public abstract class BaseYarnRuntime {
     }
 
     public boolean tryExecuteCommandLine(Entity player, String line, CommandCall.SourcePos source) {
+        return tryExecuteCommandLine(new FlowContext(player), line, source);
+    }
+
+    public boolean tryExecuteCommandLine(FlowContext context, String line, CommandCall.SourcePos source) {
         Optional<CommandCall> callOptional = runtime.parseCommandLine(line, source);
         if (callOptional.isEmpty()) return false;
 
-        List<FlowAction> actions = commandRegistry.dispatch(callOptional.get(), new FlowContext(player));
+        List<FlowAction> actions = commandRegistry.dispatch(callOptional.get(), context);
         flowExecutor.execute(actions);
         return true;
     }

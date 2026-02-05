@@ -13,6 +13,7 @@ import com.github.tilcob.game.config.ContentPaths;
 import com.github.tilcob.game.dialog.*;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandCall;
+import com.github.tilcob.game.flow.FlowContext;
 import com.github.tilcob.game.yarn.DialogYarnRuntime;
 import com.github.tilcob.game.yarn.IfStack;
 import com.github.tilcob.game.yarn.script.ScriptEvent;
@@ -271,7 +272,7 @@ public class DialogSystem extends IteratingSystem implements Disposable {
             }
 
             if (event instanceof ScriptEvent.Command cmd) {
-                if (dialogYarnRuntime.tryExecuteCommandLine(player, cmd.raw(), sourcePos)) {
+                if (dialogYarnRuntime.tryExecuteCommandLine(new FlowContext(player, npcEntity), cmd.raw(), sourcePos)) {
                     if (!navigator.advance()) return false;
                     continue;
                 }
