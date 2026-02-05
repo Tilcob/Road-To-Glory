@@ -11,18 +11,18 @@ import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 
 public class OverheadIndicatorVisibilitySystem extends IteratingSystem {
-    private final float maxDistance;
-    private final float maxDistanceSquared;
+    private final float showDistanceSquared;
+    private final float hideDistanceSquared;
     private ImmutableArray<Entity> players;
 
     public OverheadIndicatorVisibilitySystem() {
-        this(Constants.INDICATOR_MAX_DISTANCE);
+        this(Constants.INDICATOR_SHOW_DISTANCE, Constants.INDICATOR_HIDE_DISTANCE);
     }
 
-    public OverheadIndicatorVisibilitySystem(float maxDistance) {
+    public OverheadIndicatorVisibilitySystem(float showDistance, float hideDistance) {
         super(Family.all(OverheadIndicator.class, Transform.class).get());
-        this.maxDistance = maxDistance;
-        this.maxDistanceSquared = maxDistance * maxDistance;
+        this.showDistanceSquared = showDistance * showDistance;
+        this.hideDistanceSquared = hideDistance * hideDistance;
     }
 
     @Override
@@ -33,11 +33,6 @@ public class OverheadIndicatorVisibilitySystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
-        if (!indicator.isVisible()) {
-            return;
-        }
-
         Entity player = getPlayer();
         if (player == null) {
             return;
@@ -49,10 +44,12 @@ public class OverheadIndicatorVisibilitySystem extends IteratingSystem {
             return;
         }
 
+        OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
         float distanceSquared = playerTransform.getPosition().dst2(transform.getPosition());
-        if (distanceSquared > maxDistanceSquared) {
-            indicator.setVisible(false);
-        }
+        boolean shouldBeVisible = indicator.isVisible()
+            ? distanceSquared < hideDistanceSquared
+            : distanceSquared <= showDistanceSquared;
+        indicator.setVisible(shouldBeVisible);
     }
 
     private Entity getPlayer() {
@@ -60,9 +57,5 @@ public class OverheadIndicatorVisibilitySystem extends IteratingSystem {
             return null;
         }
         return players.first();
-    }
-
-    public float getMaxDistance() {
-        return maxDistance;
     }
 }

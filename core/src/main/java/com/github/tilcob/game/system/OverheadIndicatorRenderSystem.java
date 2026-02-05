@@ -55,6 +55,9 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(entity);
         TextureRegion region = OverheadIndicatorRegistry
             .getFrame(assetManager, indicator.getIndicatorId(), animation.getTime());
+        if (region == null) {
+            return;
+        }
         Transform transform = Transform.MAPPER.get(entity);
 
         float scale = indicator.getBaseScale() * animation.getCurrentScale();

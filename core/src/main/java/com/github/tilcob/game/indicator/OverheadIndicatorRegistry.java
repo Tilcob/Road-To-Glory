@@ -1,10 +1,10 @@
 package com.github.tilcob.game.indicator;
 
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.GdxRuntimeException;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.component.OverheadIndicator.OverheadIndicatorType;
@@ -20,6 +20,7 @@ import java.util.Map;
  * consistent (for example {@code "indicators/quest_available"}).</p>
  */
 public final class OverheadIndicatorRegistry {
+    private static final String TAG = OverheadIndicatorRegistry.class.getSimpleName();
     private static final Map<OverheadIndicatorType, IndicatorAnimationDef> REGISTRY =
         new EnumMap<>(OverheadIndicatorType.class);
     private static final Map<OverheadIndicatorType, IndicatorVisualDef> VISUAL_DEF_REGISTRY =
@@ -81,10 +82,13 @@ public final class OverheadIndicatorRegistry {
 
         IndicatorAnimationDef definition = REGISTRY.get(type);
         if (definition == null) {
-            throw new IllegalArgumentException("No region registered for overhead indicator: " + type);
+            return null;
         }
         Animation<TextureRegion> animation = ANIMATION_CACHE
             .computeIfAbsent(type, key -> createAnimation(assetManager, definition));
+        if (animation == null) {
+            return null;
+        }
         return animation.getKeyFrame(Math.max(stateTime, 0f));
     }
 
@@ -94,7 +98,8 @@ public final class OverheadIndicatorRegistry {
         if (regions.isEmpty()) {
             TextureAtlas.AtlasRegion region = atlas.findRegion(definition.regionKey());
             if (region == null) {
-                throw new GdxRuntimeException("No atlas region found for overhead indicator: " + definition.regionKey());
+                Gdx.app.error(TAG, "No atlas region found for overhead indicator: " + definition.regionKey());
+                return null;
             }
             regions = new Array<>();
             regions.add(region);

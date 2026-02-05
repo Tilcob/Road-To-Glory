@@ -110,7 +110,8 @@ public class GameScreenModule {
                                 services.getQuestYarnRuntime(),
                                 services.getQuestYarnRegistry(),
                                 services.getAllDialogs(),
-                                services.getAllCutscenes()).install(engine);
+                                services.getAllCutscenes(),
+                                activeEntityReference).install(engine);
 
                 new RenderSystemsInstaller(
                                 batch,

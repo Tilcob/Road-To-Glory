@@ -125,6 +125,54 @@ public class GameLoader {
             new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
         );
         OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.MERCHANT,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .12f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.TALK_AVAILABLE,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .12f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.TALK_IN_RANGE,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .12f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.12f, 2.5f, 0.07f, 2.8f)
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.TALK_BUSY,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .10f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.18f, 2.8f, 0.10f, 3.2f)
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.TALK_CHOICE,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .10f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.20f, 3.0f, 0.10f, 3.2f)
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.INTERACT_HINT,
+            AtlasAsset.INDICATORS,
+            "interact_hint",
+            .12f,
+            Animation.PlayMode.LOOP,
+            new IndicatorVisualDef(1f, 0f, 0f, 0.08f, 2.6f, 0.05f, 3.0f)
+        );
+        OverheadIndicatorRegistry.register(
             OverheadIndicator.OverheadIndicatorType.DANGER,
             AtlasAsset.INDICATORS,
             "speech_indicator",
