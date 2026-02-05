@@ -29,7 +29,7 @@ public class Constants {
     public static final float PATROL_WAIT_TIME = 1.5f;
     public static final int BASE_EXP = 50;
     public static final float OCCLUSION_ALPHA = 0.5f;
-    public static final float DEFAULT_INDICATOR_OFFSET_Y = 6f;
+    public static final float DEFAULT_INDICATOR_OFFSET_Y = 6f * UNIT_SCALE;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";

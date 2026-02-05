@@ -182,7 +182,7 @@ public class TiledAshleyConfigurator {
         Transform transform = Transform.MAPPER.get(entity);
         float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
         if (transform != null) {
-            offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y;
+            offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y - 10 * Constants.UNIT_SCALE;
         }
         OverheadIndicator indicator = new OverheadIndicator(
             indicatorType,

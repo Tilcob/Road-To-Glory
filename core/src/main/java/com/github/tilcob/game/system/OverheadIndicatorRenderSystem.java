@@ -63,8 +63,8 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         Vector2 position = transform.getPosition();
         Vector2 offset = indicator.getOffset();
 
-        float drawX = position.x + offset.x;
-        float drawY = position.y + transform.getSize().y + offset.y + animation.getCurrentOffsetY();
+        float drawX = position.x + (transform.getSize().x - width) * 0.5f + offset.x;
+        float drawY = position.y + offset.y + animation.getCurrentOffsetY();
 
         Color indicatorColor = indicator.getColor();
         if (indicatorColor != null) {
