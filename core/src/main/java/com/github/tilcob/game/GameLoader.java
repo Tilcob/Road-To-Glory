@@ -2,6 +2,7 @@ package com.github.tilcob.game;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
+import com.badlogic.gdx.graphics.g2d.Animation;
 import com.github.tilcob.game.assets.AtlasAsset;
 import com.github.tilcob.game.assets.SkinAsset;
 import com.github.tilcob.game.assets.SoundAsset;
@@ -101,6 +102,13 @@ public class GameLoader {
             OverheadIndicator.OverheadIndicatorType.QUEST_AVAILABLE,
             AtlasAsset.INDICATORS,
             "quest_available"
+        );
+        OverheadIndicatorRegistry.register(
+            OverheadIndicator.OverheadIndicatorType.TALKING,
+            AtlasAsset.INDICATORS,
+            "speech_indicator",
+            .5f,
+            Animation.PlayMode.LOOP
         );
     }
 

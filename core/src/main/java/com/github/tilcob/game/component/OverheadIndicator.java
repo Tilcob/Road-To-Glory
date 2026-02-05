@@ -82,5 +82,6 @@ public class OverheadIndicator implements Component {
         DANGER,
         ANGRY,
         INFO,
+        TALKING,
     }
 }
