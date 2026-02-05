@@ -10,6 +10,7 @@ import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.quest.QuestRewardService;
 import com.github.tilcob.game.quest.QuestYarnRegistry;
 import com.github.tilcob.game.save.states.StateManager;
+import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.tiled.TiledManager;
 import com.github.tilcob.game.yarn.CutsceneYarnRuntime;
@@ -32,6 +33,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
         private final QuestYarnRegistry questYarnRegistry;
         private final Map<String, DialogData> allDialogs;
         private final Map<String, CutsceneData> allCutscenes;
+        private final ActiveEntityReference activeEntityReference;
 
         public GameplaySystemsInstaller(
                     TiledManager tiledManager,
@@ -46,7 +48,8 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                     QuestYarnRuntime questYarnRuntime,
                     QuestYarnRegistry questYarnRegistry,
                     Map<String, DialogData> allDialogs,
-                    Map<String, CutsceneData> allCutscenes) {
+                    Map<String, CutsceneData> allCutscenes,
+                    ActiveEntityReference activeEntityReference) {
             this.tiledManager = tiledManager;
             this.eventBus = eventBus;
             this.stateManager = stateManager;
@@ -60,6 +63,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
             this.questYarnRegistry = questYarnRegistry;
             this.allDialogs = allDialogs;
             this.allCutscenes = allCutscenes;
+            this.activeEntityReference = activeEntityReference;
         }
 
         @Override
@@ -107,7 +111,10 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                 new OverheadIndicatorAttachSystem(),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
-                new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry),
+                new InteractionFocusSystem(activeEntityReference),
+                SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(
+                new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry, activeEntityReference),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                 new IndicatorCommandLifetimeSystem(),

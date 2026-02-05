@@ -82,6 +82,12 @@ public class OverheadIndicator implements Component {
         DANGER,
         ANGRY,
         INFO,
+        MERCHANT,
+        TALK_AVAILABLE,
+        TALK_IN_RANGE,
+        TALK_BUSY,
+        TALK_CHOICE,
+        INTERACT_HINT,
         TALKING,
     }
 }

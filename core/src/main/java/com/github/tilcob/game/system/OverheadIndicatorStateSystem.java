@@ -10,6 +10,8 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.OverheadIndicator.OverheadIndicatorType;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
+import com.github.tilcob.game.input.ActiveEntityReference;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.quest.Quest;
 
@@ -20,23 +22,29 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
     private final Map<NpcRole.Role, OverheadIndicatorType> roleIndicators = new EnumMap<>(NpcRole.Role.class);
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
+    private final ActiveEntityReference activeEntityReference;
     private ImmutableArray<Entity> players;
 
-    public OverheadIndicatorStateSystem(Map<String, DialogData> allDialogs, QuestYarnRegistry questYarnRegistry) {
+    public OverheadIndicatorStateSystem(
+        Map<String, DialogData> allDialogs,
+        QuestYarnRegistry questYarnRegistry,
+        ActiveEntityReference activeEntityReference
+    ) {
         super(Family.all(OverheadIndicator.class, NpcRole.class, Npc.class).get());
         this.allDialogs = allDialogs;
         this.questYarnRegistry = questYarnRegistry;
+        this.activeEntityReference = activeEntityReference;
         roleIndicators.put(NpcRole.Role.DANGER, OverheadIndicatorType.DANGER);
-        roleIndicators.put(NpcRole.Role.INFO, OverheadIndicatorType.INFO);
-        roleIndicators.put(NpcRole.Role.MERCHANT, OverheadIndicatorType.INFO);
+        roleIndicators.put(NpcRole.Role.MERCHANT, OverheadIndicatorType.MERCHANT);
         roleIndicators.put(NpcRole.Role.QUEST_GIVER, OverheadIndicatorType.QUEST_AVAILABLE);
+        roleIndicators.put(NpcRole.Role.INFO, OverheadIndicatorType.INFO);
         roleIndicators.put(NpcRole.Role.TRAINER, OverheadIndicatorType.INFO);
     }
 
     @Override
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
-        players = engine.getEntitiesFor(Family.all(Player.class).get());
+        players = engine.getEntitiesFor(Family.all(Player.class, Transform.class).get());
     }
 
     @Override
@@ -44,7 +52,8 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
         NpcRole npcRole = NpcRole.MAPPER.get(entity);
         Npc npc = Npc.MAPPER.get(entity);
-        OverheadIndicatorType desired = resolveIndicatorType(npcRole, npc);
+
+        OverheadIndicatorType desired = resolveIndicatorType(entity, npcRole, npc);
         if (desired == null) {
             indicator.setVisible(false);
             return;
@@ -56,12 +65,61 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         }
     }
 
-    private OverheadIndicatorType resolveIndicatorType(NpcRole npcRole, Npc npc) {
-        OverheadIndicatorType questIndicator = resolveQuestIndicator(npc);
-        if (questIndicator != null) {
-            return questIndicator;
+    private OverheadIndicatorType resolveIndicatorType(Entity entity, NpcRole npcRole, Npc npc) {
+        OverheadIndicatorType best = null;
+        best = pickHigher(best, resolveRoleIndicator(npcRole));
+        best = pickHigher(best, resolveDialogIndicator(entity));
+        best = pickHigher(best, resolveQuestIndicator(npc));
+        return best;
+    }
+
+    private OverheadIndicatorType resolveRoleIndicator(NpcRole npcRole) {
+        if (npcRole == null || npcRole.getRole() == null) {
+            return null;
         }
         return roleIndicators.getOrDefault(npcRole.getRole(), OverheadIndicatorType.INFO);
+    }
+
+    private OverheadIndicatorType resolveDialogIndicator(Entity npcEntity) {
+        Entity player = getPlayer();
+        if (player == null) {
+            return null;
+        }
+
+        Dialog dialog = Dialog.MAPPER.get(npcEntity);
+        if (dialog != null && dialog.getState() == Dialog.State.ACTIVE) {
+            return OverheadIndicatorType.TALK_BUSY;
+        }
+
+        DialogSession dialogSession = DialogSession.MAPPER.get(player);
+        if (dialogSession != null && dialogSession.getNpc() == npcEntity && dialogSession.isAwaitingChoice()) {
+            return OverheadIndicatorType.TALK_CHOICE;
+        }
+
+        Interactable interactable = Interactable.mapper.get(npcEntity);
+        if (interactable == null) {
+            return null;
+        }
+
+        boolean focused = activeEntityReference != null && activeEntityReference.getFocused() == npcEntity;
+        if (!focused) {
+            return OverheadIndicatorType.TALK_AVAILABLE;
+        }
+
+        if (isPlayerInRange(player, npcEntity)) {
+            return OverheadIndicatorType.INTERACT_HINT;
+        }
+        return OverheadIndicatorType.TALK_IN_RANGE;
+    }
+
+    private boolean isPlayerInRange(Entity player, Entity target) {
+        Transform playerTransform = Transform.MAPPER.get(player);
+        Transform targetTransform = Transform.MAPPER.get(target);
+        if (playerTransform == null || targetTransform == null) {
+            return false;
+        }
+        float maxDistance = Constants.INDICATOR_SHOW_DISTANCE;
+        return playerTransform.getPosition().dst2(targetTransform.getPosition()) <= (maxDistance * maxDistance);
     }
 
     private OverheadIndicatorType resolveQuestIndicator(Npc npc) {
@@ -123,7 +181,7 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
                 continue;
             }
             if ("talk".equalsIgnoreCase(step.type()) && npcName.equals(step.npc())) {
-                return OverheadIndicatorType.INFO;
+                return OverheadIndicatorType.TALK_AVAILABLE;
             }
         }
         return null;
@@ -135,6 +193,30 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
             questYarnRegistry.loadAll();
         }
         return questYarnRegistry.getQuestDefinition(questId);
+    }
+
+    private OverheadIndicatorType pickHigher(OverheadIndicatorType current, OverheadIndicatorType candidate) {
+        if (candidate == null) {
+            return current;
+        }
+        if (current == null || indicatorPriority(candidate) > indicatorPriority(current)) {
+            return candidate;
+        }
+        return current;
+    }
+
+    private int indicatorPriority(OverheadIndicatorType type) {
+        if (type == null) {
+            return 0;
+        }
+        return switch (type) {
+            case QUEST_TURNING -> 100;
+            case QUEST_AVAILABLE -> 90;
+            case DANGER, ANGRY -> 80;
+            case MERCHANT -> 70;
+            case TALK_BUSY, TALK_CHOICE, INTERACT_HINT, TALK_IN_RANGE, TALK_AVAILABLE, TALKING -> 60;
+            default -> 10;
+        };
     }
 
     private Entity getPlayer() {
