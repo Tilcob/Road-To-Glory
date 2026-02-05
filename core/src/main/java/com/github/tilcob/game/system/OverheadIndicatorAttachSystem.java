@@ -12,7 +12,7 @@ import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 
 public class OverheadIndicatorAttachSystem extends IteratingSystem {
     public OverheadIndicatorAttachSystem() {
-        super(Family.all(Transform.class).one(Interactable.class, Chest.class).exclude(OverheadIndicator.class).get());
+        super(Family.all(Interactable.class, Transform.class).exclude(OverheadIndicator.class).get());
     }
 
     @Override

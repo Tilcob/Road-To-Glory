@@ -106,6 +106,7 @@ public class TiledAshleyConfigurator {
 
         NpcType npcType = NpcType.valueOf(npcTypeStr);
         entity.add(new Npc(npcType, name));
+        entity.add(new Interactable());
         entity.add(new PlayerReference(null));
         entity.add(new Dialog());
         entity.add(new NpcFsm(entity));
@@ -226,6 +227,7 @@ public class TiledAshleyConfigurator {
         MapAsset map = tiledManager.getCurrentMapAsset();
         if (chestRegistry.contains(map, id)) {
             entity.add(new Chest(chestRegistry.getOrCreate(map, id, null)));
+            entity.add(new Interactable());
             return;
         }
 
@@ -243,6 +245,7 @@ public class TiledAshleyConfigurator {
         }
 
         entity.add(new Chest(state));
+        entity.add(new Interactable());
     }
 
     private Array<String> getItemIds(String lootStr) {
