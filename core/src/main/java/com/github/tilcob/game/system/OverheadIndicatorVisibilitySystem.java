@@ -45,6 +45,11 @@ public class OverheadIndicatorVisibilitySystem extends IteratingSystem {
         }
 
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
+        if (indicator.getIndicatorId() != OverheadIndicator.OverheadIndicatorType.INTERACT_HINT) {
+            indicator.setVisible(true);
+            return;
+        }
+
         float distanceSquared = playerTransform.getPosition().dst2(transform.getPosition());
         boolean shouldBeVisible = indicator.isVisible()
             ? distanceSquared < hideDistanceSquared
