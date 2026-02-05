@@ -17,8 +17,9 @@ public final class DialogCommandModule {
         });
 
         registry.register("give_item", (call, ctx) -> {
-            String itemId = call.arguments().get(0);
-            int count = call.arguments().get(1) != null ? Integer.parseInt(call.arguments().get(1)) : 1;
+            String itemId = argumentAt(call.arguments(), 0);
+            String countArg = argumentAt(call.arguments(), 1);
+            int count = countArg != null ? Integer.parseInt(countArg) : 1;
             return List.of(new FlowAction.EmitEvent(new DialogGiveItemEvent(ctx.player(), itemId, count)));
         });
 
@@ -35,11 +36,15 @@ public final class DialogCommandModule {
         });
 
         registry.register("play_indicator", (call, ctx) -> {
-            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(0));
-            Float durationSeconds = parseDurationSeconds(call.arguments().get(1));
+            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(argumentAt(call.arguments(), 0));
+            Float durationSeconds = parseDurationSeconds(argumentAt(call.arguments(), 1));
             return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), ctx.npc(),
                 indicatorType, durationSeconds)));
         });
+    }
+
+    private String argumentAt(List<String> arguments, int index) {
+        return index >= 0 && index < arguments.size() ? arguments.get(index) : null;
     }
 
     private Float parseDurationSeconds(String durationSeconds) {

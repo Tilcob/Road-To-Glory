@@ -36,7 +36,7 @@ class CutsceneCommandModuleTest {
         new CutsceneCommandModule(() -> lookup).register(registry);
 
         List<FlowAction> actions = registry.dispatch(
-            CommandCall.simple("play_indicator", List.of("npc_no_role", "INFO")),
+            CommandCall.simple("play_indicator", List.of("npc_no_role", "TALKING")),
             new FlowContext(player)
         );
 
@@ -45,7 +45,7 @@ class CutsceneCommandModuleTest {
 
         assertSame(player, event.player());
         assertSame(npcWithoutRole, event.target());
-        assertEquals(OverheadIndicator.OverheadIndicatorType.INFO, event.indicatorType());
+        assertEquals(OverheadIndicator.OverheadIndicatorType.TALKING, event.indicatorType());
         assertNull(event.durationSeconds());
     }
 

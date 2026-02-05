@@ -71,7 +71,9 @@ public class CutsceneCommandModule {
             Entity target = resolveEntity(ctx.player(), call.arguments().get(0));
             OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(1));
 
-            Float durationSeconds = parseDurationSeconds(call.arguments().get(2));
+            Float durationSeconds = parseDurationSeconds(
+                call.arguments().size() > 2 ? call.arguments().get(2) : null
+            );
             return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(),
                 target, indicatorType, durationSeconds)));
         });

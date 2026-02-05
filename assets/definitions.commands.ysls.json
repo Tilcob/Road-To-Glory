@@ -188,7 +188,8 @@
             "Documentation": "",
             "Parameters": [
                 { "Name": "entity", "Type": "string" },
-                { "Name": "indicatorType", "Type": "string" }
+                { "Name": "indicatorType", "Type": "string" },
+                { "Name": "duration", "Type": "number" }
             ]
         }
     ],
