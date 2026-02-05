@@ -74,7 +74,7 @@ quest_available
 The atlas is already registered in the `AtlasAsset` enum:
 
 ```java
-INDICATORS("graphics/indicators.atlas")
+INDICATORS("graphics/indicators.atlas");
 ```
 
 The atlas is automatically queued and loaded during game startup.

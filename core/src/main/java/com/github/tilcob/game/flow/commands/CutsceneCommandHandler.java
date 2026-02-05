@@ -1,6 +1,7 @@
 package com.github.tilcob.game.flow.commands;
 
 import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
@@ -21,6 +22,7 @@ public class CutsceneCommandHandler {
         eventBus.subscribe(CameraMoveRelativeEvent.class, this::cameraMoveRelative);
         eventBus.subscribe(CameraMoveBackEvent.class, this::cameraMoveBack);
         eventBus.subscribe(PlayAnimationEvent.class, this::playAnimation);
+        eventBus.subscribe(PlayIndicatorEvent.class, this::playIndicator);
         eventBus.subscribe(MoveToEvent.class, this::moveTo);
         eventBus.subscribe(FaceEntityEvent.class, this::faceEntity);
         eventBus.subscribe(FadeInEvent.class, this::fadeIn);
@@ -73,6 +75,41 @@ public class CutsceneCommandHandler {
         if (animation2D == null || event.type() == null) return;
         animation2D.setType(event.type());
         animation2D.setPlayMode(event.playMode());
+    }
+
+    private void playIndicator(PlayIndicatorEvent event) {
+        if (event.player() == null || event.target() == null || event.indicatorType() == null) return;
+
+        OverheadIndicator indicator = OverheadIndicator.MAPPER.get(event.target());
+        if (indicator == null) {
+            Transform transform = Transform.MAPPER.get(event.target());
+            float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
+            if (transform != null) {
+                offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y - 8f * Constants.UNIT_SCALE;
+            }
+            indicator = new OverheadIndicator(
+                event.indicatorType(),
+                new Vector2(0f, offsetY),
+                .6f,
+                Color.WHITE.cpy(),
+                true
+            );
+            event.target().add(indicator);
+        }
+
+        indicator.setIndicatorId(event.indicatorType());
+        indicator.setVisible(true);
+
+        OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(event.target());
+        if (animation == null) {
+            event.target().add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
+        } else {
+            animation.setTime(0f);
+            animation.setBobPhase(0f);
+            animation.setPulsePhase(0f);
+            animation.setCurrentOffsetY(0f);
+            animation.setCurrentScale(1f);
+        }
     }
 
     private void moveTo(MoveToEvent event) {

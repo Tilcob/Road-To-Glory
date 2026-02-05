@@ -7,6 +7,7 @@ import com.github.tilcob.game.assets.MusicAsset;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.component.Animation2D;
 import com.github.tilcob.game.component.Facing;
+import com.github.tilcob.game.component.OverheadIndicator;
 import com.github.tilcob.game.entity.EntityLookup;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandRegistry;
@@ -64,6 +65,12 @@ public class CutsceneCommandModule {
                 call.arguments().size() > 2 ? call.arguments().get(2) : null, type
             );
             return List.of(new FlowAction.EmitEvent(new PlayAnimationEvent(ctx.player(), target, type, playMode)));
+        });
+
+        registry.register("play_indicator", (call, ctx) -> {
+            Entity target = resolveEntity(ctx.player(), call.arguments().get(0));
+            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(1));
+            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), target, indicatorType)));
         });
 
         registry.register("move_to", (call, ctx) -> {
@@ -155,6 +162,17 @@ public class CutsceneCommandModule {
             case IDLE, WALK -> Animation.PlayMode.LOOP;
             default -> Animation.PlayMode.NORMAL;
         };
+    }
+
+    private OverheadIndicator.OverheadIndicatorType parseIndicatorType(String type) {
+        if (type == null || type.isBlank()) return null;
+
+        String normalized = type.trim().toUpperCase(Locale.ROOT);
+        try {
+            return OverheadIndicator.OverheadIndicatorType.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+            return null;
+        }
     }
 
     private Facing.FacingDirection parseFacing(String direction) {
