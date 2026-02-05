@@ -167,7 +167,7 @@ public class GameLoader {
         OverheadIndicatorRegistry.register(
             OverheadIndicator.OverheadIndicatorType.INTERACT_HINT,
             AtlasAsset.INDICATORS,
-            "interact_hint",
+            "key_e",
             .12f,
             Animation.PlayMode.LOOP,
             new IndicatorVisualDef(1f, 0f, 0f, 0.08f, 2.6f, 0.05f, 3.0f)

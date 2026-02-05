@@ -40,9 +40,11 @@ The core module contains the platform-independent game logic for **Road-To-Glory
 - `MapChangeSystem`: Map changes and transitions.
 - `MoveIntentSystem`: Applies `MoveIntent` movement for non-NPC entities.
 - `NpcPathfindingSystem`: NPC pathfinding.
+- `InteractionFocusSystem`: Selects the best current interactable target for the player.
 - `OverheadIndicatorAnimationSystem`: Updates bob/pulse animation data for overhead indicators.
-- `OverheadIndicatorRenderSystem`: Renders overhead indicators in the world overlay pass.
-- `OverheadIndicatorStateSystem`: Resolves an indicator type from NPC role and quest/dialog state.
+- `OverheadIndicatorStateSystem`: Resolves a single prioritized indicator type from role, quest, and dialog context.
+- `OverheadIndicatorVisibilitySystem`: Applies distance visibility with show/hide hysteresis.
+- `OverheadIndicatorRenderSystem`: Renders overhead indicators in the world overlay pass (null-safe atlas fallback).
 - `PhysicDebugRenderSystem`: Physics debug rendering.
 - `PhysicMoveSystem`: Physics-based movement logic.
 - `PhysicSystem`: Physics stepping/simulation.
