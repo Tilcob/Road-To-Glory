@@ -81,6 +81,11 @@ public class CutsceneCommandHandler {
         if (event.player() == null || event.target() == null || event.indicatorType() == null) return;
 
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(event.target());
+        boolean hadIndicator = indicator != null;
+        OverheadIndicator.OverheadIndicatorType fallbackType =
+            hadIndicator ? indicator.getIndicatorId() : event.indicatorType();
+        boolean fallbackVisible = hadIndicator && indicator.isVisible();
+
         if (indicator == null) {
             Transform transform = Transform.MAPPER.get(event.target());
             float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
@@ -99,6 +104,11 @@ public class CutsceneCommandHandler {
 
         indicator.setIndicatorId(event.indicatorType());
         indicator.setVisible(true);
+
+        if (event.durationSeconds() != null && event.durationSeconds() > 0f) {
+            event.target().remove(IndicatorCommandLifetime.class);
+            event.target().add(new IndicatorCommandLifetime(event.durationSeconds(), fallbackType, fallbackVisible));
+        }
 
         OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(event.target());
         if (animation == null) {

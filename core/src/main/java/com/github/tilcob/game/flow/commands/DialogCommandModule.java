@@ -36,8 +36,19 @@ public final class DialogCommandModule {
 
         registry.register("play_indicator", (call, ctx) -> {
             OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(0));
-            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), ctx.npc(), indicatorType)));
+            Float durationSeconds = parseDurationSeconds(call.arguments().get(1));
+            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), ctx.npc(),
+                indicatorType, durationSeconds)));
         });
+    }
+
+    private Float parseDurationSeconds(String durationSeconds) {
+        if (durationSeconds == null || durationSeconds.isBlank()) return null;
+        try {
+            return Math.max(0f, Float.parseFloat(durationSeconds));
+        } catch (NumberFormatException e) {
+            return null;
+        }
     }
 
     private OverheadIndicator.OverheadIndicatorType parseIndicatorType(String type) {

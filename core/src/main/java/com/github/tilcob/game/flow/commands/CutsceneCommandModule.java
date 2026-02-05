@@ -70,7 +70,10 @@ public class CutsceneCommandModule {
         registry.register("play_indicator", (call, ctx) -> {
             Entity target = resolveEntity(ctx.player(), call.arguments().get(0));
             OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(call.arguments().get(1));
-            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), target, indicatorType)));
+
+            Float durationSeconds = parseDurationSeconds(call.arguments().get(2));
+            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(),
+                target, indicatorType, durationSeconds)));
         });
 
         registry.register("move_to", (call, ctx) -> {
@@ -192,6 +195,15 @@ public class CutsceneCommandModule {
             return Float.parseFloat(value);
         } catch (NumberFormatException e) {
             return fallback;
+        }
+    }
+
+    private Float parseDurationSeconds(String value) {
+        if (value == null || value.isBlank()) return null;
+        try {
+            return Math.max(0f, Float.parseFloat(value));
+        } catch (NumberFormatException e) {
+            return null;
         }
     }
 

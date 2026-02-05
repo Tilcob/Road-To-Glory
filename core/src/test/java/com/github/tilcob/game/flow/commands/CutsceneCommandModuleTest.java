@@ -46,5 +46,36 @@ class CutsceneCommandModuleTest {
         assertSame(player, event.player());
         assertSame(npcWithoutRole, event.target());
         assertEquals(OverheadIndicator.OverheadIndicatorType.INFO, event.indicatorType());
+        assertNull(event.durationSeconds());
+    }
+
+    @Test
+    void playIndicatorParsesOptionalDurationSeconds() {
+        Entity player = new Entity();
+
+        EntityLookup lookup = new EntityLookup() {
+            @Override
+            public Entity find(String name) {
+                return null;
+            }
+
+            @Override
+            public Entity getPlayer() {
+                return player;
+            }
+        };
+
+        CommandRegistry registry = new CommandRegistry();
+        new CutsceneCommandModule(() -> lookup).register(registry);
+
+        List<FlowAction> actions = registry.dispatch(
+            CommandCall.simple("play_indicator", List.of("player", "INFO", "2.25")),
+            new FlowContext(player)
+        );
+
+        FlowAction.EmitEvent emitEvent = assertInstanceOf(FlowAction.EmitEvent.class, actions.get(0));
+        PlayIndicatorEvent event = assertInstanceOf(PlayIndicatorEvent.class, emitEvent.event());
+
+        assertEquals(2.25f, event.durationSeconds());
     }
 }

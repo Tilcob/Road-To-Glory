@@ -107,6 +107,9 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                 new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
+                new IndicatorCommandLifetimeSystem(),
+                SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(
                             new DialogSystem(eventBus, allDialogs, dialogYarnRuntime),
                             SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(

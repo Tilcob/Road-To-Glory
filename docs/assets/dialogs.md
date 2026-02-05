@@ -129,6 +129,9 @@ Direct reward commands are only supported in dialog yarn nodes (never in quest y
 
 - `<<give_money <amount>>>`: Grant currency to the player.
 - `<<give_item <itemId> <amount>>>`: Grant one or more items (amount defaults to `1`).
+- `<<play_indicator <indicatorType> [seconds]>>`: Show an overhead indicator on the active
+  dialog NPC. `seconds` is optional and controls how long the override should stay active
+  before the previous indicator state is restored.
 
 ### Example: outside a choice <<if ...>>
 
