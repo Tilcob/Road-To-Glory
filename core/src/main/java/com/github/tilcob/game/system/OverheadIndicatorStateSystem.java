@@ -45,7 +45,13 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         NpcRole npcRole = NpcRole.MAPPER.get(entity);
         Npc npc = Npc.MAPPER.get(entity);
         OverheadIndicatorType desired = resolveIndicatorType(npcRole, npc);
-        if (desired != null && desired != indicator.getIndicatorId()) {
+        if (desired == null) {
+            indicator.setVisible(false);
+            return;
+        }
+
+        indicator.setVisible(true);
+        if (desired != indicator.getIndicatorId()) {
             indicator.setIndicatorId(desired);
         }
     }
@@ -67,11 +73,11 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         QuestDialog questDialog = resolveQuestDialog(npc);
         if (questDialog != null && questDialog.questId() != null && !questDialog.questId().isBlank()) {
             QuestState state = questLog.getQuestStateById(questDialog.questId());
-            if (state == QuestState.NOT_STARTED) {
-                return OverheadIndicatorType.QUEST_AVAILABLE;
-            }
             if (state == QuestState.COMPLETED && isQuestTurnInAvailable(questLog, questDialog.questId())) {
                 return OverheadIndicatorType.QUEST_TURNING;
+            }
+            if (state == QuestState.NOT_STARTED) {
+                return OverheadIndicatorType.QUEST_AVAILABLE;
             }
         }
 

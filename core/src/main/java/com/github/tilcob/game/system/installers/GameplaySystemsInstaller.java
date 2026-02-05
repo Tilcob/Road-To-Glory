@@ -104,6 +104,9 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                                             questManager),
                             SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
+                new OverheadIndicatorAttachSystem(),
+                SystemOrder.GAMEPLAY));
+            engine.addSystem(withPriority(
                 new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(

@@ -22,6 +22,8 @@ import java.util.Map;
 public final class OverheadIndicatorRegistry {
     private static final Map<OverheadIndicatorType, IndicatorAnimationDef> REGISTRY =
         new EnumMap<>(OverheadIndicatorType.class);
+    private static final Map<OverheadIndicatorType, IndicatorVisualDef> VISUAL_DEF_REGISTRY =
+        new EnumMap<>(OverheadIndicatorType.class);
     private static final Map<OverheadIndicatorType, Animation<TextureRegion>> ANIMATION_CACHE =
         new EnumMap<>(OverheadIndicatorType.class);
 
@@ -29,7 +31,7 @@ public final class OverheadIndicatorRegistry {
     }
 
     public static void register(OverheadIndicatorType type, AtlasAsset atlasAsset, String regionKey) {
-        register(type, atlasAsset, regionKey, Constants.FRAME_DURATION, Animation.PlayMode.LOOP);
+        register(type, atlasAsset, regionKey, Constants.FRAME_DURATION, Animation.PlayMode.LOOP, null);
     }
 
     public static void register(
@@ -38,6 +40,17 @@ public final class OverheadIndicatorRegistry {
         String regionKey,
         float frameDuration,
         Animation.PlayMode playMode
+    ) {
+        register(type, atlasAsset, regionKey, frameDuration, playMode, null);
+    }
+
+    public static void register(
+        OverheadIndicatorType type,
+        AtlasAsset atlasAsset,
+        String regionKey,
+        float frameDuration,
+        Animation.PlayMode playMode,
+        IndicatorVisualDef visualDef
     ) {
         if (type == null) throw new IllegalArgumentException("Overhead indicator type must not be null.");
         if (atlasAsset == null) throw new IllegalArgumentException("Atlas asset must not be null.");
@@ -48,6 +61,14 @@ public final class OverheadIndicatorRegistry {
             throw new IllegalArgumentException("Overhead indicator already registered: " + type);
         }
         REGISTRY.put(type, new IndicatorAnimationDef(atlasAsset, regionKey, frameDuration, playMode));
+        if (visualDef != null) {
+            VISUAL_DEF_REGISTRY.put(type, visualDef);
+        }
+    }
+
+    public static IndicatorVisualDef getVisualDef(OverheadIndicatorType type) {
+        if (type == null) return null;
+        return VISUAL_DEF_REGISTRY.get(type);
     }
 
     public static TextureRegion getRegion(AssetManager assetManager, OverheadIndicatorType type) {
@@ -86,6 +107,7 @@ public final class OverheadIndicatorRegistry {
 
     public static void clear() {
         REGISTRY.clear();
+        VISUAL_DEF_REGISTRY.clear();
         ANIMATION_CACHE.clear();
     }
 

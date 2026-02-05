@@ -7,6 +7,8 @@ import com.badlogic.gdx.math.MathUtils;
 import com.github.tilcob.game.component.OverheadIndicator;
 import com.github.tilcob.game.component.OverheadIndicatorAnimation;
 import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.indicator.IndicatorVisualDef;
+import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 
 public class OverheadIndicatorAnimationSystem extends IteratingSystem {
     private static final float BOB_AMPLITUDE = 0.15f;
@@ -25,16 +27,22 @@ public class OverheadIndicatorAnimationSystem extends IteratingSystem {
 
         animation.setTime(animation.getTime() + deltaTime);
 
-        float bobPhase = animation.getBobPhase() + deltaTime * BOB_SPEED;
-        float pulsePhase = animation.getPulsePhase() + deltaTime * PULSE_SPEED;
+        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(indicator.getIndicatorId());
+        float bobSpeed = visualDef == null ? BOB_SPEED : visualDef.bobSpeed();
+        float pulseSpeed = visualDef == null ? PULSE_SPEED : visualDef.pulseSpeed();
+        float bobAmplitude = visualDef == null ? BOB_AMPLITUDE : visualDef.bobAmplitude();
+        float pulseAmplitude = visualDef == null ? PULSE_AMPLITUDE : visualDef.pulseAmplitude();
+
+        float bobPhase = animation.getBobPhase() + deltaTime * bobSpeed;
+        float pulsePhase = animation.getPulsePhase() + deltaTime * pulseSpeed;
         animation.setBobPhase(bobPhase);
         animation.setPulsePhase(pulsePhase);
 
         boolean allowBob = indicator.getAllowBob() == null || indicator.getAllowBob();
         boolean allowPulse = indicator.getAllowPulse() == null || indicator.getAllowPulse();
 
-        float currentOffsetY = allowBob ? MathUtils.sin(bobPhase) * BOB_AMPLITUDE : 0f;
-        float currentScale = allowPulse ? 1f + MathUtils.sin(pulsePhase) * PULSE_AMPLITUDE : 1f;
+        float currentOffsetY = allowBob ? MathUtils.sin(bobPhase) * bobAmplitude : 0f;
+        float currentScale = allowPulse ? 1f + MathUtils.sin(pulsePhase) * pulseAmplitude : 1f;
         animation.setCurrentOffsetY(currentOffsetY);
         animation.setCurrentScale(currentScale);
     }
