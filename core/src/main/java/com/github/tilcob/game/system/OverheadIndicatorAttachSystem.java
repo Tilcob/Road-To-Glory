@@ -5,28 +5,20 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
-import com.github.tilcob.game.component.Npc;
-import com.github.tilcob.game.component.NpcRole;
-import com.github.tilcob.game.component.OverheadIndicator;
-import com.github.tilcob.game.component.OverheadIndicatorAnimation;
-import com.github.tilcob.game.component.Transform;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.indicator.IndicatorVisualDef;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 
 public class OverheadIndicatorAttachSystem extends IteratingSystem {
     public OverheadIndicatorAttachSystem() {
-        super(Family.all(Npc.class, NpcRole.class).exclude(OverheadIndicator.class).get());
+        super(Family.all(Transform.class).one(Interactable.class, Chest.class).exclude(OverheadIndicator.class).get());
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         NpcRole npcRole = NpcRole.MAPPER.get(entity);
-        if (!isIndicatorRelevant(npcRole)) {
-            return;
-        }
-
-        OverheadIndicator.OverheadIndicatorType defaultType = defaultTypeForRole(npcRole.getRole());
+        OverheadIndicator.OverheadIndicatorType defaultType = defaultTypeForEntity(entity, npcRole);
         OverheadIndicator indicator = createDefaultIndicator(entity, defaultType);
         entity.add(indicator);
 
@@ -37,6 +29,13 @@ public class OverheadIndicatorAttachSystem extends IteratingSystem {
 
     private boolean isIndicatorRelevant(NpcRole npcRole) {
         return npcRole != null && npcRole.getRole() != null;
+    }
+
+    private OverheadIndicator.OverheadIndicatorType defaultTypeForEntity(Entity entity, NpcRole npcRole) {
+        if (entity != null && Npc.MAPPER.has(entity) && isIndicatorRelevant(npcRole)) {
+            return defaultTypeForRole(npcRole.getRole());
+        }
+        return OverheadIndicator.OverheadIndicatorType.INTERACT_HINT;
     }
 
     private OverheadIndicator.OverheadIndicatorType defaultTypeForRole(NpcRole.Role role) {
