@@ -5,11 +5,14 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.OverheadIndicator.OverheadIndicatorType;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
+import com.github.tilcob.game.indicator.IndicatorVisualDef;
+import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.quest.*;
@@ -18,22 +21,42 @@ import com.github.tilcob.game.quest.Quest;
 import java.util.EnumMap;
 import java.util.Map;
 
-public class OverheadIndicatorStateSystem extends IteratingSystem {
+public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
+    private static final float BOB_AMPLITUDE = 0.15f;
+    private static final float BOB_SPEED = 2.5f;
+    private static final float PULSE_AMPLITUDE = 0.08f;
+    private static final float PULSE_SPEED = 3.0f;
+
     private final Map<NpcRole.Role, OverheadIndicatorType> roleIndicators = new EnumMap<>(NpcRole.Role.class);
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
     private final ActiveEntityReference activeEntityReference;
+    private final float showDistanceSquared;
+    private final float hideDistanceSquared;
     private ImmutableArray<Entity> players;
 
-    public OverheadIndicatorStateSystem(
+    public OverheadIndicatorStateMachineSystem(
         Map<String, DialogData> allDialogs,
         QuestYarnRegistry questYarnRegistry,
         ActiveEntityReference activeEntityReference
     ) {
-        super(Family.all(OverheadIndicator.class, NpcRole.class, Npc.class).get());
+        this(allDialogs, questYarnRegistry, activeEntityReference,
+            Constants.INDICATOR_SHOW_DISTANCE, Constants.INDICATOR_HIDE_DISTANCE);
+    }
+
+    public OverheadIndicatorStateMachineSystem(
+        Map<String, DialogData> allDialogs,
+        QuestYarnRegistry questYarnRegistry,
+        ActiveEntityReference activeEntityReference,
+        float showDistance,
+        float hideDistance
+    ) {
+        super(Family.all(OverheadIndicator.class, OverheadIndicatorAnimation.class, Transform.class).get());
         this.allDialogs = allDialogs;
         this.questYarnRegistry = questYarnRegistry;
         this.activeEntityReference = activeEntityReference;
+        this.showDistanceSquared = showDistance * showDistance;
+        this.hideDistanceSquared = hideDistance * hideDistance;
         roleIndicators.put(NpcRole.Role.DANGER, OverheadIndicatorType.DANGER);
         roleIndicators.put(NpcRole.Role.MERCHANT, OverheadIndicatorType.MERCHANT);
         roleIndicators.put(NpcRole.Role.QUEST_GIVER, OverheadIndicatorType.QUEST_AVAILABLE);
@@ -50,19 +73,58 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
+        OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(entity);
         NpcRole npcRole = NpcRole.MAPPER.get(entity);
         Npc npc = Npc.MAPPER.get(entity);
 
-        OverheadIndicatorType desired = resolveIndicatorType(entity, npcRole, npc);
-        if (desired == null) {
-            indicator.setVisible(false);
+        boolean hasStateDecision = npcRole != null && npc != null;
+        OverheadIndicatorType desired = null;
+        if (hasStateDecision) {
+            desired = resolveIndicatorType(entity, npcRole, npc);
+            if (desired == null) {
+                indicator.setVisible(false);
+            } else {
+                indicator.setVisible(true);
+                if (desired != indicator.getIndicatorId()) {
+                    indicator.setIndicatorId(desired);
+                }
+            }
+        }
+
+        updateVisibility(entity, indicator, hasStateDecision, desired);
+        updateAnimation(indicator, animation, deltaTime);
+    }
+
+    private void updateVisibility(
+        Entity entity,
+        OverheadIndicator indicator,
+        boolean hasStateDecision,
+        OverheadIndicatorType desired) {
+
+        if (hasStateDecision && desired == null) {
+            return;
+        }
+        if (indicator.getIndicatorId() != OverheadIndicatorType.INTERACT_HINT) {
+            indicator.setVisible(true);
             return;
         }
 
-        indicator.setVisible(true);
-        if (desired != indicator.getIndicatorId()) {
-            indicator.setIndicatorId(desired);
+        Entity player = getPlayer();
+        if (player == null) {
+            return;
         }
+
+        Transform playerTransform = Transform.MAPPER.get(player);
+        Transform transform = Transform.MAPPER.get(entity);
+        if (playerTransform == null || transform == null) {
+            return;
+        }
+
+        float distanceSquared = playerTransform.getPosition().dst2(transform.getPosition());
+        boolean shouldBeVisible = indicator.isVisible()
+            ? distanceSquared < hideDistanceSquared
+            : distanceSquared <= showDistanceSquared;
+        indicator.setVisible(shouldBeVisible);
     }
 
     private OverheadIndicatorType resolveIndicatorType(Entity entity, NpcRole npcRole, Npc npc) {
@@ -71,6 +133,29 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         best = pickHigher(best, resolveDialogIndicator(entity));
         best = pickHigher(best, resolveQuestIndicator(npc));
         return best;
+    }
+
+    private void updateAnimation(OverheadIndicator indicator, OverheadIndicatorAnimation animation, float deltaTime) {
+        animation.setTime(animation.getTime() + deltaTime);
+
+        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(indicator.getIndicatorId());
+        float bobSpeed = visualDef == null ? BOB_SPEED : visualDef.bobSpeed();
+        float pulseSpeed = visualDef == null ? PULSE_SPEED : visualDef.pulseSpeed();
+        float bobAmplitude = visualDef == null ? BOB_AMPLITUDE : visualDef.bobAmplitude();
+        float pulseAmplitude = visualDef == null ? PULSE_AMPLITUDE : visualDef.pulseAmplitude();
+
+        float bobPhase = animation.getBobPhase() + deltaTime * bobSpeed;
+        float pulsePhase = animation.getPulsePhase() + deltaTime * pulseSpeed;
+        animation.setBobPhase(bobPhase);
+        animation.setPulsePhase(pulsePhase);
+
+        boolean allowBob = indicator.getAllowBob() == null || indicator.getAllowBob();
+        boolean allowPulse = indicator.getAllowPulse() == null || indicator.getAllowPulse();
+
+        float currentOffsetY = allowBob ? MathUtils.sin(bobPhase) * bobAmplitude : 0f;
+        float currentScale = allowPulse ? 1f + MathUtils.sin(pulsePhase) * pulseAmplitude : 1f;
+        animation.setCurrentOffsetY(currentOffsetY);
+        animation.setCurrentScale(currentScale);
     }
 
     private OverheadIndicatorType resolveRoleIndicator(NpcRole npcRole) {

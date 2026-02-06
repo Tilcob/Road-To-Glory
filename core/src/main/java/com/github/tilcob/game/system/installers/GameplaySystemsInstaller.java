@@ -117,7 +117,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                 new InteractIndicatorSuppressionSystem(eventBus, activeEntityReference),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
-                new OverheadIndicatorStateSystem(allDialogs, questYarnRegistry, activeEntityReference),
+                new OverheadIndicatorStateMachineSystem(allDialogs, questYarnRegistry, activeEntityReference),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                 new IndicatorCommandLifetimeSystem(),
