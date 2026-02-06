@@ -105,6 +105,7 @@ public class CutsceneCommandHandler {
                 true
             );
             event.target().add(indicator);
+            event.target().add(new OverheadIndicatorState());
         }
 
         indicator.setIndicatorId(event.indicatorType());

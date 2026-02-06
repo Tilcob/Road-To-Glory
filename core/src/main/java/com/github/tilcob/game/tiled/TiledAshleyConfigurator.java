@@ -204,6 +204,7 @@ public class TiledAshleyConfigurator {
         if (allowPulse != null) indicator.setAllowPulse(allowPulse);
 
         entity.add(indicator);
+        entity.add(new OverheadIndicatorState());
         entity.add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
     }
 
