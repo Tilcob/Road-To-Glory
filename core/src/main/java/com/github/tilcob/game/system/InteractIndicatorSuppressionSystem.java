@@ -5,11 +5,11 @@ import com.badlogic.ashley.core.EntitySystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.component.InteractIndicatorSuppression;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.CommandEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.input.Command;
-import com.github.tilcob.game.config.Constants;
 
 public class InteractIndicatorSuppressionSystem extends EntitySystem implements Disposable {
     private final GameEventBus eventBus;

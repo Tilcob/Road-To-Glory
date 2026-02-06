@@ -34,8 +34,6 @@ public class RenderSystemsInstaller implements SystemInstaller {
     @Override
     public void install(Engine engine) {
         engine.addSystem(withPriority(new AnimationSystem(assetManager), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new OverheadIndicatorAnimationSystem(), SystemOrder.RENDER));
-        engine.addSystem(withPriority(new OverheadIndicatorVisibilitySystem(), SystemOrder.RENDER));
         engine.addSystem(withPriority(new CameraSystem(camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(new RenderSystem(batch, viewport, camera), SystemOrder.RENDER));
         engine.addSystem(withPriority(

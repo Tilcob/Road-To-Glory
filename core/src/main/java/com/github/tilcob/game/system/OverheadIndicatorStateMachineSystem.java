@@ -9,12 +9,12 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.OverheadIndicator.OverheadIndicatorType;
+import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.indicator.IndicatorVisualDef;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.input.ActiveEntityReference;
-import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.quest.Quest;
 
