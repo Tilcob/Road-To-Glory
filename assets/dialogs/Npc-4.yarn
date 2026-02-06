@@ -7,8 +7,10 @@ An enemy of the woods is here in our village.
 Would you be so kind and help us.
 -> Yes I am eager to help. What must I do?
     <<add_quest the_first_fight>>
+    <<play_indicator Npc-1 HAPPY 3>>
     <<jump npc_4_quest_notStarted>>
 -> I have not time. I am sorry.
+    <<play_indicator Npc-1 SAD 3>>
     <<jump npc_4_idle>>
 ===
 title: npc_4_quest_notStarted

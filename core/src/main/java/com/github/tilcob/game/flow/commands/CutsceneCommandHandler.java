@@ -7,6 +7,8 @@ import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.indicator.IndicatorVisualDef;
+import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.input.Command;
 
 public class CutsceneCommandHandler {
@@ -92,10 +94,13 @@ public class CutsceneCommandHandler {
             if (transform != null) {
                 offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y - 8f * Constants.UNIT_SCALE;
             }
+            IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
+            float baseScale = visualDef == null ? 0.6f : visualDef.defaultScale();
+
             indicator = new OverheadIndicator(
                 event.indicatorType(),
                 new Vector2(0f, offsetY),
-                .6f,
+                baseScale,
                 Color.WHITE.cpy(),
                 true
             );
@@ -103,6 +108,10 @@ public class CutsceneCommandHandler {
         }
 
         indicator.setIndicatorId(event.indicatorType());
+        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
+        if (visualDef != null) {
+            indicator.setBaseScale(visualDef.defaultScale());
+        }
         indicator.setVisible(true);
 
         if (event.durationSeconds() != null && event.durationSeconds() > 0f) {

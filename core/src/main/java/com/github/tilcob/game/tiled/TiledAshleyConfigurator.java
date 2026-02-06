@@ -29,6 +29,8 @@ import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.entity.EntityIdGenerator;
+import com.github.tilcob.game.indicator.IndicatorVisualDef;
+import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.loot.LootTableType;
 import com.github.tilcob.game.npc.NpcType;
@@ -147,7 +149,7 @@ public class TiledAshleyConfigurator {
         }
         boolean indicatorAdded = addOverheadIndicatorFromProperties(properties, tileProperties, entity);
         if (!indicatorAdded && hasRoleProperty && OverheadIndicator.MAPPER.get(entity) == null) {
-            addOverheadIndicator(entity, OverheadIndicator.OverheadIndicatorType.INFO, properties, tileProperties);
+            addOverheadIndicator(entity, OverheadIndicator.OverheadIndicatorType.QUEST_AVAILABLE, properties, tileProperties);
         }
     }
 
@@ -185,10 +187,13 @@ public class TiledAshleyConfigurator {
         if (transform != null) {
             offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y - 8f * Constants.UNIT_SCALE;
         }
+        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(indicatorType);
+        float baseScale = visualDef == null ? 0.6f : visualDef.defaultScale();
+
         OverheadIndicator indicator = new OverheadIndicator(
             indicatorType,
             new Vector2(0f, offsetY),
-            .6f,
+            baseScale,
             Color.WHITE.cpy(),
             true
         );
