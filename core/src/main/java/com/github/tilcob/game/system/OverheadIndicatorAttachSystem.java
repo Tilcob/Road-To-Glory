@@ -21,11 +21,6 @@ public class OverheadIndicatorAttachSystem extends IteratingSystem {
         OverheadIndicator.OverheadIndicatorType defaultType = defaultTypeForEntity(entity, npcRole);
         OverheadIndicator indicator = createDefaultIndicator(entity, defaultType);
         entity.add(indicator);
-        entity.add(new OverheadIndicatorState());
-
-        if (OverheadIndicatorAnimation.MAPPER.get(entity) == null) {
-            entity.add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
-        }
     }
 
     private boolean isIndicatorRelevant(NpcRole npcRole) {

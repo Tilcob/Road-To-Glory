@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.component.OverheadIndicator;
-import com.github.tilcob.game.component.OverheadIndicatorAnimation;
 import com.github.tilcob.game.component.Player;
 import com.github.tilcob.game.component.Transform;
 import org.junit.jupiter.api.Test;
@@ -34,7 +33,6 @@ class OverheadIndicatorStateMachineSystemTest {
                 false
             );
             npc.add(indicator);
-            npc.add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
             npc.add(new Transform(new Vector2(10f, 0f), 0, new Vector2(1f, 1f), new Vector2(1f, 1f), 0f));
             engine.addEntity(npc);
 
@@ -62,7 +60,6 @@ class OverheadIndicatorStateMachineSystemTest {
                 true
             );
             npc.add(indicator);
-            npc.add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
             npc.add(new Transform(new Vector2(3f, 0f), 0, new Vector2(1f, 1f), new Vector2(1f, 1f), 0f));
             engine.addEntity(npc);
 

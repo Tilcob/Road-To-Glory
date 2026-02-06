@@ -11,7 +11,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.github.tilcob.game.assets.AssetManager;
 import com.github.tilcob.game.component.OverheadIndicator;
-import com.github.tilcob.game.component.OverheadIndicatorAnimation;
 import com.github.tilcob.game.component.Transform;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
@@ -28,7 +27,7 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         Viewport viewport,
         OrthographicCamera camera
     ) {
-        super(Family.all(OverheadIndicator.class, OverheadIndicatorAnimation.class, Transform.class).get());
+        super(Family.all(OverheadIndicator.class, Transform.class).get());
         this.assetManager = assetManager;
         this.batch = batch;
         this.viewport = viewport;
@@ -52,15 +51,15 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         if (!indicator.isVisible()) {
             return;
         }
-        OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(entity);
+
         TextureRegion region = OverheadIndicatorRegistry
-            .getFrame(assetManager, indicator.getIndicatorId(), animation.getTime());
+            .getFrame(assetManager, indicator.getCurrentType(), indicator.getTime());
         if (region == null) {
             return;
         }
         Transform transform = Transform.MAPPER.get(entity);
 
-        float scale = indicator.getBaseScale() * animation.getCurrentScale();
+        float scale = indicator.getBaseScale() * indicator.getScale();
         float width = region.getRegionWidth() * Constants.UNIT_SCALE * scale;
         float height = region.getRegionHeight() * Constants.UNIT_SCALE * scale;
 
@@ -68,7 +67,7 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         Vector2 offset = indicator.getOffset();
 
         float drawX = position.x + (transform.getSize().x - width) * 0.5f + offset.x;
-        float drawY = position.y + offset.y + animation.getCurrentOffsetY();
+        float drawY = position.y + offset.y + indicator.getCurrentOffsetY();
 
         Color indicatorColor = indicator.getColor();
         if (indicatorColor != null) {

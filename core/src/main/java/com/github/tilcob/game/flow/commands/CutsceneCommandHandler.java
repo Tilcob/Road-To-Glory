@@ -85,7 +85,7 @@ public class CutsceneCommandHandler {
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(event.target());
         boolean hadIndicator = indicator != null;
         OverheadIndicator.OverheadIndicatorType fallbackType =
-            hadIndicator ? indicator.getIndicatorId() : event.indicatorType();
+            hadIndicator ? indicator.getCurrentType() : event.indicatorType();
         boolean fallbackVisible = hadIndicator && indicator.isVisible();
 
         if (indicator == null) {
@@ -105,10 +105,9 @@ public class CutsceneCommandHandler {
                 true
             );
             event.target().add(indicator);
-            event.target().add(new OverheadIndicatorState());
         }
 
-        indicator.setIndicatorId(event.indicatorType());
+        indicator.setCurrentType(event.indicatorType());
         IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
         if (visualDef != null) {
             indicator.setBaseScale(visualDef.defaultScale());
@@ -120,16 +119,11 @@ public class CutsceneCommandHandler {
             event.target().add(new IndicatorCommandLifetime(event.durationSeconds(), fallbackType, fallbackVisible));
         }
 
-        OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(event.target());
-        if (animation == null) {
-            event.target().add(new OverheadIndicatorAnimation(0f, 0f, 0f, 0f, 1f));
-        } else {
-            animation.setTime(0f);
-            animation.setBobPhase(0f);
-            animation.setPulsePhase(0f);
-            animation.setCurrentOffsetY(0f);
-            animation.setCurrentScale(1f);
-        }
+        indicator.setTime(0f);
+        indicator.setBobPhase(0f);
+        indicator.setPulsePhase(0f);
+        indicator.setCurrentOffsetY(0f);
+        indicator.setScale(1f);
     }
 
     private void moveTo(MoveToEvent event) {

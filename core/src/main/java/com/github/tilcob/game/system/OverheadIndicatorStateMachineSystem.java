@@ -51,7 +51,7 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         float showDistance,
         float hideDistance
     ) {
-        super(Family.all(OverheadIndicator.class, OverheadIndicatorAnimation.class, Transform.class).get());
+        super(Family.all(OverheadIndicator.class, Transform.class).get());
         this.allDialogs = allDialogs;
         this.questYarnRegistry = questYarnRegistry;
         this.activeEntityReference = activeEntityReference;
@@ -73,7 +73,6 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
-        OverheadIndicatorAnimation animation = OverheadIndicatorAnimation.MAPPER.get(entity);
         NpcRole npcRole = NpcRole.MAPPER.get(entity);
         Npc npc = Npc.MAPPER.get(entity);
 
@@ -85,14 +84,14 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
                 indicator.setVisible(false);
             } else {
                 indicator.setVisible(true);
-                if (desired != indicator.getIndicatorId()) {
-                    indicator.setIndicatorId(desired);
+                if (desired != indicator.getCurrentType()) {
+                    indicator.setCurrentType(desired);
                 }
             }
         }
 
         updateVisibility(entity, indicator, hasStateDecision, desired);
-        updateAnimation(indicator, animation, deltaTime);
+        updateAnimation(indicator, deltaTime);
     }
 
     private void updateVisibility(
@@ -104,7 +103,7 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         if (hasStateDecision && desired == null) {
             return;
         }
-        if (indicator.getIndicatorId() != OverheadIndicatorType.INTERACT_HINT) {
+        if (indicator.getCurrentType() != OverheadIndicatorType.INTERACT_HINT) {
             indicator.setVisible(true);
             return;
         }
@@ -135,27 +134,27 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         return best;
     }
 
-    private void updateAnimation(OverheadIndicator indicator, OverheadIndicatorAnimation animation, float deltaTime) {
-        animation.setTime(animation.getTime() + deltaTime);
+    private void updateAnimation(OverheadIndicator indicator, float deltaTime) {
+        indicator.setTime(indicator.getTime() + deltaTime);
 
-        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(indicator.getIndicatorId());
+        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(indicator.getCurrentType());
         float bobSpeed = visualDef == null ? BOB_SPEED : visualDef.bobSpeed();
         float pulseSpeed = visualDef == null ? PULSE_SPEED : visualDef.pulseSpeed();
         float bobAmplitude = visualDef == null ? BOB_AMPLITUDE : visualDef.bobAmplitude();
         float pulseAmplitude = visualDef == null ? PULSE_AMPLITUDE : visualDef.pulseAmplitude();
 
-        float bobPhase = animation.getBobPhase() + deltaTime * bobSpeed;
-        float pulsePhase = animation.getPulsePhase() + deltaTime * pulseSpeed;
-        animation.setBobPhase(bobPhase);
-        animation.setPulsePhase(pulsePhase);
+        float bobPhase = indicator.getBobPhase() + deltaTime * bobSpeed;
+        float pulsePhase = indicator.getPulsePhase() + deltaTime * pulseSpeed;
+        indicator.setBobPhase(bobPhase);
+        indicator.setPulsePhase(pulsePhase);
 
         boolean allowBob = indicator.getAllowBob() == null || indicator.getAllowBob();
         boolean allowPulse = indicator.getAllowPulse() == null || indicator.getAllowPulse();
 
         float currentOffsetY = allowBob ? MathUtils.sin(bobPhase) * bobAmplitude : 0f;
         float currentScale = allowPulse ? 1f + MathUtils.sin(pulsePhase) * pulseAmplitude : 1f;
-        animation.setCurrentOffsetY(currentOffsetY);
-        animation.setCurrentScale(currentScale);
+        indicator.setCurrentOffsetY(currentOffsetY);
+        indicator.setScale(currentScale);
     }
 
     private OverheadIndicatorType resolveRoleIndicator(NpcRole npcRole) {

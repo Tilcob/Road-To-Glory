@@ -23,7 +23,7 @@ public class IndicatorCommandLifetimeSystem extends IteratingSystem {
             return;
         }
 
-        indicator.setIndicatorId(lifetime.getFallbackIndicatorType());
+        indicator.setCurrentType(lifetime.getFallbackIndicatorType());
         indicator.setVisible(lifetime.isFallbackVisible());
         entity.remove(IndicatorCommandLifetime.class);
     }
