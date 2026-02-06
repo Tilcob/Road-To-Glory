@@ -12,6 +12,7 @@ import com.github.tilcob.game.cutscene.CutsceneRepository;
 import com.github.tilcob.game.cutscene.YarnCutsceneLoader;
 import com.github.tilcob.game.dialog.DialogRepository;
 import com.github.tilcob.game.dialog.YarnDialogLoader;
+import com.github.tilcob.game.indicator.IndicatorLoader;
 import com.github.tilcob.game.indicator.IndicatorVisualDef;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.input.Command;
@@ -102,104 +103,7 @@ public class GameLoader {
             )
         );
         services.getAssetManager().queue(SkinAsset.DEFAULT);
-        OverheadIndicatorRegistry.clear();
-
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.QUEST_AVAILABLE,
-            AtlasAsset.INDICATORS,
-            "quest_available",
-            Constants.FRAME_DURATION,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.15f, 2.5f, 0.08f, 3.0f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.QUEST_TURNING,
-            AtlasAsset.INDICATORS,
-            "quest_available",
-            Constants.FRAME_DURATION,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.20f, 2.8f, 0.10f, 3.2f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.INFO,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .12f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.MERCHANT,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .12f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.TALK_AVAILABLE,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .12f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.10f, 2.3f, 0.06f, 2.8f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.TALK_IN_RANGE,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .12f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.12f, 2.5f, 0.07f, 2.8f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.TALK_BUSY,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .10f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.18f, 2.8f, 0.10f, 3.2f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.TALK_CHOICE,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .10f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.20f, 3.0f, 0.10f, 3.2f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.INTERACT_HINT,
-            AtlasAsset.INDICATORS,
-            "key_" + inputBindings.getPrimaryBindingLabel(Command.INTERACT).toLowerCase(),
-            .12f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(.3f, 0f, 0f, 0.08f, 2.6f, 0.05f, 3.0f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.DANGER,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .10f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.20f, 3.0f, 0.12f, 3.4f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.ANGRY,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .10f,
-            Animation.PlayMode.LOOP,
-            new IndicatorVisualDef(1f, 0f, 0f, 0.20f, 3.0f, 0.12f, 3.4f)
-        );
-        OverheadIndicatorRegistry.register(
-            OverheadIndicator.OverheadIndicatorType.TALKING,
-            AtlasAsset.INDICATORS,
-            "speech_indicator",
-            .12f,
-            Animation.PlayMode.NORMAL,
-            new IndicatorVisualDef(1f, 0f, 0f, 0f, 2.5f, 0f, 3.0f)
-        );
+        IndicatorLoader.load(inputBindings);
     }
 
     private void loadFileHandles(
