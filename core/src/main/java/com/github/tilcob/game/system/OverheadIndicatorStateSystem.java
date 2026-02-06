@@ -77,6 +77,9 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         if (npcRole == null || npcRole.getRole() == null) {
             return null;
         }
+        if (npcRole.getRole() == NpcRole.Role.QUEST_GIVER) {
+            return null;
+        }
         return roleIndicators.getOrDefault(npcRole.getRole(), OverheadIndicatorType.INFO);
     }
 
