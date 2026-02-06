@@ -81,6 +81,8 @@ public class OverheadIndicator implements Component {
         QUEST_TURNING,
         DANGER,
         ANGRY,
+        HAPPY,
+        SAD,
         INFO,
         MERCHANT,
         TALK_AVAILABLE,

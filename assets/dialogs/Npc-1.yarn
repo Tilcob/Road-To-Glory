@@ -4,8 +4,10 @@ position: -193,-349
 ---
 Hello, would you like to do a quest?
 -> ... (Take Quest)
+    <<play_indicator Npc-1 HAPPY 3>>
     <<add_quest welcome_to_town>>
     <<jump npc_1_quest_notStarted>>
+    <<play_indicator Npc-1 SAD 3>>
 -> ... (not now)
     <<jump npc_1_idle>>
 ===

@@ -49,6 +49,13 @@ public class IndicatorLoader {
 
         register(TALKING, "talking",
             new IndicatorVisualDef(10f, 0f, 0f, 0f, 2.5f, 0f, 3.0f));
+
+        register(HAPPY, "happy",
+            new IndicatorVisualDef(2f, 0f, 0f, 0.20f, 3.0f, 0.12f, 3.4f));
+
+        register(SAD, "sad",
+            new IndicatorVisualDef(2f, 0f, 0f, 0.20f, 3.0f, 0.12f, 3.4f));
+
     }
 
     private static void register(
