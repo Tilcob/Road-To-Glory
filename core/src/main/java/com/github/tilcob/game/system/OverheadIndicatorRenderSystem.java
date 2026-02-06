@@ -59,7 +59,7 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         }
         Transform transform = Transform.MAPPER.get(entity);
 
-        float scale = indicator.getScale();
+        float scale = indicator.getBaseScale() * indicator.getScale();
         float width = region.getRegionWidth() * Constants.UNIT_SCALE * scale;
         float height = region.getRegionHeight() * Constants.UNIT_SCALE * scale;
 
@@ -67,7 +67,7 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
         Vector2 offset = indicator.getOffset();
 
         float drawX = position.x + (transform.getSize().x - width) * 0.5f + offset.x;
-        float drawY = position.y + offset.y;
+        float drawY = position.y + offset.y + indicator.getCurrentOffsetY();
         float alpha = indicator.getAlpha();
 
         Color indicatorColor = indicator.getColor();
