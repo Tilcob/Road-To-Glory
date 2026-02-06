@@ -26,6 +26,7 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
     private static final float BOB_SPEED = 2.5f;
     private static final float PULSE_AMPLITUDE = 0.08f;
     private static final float PULSE_SPEED = 3.0f;
+    private static final float FADE_DURATION = 0.2f;
 
     private final Map<NpcRole.Role, OverheadIndicatorType> roleIndicators = new EnumMap<>(NpcRole.Role.class);
     private final Map<String, DialogData> allDialogs;
@@ -77,53 +78,112 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         Npc npc = Npc.MAPPER.get(entity);
 
         boolean hasStateDecision = npcRole != null && npc != null;
-        OverheadIndicatorType desired = null;
+        OverheadIndicatorType baseType = indicator.getCurrentType();
         if (hasStateDecision) {
-            desired = resolveIndicatorType(entity, npcRole, npc);
-            if (desired == null) {
-                indicator.setVisible(false);
-            } else {
-                indicator.setVisible(true);
-                if (desired != indicator.getCurrentType()) {
-                    indicator.setCurrentType(desired);
-                }
+            baseType = resolveIndicatorType(entity, npcRole, npc);
+            if (baseType != indicator.getCurrentType()) {
+                indicator.setCurrentType(baseType);
             }
         }
 
-        updateVisibility(entity, indicator, hasStateDecision, desired);
+        OverheadIndicatorType desired = indicator.getDesiredType() != null
+            ? indicator.getDesiredType()
+            : baseType;
+        boolean shouldBeVisible = resolveVisibility(entity, indicator, desired);
+        updateState(indicator, desired, shouldBeVisible, deltaTime);
         updateAnimation(indicator, deltaTime);
     }
 
-    private void updateVisibility(
+    private boolean resolveVisibility(
         Entity entity,
         OverheadIndicator indicator,
-        boolean hasStateDecision,
         OverheadIndicatorType desired) {
 
-        if (hasStateDecision && desired == null) {
-            return;
-        }
-        if (indicator.getCurrentType() != OverheadIndicatorType.INTERACT_HINT) {
-            indicator.setVisible(true);
-            return;
-        }
+        if (desired == null) return false;
+        if (desired != OverheadIndicatorType.INTERACT_HINT) return true;
 
         Entity player = getPlayer();
-        if (player == null) {
-            return;
-        }
+        if (player == null) return indicator.isVisible();
 
         Transform playerTransform = Transform.MAPPER.get(player);
         Transform transform = Transform.MAPPER.get(entity);
-        if (playerTransform == null || transform == null) {
-            return;
-        }
+        if (playerTransform == null || transform == null) return indicator.isVisible();
 
         float distanceSquared = playerTransform.getPosition().dst2(transform.getPosition());
-        boolean shouldBeVisible = indicator.isVisible()
+        return indicator.isVisible()
             ? distanceSquared < hideDistanceSquared
             : distanceSquared <= showDistanceSquared;
-        indicator.setVisible(shouldBeVisible);
+    }
+
+    private void updateState(
+        OverheadIndicator indicator,
+        OverheadIndicatorType desiredType,
+        boolean shouldBeVisible,
+        float deltaTime
+    ) {
+        OverheadIndicatorType activeType = indicator.getIndicatorId();
+        OverheadIndicator.State state = indicator.getState();
+
+        if (!shouldBeVisible || desiredType == null) {
+            if (state != OverheadIndicator.State.FADE_OUT && state != OverheadIndicator.State.HIDDEN) {
+                indicator.setState(OverheadIndicator.State.FADE_OUT);
+                indicator.setTimer(0f);
+            }
+        } else if (state == OverheadIndicator.State.HIDDEN) {
+            indicator.setIndicatorId(desiredType);
+            indicator.setState(OverheadIndicator.State.FADE_IN);
+            indicator.setTimer(0f);
+        } else if (activeType == null) {
+            indicator.setIndicatorId(desiredType);
+            indicator.setState(OverheadIndicator.State.FADE_IN);
+            indicator.setTimer(0f);
+        } else if (activeType != desiredType && state != OverheadIndicator.State.FADE_OUT) {
+            indicator.setState(OverheadIndicator.State.FADE_OUT);
+            indicator.setTimer(0f);
+        }
+
+        state = indicator.getState();
+        switch (state) {
+            case FADE_IN -> {
+                indicator.setVisible(true);
+                float timer = indicator.getTimer() + deltaTime;
+                float progress = Math.min(timer / FADE_DURATION, 1f);
+                indicator.setAlpha(progress);
+                indicator.setTimer(timer);
+                if (progress >= 1f) {
+                    indicator.setAlpha(1f);
+                    indicator.setState(OverheadIndicator.State.IDLE);
+                    indicator.setTimer(0f);
+                }
+            }
+            case FADE_OUT -> {
+                indicator.setVisible(true);
+                float timer = indicator.getTimer() + deltaTime;
+                float progress = Math.min(timer / FADE_DURATION, 1f);
+                indicator.setAlpha(1f - progress);
+                indicator.setTimer(timer);
+                if (progress >= 1f) {
+                    indicator.setAlpha(0f);
+                    if (!shouldBeVisible || desiredType == null) {
+                        indicator.setVisible(false);
+                        indicator.setState(OverheadIndicator.State.HIDDEN);
+                    } else {
+                        indicator.setIndicatorId(desiredType);
+                        indicator.setState(OverheadIndicator.State.FADE_IN);
+                        indicator.setTimer(0f);
+                    }
+                }
+            }
+            case HIDDEN -> {
+                indicator.setVisible(false);
+                indicator.setAlpha(0f);
+                indicator.setTimer(0f);
+            }
+            case IDLE, ATTENTION -> {
+                indicator.setVisible(true);
+                indicator.setAlpha(1f);
+            }
+        }
     }
 
     private OverheadIndicatorType resolveIndicatorType(Entity entity, NpcRole npcRole, Npc npc) {
@@ -229,11 +289,7 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
             }
         }
 
-        OverheadIndicatorType stepIndicator = resolveQuestStepIndicator(questLog, npc.getName());
-        if (stepIndicator != null) {
-            return stepIndicator;
-        }
-        return null;
+        return resolveQuestStepIndicator(questLog, npc.getName());
     }
 
     private QuestDialog resolveQuestDialog(Npc npc) {

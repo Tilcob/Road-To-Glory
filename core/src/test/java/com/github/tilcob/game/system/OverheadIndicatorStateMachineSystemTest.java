@@ -36,7 +36,7 @@ class OverheadIndicatorStateMachineSystemTest {
             npc.add(new Transform(new Vector2(10f, 0f), 0, new Vector2(1f, 1f), new Vector2(1f, 1f), 0f));
             engine.addEntity(npc);
 
-            engine.update(0.016f);
+            engine.update(0.5f);
 
             assertTrue(indicator.isVisible());
         }
@@ -63,7 +63,7 @@ class OverheadIndicatorStateMachineSystemTest {
             npc.add(new Transform(new Vector2(3f, 0f), 0, new Vector2(1f, 1f), new Vector2(1f, 1f), 0f));
             engine.addEntity(npc);
 
-            engine.update(0.016f);
+            engine.update(0.5f);
 
             assertFalse(indicator.isVisible());
         }

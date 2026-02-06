@@ -107,12 +107,11 @@ public class CutsceneCommandHandler {
             event.target().add(indicator);
         }
 
-        indicator.setCurrentType(event.indicatorType());
+        indicator.setDesiredType(event.indicatorType());
         IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
         if (visualDef != null) {
             indicator.setBaseScale(visualDef.defaultScale());
         }
-        indicator.setVisible(true);
 
         if (event.durationSeconds() != null && event.durationSeconds() > 0f) {
             event.target().remove(IndicatorCommandLifetime.class);

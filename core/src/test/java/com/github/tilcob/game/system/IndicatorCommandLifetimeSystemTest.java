@@ -35,6 +35,6 @@ class IndicatorCommandLifetimeSystemTest {
         engine.update(0.2f);
         assertNull(IndicatorCommandLifetime.MAPPER.get(npc));
         assertEquals(OverheadIndicator.OverheadIndicatorType.INFO, indicator.getCurrentType());
-        assertFalse(indicator.isVisible());
+        assertNull(indicator.getDesiredType());
     }
 }

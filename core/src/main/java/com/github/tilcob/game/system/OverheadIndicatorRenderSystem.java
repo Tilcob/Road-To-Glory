@@ -48,12 +48,13 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         OverheadIndicator indicator = OverheadIndicator.MAPPER.get(entity);
-        if (!indicator.isVisible()) {
-            return;
-        }
+        if (!indicator.isVisible()) return;
+
+        OverheadIndicator.OverheadIndicatorType indicatorId = indicator.getIndicatorId();
+        if (indicatorId == null) return;
 
         TextureRegion region = OverheadIndicatorRegistry
-            .getFrame(assetManager, indicator.getCurrentType(), indicator.getTime());
+            .getFrame(assetManager, indicatorId, indicator.getTime());
         if (region == null) {
             return;
         }
@@ -68,10 +69,13 @@ public class OverheadIndicatorRenderSystem extends IteratingSystem {
 
         float drawX = position.x + (transform.getSize().x - width) * 0.5f + offset.x;
         float drawY = position.y + offset.y + indicator.getCurrentOffsetY();
+        float alpha = indicator.getAlpha();
 
         Color indicatorColor = indicator.getColor();
         if (indicatorColor != null) {
-            batch.setColor(indicatorColor);
+            batch.setColor(indicatorColor.r, indicatorColor.g, indicatorColor.b, indicatorColor.a * alpha);
+        } else {
+            batch.setColor(1, 1, 1, alpha);
         }
         batch.draw(region, drawX, drawY, width, height);
         batch.setColor(Color.WHITE);

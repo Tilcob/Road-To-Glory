@@ -99,6 +99,14 @@ public class OverheadIndicator implements Component {
         this.scale = scale;
     }
 
+    public OverheadIndicatorType getIndicatorId() {
+        return indicatorId;
+    }
+
+    public void setIndicatorId(OverheadIndicatorType indicatorId) {
+        this.indicatorId = indicatorId;
+    }
+
     public Vector2 getOffset() {
         return offset;
     }
