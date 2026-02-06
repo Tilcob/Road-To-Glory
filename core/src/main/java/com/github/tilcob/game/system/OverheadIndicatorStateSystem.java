@@ -107,6 +107,9 @@ public class OverheadIndicatorStateSystem extends IteratingSystem {
         }
 
         if (isPlayerInRange(player, npcEntity)) {
+            if (InteractIndicatorSuppression.MAPPER.get(npcEntity) != null) {
+                return null;
+            }
             return OverheadIndicatorType.INTERACT_HINT;
         }
         return OverheadIndicatorType.TALK_IN_RANGE;

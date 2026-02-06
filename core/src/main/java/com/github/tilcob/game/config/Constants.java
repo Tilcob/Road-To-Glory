@@ -33,6 +33,7 @@ public class Constants {
     public static final float INDICATOR_MAX_DISTANCE = 8f;
     public static final float INDICATOR_SHOW_DISTANCE = 1.5f;
     public static final float INDICATOR_HIDE_DISTANCE = 2f;
+    public static final float INTERACT_INDICATOR_SUPPRESSION_SECONDS = 0.35f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
