@@ -107,11 +107,11 @@ public class ControllerSystem extends IteratingSystem {
     }
 
     private void interact(Entity player) {
-        eventBus.fire(new CommandEvent(player, Command.INTERACT));
+        eventBus.fire(AbilityRequestEvent.fromCommand(player, Command.INTERACT));
     }
 
     private void select(Entity player) {
-        eventBus.fire(new CommandEvent(player, Command.SELECT));
+        eventBus.fire(AbilityRequestEvent.fromCommand(player, Command.SELECT));
     }
 
     private void openSkillTree(Entity player) {

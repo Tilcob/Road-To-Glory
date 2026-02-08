@@ -4,8 +4,10 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
+import com.github.tilcob.game.ability.Ability;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.event.AbilityRequestEvent;
 import com.github.tilcob.game.event.CommandEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.Command;
@@ -19,7 +21,7 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         this.audioManager = audioManager;
         this.eventBus = eventBus;
 
-        eventBus.subscribe(CommandEvent.class, this::onCommand);
+        eventBus.subscribe(AbilityRequestEvent.class, this::onAbilityRequest);
     }
 
     @Override
@@ -41,10 +43,11 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         }
     }
 
-    private void onCommand(CommandEvent event) {
+    private void onAbilityRequest(AbilityRequestEvent event) {
         if (event.isHandled()) return;
-        if (event.getCommand() != Command.SELECT) return;
-        Attack attack = Attack.MAPPER.get(event.getPlayer());
+        if (!event.isResolved()) return;
+        if (event.getAbility() != Ability.ATTACK) return;
+        Attack attack = Attack.MAPPER.get(event.getEntity());
         if (attack == null) return;
         if (attack.canAttack()) {
             attack.startAttack();
@@ -64,6 +67,6 @@ public class AttackSystem extends IteratingSystem implements Disposable {
 
     @Override
     public void dispose() {
-        eventBus.unsubscribe(CommandEvent.class, this::onCommand);
+        eventBus.unsubscribe(AbilityRequestEvent.class, this::onAbilityRequest);
     }
 }

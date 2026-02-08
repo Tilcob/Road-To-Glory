@@ -3,13 +3,27 @@ package com.github.tilcob.game.ai.state;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
+import com.github.tilcob.game.ability.Ability;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorRegistry;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.AbilityRequestEvent;
+import com.github.tilcob.game.event.GameEventBus;
 
 public final class NpcStateSupport {
+    private static GameEventBus eventBus;
+
     private NpcStateSupport() {
+    }
+
+    public static void setEventBus(GameEventBus eventBus) {
+        NpcStateSupport.eventBus = eventBus;
+    }
+
+    public static void requestAbility(Entity entity, Ability ability, int priority) {
+        if (eventBus == null || entity == null || ability == null) return;
+        eventBus.fire(AbilityRequestEvent.fromAbility(entity, ability, priority));
     }
 
     public static void chasePlayer(Entity entity, Entity player) {

@@ -2,6 +2,7 @@ package com.github.tilcob.game.system.installers;
 
 import com.badlogic.ashley.core.Engine;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.system.AbilitySystem;
 import com.github.tilcob.game.system.ControllerSystem;
 import com.github.tilcob.game.system.SystemOrder;
 
@@ -17,5 +18,8 @@ public class InputSystemsInstaller implements SystemInstaller {
         engine.addSystem(withPriority(
                 new ControllerSystem(eventBus),
                 SystemOrder.INPUT));
+        engine.addSystem(withPriority(
+            new AbilitySystem(eventBus),
+            SystemOrder.INPUT));
     }
 }

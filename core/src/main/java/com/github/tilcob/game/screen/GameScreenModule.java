@@ -88,7 +88,7 @@ public class GameScreenModule {
 
                 // Installers
                 new InputSystemsInstaller(services.getEventBus()).install(engine);
-                new AiSystemsInstaller().install(engine);
+                new AiSystemsInstaller(services.getEventBus()).install(engine);
                 new PhysicsSystemsInstaller(physicWorld, services.getEventBus()).install(engine);
                 new CombatSystemsInstaller(
                                 services.getAudioManager(),

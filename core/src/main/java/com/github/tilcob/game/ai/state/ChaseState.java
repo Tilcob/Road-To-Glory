@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ai.fsm.State;
 import com.badlogic.gdx.ai.msg.Telegram;
+import com.github.tilcob.game.ability.Ability;
 import com.github.tilcob.game.ai.NpcState;
 import com.github.tilcob.game.ai.behavior.NpcBehaviorProfile;
 import com.github.tilcob.game.component.*;
@@ -83,7 +84,7 @@ public class ChaseState implements State<Entity> {
         }
         float distance = playerTransform.getPosition().dst(selfTransform.getPosition());
         if (distance <= Constants.ENEMY_ATTACK_RANGE) {
-            attack.startAttack();
+            NpcStateSupport.requestAbility(entity, Ability.ATTACK, 1);
             MoveIntent moveIntent = MoveIntent.MAPPER.get(entity);
             if (moveIntent != null) {
                 moveIntent.clear();
