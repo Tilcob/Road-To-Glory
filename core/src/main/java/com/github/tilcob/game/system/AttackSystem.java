@@ -6,11 +6,10 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.ability.Ability;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.*;
+import com.github.tilcob.game.component.ActionLock;
+import com.github.tilcob.game.component.Attack;
 import com.github.tilcob.game.event.AbilityRequestEvent;
-import com.github.tilcob.game.event.CommandEvent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.input.Command;
 
 public class AttackSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;
@@ -33,14 +32,16 @@ public class AttackSystem extends IteratingSystem implements Disposable {
             setLocks(entity, true);
         }
 
-        if (attack.canAttack()) return;
+        if (attack.canAttack()) {
+            if (attack.consumeQueuedAttack()) attack.startAttack();
+            return;
+        }
 
         attack.advance(deltaTime);
         attack.consumeTriggered();
 
-        if (attack.consumeFinished()) {
-            setLocks(entity, false);
-        }
+        if (attack.consumeFinished()) setLocks(entity, false);
+        if (attack.canAttack() && attack.consumeQueuedAttack()) attack.startAttack();
     }
 
     private void onAbilityRequest(AbilityRequestEvent event) {
@@ -52,7 +53,10 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         if (attack.canAttack()) {
             attack.startAttack();
             event.setHandled(true);
+            return;
         }
+        attack.queueAttack();
+        event.setHandled(true);
     }
 
     private static void setLocks(Entity entity, boolean locked) {

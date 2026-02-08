@@ -63,7 +63,7 @@ public class AbilitySystem extends EntitySystem implements Disposable {
         return switch (ability) {
             case ATTACK -> {
                 Attack attack = Attack.MAPPER.get(entity);
-                yield attack != null && attack.canAttack();
+                yield attack != null;
             }
         };
     }

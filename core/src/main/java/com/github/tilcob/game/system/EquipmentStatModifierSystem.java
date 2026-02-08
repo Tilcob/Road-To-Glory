@@ -9,7 +9,6 @@ import com.github.tilcob.game.component.Equipment;
 import com.github.tilcob.game.component.Item;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.StatRecalcEvent;
 import com.github.tilcob.game.event.UpdateEquipmentEvent;
 import com.github.tilcob.game.item.ItemCategory;
 import com.github.tilcob.game.item.ItemDefinition;

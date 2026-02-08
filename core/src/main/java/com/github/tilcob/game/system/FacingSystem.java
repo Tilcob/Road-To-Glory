@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.component.ActionLock;
-import com.github.tilcob.game.component.Attack;
 import com.github.tilcob.game.component.Facing;
 import com.github.tilcob.game.component.Move;
 

@@ -23,6 +23,7 @@ public class Attack implements Component {
     private boolean triggeredThisFrame;
     private boolean finishedThisFrame;
     private boolean damageWindowActive;
+    private boolean queuedAttack;
     private State state;
 
     public Attack(float damage, float windup, float cooldown, SoundAsset soundAsset) {
@@ -42,6 +43,7 @@ public class Attack implements Component {
         this.triggeredThisFrame = false;
         this.finishedThisFrame = false;
         this.damageWindowActive = false;
+        this.queuedAttack = false;
         this.hitEntities = new ObjectSet<>();
         this.state = State.IDLE;
     }
@@ -79,6 +81,16 @@ public class Attack implements Component {
         damageTimer = Math.max(0f, hitDelay);;
         damageWindowActive = false;
         hitEntities.clear();
+    }
+
+    public void queueAttack() {
+        queuedAttack = true;
+    }
+
+    public boolean consumeQueuedAttack() {
+        if (!queuedAttack) return false;
+        queuedAttack = false;
+        return true;
     }
 
     public void advance(float delta) {

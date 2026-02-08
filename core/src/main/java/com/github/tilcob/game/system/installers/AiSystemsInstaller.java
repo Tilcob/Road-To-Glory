@@ -3,7 +3,10 @@ package com.github.tilcob.game.system.installers;
 import com.badlogic.ashley.core.Engine;
 import com.github.tilcob.game.ai.state.NpcStateSupport;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.system.*;
+import com.github.tilcob.game.system.AiSystem;
+import com.github.tilcob.game.system.FsmSystem;
+import com.github.tilcob.game.system.MoveIntentSystem;
+import com.github.tilcob.game.system.NpcPathfindingSystem;
 
 public class AiSystemsInstaller implements SystemInstaller {
     private final GameEventBus eventBus;
