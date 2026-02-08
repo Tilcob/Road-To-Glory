@@ -159,7 +159,7 @@ public class GameContactListener implements ContactListener {
 
     private boolean isAttackFixture(Fixture fixture) {
         if (fixture.getUserData() instanceof MapObject mapObject) {
-            return mapObject.getName().contains("attack")
+            return mapObject.getName() != null && mapObject.getName().contains("attack")
                     && mapObject.getProperties().get(Constants.SENSOR, false, Boolean.class);
         }
         return false;
