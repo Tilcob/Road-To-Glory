@@ -91,7 +91,6 @@ public class GameScreenModule {
                 new AiSystemsInstaller().install(engine);
                 new PhysicsSystemsInstaller(physicWorld, services.getEventBus()).install(engine);
                 new CombatSystemsInstaller(
-                                physicWorld,
                                 services.getAudioManager(),
                                 services.getEventBus(),
                                 gameViewModel,

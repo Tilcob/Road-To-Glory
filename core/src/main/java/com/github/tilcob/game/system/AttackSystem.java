@@ -20,26 +20,12 @@ import com.github.tilcob.game.input.Command;
 import com.github.tilcob.game.npc.NpcType;
 
 public class AttackSystem extends IteratingSystem implements Disposable {
-    private static final Rectangle attackAABB = new Rectangle();
-
-    private final AudioManager audioManager;
-    private final World world;
-    private final Vector2 tmpVertex;
-    private final ObjectSet<Entity> hitEntities;
     private final GameEventBus eventBus;
-    private Body attackerBody;
-    private Entity attackerEntity;
-    private float attackDamage;
+    private final AudioManager audioManager;
 
-    public AttackSystem(World world, AudioManager audioManager, GameEventBus eventBus) {
+    public AttackSystem(AudioManager audioManager, GameEventBus eventBus) {
         super(Family.all(Attack.class, Facing.class, Physic.class).get());
-        this.world = world;
         this.audioManager = audioManager;
-        this.tmpVertex = new Vector2();
-        this.hitEntities = new ObjectSet<>();
-        this.attackerBody = null;
-        this.attackerEntity = null;
-        this.attackDamage = 0;
         this.eventBus = eventBus;
 
         eventBus.subscribe(CommandEvent.class, this::onCommand);
@@ -52,7 +38,6 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         if (attack.consumeStarted()) {
             if (attack.getSfx() != null) audioManager.playSound(attack.getSfx());
             setRooted(entity, true);
-            hitEntities.clear();
         }
 
         if (attack.canAttack()) return;
@@ -60,14 +45,6 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         attack.advance(deltaTime);
         if (attack.consumeTriggered()) {
             setRooted(entity, false);
-            Facing.FacingDirection facingDirection = Facing.MAPPER.get(entity).getDirection();
-            attackerEntity = entity;
-            attackerBody = Physic.MAPPER.get(entity).getBody();
-            PolygonShape attackShape = getAttackFixture(attackerBody, facingDirection);
-            updateAttackAABB(attackerBody.getPosition(), attackShape);
-
-            attackDamage = attack.getDamage();
-            world.QueryAABB(this::attackCallback, attackAABB.x, attackAABB.y, attackAABB.x + attackAABB.width, attackAABB.y + attackAABB.height);
         }
 
         if (attack.consumeFinished()) {
@@ -90,71 +67,6 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         Move move = Move.MAPPER.get(entity);
         if (move != null) {
             move.setRooted(rooted);
-        }
-    }
-
-    private void updateAttackAABB(Vector2 position, PolygonShape attackShape) {
-        int vertexCount = attackShape.getVertexCount();
-        float minX = Float.MAX_VALUE;
-        float minY = Float.MAX_VALUE;
-        float maxX = -Float.MAX_VALUE;
-        float maxY = -Float.MAX_VALUE;
-
-        for (int i = 0; i < vertexCount; i++) {
-            attackShape.getVertex(i, tmpVertex);
-            tmpVertex.add(position);
-            minX = Math.min(minX, tmpVertex.x);
-            minY = Math.min(minY, tmpVertex.y);
-            maxX = Math.max(maxX, tmpVertex.x);
-            maxY = Math.max(maxY, tmpVertex.y);
-        }
-        attackAABB.set(minX, minY, maxX - minX, maxY - minY);
-    }
-
-    private boolean attackCallback(Fixture fixture) {
-        Body body = fixture.getBody();
-
-        if (body.equals(attackerBody)) return true;
-        if (!(body.getUserData() instanceof Entity entity)) return true;
-
-        Npc npc = Npc.MAPPER.get(entity);
-        if (npc != null && npc.getType() == NpcType.FRIEND) return true;
-
-        Life life = Life.MAPPER.get(entity);
-        if (life == null) {
-            return true;
-        }
-
-        if (hitEntities.contains(entity)) return true;
-        hitEntities.add(entity);
-
-        Damaged damaged = Damaged.MAPPER.get(entity);
-        if (damaged == null) {
-            entity.add(new Damaged(attackDamage, attackerEntity));
-        } else {
-            damaged.addDamage(attackDamage, attackerEntity);
-        }
-        return true;
-    }
-
-    private PolygonShape getAttackFixture(Body body, Facing.FacingDirection facingDirection) {
-        Array<Fixture> fixtureList = body.getFixtureList();
-        String fixtureName = Constants.ATTACK_SENSOR + facingDirection.getAtlasKey();
-        for (Fixture fixture : fixtureList) {
-            if ((getName(fixture) != null && fixtureName.equals(getName(fixture)))
-                && Shape.Type.Polygon.equals(fixture.getShape().getType())) {
-                return (PolygonShape) fixture.getShape();
-            }
-        }
-
-        throw new GdxRuntimeException("Entity has no attack sensors of name: " + fixtureName);
-    }
-
-    private String getName(Fixture fixture) {
-        if (fixture.getUserData() instanceof MapObject mapObject) {
-            return mapObject.getName();
-        } else {
-            return fixture.getUserData() != null ? fixture.getUserData().toString() : null;
         }
     }
 

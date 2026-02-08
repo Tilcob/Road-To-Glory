@@ -2,6 +2,8 @@ package com.github.tilcob.game.component;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.ComponentMapper;
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.assets.SoundAsset;
 import com.github.tilcob.game.config.Constants;
 
@@ -10,6 +12,7 @@ public class Attack implements Component {
 
     private final float baseDamage;
     private final float hitDelay;
+    private final ObjectSet<Entity> hitEntities;
     private float damage;
     private float windup;
     private float recovery;
@@ -19,6 +22,7 @@ public class Attack implements Component {
     private boolean startedThisFrame;
     private boolean triggeredThisFrame;
     private boolean finishedThisFrame;
+    private boolean damageWindowActive;
     private State state;
 
     public Attack (float damage, float windup, float cooldown, float hitDelay, SoundAsset soundAsset) {
@@ -33,6 +37,8 @@ public class Attack implements Component {
         this.startedThisFrame = false;
         this.triggeredThisFrame = false;
         this.finishedThisFrame = false;
+        this.damageWindowActive = false;
+        this.hitEntities = new ObjectSet<>();
         this.state = State.IDLE;
     }
 
@@ -67,6 +73,8 @@ public class Attack implements Component {
         attackTimer = Math.max(0f, windup);
         startedThisFrame = true;
         damageTimer = hitDelay;
+        damageWindowActive = false;
+        hitEntities.clear();
     }
 
     public void advance(float delta) {
@@ -78,6 +86,7 @@ public class Attack implements Component {
             if (damageTimer == 0f) {
                 triggeredThisFrame = true;
                 damageTimer = -1f;
+                damageWindowActive = true;
             }
         }
 
@@ -92,6 +101,7 @@ public class Attack implements Component {
             if (attackTimer == 0f) {
                 state = State.IDLE;
                 finishedThisFrame = true;
+                damageWindowActive = false;
             }
         }
     }
@@ -106,6 +116,18 @@ public class Attack implements Component {
         if (!finishedThisFrame) return false;
         finishedThisFrame = false;
         return true;
+    }
+
+    public boolean isDamageWindowActive() {
+        return damageWindowActive;
+    }
+
+    public boolean hasHit(Entity entity) {
+        return hitEntities.contains(entity);
+    }
+
+    public void registerHit(Entity entity) {
+        hitEntities.add(entity);
     }
 
     public float getBaseDamage() {

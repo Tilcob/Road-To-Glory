@@ -4,12 +4,12 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.physics.box2d.*;
 import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.github.tilcob.game.component.Player;
-import com.github.tilcob.game.component.Quest;
-import com.github.tilcob.game.component.Trigger;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.event.AttackHitEvent;
 import com.github.tilcob.game.event.ExitTriggerEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.npc.NpcType;
 
 public class GameContactListener implements ContactListener {
     private final GameEventBus eventBus;
@@ -24,10 +24,11 @@ public class GameContactListener implements ContactListener {
         if (collision == null)
             return;
 
-        if (isPlayer(collision.entityA(), collision.fixtureA()) && isAttackFixture(collision.fixtureA()))
-            return;
-        if (isPlayer(collision.entityB(), collision.fixtureB()) && isAttackFixture(collision.fixtureB()))
-            return;
+        handleAttackContact(collision.entityA(), collision.fixtureA(),
+            collision.entityB(), collision.fixtureB());
+        handleAttackContact(collision.entityB(), collision.fixtureB(),
+            collision.entityA(), collision.fixtureA());
+
         onEnter(collision.entityA(), collision.fixtureA(), collision.entityB(), collision.fixtureB());
     }
 
@@ -89,6 +90,36 @@ public class GameContactListener implements ContactListener {
             }
             eventBus.fire(new ExitTriggerEvent(entityA, entityB));
         }
+    }
+
+    private void handleAttackContact(Entity attacker, Fixture attackFixture, Entity target, Fixture targetFixture) {
+        if (!isAttackFixture(attackFixture)) return;
+        if (isAttackFixture(targetFixture)) return;
+
+        Attack attack = Attack.MAPPER.get(attacker);
+        if (attack == null || !attack.isDamageWindowActive()) return;
+        if (attacker == target) return;
+        if (isFriendlyFire(attacker, target)) return;
+
+        Life life = Life.MAPPER.get(target);
+        if (life == null) return;
+
+        if (attack.hasHit(target)) return;
+        attack.registerHit(target);
+        eventBus.fire(new AttackHitEvent(attacker, target, attack.getDamage()));
+    }
+
+    private boolean isFriendlyFire(Entity attacker, Entity target) {
+        Npc targetNpc = Npc.MAPPER.get(target);
+        if (targetNpc != null && targetNpc.getType() == NpcType.FRIEND) return true;
+
+        Npc attackerNpc = Npc.MAPPER.get(attacker);
+        if (attackerNpc != null && attackerNpc.getType() == NpcType.FRIEND) {
+            return Player.MAPPER.get(target) != null
+                || (targetNpc != null && targetNpc.getType() == NpcType.FRIEND);
+        }
+
+        return Player.MAPPER.get(attacker) != null && Player.MAPPER.get(target) != null;
     }
 
     private void addTrigger(Fixture trigger, Entity triggerEntity, Entity player) {
