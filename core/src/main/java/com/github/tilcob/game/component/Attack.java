@@ -11,8 +11,8 @@ public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
     private final float baseDamage;
-    private final float hitDelay;
     private final ObjectSet<Entity> hitEntities;
+    private float hitDelay;
     private float damage;
     private float windup;
     private float recovery;
@@ -154,6 +154,17 @@ public class Attack implements Component {
         this.recovery = Math.max(recovery, Constants.FIXED_INTERVAL);
         if (state == State.RECOVERY) {
             attackTimer = Math.max(0f, this.recovery);
+        }
+    }
+
+    public float getHitDelay() {
+        return hitDelay;
+    }
+
+    public void setHitDelay(float hitDelay) {
+        this.hitDelay = Math.max(0f, hitDelay);
+        if (state != State.IDLE && damageTimer >= 0f) {
+            damageTimer = Math.max(0f, this.hitDelay);
         }
     }
 

@@ -75,6 +75,7 @@ public class AnimationSystem extends IteratingSystem {
                 float duration = animation.getAnimationDuration() / speed;
                 attack.setWindup(duration);
                 attack.setRecovery(duration);
+                attack.setHitDelay(duration * 0.5f);
             }
         }
     }
