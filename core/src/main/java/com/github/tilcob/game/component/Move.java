@@ -9,7 +9,6 @@ public class Move implements Component {
 
     private float maxSpeed;
     private final Vector2 direction;
-    private boolean isRooted;
 
     public Move(float maxSpeed) {
         this.direction = new Vector2();
@@ -24,15 +23,7 @@ public class Move implements Component {
         return direction;
     }
 
-    public boolean isRooted() {
-        return isRooted;
-    }
-
     public void setMaxSpeed(float maxSpeed) {
         this.maxSpeed = maxSpeed;
-    }
-
-    public void setRooted(boolean rooted) {
-        isRooted = rooted;
     }
 }
