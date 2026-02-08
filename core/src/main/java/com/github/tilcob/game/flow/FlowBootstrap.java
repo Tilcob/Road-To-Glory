@@ -40,7 +40,7 @@ public final class FlowBootstrap {
         FlowExecutor executor = new FlowExecutor(eventBus, trace);
         CommandRegistry commandRegistry = new CommandRegistry();
         FunctionRegistry functionRegistry = new FunctionRegistry();
-        new DialogCommandModule().register(commandRegistry);
+        new DialogCommandModule(entityLookup).register(commandRegistry);
         new QuestCommandModule().register(commandRegistry);
         new CutsceneCommandModule(entityLookup).register(commandRegistry);
         new QuestFunctionModule().register(functionRegistry);

@@ -1,13 +1,25 @@
 package com.github.tilcob.game.flow.commands;
 
+import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.OverheadIndicator;
+import com.github.tilcob.game.entity.EntityLookup;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.flow.CommandRegistry;
 import com.github.tilcob.game.flow.FlowAction;
 
 import java.util.List;
+import java.util.function.Supplier;
 
 public final class DialogCommandModule {
+    private final Supplier<EntityLookup> entityLookup;
+
+    public DialogCommandModule() {
+        this(null);
+    }
+
+    public DialogCommandModule(Supplier<EntityLookup> entityLookup) {
+        this.entityLookup = entityLookup;
+    }
 
     public void register(CommandRegistry registry) {
 
@@ -36,9 +48,23 @@ public final class DialogCommandModule {
         });
 
         registry.register("play_indicator", (call, ctx) -> {
-            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(argumentAt(call.arguments(), 0));
-            Float durationSeconds = parseDurationSeconds(argumentAt(call.arguments(), 1));
-            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), ctx.npc(),
+            String firstArg = argumentAt(call.arguments(), 0);
+            String secondArg = argumentAt(call.arguments(), 1);
+            String thirdArg = argumentAt(call.arguments(), 2);
+
+            OverheadIndicator.OverheadIndicatorType indicatorType = parseIndicatorType(firstArg);
+            Entity target = ctx.npc();
+            Float durationSeconds;
+
+            if (indicatorType != null) {
+                durationSeconds = parseDurationSeconds(secondArg);
+            } else {
+                target = resolveEntity(ctx.player(), ctx.npc(), firstArg);
+                indicatorType = parseIndicatorType(secondArg);
+                durationSeconds = parseDurationSeconds(thirdArg);
+            }
+
+            return List.of(new FlowAction.EmitEvent(new PlayIndicatorEvent(ctx.player(), target,
                 indicatorType, durationSeconds)));
         });
     }
@@ -64,5 +90,17 @@ public final class DialogCommandModule {
         } catch (IllegalArgumentException e) {
             return null;
         }
+    }
+
+    private Entity resolveEntity(Entity player, Entity fallbackNpc, String entityId) {
+        if (entityId == null || entityId.isBlank()) return fallbackNpc;
+
+        EntityLookup lookup = entityLookup == null ? null : entityLookup.get();
+        if (lookup != null) {
+            Entity resolved = lookup.find(entityId);
+            if (resolved != null) return resolved;
+        }
+        if ("player".equalsIgnoreCase(entityId)) return player;
+        return null;
     }
 }

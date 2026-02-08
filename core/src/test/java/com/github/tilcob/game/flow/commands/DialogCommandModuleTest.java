@@ -2,6 +2,7 @@ package com.github.tilcob.game.flow.commands;
 
 import com.badlogic.ashley.core.Entity;
 import com.github.tilcob.game.component.OverheadIndicator;
+import com.github.tilcob.game.entity.EntityLookup;
 import com.github.tilcob.game.event.PlayIndicatorEvent;
 import com.github.tilcob.game.flow.CommandCall;
 import com.github.tilcob.game.flow.CommandRegistry;
@@ -54,5 +55,37 @@ class DialogCommandModuleTest {
         PlayIndicatorEvent event = assertInstanceOf(PlayIndicatorEvent.class, emitEvent.event());
 
         assertEquals(1.5f, event.durationSeconds());
+    }
+
+    @Test
+    void playIndicatorResolvesNpcTargetFromArguments() {
+        Entity player = new Entity();
+        Entity npc = new Entity();
+        Entity otherNpc = new Entity();
+
+        CommandRegistry registry = new CommandRegistry();
+        new DialogCommandModule(() -> new EntityLookup() {
+            @Override
+            public Entity find(String name) {
+                return "Npc-1".equals(name) ? otherNpc : null;
+            }
+
+            @Override
+            public Entity getPlayer() {
+                return player;
+            }
+        }).register(registry);
+
+        List<FlowAction> actions = registry.dispatch(
+            CommandCall.simple("play_indicator", List.of("Npc-1", "HAPPY", "2")),
+            new FlowContext(player, npc)
+        );
+
+        FlowAction.EmitEvent emitEvent = assertInstanceOf(FlowAction.EmitEvent.class, actions.get(0));
+        PlayIndicatorEvent event = assertInstanceOf(PlayIndicatorEvent.class, emitEvent.event());
+
+        assertSame(otherNpc, event.target());
+        assertEquals(OverheadIndicator.OverheadIndicatorType.HAPPY, event.indicatorType());
+        assertEquals(2f, event.durationSeconds());
     }
 }

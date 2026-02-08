@@ -1,14 +1,11 @@
 package com.github.tilcob.game.flow.commands;
 
 import com.badlogic.ashley.core.Entity;
-import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.config.Constants;
 import com.github.tilcob.game.event.*;
-import com.github.tilcob.game.indicator.IndicatorVisualDef;
-import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
 import com.github.tilcob.game.input.Command;
 
 public class CutsceneCommandHandler {
