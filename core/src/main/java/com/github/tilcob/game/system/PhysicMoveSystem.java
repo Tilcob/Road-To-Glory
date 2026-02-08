@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.github.tilcob.game.component.ActionLock;
 import com.github.tilcob.game.component.Move;
 import com.github.tilcob.game.component.Physic;
 
@@ -23,7 +24,8 @@ public class PhysicMoveSystem extends IteratingSystem {
         Body body = Physic.MAPPER.get(entity).getBody();
         if (move == null || body == null) return;
         boolean isIdle = move.getDirection().isZero();
-        if (move.isRooted() || isIdle) {
+        ActionLock lock = ActionLock.MAPPER.get(entity);
+        if ((lock != null && lock.isLockMovement()) || isIdle) {
             body.setLinearVelocity(0f, 0f);
             return;
         }

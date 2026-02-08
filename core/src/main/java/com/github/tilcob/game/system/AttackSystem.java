@@ -5,10 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Disposable;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.Attack;
-import com.github.tilcob.game.component.Facing;
-import com.github.tilcob.game.component.Move;
-import com.github.tilcob.game.component.Physic;
+import com.github.tilcob.game.component.*;
 import com.github.tilcob.game.event.CommandEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.Command;
@@ -31,18 +28,16 @@ public class AttackSystem extends IteratingSystem implements Disposable {
 
         if (attack.consumeStarted()) {
             if (attack.getSfx() != null) audioManager.playSound(attack.getSfx());
-            setRooted(entity, true);
+            setLocks(entity, true);
         }
 
         if (attack.canAttack()) return;
 
         attack.advance(deltaTime);
-        if (attack.consumeTriggered()) {
-            setRooted(entity, false);
-        }
+        attack.consumeTriggered();
 
         if (attack.consumeFinished()) {
-            setRooted(entity, false);
+            setLocks(entity, false);
         }
     }
 
@@ -57,11 +52,14 @@ public class AttackSystem extends IteratingSystem implements Disposable {
         }
     }
 
-    private static void setRooted(Entity entity, boolean rooted) {
-        Move move = Move.MAPPER.get(entity);
-        if (move != null) {
-            move.setRooted(rooted);
+    private static void setLocks(Entity entity, boolean locked) {
+        ActionLock lock = ActionLock.MAPPER.get(entity);
+        if (lock == null) {
+            lock = new ActionLock();
+            entity.add(lock);
         }
+        lock.setLockMovement(locked);
+        lock.setLockFacing(locked);
     }
 
     @Override

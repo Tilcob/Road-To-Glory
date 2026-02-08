@@ -24,13 +24,23 @@ public class ControllerSystem extends IteratingSystem {
     protected void processEntity(Entity entity, float deltaTime) {
         Controller controller = Controller.MAPPER.get(entity);
         DialogSession dialogSession = DialogSession.MAPPER.get(entity);
-        PlayerInputLock lock = PlayerInputLock.MAPPER.get(entity);
-        if (lock != null) {
+        PlayerInputLock inputLock = PlayerInputLock.MAPPER.get(entity);
+        ActionLock actionLock = ActionLock.MAPPER.get(entity);
+        if (actionLock != null && actionLock.isLockInput()) {
             clearMovement(entity);
-            controller.getHeldCommands().removeIf(c -> !lock.isAllowed(c));
-            controller.getPressedCommands().removeIf(c -> !lock.isAllowed(c));
-            controller.getReleasedCommands().removeIf(c -> !lock.isAllowed(c));
-            controller.getCommandBuffer().entrySet().removeIf(e -> !lock.isAllowed(e.getKey()));
+            controller.getHeldCommands().clear();
+            controller.getPressedCommands().clear();
+            controller.getReleasedCommands().clear();
+            controller.getCommandBuffer().clear();
+            return;
+        }
+
+        if (inputLock != null) {
+            clearMovement(entity);
+            controller.getHeldCommands().removeIf(c -> !inputLock.isAllowed(c));
+            controller.getPressedCommands().removeIf(c -> !inputLock.isAllowed(c));
+            controller.getReleasedCommands().removeIf(c -> !inputLock.isAllowed(c));
+            controller.getCommandBuffer().entrySet().removeIf(e -> !inputLock.isAllowed(e.getKey()));
         }
         boolean choosingDialog = dialogSession != null && dialogSession.isAwaitingChoice();
 
