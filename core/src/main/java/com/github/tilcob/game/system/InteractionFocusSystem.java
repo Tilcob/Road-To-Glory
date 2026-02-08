@@ -19,7 +19,7 @@ public class InteractionFocusSystem extends EntitySystem {
 
     private final ActiveEntityReference activeEntityReference;
     private ImmutableArray<Entity> players;
-    private ImmutableArray<Entity> interactables;
+    private ImmutableArray<Entity> interactable;
 
     public InteractionFocusSystem(ActiveEntityReference activeEntityReference) {
         this.activeEntityReference = activeEntityReference;
@@ -29,7 +29,7 @@ public class InteractionFocusSystem extends EntitySystem {
     public void addedToEngine(Engine engine) {
         super.addedToEngine(engine);
         players = engine.getEntitiesFor(Family.all(Player.class, Transform.class).get());
-        interactables = engine.getEntitiesFor(Family.all(Interactable.class, Transform.class).get());
+        interactable = engine.getEntitiesFor(Family.all(Interactable.class, Transform.class).get());
     }
 
     @Override
@@ -51,8 +51,8 @@ public class InteractionFocusSystem extends EntitySystem {
         Entity bestEntity = null;
 
         Vector2 playerPosition = playerTransform.getPosition();
-        for (int i = 0; i < interactables.size(); i++) {
-            Entity candidate = interactables.get(i);
+        for (int i = 0; i < interactable.size(); i++) {
+            Entity candidate = interactable.get(i);
             if (candidate == player) {
                 continue;
             }

@@ -103,24 +103,13 @@ public class GameplaySystemsInstaller implements SystemInstaller {
                             SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(new OcclusionSystem(), SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
-                            new DialogQuestBridgeSystem(
-                                            eventBus,
-                                            questManager),
-                            SystemOrder.GAMEPLAY));
-            engine.addSystem(withPriority(
-                new OverheadIndicatorAttachSystem(),
+                new DialogQuestBridgeSystem(eventBus, questManager),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                 new InteractionFocusSystem(activeEntityReference),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
-                new InteractIndicatorSuppressionSystem(eventBus, activeEntityReference),
-                SystemOrder.GAMEPLAY));
-            engine.addSystem(withPriority(
                 new OverheadIndicatorStateMachineSystem(allDialogs, questYarnRegistry, activeEntityReference),
-                SystemOrder.GAMEPLAY));
-            engine.addSystem(withPriority(
-                new IndicatorCommandLifetimeSystem(),
                 SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                             new DialogSystem(eventBus, allDialogs, dialogYarnRuntime),
