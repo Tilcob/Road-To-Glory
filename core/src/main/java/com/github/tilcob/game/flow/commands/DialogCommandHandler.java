@@ -6,6 +6,7 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.event.DialogGiveItemEvent;
 import com.github.tilcob.game.event.DialogGiveMoneyEvent;
 import com.github.tilcob.game.event.GameEventBus;
+import com.github.tilcob.game.event.PlayIndicatorEvent;
 import com.github.tilcob.game.item.ItemDefinitionRegistry;
 
 public class DialogCommandHandler {
@@ -13,6 +14,7 @@ public class DialogCommandHandler {
     public DialogCommandHandler(GameEventBus eventBus) {
         eventBus.subscribe(DialogGiveMoneyEvent.class, this::giveMoney);
         eventBus.subscribe(DialogGiveItemEvent.class, this::giveItem);
+        eventBus.subscribe(PlayIndicatorEvent.class, this::playIndicator);
     }
 
     private void giveMoney(DialogGiveMoneyEvent event) {
@@ -42,5 +44,9 @@ public class DialogCommandHandler {
         }
         String resolved = ItemDefinitionRegistry.resolveId(itemId);
         for (int i = 0; i < count; i++) inventory.getItemsToAdd().add(resolved);
+    }
+
+    private void playIndicator(PlayIndicatorEvent event) {
+        IndicatorCommandUtil.playIndicator(event);
     }
 }

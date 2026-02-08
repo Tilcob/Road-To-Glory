@@ -3,6 +3,7 @@ tags: start, root
 position: -193,-349
 ---
 Hello, would you like to do a quest?
+<<play_indicator TALKING 3>>
 -> ... (Take Quest)
     <<play_indicator Npc-1 HAPPY 3>>
     <<add_quest welcome_to_town>>

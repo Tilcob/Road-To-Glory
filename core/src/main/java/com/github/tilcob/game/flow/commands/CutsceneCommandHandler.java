@@ -80,49 +80,7 @@ public class CutsceneCommandHandler {
     }
 
     private void playIndicator(PlayIndicatorEvent event) {
-        if (event.player() == null || event.target() == null || event.indicatorType() == null) return;
-
-        OverheadIndicator indicator = OverheadIndicator.MAPPER.get(event.target());
-        boolean hadIndicator = indicator != null;
-        OverheadIndicator.OverheadIndicatorType fallbackType =
-            hadIndicator ? indicator.getCurrentType() : event.indicatorType();
-        boolean fallbackVisible = hadIndicator && indicator.isVisible();
-
-        if (indicator == null) {
-            Transform transform = Transform.MAPPER.get(event.target());
-            float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
-            if (transform != null) {
-                offsetY = transform.getSize().y + Constants.DEFAULT_INDICATOR_OFFSET_Y - 8f * Constants.UNIT_SCALE;
-            }
-            IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
-            float baseScale = visualDef == null ? 0.6f : visualDef.defaultScale();
-
-            indicator = new OverheadIndicator(
-                event.indicatorType(),
-                new Vector2(0f, offsetY),
-                baseScale,
-                Color.WHITE.cpy(),
-                true
-            );
-            event.target().add(indicator);
-        }
-
-        indicator.setDesiredType(event.indicatorType());
-        IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(event.indicatorType());
-        if (visualDef != null) {
-            indicator.setBaseScale(visualDef.defaultScale());
-        }
-
-        if (event.durationSeconds() != null && event.durationSeconds() > 0f) {
-            event.target().remove(IndicatorCommandLifetime.class);
-            event.target().add(new IndicatorCommandLifetime(event.durationSeconds(), fallbackType, fallbackVisible));
-        }
-
-        indicator.setTime(0f);
-        indicator.setBobPhase(0f);
-        indicator.setPulsePhase(0f);
-        indicator.setCurrentOffsetY(0f);
-        indicator.setScale(1f);
+        IndicatorCommandUtil.playIndicator(event);
     }
 
     private void moveTo(MoveToEvent event) {
