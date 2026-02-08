@@ -14,7 +14,6 @@ import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.indicator.IndicatorVisualDef;
 import com.github.tilcob.game.indicator.OverheadIndicatorRegistry;
-import com.github.tilcob.game.input.ActiveEntityReference;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.quest.Quest;
 

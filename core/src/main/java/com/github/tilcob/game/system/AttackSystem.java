@@ -3,21 +3,15 @@ package com.github.tilcob.game.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
-import com.badlogic.gdx.maps.MapObject;
-import com.badlogic.gdx.math.Rectangle;
-import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.physics.box2d.*;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Disposable;
-import com.badlogic.gdx.utils.GdxRuntimeException;
-import com.badlogic.gdx.utils.ObjectSet;
 import com.github.tilcob.game.audio.AudioManager;
-import com.github.tilcob.game.component.*;
-import com.github.tilcob.game.config.Constants;
+import com.github.tilcob.game.component.Attack;
+import com.github.tilcob.game.component.Facing;
+import com.github.tilcob.game.component.Move;
+import com.github.tilcob.game.component.Physic;
 import com.github.tilcob.game.event.CommandEvent;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.input.Command;
-import com.github.tilcob.game.npc.NpcType;
 
 public class AttackSystem extends IteratingSystem implements Disposable {
     private final GameEventBus eventBus;

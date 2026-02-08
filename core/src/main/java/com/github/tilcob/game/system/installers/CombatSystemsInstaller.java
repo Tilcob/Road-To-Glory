@@ -1,7 +1,6 @@
 package com.github.tilcob.game.system.installers;
 
 import com.badlogic.ashley.core.Engine;
-import com.badlogic.gdx.physics.box2d.World;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.quest.QuestManager;
