@@ -17,7 +17,7 @@ class OverheadIndicatorStateMachineSystemTest {
         @Test
         void keepsNonInteractIndicatorsVisibleEvenOutOfRange() {
             Engine engine = new Engine();
-            engine.addSystem(new OverheadIndicatorStateMachineSystem(null, null, null, 1.5f, 2f));
+            engine.addSystem(new OverheadIndicatorStateMachineSystem(null, null, 1.5f, 2f));
 
             Entity player = new Entity();
             player.add(new Player());
@@ -44,7 +44,7 @@ class OverheadIndicatorStateMachineSystemTest {
         @Test
         void appliesDistanceVisibilityOnlyToInteractHint() {
             Engine engine = new Engine();
-            engine.addSystem(new OverheadIndicatorStateMachineSystem(null, null, null, 1.5f, 2f));
+            engine.addSystem(new OverheadIndicatorStateMachineSystem(null, null, 1.5f, 2f));
 
             Entity player = new Entity();
             player.add(new Player());
