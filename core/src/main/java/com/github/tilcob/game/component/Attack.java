@@ -11,7 +11,7 @@ public class Attack implements Component {
     private final float baseDamage;
     private float damage;
     private float windup;
-    private final float cooldown;
+    private float recovery;
     private float attackTimer;
     private float damageTimer;
     private SoundAsset sfx;
@@ -24,7 +24,7 @@ public class Attack implements Component {
         this.damage = damage;
         this.baseDamage = damage;
         this.windup = windup;
-        this.cooldown = cooldown;
+        this.recovery = Math.max(cooldown, Constants.FIXED_INTERVAL);
         this.sfx = soundAsset;
         this.attackTimer = 0f;
         this.damageTimer = .1f;
@@ -83,7 +83,7 @@ public class Attack implements Component {
             attackTimer = Math.max(0f, attackTimer - delta);
             if (attackTimer == 0f) {
                 state = State.RECOVERY;
-                attackTimer = Math.max(cooldown, Constants.FIXED_INTERVAL);
+                attackTimer = Math.max(recovery, Constants.FIXED_INTERVAL);
             }
         } else if (state == State.RECOVERY) {
             attackTimer = Math.max(0f, attackTimer - delta);
@@ -120,6 +120,17 @@ public class Attack implements Component {
 
     public SoundAsset getSfx() {
         return sfx;
+    }
+
+    public float getRecovery() {
+        return recovery;
+    }
+
+    public void setRecovery(float recovery) {
+        this.recovery = Math.max(recovery, Constants.FIXED_INTERVAL);
+        if (state == State.RECOVERY) {
+            attackTimer = Math.max(0f, this.recovery);
+        }
     }
 
     public enum State {

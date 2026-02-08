@@ -21,9 +21,11 @@ public class InteractableIndicatorAttachSystem extends IteratingSystem {
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
         Transform transform = Transform.MAPPER.get(entity);
-        float offestY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
+        float offsetY = Constants.DEFAULT_INDICATOR_OFFSET_Y;
         if (transform != null) {
-            offestY = Constants.DEFAULT_INDICATOR_OFFSET_Y * 3;
+            offsetY = transform.getSize().y
+                + Constants.DEFAULT_INDICATOR_OFFSET_Y
+                - 8f * Constants.UNIT_SCALE;
         }
         IndicatorVisualDef visualDef = OverheadIndicatorRegistry.getVisualDef(
             OverheadIndicator.OverheadIndicatorType.INTERACT_HINT
@@ -32,7 +34,7 @@ public class InteractableIndicatorAttachSystem extends IteratingSystem {
 
         OverheadIndicator interactHint = new OverheadIndicator(
             OverheadIndicator.OverheadIndicatorType.INTERACT_HINT,
-            new Vector2(0, offestY),
+            new Vector2(0, offsetY),
             baseScale,
             Color.WHITE.cpy(),
             true

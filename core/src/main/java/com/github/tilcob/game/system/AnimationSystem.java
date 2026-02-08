@@ -72,7 +72,9 @@ public class AnimationSystem extends IteratingSystem {
             Attack attack = Attack.MAPPER.get(entity);
             if (attack != null && attack.isInWindup()) {
                 float speed = Math.max(animation2D.getSpeed(), 0.0001f);
-                attack.setWindup(animation.getAnimationDuration() / speed);
+                float duration = animation.getAnimationDuration() / speed;
+                attack.setWindup(duration);
+                attack.setRecovery(duration);
             }
         }
     }
