@@ -25,6 +25,10 @@ public class Attack implements Component {
     private boolean damageWindowActive;
     private State state;
 
+    public Attack(float damage, float windup, float cooldown, SoundAsset soundAsset) {
+        this(damage, windup, cooldown, Constants.DEFAULT_ATTACK_HIT_DELAY, soundAsset);
+    }
+
     public Attack (float damage, float windup, float cooldown, float hitDelay, SoundAsset soundAsset) {
         this.damage = damage;
         this.hitDelay = Math.max(0, hitDelay);
@@ -72,7 +76,7 @@ public class Attack implements Component {
         state = State.WINDUP;
         attackTimer = Math.max(0f, windup);
         startedThisFrame = true;
-        damageTimer = hitDelay;
+        damageTimer = Math.max(0f, hitDelay);;
         damageWindowActive = false;
         hitEntities.clear();
     }
@@ -83,7 +87,7 @@ public class Attack implements Component {
 
         if (state != State.IDLE && damageTimer >= 0f) {
             damageTimer = Math.max(0f, damageTimer - delta);
-            if (damageTimer == 0f) {
+            if (damageTimer <= 0f) {
                 triggeredThisFrame = true;
                 damageTimer = -1f;
                 damageWindowActive = true;
