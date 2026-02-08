@@ -34,6 +34,7 @@ public class Constants {
     public static final float INDICATOR_SHOW_DISTANCE = 1.5f;
     public static final float INDICATOR_HIDE_DISTANCE = 2f;
     public static final float INTERACT_INDICATOR_SUPPRESSION_SECONDS = 0.35f;
+    public static final float DEFAULT_ATTACK_HIT_DELAY = 0.1f;
 
     // Tiled Layers
     public static final String OBJECT_LAYER = "objects";
@@ -64,6 +65,7 @@ public class Constants {
     public static final String DAMAGE = "damage";
     public static final String ATTACK_WINDUP = "attackWindup";
     public static final String ATTACK_COOLDOWN = "attackCooldown";
+    public static final String ATTACK_HIT_DELAY = "attackHitDelay";
     public static final String ATTACK_SENSOR = "attack_sensor_";
     public static final String ID = "id";
     public static final String BODY_TYPE = "bodyType";

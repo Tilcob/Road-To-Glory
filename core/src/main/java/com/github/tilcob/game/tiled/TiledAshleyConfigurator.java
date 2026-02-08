@@ -287,6 +287,9 @@ public class TiledAshleyConfigurator {
         float cooldown = properties.containsKey(Constants.ATTACK_COOLDOWN)
             ? properties.get(Constants.ATTACK_COOLDOWN, 0f, Float.class)
             : tile.getProperties().get(Constants.ATTACK_COOLDOWN, 0f, Float.class);
+        float hitDelay = properties.containsKey(Constants.ATTACK_HIT_DELAY)
+            ? properties.get(Constants.ATTACK_HIT_DELAY, Constants.DEFAULT_ATTACK_HIT_DELAY, Float.class)
+            : tile.getProperties().get(Constants.ATTACK_HIT_DELAY, Constants.DEFAULT_ATTACK_HIT_DELAY, Float.class);
         String soundAssetStr = properties.containsKey(Constants.ATTACK_SOUND)
             ? properties.get(Constants.ATTACK_SOUND, "", String.class)
             : tile.getProperties().get(Constants.ATTACK_SOUND, "", String.class);
@@ -295,7 +298,7 @@ public class TiledAshleyConfigurator {
             soundAsset = SoundAsset.valueOf(soundAssetStr);
         }
 
-        entity.add(new Attack(damage, windup, cooldown, soundAsset));
+        entity.add(new Attack(damage, windup, cooldown, hitDelay, soundAsset));
     }
 
     private BodyDef.BodyType getObjectBodyType(TiledMapTile tile, MapObject object) {

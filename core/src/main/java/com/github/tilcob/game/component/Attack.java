@@ -9,6 +9,7 @@ public class Attack implements Component {
     public static final ComponentMapper<Attack> MAPPER = ComponentMapper.getFor(Attack.class);
 
     private final float baseDamage;
+    private final float hitDelay;
     private float damage;
     private float windup;
     private float recovery;
@@ -20,14 +21,15 @@ public class Attack implements Component {
     private boolean finishedThisFrame;
     private State state;
 
-    public Attack (float damage, float windup, float cooldown, SoundAsset soundAsset) {
+    public Attack (float damage, float windup, float cooldown, float hitDelay, SoundAsset soundAsset) {
         this.damage = damage;
+        this.hitDelay = Math.max(0, hitDelay);
         this.baseDamage = damage;
         this.windup = windup;
         this.recovery = Math.max(cooldown, Constants.FIXED_INTERVAL);
         this.sfx = soundAsset;
         this.attackTimer = 0f;
-        this.damageTimer = .1f;
+        this.damageTimer = -1f;
         this.startedThisFrame = false;
         this.triggeredThisFrame = false;
         this.finishedThisFrame = false;
@@ -64,14 +66,14 @@ public class Attack implements Component {
         state = State.WINDUP;
         attackTimer = Math.max(0f, windup);
         startedThisFrame = true;
-        damageTimer = .1f;
+        damageTimer = hitDelay;
     }
 
     public void advance(float delta) {
         finishedThisFrame = false;
         triggeredThisFrame = false;
 
-        if (state != State.IDLE && damageTimer > 0f) {
+        if (state != State.IDLE && damageTimer >= 0f) {
             damageTimer = Math.max(0f, damageTimer - delta);
             if (damageTimer == 0f) {
                 triggeredThisFrame = true;
