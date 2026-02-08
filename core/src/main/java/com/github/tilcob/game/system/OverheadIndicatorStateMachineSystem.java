@@ -95,9 +95,6 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         OverheadIndicatorType desired) {
 
         if (desired == null) return false;
-        if (desired == OverheadIndicatorType.INTERACT_HINT
-            && InteractIndicatorSuppression.MAPPER.get(entity) != null) return false;
-
         if (desired != OverheadIndicatorType.INTERACT_HINT) return true;
 
         Entity player = getPlayer();
@@ -108,9 +105,15 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         if (playerTransform == null || transform == null) return indicator.isVisible();
 
         float distanceSquared = playerTransform.getPosition().dst2(transform.getPosition());
-        return indicator.isVisible()
+        boolean inRange =  indicator.isVisible()
             ? distanceSquared < hideDistanceSquared
             : distanceSquared <= showDistanceSquared;
+
+        if (InteractIndicatorSuppression.MAPPER.get(entity) != null) {
+            if (!inRange) entity.remove(InteractIndicatorSuppression.class);
+            return false;
+        }
+        return inRange;
     }
 
     private void updateState(
@@ -351,9 +354,10 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         return switch (type) {
             case QUEST_TURNING -> 100;
             case QUEST_AVAILABLE -> 90;
+            case INTERACT_HINT -> 95;
             case DANGER, ANGRY -> 80;
             case MERCHANT -> 70;
-            case TALK_BUSY, TALK_CHOICE, INTERACT_HINT, TALK_IN_RANGE, TALK_AVAILABLE, TALKING -> 60;
+            case TALK_BUSY, TALK_CHOICE, TALK_IN_RANGE, TALK_AVAILABLE, TALKING -> 60;
             default -> 10;
         };
     }
