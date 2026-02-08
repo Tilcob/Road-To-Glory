@@ -12,14 +12,17 @@ import com.github.tilcob.game.skill.SkillTreeLoader;
 import com.github.tilcob.game.skill.data.SkillNodeDefinition;
 import com.github.tilcob.game.skill.data.SkillTreeDefinition;
 import com.github.tilcob.game.stat.StatModifier;
+import com.github.tilcob.game.stat.StatModifierManager;
 import com.github.tilcob.game.stat.StatType;
 
 public class SkillSystem extends IteratingSystem {
     private final GameEventBus eventBus;
+    private final StatModifierManager statModifierManager;
 
     public SkillSystem(GameEventBus eventBus) {
         super(Family.all(Skill.class).get());
         this.eventBus = eventBus;
+        this.statModifierManager = new StatModifierManager(eventBus);
 
         eventBus.subscribe(ExpGainEvent.class, this::onXpGain);
         eventBus.subscribe(SkillUnlockEvent.class, this::onSkillUnlock);
@@ -97,9 +100,6 @@ public class SkillSystem extends IteratingSystem {
     private void applyModifiers(Entity entity, SkillNodeDefinition nodeDef) {
         if (nodeDef.getModifiers() == null || nodeDef.getModifiers().isEmpty()) return;
 
-        StatModifierComponent modifierComp = StatModifierComponent.MAPPER.get(entity);
-        if (modifierComp == null) return;
-
         for (var entry : nodeDef.getModifiers().entrySet()) {
             String statKey = entry.getKey();
             if (statKey == null) {
@@ -116,9 +116,7 @@ public class SkillSystem extends IteratingSystem {
                 }
             }
             String source = "skill:" + nodeDef.getId();
-            modifierComp.addModifier(new StatModifier(statType, entry.getValue(), 0f, source));
+            statModifierManager.addModifier(entity, new StatModifier(statType, entry.getValue(), 0f, source));
         }
-
-        eventBus.fire(new StatRecalcEvent(entity));
     }
 }

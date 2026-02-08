@@ -7,8 +7,14 @@ import com.github.tilcob.game.component.Wallet;
 import com.github.tilcob.game.dialog.DialogData;
 import com.github.tilcob.game.dialog.QuestDialog;
 import com.github.tilcob.game.event.*;
+import com.github.tilcob.game.flow.CommandRegistry;
+import com.github.tilcob.game.flow.FlowExecutor;
+import com.github.tilcob.game.flow.FlowTrace;
+import com.github.tilcob.game.flow.FunctionRegistry;
 import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.test.HeadlessGdxTest;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
+import com.github.tilcob.game.yarn.YarnRuntime;
 import org.junit.jupiter.api.Test;
 
 import java.util.HashMap;
@@ -118,7 +124,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, dialogs);
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, createQuestManager(registry, eventBus), questRewardService);
 
         Entity npc = new Entity();
         npc.add(new Npc(null, "QuestGiver"));
@@ -162,7 +168,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -199,7 +205,7 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
         QuestLifecycleService questLifecycleService = new QuestLifecycleService(eventBus, registry, Map.of());
         QuestRewardSchedulerSystem scheduler = new QuestRewardSchedulerSystem(eventBus, questLifecycleService);
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus, createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -227,5 +233,20 @@ class QuestRewardSchedulerSystemTest extends HeadlessGdxTest {
 
         rewardSystem.dispose();
         scheduler.dispose();
+    }
+
+    private QuestManager createQuestManager(QuestYarnRegistry registry, GameEventBus eventBus) {
+        YarnRuntime runtime = new YarnRuntime();
+        CommandRegistry commandRegistry = new CommandRegistry();
+        FunctionRegistry functionRegistry = new FunctionRegistry();
+        FlowExecutor flowExecutor = new FlowExecutor(eventBus, new FlowTrace(200));
+        QuestYarnRuntime questYarnRuntime = new QuestYarnRuntime(
+            runtime,
+            registry,
+            commandRegistry,
+            flowExecutor,
+            functionRegistry
+        );
+        return new QuestManager(questYarnRuntime);
     }
 }

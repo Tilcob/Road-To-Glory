@@ -8,11 +8,14 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.event.QuestRewardEvent;
 import com.github.tilcob.game.event.RewardGrantedEvent;
 import com.github.tilcob.game.event.UpdateQuestLogEvent;
-import com.github.tilcob.game.quest.Quest;
-import com.github.tilcob.game.quest.QuestReward;
-import com.github.tilcob.game.quest.QuestRewardService;
-import com.github.tilcob.game.quest.QuestYarnRegistry;
+import com.github.tilcob.game.flow.CommandRegistry;
+import com.github.tilcob.game.flow.FlowExecutor;
+import com.github.tilcob.game.flow.FlowTrace;
+import com.github.tilcob.game.flow.FunctionRegistry;
+import com.github.tilcob.game.quest.*;
 import com.github.tilcob.game.test.HeadlessGdxTest;
+import com.github.tilcob.game.yarn.QuestYarnRuntime;
+import com.github.tilcob.game.yarn.YarnRuntime;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -28,7 +31,8 @@ class RewardSystemTest extends HeadlessGdxTest {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus,
+            createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -58,7 +62,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus,createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -82,7 +86,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus,createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -112,7 +116,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus,createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -139,7 +143,7 @@ class RewardSystemTest extends HeadlessGdxTest {
         GameEventBus eventBus = new GameEventBus();
         QuestYarnRegistry registry = new QuestYarnRegistry("tests/quests_test/index.json", "tests/quests_test");
         QuestRewardService questRewardService = new QuestRewardService(eventBus, registry);
-        RewardSystem rewardSystem = new RewardSystem(eventBus, questRewardService);
+        RewardSystem rewardSystem = new RewardSystem(eventBus,createQuestManager(registry, eventBus), questRewardService);
 
         Entity player = new Entity();
         QuestLog questLog = new QuestLog();
@@ -158,5 +162,20 @@ class RewardSystemTest extends HeadlessGdxTest {
         assertTrue(quest.isRewardClaimed());
 
         rewardSystem.dispose();
+    }
+
+    private QuestManager createQuestManager(QuestYarnRegistry registry, GameEventBus eventBus) {
+        YarnRuntime runtime = new YarnRuntime();
+        CommandRegistry commandRegistry = new CommandRegistry();
+        FunctionRegistry functionRegistry = new FunctionRegistry();
+        FlowExecutor flowExecutor = new FlowExecutor(eventBus, new FlowTrace(200));
+        QuestYarnRuntime questYarnRuntime = new QuestYarnRuntime(
+            runtime,
+            registry,
+            commandRegistry,
+            flowExecutor,
+            functionRegistry
+        );
+        return new QuestManager(questYarnRuntime);
     }
 }
