@@ -14,7 +14,7 @@ public class StatModifierManager {
         this.eventBus = eventBus;
     }
 
-    public void addModifier(Entity entity, StatModifier modifier) {
+    public void add(Entity entity, StatModifier modifier) {
         if (entity == null || modifier == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
         if (modifiers == null) return;
@@ -23,7 +23,7 @@ public class StatModifierManager {
         eventBus.fire(new StatRecalcEvent(entity));
     }
 
-    public void removeModifier(Entity entity, StatModifier modifier) {
+    public void remove(Entity entity, StatModifier modifier) {
         if (entity == null || modifier == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
         if (modifiers == null) return;
@@ -33,7 +33,7 @@ public class StatModifierManager {
         if (modifiers.getModifiers().size != before) eventBus.fire(new StatRecalcEvent(entity));
     }
 
-    public void removeExpired(Entity entity, long now) {
+    public void expire(Entity entity, long now) {
         if (entity == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
         if (modifiers == null) return;
@@ -60,6 +60,33 @@ public class StatModifierManager {
         }
 
         if (removed) eventBus.fire(new StatRecalcEvent(entity));
+    }
+
+    public void replaceModifiersBySourcePrefix(Entity entity, String sourcePrefix, Iterable<StatModifier> newModifiers) {
+        if (entity == null || sourcePrefix == null || sourcePrefix.isBlank()) return;
+        StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
+        if (modifiers == null) return;
+
+        boolean changed = false;
+        for (int i = modifiers.getModifiers().size - 1; i >= 0; i--) {
+            StatModifier modifier = modifiers.getModifiers().get(i);
+            String source = modifier.getSource();
+            if (source != null && source.startsWith(sourcePrefix)) {
+                modifiers.getModifiers().removeIndex(i);
+                changed = true;
+            }
+        }
+
+        if (newModifiers != null) {
+            for (StatModifier modifier : newModifiers) {
+                if (modifier == null) continue;
+
+                modifiers.addModifier(modifier);
+                changed = true;
+            }
+        }
+
+        if (changed) eventBus.fire(new StatRecalcEvent(entity));
     }
 
     private static boolean isBuffSource(String source) {

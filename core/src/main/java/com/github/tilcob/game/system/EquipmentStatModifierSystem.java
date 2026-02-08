@@ -17,8 +17,10 @@ import com.github.tilcob.game.item.ItemDefinitionRegistry;
 import com.github.tilcob.game.item.ItemStatModifier;
 import com.github.tilcob.game.stat.StatKey;
 import com.github.tilcob.game.stat.StatModifier;
+import com.github.tilcob.game.stat.StatModifierManager;
 import com.github.tilcob.game.stat.StatType;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -27,10 +29,12 @@ public class EquipmentStatModifierSystem extends IteratingSystem implements Disp
     private static final Map<String, StatType> STAT_TYPE_LOOKUP = buildStatTypeLookup();
 
     private final GameEventBus eventBus;
+    private final StatModifierManager statModifierManager;
 
     public EquipmentStatModifierSystem(GameEventBus eventBus) {
         super(Family.all(Equipment.class, StatModifierComponent.class).get());
         this.eventBus = eventBus;
+        this.statModifierManager = new StatModifierManager(eventBus);
 
         eventBus.subscribe(UpdateEquipmentEvent.class, this::onUpdateEquipment);
     }
@@ -45,7 +49,7 @@ public class EquipmentStatModifierSystem extends IteratingSystem implements Disp
     }
 
     private void recalcModifiers(Entity entity, Equipment equipment, StatModifierComponent modifiers) {
-        modifiers.removeModifiersBySourcePrefix(ITEM_SOURCE_PREFIX);
+        ArrayList<StatModifier> newModifiers = new ArrayList<>();
 
         for (ObjectMap.Entry<ItemCategory, Entity> entry : equipment.getEquippedSlots()) {
             Entity itemEntity = entry.value;
@@ -63,7 +67,7 @@ public class EquipmentStatModifierSystem extends IteratingSystem implements Disp
                 if (statType == null) {
                     continue;
                 }
-                modifiers.addModifier(new StatModifier(
+                newModifiers.add(new StatModifier(
                     statType,
                     itemModifier.additive(),
                     itemModifier.multiplier(),
@@ -71,7 +75,7 @@ public class EquipmentStatModifierSystem extends IteratingSystem implements Disp
                 ));
             }
         }
-        eventBus.fire(new StatRecalcEvent(entity));
+        statModifierManager.replaceModifiersBySourcePrefix(entity, ITEM_SOURCE_PREFIX, newModifiers);
     }
 
     private static Map<String, StatType> buildStatTypeLookup() {

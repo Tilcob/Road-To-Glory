@@ -5,7 +5,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.github.tilcob.game.component.Skill;
-import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.*;
 import com.github.tilcob.game.save.states.SkillTreeState;
 import com.github.tilcob.game.skill.SkillTreeLoader;
@@ -116,7 +115,7 @@ public class SkillSystem extends IteratingSystem {
                 }
             }
             String source = "skill:" + nodeDef.getId();
-            statModifierManager.addModifier(entity, new StatModifier(statType, entry.getValue(), 0f, source));
+            statModifierManager.add(entity, new StatModifier(statType, entry.getValue(), 0f, source));
         }
     }
 }

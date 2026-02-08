@@ -6,8 +6,6 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.github.tilcob.game.component.StatModifierComponent;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.event.StatRecalcEvent;
-import com.github.tilcob.game.stat.StatModifier;
 import com.github.tilcob.game.stat.StatModifierManager;
 
 public class StatModifierDurationSystem extends IteratingSystem {
@@ -20,6 +18,6 @@ public class StatModifierDurationSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        statModifierManager.removeExpired(entity, TimeUtils.millis());
+        statModifierManager.expire(entity, TimeUtils.millis());
     }
 }
