@@ -25,144 +25,146 @@ import com.github.tilcob.game.ui.model.*;
 import com.github.tilcob.game.ui.view.SkillTreeView;
 
 public class GameScreenModule {
-        private final GameServices services;
-        private final Batch batch;
-        private final OrthographicCamera camera;
-        private final Viewport viewport;
-        private final InputManager inputManager;
-        private final ScreenNavigator screenNavigator;
+    private final GameServices services;
+    private final Batch batch;
+    private final OrthographicCamera camera;
+    private final Viewport viewport;
+    private final InputManager inputManager;
+    private final ScreenNavigator screenNavigator;
 
-        public GameScreenModule(
-                        GameServices services,
-                        Batch batch,
-                        OrthographicCamera camera,
-                        Viewport viewport,
-                        InputManager inputManager,
-                        ScreenNavigator screenNavigator) {
-                this.services = services;
-                this.batch = batch;
-                this.camera = camera;
-                this.viewport = viewport;
-                this.inputManager = inputManager;
-                this.screenNavigator = screenNavigator;
-        }
+    public GameScreenModule(
+            GameServices services,
+            Batch batch,
+            OrthographicCamera camera,
+            Viewport viewport,
+            InputManager inputManager,
+            ScreenNavigator screenNavigator) {
+        this.services = services;
+        this.batch = batch;
+        this.camera = camera;
+        this.viewport = viewport;
+        this.inputManager = inputManager;
+        this.screenNavigator = screenNavigator;
+    }
 
-        public GameScreen create(Viewport uiViewport) {
-                GameScreen screen = new GameScreen(services, uiViewport);
-                screen.initialize(createDependencies(uiViewport));
-                return screen;
-        }
+    public GameScreen create(Viewport uiViewport) {
+        GameScreen screen = new GameScreen(services, uiViewport);
+        screen.initialize(createDependencies(uiViewport));
+        return screen;
+    }
 
-        private Dependencies createDependencies(Viewport uiViewport) {
-                Engine engine = new Engine();
-                EntityIdService entityIdService = new EntityIdService(engine);
-                services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
-                SkillTreeLoader.loadAll();
-                ExpDistributionLoader.loadAll();
-                World physicWorld = new World(Constants.GRAVITY, true);
-                physicWorld.setAutoClearForces(false);
-                TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
-                TiledAshleyConfigurator tiledAshleyConfigurator = new TiledAshleyConfigurator(
-                                engine,
-                                services.getAssetManager(),
-                                physicWorld,
-                                services.getChestRegistry(),
-                                tiledManager);
-                IdleControllerState idleControllerState = new IdleControllerState();
-                ActiveEntityReference activeEntityReference = new ActiveEntityReference();
-                services.setActiveEntityReference(activeEntityReference);
-                GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
-                UiControllerState uiControllerState = new UiControllerState(services.getEventBus());
-                Stage stage = new Stage(uiViewport, batch);
-                UiModelFactory uiModelFactory = new UiModelFactory();
-                GameViewModel gameViewModel = new GameViewModel(services, viewport, uiModelFactory);
-                InventoryViewModel inventoryViewModel = new InventoryViewModel(services, uiModelFactory);
-                ChestViewModel chestViewModel = new ChestViewModel(services, uiModelFactory);
-                PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
-                SettingsViewModel settingsViewModel = new SettingsViewModel(services, inputManager);
-                com.github.tilcob.game.ui.model.SkillTreeViewModel skillTreeViewModel = new com.github.tilcob.game.ui.model.SkillTreeViewModel(
-                                services);
-                Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
-                services.getInventoryService().setSkin(skin);
-                services.getInventoryService().setEngine(engine);
+    private Dependencies createDependencies(Viewport uiViewport) {
+        Engine engine = new Engine();
+        EntityIdService entityIdService = new EntityIdService(engine);
+        services.setEntityLookup(new EngineEntityLookup(engine, entityIdService));
+        SkillTreeLoader.loadAll();
+        ExpDistributionLoader.loadAll();
+        World physicWorld = new World(Constants.GRAVITY, true);
+        physicWorld.setAutoClearForces(false);
+        TiledManager tiledManager = new TiledManager(services.getAssetManager(), physicWorld, engine);
+        TiledAshleyConfigurator tiledAshleyConfigurator = new TiledAshleyConfigurator(
+            engine,
+            services.getAssetManager(),
+            physicWorld,
+            services.getChestRegistry(),
+            tiledManager);
+        IdleControllerState idleControllerState = new IdleControllerState();
+        ActiveEntityReference activeEntityReference = new ActiveEntityReference();
+        services.setActiveEntityReference(activeEntityReference);
+        GameControllerState gameControllerState = new GameControllerState(activeEntityReference);
+        UiControllerState uiControllerState = new UiControllerState(services.getEventBus());
+        Stage stage = new Stage(uiViewport, batch);
+        UiModelFactory uiModelFactory = new UiModelFactory();
+        GameViewModel gameViewModel = new GameViewModel(services, viewport, uiModelFactory);
+        InventoryViewModel inventoryViewModel = new InventoryViewModel(services, uiModelFactory);
+        ChestViewModel chestViewModel = new ChestViewModel(services, uiModelFactory);
+        PauseViewModel pauseViewModel = new PauseViewModel(services, screenNavigator);
+        SettingsViewModel settingsViewModel = new SettingsViewModel(services, inputManager);
+        SkillTreeViewModel skillTreeViewModel = new SkillTreeViewModel(services);
+        Skin skin = services.getAssetManager().get(SkinAsset.DEFAULT);
+        services.getInventoryService().setSkin(skin);
+        services.getInventoryService().setEngine(engine);
 
-                // Installers
-                new InputSystemsInstaller(services.getEventBus()).install(engine);
-                new AiSystemsInstaller(services.getEventBus()).install(engine);
-                new PhysicsSystemsInstaller(physicWorld, services.getEventBus()).install(engine);
-                new CombatSystemsInstaller(
-                                services.getAudioManager(),
-                                services.getEventBus(),
-                                gameViewModel,
-                                screenNavigator).install(engine);
-                new GameplaySystemsInstaller(
-                                tiledManager,
-                                services.getEventBus(),
-                                services.getStateManager(),
-                                services.getQuestManager(),
-                                services.getInventoryService(),
-                                services.getQuestLifecycleService(),
-                                services.getQuestRewardService(),
-                                services.getDialogYarnRuntime(),
-                                services.getCutsceneYarnRuntime(),
-                                services.getQuestYarnRuntime(),
-                                services.getQuestYarnRegistry(),
-                                services.getAllDialogs(),
-                                services.getAllCutscenes(),
-                                activeEntityReference).install(engine);
+        // Installers
+        new InputSystemsInstaller(services.getEventBus()).install(engine);
+        new AiSystemsInstaller(services.getEventBus()).install(engine);
+        new PhysicsSystemsInstaller(physicWorld, services.getEventBus()).install(engine);
+        new CombatSystemsInstaller(
+            services.getAudioManager(),
+            services.getEventBus(),
+            gameViewModel,
+            screenNavigator).install(engine);
+        new TriggerSystemsInstaller(
+            services.getAudioManager(),
+            services.getEventBus()).install(engine);
+        new GameplaySystemsInstaller(
+            tiledManager,
+            services.getEventBus(),
+            services.getStateManager(),
+            services.getQuestManager(),
+            services.getInventoryService(),
+            services.getQuestLifecycleService(),
+            services.getQuestRewardService(),
+            services.getDialogYarnRuntime(),
+            services.getCutsceneYarnRuntime(),
+            services.getQuestYarnRuntime(),
+            services.getQuestYarnRegistry(),
+            services.getAllDialogs(),
+            services.getAllCutscenes(),
+            activeEntityReference).install(engine);
 
-                new RenderSystemsInstaller(
-                                batch,
-                                viewport,
-                                camera,
-                                services.getAssetManager(),
-                                physicWorld,
-                                Constants.DEBUG).install(engine);
+        new RenderSystemsInstaller(
+            batch,
+            viewport,
+            camera,
+            services.getAssetManager(),
+            physicWorld,
+            Constants.DEBUG).install(engine);
 
-                SkillTreeView skillTreeView = new SkillTreeView(skin, stage, skillTreeViewModel);
-                return new Dependencies(
-                                engine,
-                                tiledManager,
-                                tiledAshleyConfigurator,
-                                idleControllerState,
-                                gameControllerState,
-                                uiControllerState,
-                                physicWorld,
-                                stage,
-                                gameViewModel,
-                                inventoryViewModel,
-                                chestViewModel,
-                                pauseViewModel,
-                                settingsViewModel,
-                                skillTreeViewModel,
-                                skillTreeView,
-                                skin,
-                                inputManager,
-                                services.getAudioManager(),
-                                activeEntityReference,
-                                services.getInventoryService());
-        }
+        SkillTreeView skillTreeView = new SkillTreeView(skin, stage, skillTreeViewModel);
+        return new Dependencies(
+            engine,
+            tiledManager,
+            tiledAshleyConfigurator,
+            idleControllerState,
+            gameControllerState,
+            uiControllerState,
+            physicWorld,
+            stage,
+            gameViewModel,
+            inventoryViewModel,
+            chestViewModel,
+            pauseViewModel,
+            settingsViewModel,
+            skillTreeViewModel,
+            skillTreeView,
+            skin,
+            inputManager,
+            services.getAudioManager(),
+            activeEntityReference,
+            services.getInventoryService());
+    }
 
-        public record Dependencies(
-                        Engine engine,
-                        TiledManager tiledManager,
-                        TiledAshleyConfigurator tiledAshleyConfigurator,
-                        IdleControllerState idleControllerState,
-                        GameControllerState gameControllerState,
-                        UiControllerState uiControllerState,
-                        World physicWorld,
-                        Stage stage,
-                        GameViewModel gameViewModel,
-                        InventoryViewModel inventoryViewModel,
-                        ChestViewModel chestViewModel,
-                        PauseViewModel pauseViewModel,
-                        SettingsViewModel settingsViewModel,
-                        SkillTreeViewModel skillTreeViewModel,
-                        SkillTreeView skillTreeView,
-                        Skin skin,
-                        InputManager inputManager,
-                        AudioManager audioManager,
-                        ActiveEntityReference activeEntityReference,
-                        InventoryService inventoryService) {
-        }
+    public record Dependencies(
+        Engine engine,
+        TiledManager tiledManager,
+        TiledAshleyConfigurator tiledAshleyConfigurator,
+        IdleControllerState idleControllerState,
+        GameControllerState gameControllerState,
+        UiControllerState uiControllerState,
+        World physicWorld,
+        Stage stage,
+        GameViewModel gameViewModel,
+        InventoryViewModel inventoryViewModel,
+        ChestViewModel chestViewModel,
+        PauseViewModel pauseViewModel,
+        SettingsViewModel settingsViewModel,
+        SkillTreeViewModel skillTreeViewModel,
+        SkillTreeView skillTreeView,
+        Skin skin,
+        InputManager inputManager,
+        AudioManager audioManager,
+        ActiveEntityReference activeEntityReference,
+        InventoryService inventoryService) {
+    }
 }

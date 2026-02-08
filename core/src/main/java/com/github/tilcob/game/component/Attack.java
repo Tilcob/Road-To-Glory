@@ -96,13 +96,13 @@ public class Attack implements Component {
 
         if (state == State.WINDUP) {
             attackTimer = Math.max(0f, attackTimer - delta);
-            if (attackTimer == 0f) {
+            if (attackTimer <= 0f) {
                 state = State.RECOVERY;
                 attackTimer = Math.max(recovery, Constants.FIXED_INTERVAL);
             }
         } else if (state == State.RECOVERY) {
             attackTimer = Math.max(0f, attackTimer - delta);
-            if (attackTimer == 0f) {
+            if (attackTimer <= 0f) {
                 state = State.IDLE;
                 finishedThisFrame = true;
                 damageWindowActive = false;

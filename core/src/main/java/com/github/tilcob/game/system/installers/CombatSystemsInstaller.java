@@ -26,7 +26,7 @@ public class CombatSystemsInstaller implements SystemInstaller {
 
         @Override
         public void install(Engine engine) {
-            // Combat order: Attack -> Hit -> Damage -> Life -> Death -> GameOver -> Trigger
+            // Combat order: Attack -> Hit -> Damage -> Life -> Death -> GameOver
             engine.addSystem(withPriority(
                 new AttackSystem(audioManager, eventBus),
                 SystemOrder.COMBAT_ATTACK));
@@ -36,8 +36,5 @@ public class CombatSystemsInstaller implements SystemInstaller {
             engine.addSystem(withPriority(new DeathSystem(eventBus), SystemOrder.COMBAT_DEATH));
             engine.addSystem(withPriority(new GameOverSystem(screenNavigator, eventBus),
                 SystemOrder.COMBAT_GAME_OVER));
-            engine.addSystem(withPriority(
-                new TriggerSystem(audioManager, eventBus),
-                SystemOrder.COMBAT_TRIGGER));
         }
 }
