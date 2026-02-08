@@ -154,7 +154,8 @@ public class GameContactListener implements ContactListener {
     }
 
     private boolean isPlayer(Entity entity, Fixture fixture) {
-        return Player.MAPPER.get(entity) != null && !fixture.isSensor();
+        if (Player.MAPPER.get(entity) == null) return false;
+        return !fixture.isSensor() || isAttackFixture(fixture);
     }
 
     private boolean isAttackFixture(Fixture fixture) {

@@ -17,7 +17,7 @@ public class AttackSystem extends IteratingSystem implements Disposable {
     private final AudioManager audioManager;
 
     public AttackSystem(AudioManager audioManager, GameEventBus eventBus) {
-        super(Family.all(Attack.class, Facing.class, Physic.class).get());
+        super(Family.all(Attack.class).get());
         this.audioManager = audioManager;
         this.eventBus = eventBus;
 
