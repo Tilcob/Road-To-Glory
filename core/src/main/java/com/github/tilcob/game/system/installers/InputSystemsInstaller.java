@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Engine;
 import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.system.AbilitySystem;
 import com.github.tilcob.game.system.ControllerSystem;
-import com.github.tilcob.game.system.SystemOrder;
 
 public class InputSystemsInstaller implements SystemInstaller {
     private final GameEventBus eventBus;

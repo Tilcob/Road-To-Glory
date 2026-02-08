@@ -3,7 +3,6 @@ package com.github.tilcob.game.system.installers;
 import com.badlogic.ashley.core.Engine;
 import com.github.tilcob.game.audio.AudioManager;
 import com.github.tilcob.game.event.GameEventBus;
-import com.github.tilcob.game.quest.QuestManager;
 import com.github.tilcob.game.screen.ScreenNavigator;
 import com.github.tilcob.game.system.*;
 import com.github.tilcob.game.ui.model.GameViewModel;
@@ -27,16 +26,18 @@ public class CombatSystemsInstaller implements SystemInstaller {
 
         @Override
         public void install(Engine engine) {
+            // Combat order: Attack -> Hit -> Damage -> Life -> Death -> GameOver -> Trigger
             engine.addSystem(withPriority(
                 new AttackSystem(audioManager, eventBus),
-                SystemOrder.COMBAT));
-            engine.addSystem(withPriority(new AttackHitSystem(eventBus), SystemOrder.COMBAT));
-            engine.addSystem(withPriority(new DamageApplySystem(eventBus), SystemOrder.COMBAT));
-            engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
-            engine.addSystem(withPriority(new DeathSystem(eventBus), SystemOrder.COMBAT));
-            engine.addSystem(withPriority(new GameOverSystem(screenNavigator, eventBus), SystemOrder.COMBAT));
+                SystemOrder.COMBAT_ATTACK));
+            engine.addSystem(withPriority(new AttackHitSystem(eventBus), SystemOrder.COMBAT_HIT));
+            engine.addSystem(withPriority(new DamageApplySystem(eventBus), SystemOrder.COMBAT_DAMAGE));
+            engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT_LIFE));
+            engine.addSystem(withPriority(new DeathSystem(eventBus), SystemOrder.COMBAT_DEATH));
+            engine.addSystem(withPriority(new GameOverSystem(screenNavigator, eventBus),
+                SystemOrder.COMBAT_GAME_OVER));
             engine.addSystem(withPriority(
                 new TriggerSystem(audioManager, eventBus),
-                SystemOrder.COMBAT));
+                SystemOrder.COMBAT_TRIGGER));
         }
 }

@@ -14,44 +14,29 @@ public class StatModifierManager {
         this.eventBus = eventBus;
     }
 
-    public boolean addModifier(Entity entity, StatModifier modifier) {
-        if (entity == null || modifier == null) {
-            return false;
-        }
+    public void addModifier(Entity entity, StatModifier modifier) {
+        if (entity == null || modifier == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
-        if (modifiers == null) {
-            return false;
-        }
+        if (modifiers == null) return;
+
         modifiers.addModifier(modifier);
         eventBus.fire(new StatRecalcEvent(entity));
-        return true;
     }
 
-    public boolean removeModifier(Entity entity, StatModifier modifier) {
-        if (entity == null || modifier == null) {
-            return false;
-        }
+    public void removeModifier(Entity entity, StatModifier modifier) {
+        if (entity == null || modifier == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
-        if (modifiers == null) {
-            return false;
-        }
+        if (modifiers == null) return;
+
         int before = modifiers.getModifiers().size;
         modifiers.removeModifier(modifier);
-        if (modifiers.getModifiers().size != before) {
-            eventBus.fire(new StatRecalcEvent(entity));
-            return true;
-        }
-        return false;
+        if (modifiers.getModifiers().size != before) eventBus.fire(new StatRecalcEvent(entity));
     }
 
-    public boolean removeExpired(Entity entity, long now) {
-        if (entity == null) {
-            return false;
-        }
+    public void removeExpired(Entity entity, long now) {
+        if (entity == null) return;
         StatModifierComponent modifiers = StatModifierComponent.MAPPER.get(entity);
-        if (modifiers == null) {
-            return false;
-        }
+        if (modifiers == null) return;
 
         boolean removed = false;
         for (int i = modifiers.getModifiers().size - 1; i >= 0; i--) {
@@ -61,9 +46,8 @@ public class StatModifierManager {
                 removed = true;
                 continue;
             }
-            if (!isBuffSource(modifier.getSource())) {
-                continue;
-            }
+            if (!isBuffSource(modifier.getSource())) continue;
+
             if (modifier.getDurationSeconds() != null && modifier.getExpireTimeEpochMs() == null) {
                 long durationMs = Math.max(0L, Math.round(modifier.getDurationSeconds() * 1000f));
                 modifier.setExpireTimeEpochMs(now + durationMs);
@@ -75,10 +59,7 @@ public class StatModifierManager {
             }
         }
 
-        if (removed) {
-            eventBus.fire(new StatRecalcEvent(entity));
-        }
-        return removed;
+        if (removed) eventBus.fire(new StatRecalcEvent(entity));
     }
 
     private static boolean isBuffSource(String source) {

@@ -7,7 +7,6 @@ import com.github.tilcob.game.event.GameEventBus;
 import com.github.tilcob.game.system.FacingSystem;
 import com.github.tilcob.game.system.PhysicMoveSystem;
 import com.github.tilcob.game.system.PhysicSystem;
-import com.github.tilcob.game.system.SystemOrder;
 
 public class PhysicsSystemsInstaller implements SystemInstaller {
     private final World physicWorld;
