@@ -31,31 +31,27 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
     private final Map<NpcRole.Role, OverheadIndicatorType> roleIndicators = new EnumMap<>(NpcRole.Role.class);
     private final Map<String, DialogData> allDialogs;
     private final QuestYarnRegistry questYarnRegistry;
-    private final ActiveEntityReference activeEntityReference;
     private final float showDistanceSquared;
     private final float hideDistanceSquared;
     private ImmutableArray<Entity> players;
 
     public OverheadIndicatorStateMachineSystem(
         Map<String, DialogData> allDialogs,
-        QuestYarnRegistry questYarnRegistry,
-        ActiveEntityReference activeEntityReference
+        QuestYarnRegistry questYarnRegistry
     ) {
-        this(allDialogs, questYarnRegistry, activeEntityReference,
+        this(allDialogs, questYarnRegistry,
             Constants.INDICATOR_SHOW_DISTANCE, Constants.INDICATOR_HIDE_DISTANCE);
     }
 
     public OverheadIndicatorStateMachineSystem(
         Map<String, DialogData> allDialogs,
         QuestYarnRegistry questYarnRegistry,
-        ActiveEntityReference activeEntityReference,
         float showDistance,
         float hideDistance
     ) {
         super(Family.all(OverheadIndicator.class, Transform.class).get());
         this.allDialogs = allDialogs;
         this.questYarnRegistry = questYarnRegistry;
-        this.activeEntityReference = activeEntityReference;
         this.showDistanceSquared = showDistance * showDistance;
         this.hideDistanceSquared = hideDistance * hideDistance;
         roleIndicators.put(NpcRole.Role.DANGER, OverheadIndicatorType.DANGER);
@@ -100,6 +96,9 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
         OverheadIndicatorType desired) {
 
         if (desired == null) return false;
+        if (desired == OverheadIndicatorType.INTERACT_HINT
+            && InteractIndicatorSuppression.MAPPER.get(entity) != null) return false;
+
         if (desired != OverheadIndicatorType.INTERACT_HINT) return true;
 
         Entity player = getPlayer();
@@ -248,18 +247,13 @@ public class OverheadIndicatorStateMachineSystem extends IteratingSystem {
             return null;
         }
 
-        boolean focused = activeEntityReference != null && activeEntityReference.getFocused() == npcEntity;
-        if (!focused) {
-            return OverheadIndicatorType.TALK_AVAILABLE;
-        }
-
         if (isPlayerInRange(player, npcEntity)) {
             if (InteractIndicatorSuppression.MAPPER.get(npcEntity) != null) {
                 return null;
             }
             return OverheadIndicatorType.INTERACT_HINT;
         }
-        return OverheadIndicatorType.TALK_IN_RANGE;
+        return OverheadIndicatorType.TALK_AVAILABLE;
     }
 
     private boolean isPlayerInRange(Entity player, Entity target) {
