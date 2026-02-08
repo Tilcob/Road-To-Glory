@@ -87,7 +87,7 @@ public class GameplaySystemsInstaller implements SystemInstaller {
             engine.addSystem(withPriority(new QuestSystem(
                             eventBus, questLifecycleService),
                             SystemOrder.GAMEPLAY));
-            engine.addSystem(withPriority(new RewardSystem(eventBus, questRewardService),
+            engine.addSystem(withPriority(new RewardSystem(eventBus, questManager, questRewardService),
                             SystemOrder.GAMEPLAY));
             engine.addSystem(withPriority(
                             new QuestRewardSchedulerSystem(

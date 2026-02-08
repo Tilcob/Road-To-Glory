@@ -94,7 +94,6 @@ public class GameScreenModule {
                                 services.getAudioManager(),
                                 services.getEventBus(),
                                 gameViewModel,
-                                services.getQuestManager(),
                                 screenNavigator).install(engine);
                 new GameplaySystemsInstaller(
                                 tiledManager,

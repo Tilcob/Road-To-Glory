@@ -12,19 +12,16 @@ public class CombatSystemsInstaller implements SystemInstaller {
         private final AudioManager audioManager;
         private final GameEventBus eventBus;
         private final GameViewModel gameViewModel;
-        private final QuestManager questManager;
         private final ScreenNavigator screenNavigator;
 
         public CombatSystemsInstaller(
                 AudioManager audioManager,
                 GameEventBus eventBus,
                 GameViewModel gameViewModel,
-                QuestManager questManager,
                 ScreenNavigator screenNavigator) {
             this.audioManager = audioManager;
             this.eventBus = eventBus;
             this.gameViewModel = gameViewModel;
-            this.questManager = questManager;
             this.screenNavigator = screenNavigator;
         }
 
@@ -34,10 +31,9 @@ public class CombatSystemsInstaller implements SystemInstaller {
                 new AttackSystem(audioManager, eventBus),
                 SystemOrder.COMBAT));
             engine.addSystem(withPriority(new AttackHitSystem(eventBus), SystemOrder.COMBAT));
-            engine.addSystem(withPriority(
-                new DamageSystem(questManager, eventBus),
-                SystemOrder.COMBAT));
+            engine.addSystem(withPriority(new DamageApplySystem(eventBus), SystemOrder.COMBAT));
             engine.addSystem(withPriority(new LifeSystem(gameViewModel), SystemOrder.COMBAT));
+            engine.addSystem(withPriority(new DeathSystem(eventBus), SystemOrder.COMBAT));
             engine.addSystem(withPriority(new GameOverSystem(screenNavigator, eventBus), SystemOrder.COMBAT));
             engine.addSystem(withPriority(
                 new TriggerSystem(audioManager, eventBus),

@@ -24,8 +24,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 264,
-                "y": 159.75
+                "x": 292.75,
+                "y": 247.25
             }
         },
         "objects.tsx": {
@@ -66,10 +66,10 @@
     "project": "Road-To-Glory.tiled-project",
     "property.type": "NpcRole",
     "recentFiles": [
+        "player.tmx",
         "terrain.tsx",
         "objects.tsx",
         "house.tmx",
-        "main.tmx",
-        "player.tmx"
+        "main.tmx"
     ]
 }
